@@ -7,19 +7,19 @@ export class ContactsController {
 
   @Get()
   async findAll() {
-    const tenantId = 'cmiu678h00000gf4ipdppzsm5';
+    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
     return this.contactsService.findAll(tenantId);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const tenantId = 'cmiu678h00000gf4ipdppzsm5';
+    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
     return this.contactsService.findOne(tenantId, id);
   }
 
   @Post()
   async create(@Body() createContactDto: any) {
-    const tenantId = 'cmiu678h00000gf4ipdppzsm5';
+    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
     return this.contactsService.create(tenantId, createContactDto);
   }
 }

@@ -35,6 +35,20 @@ async function main() {
   })
 
   console.log('✅ Created contact:', contact.firstName, contact.lastName)
+
+  const deal = await prisma.deal.create({
+    data: {
+      tenantId: tenant.id,
+      dealName: 'Kitchen Remodel Project',
+      contactId: contact.id,
+      dealValue: 45000,
+      probability: 75,
+      stage: 'Proposal',
+      status: 'open',
+    }
+  })
+
+  console.log('✅ Created deal:', deal.dealName)
   console.log('🎉 Seeding complete!')
 }
 

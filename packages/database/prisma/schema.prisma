@@ -15,6 +15,7 @@ model Tenant {
   updatedAt DateTime @updatedAt
   users User[]
   contacts Contact[]
+  deals Deal[]
   
   @@map("tenants")
 }
@@ -41,6 +42,25 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
+  deals Deal[]
   
   @@map("contacts")
+}
+
+model Deal {
+  id String @id @default(cuid())
+  tenantId String
+  dealName String
+  contactId String?
+  dealValue Float
+  probability Int @default(50)
+  stage String
+  status String @default("open")
+  closeDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  contact Contact? @relation(fields: [contactId], references: [id])
+  
+  @@map("deals")
 }
