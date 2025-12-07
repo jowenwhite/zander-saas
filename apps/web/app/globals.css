@@ -1,26 +1,130 @@
-@import "tailwindcss";
+:root {
+  /* Light Mode Base Colors */
+  --zander-red: #BF0A30;
+  --zander-navy: #0C2340;
+  --zander-gold: #F0B323;
+  --zander-white: #FFFFFF;
+  --zander-off-white: #F8F9FA;
+  --zander-light-gray: #E9ECEF;
+  --zander-border-gray: #DEE2E6;
+  --zander-gray: #6C757D;
+  --zander-dark-gray: #343A40;
+  --zander-black: #212529;
+
+  /* Light Mode Background and Text */
+  --background: var(--zander-off-white);
+  --text-primary: var(--zander-dark-gray);
+  --text-secondary: var(--zander-gray);
+  --card-bg: var(--zander-white);
+  --card-border: var(--zander-border-gray);
+  --hover-bg: var(--zander-light-gray);
+}
+
+[data-theme="dark"] {
+  /* Dark Mode Base Colors */
+  --background: #121212;      /* Deep dark background */
+  --text-primary: #E0E0E0;    /* Light gray text */
+  --text-secondary: #A0A0A0;  /* Muted gray text */
+  --card-bg: #1E1E1E;         /* Slightly lighter than background */
+  --card-border: #333333;     /* Dark border */
+  --hover-bg: #2C2C2C;        /* Lighter hover state */
+
+  /* Preserve Zander brand colors */
+  --zander-red: #BF0A30;
+  --zander-navy: #0C2340;
+  --zander-gold: #F0B323;
+}
+
+/* Ensure smooth transition between themes */
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.theme-toggle {
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+html[data-theme="dark"] {
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] body {
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .theme-toggle {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border-color: var(--card-border);
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Existing light mode variables */
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="dark"] {
+  color-scheme: dark;
+  /* Dark mode variables */
+  --background: #121212;
+  --text-primary: #E0E0E0;
+  --text-secondary: #A0A0A0;
+  --card-bg: #1E1E1E;
+  --card-border: #333333;
+  --hover-bg: #2C2C2C;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background, white);
+  color: var(--text-primary, black);
+}
+
+.theme-toggle {
+  background: var(--card-bg, white);
+  color: var(--text-primary, black);
+  border-color: var(--card-border, gray);
+}
+[data-theme="dark"] {
+  /* Override ALL elements */
+  background-color: var(--background, #121212) !important;
+  color: var(--text-primary, #E0E0E0) !important;
+}
+
+[data-theme="dark"] * {
+  background-color: var(--card-bg, #1E1E1E) !important;
+  color: var(--text-primary, #E0E0E0) !important;
+  border-color: var(--card-border, #333333) !important;
+}
+
+[data-theme="dark"] .theme-toggle {
+  background-color: var(--card-bg, #1E1E1E) !important;
+  color: var(--text-primary, #E0E0E0) !important;
+  border-color: var(--card-border, #333333) !important;
 }
