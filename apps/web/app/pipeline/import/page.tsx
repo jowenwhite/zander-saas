@@ -1,0 +1,389 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import ThemeToggle from '../../components/ThemeToggle';
+import AuthGuard from '../../components/AuthGuard';
+import { logout } from '../../utils/auth';
+
+interface ImportSource {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  category: 'crm' | 'marketing' | 'file';
+  status: 'available' | 'coming_soon';
+}
+
+const importSources: ImportSource[] = [
+  // CRM Systems
+  { id: 'hubspot', name: 'HubSpot', icon: '🟠', description: 'Import deals from HubSpot CRM', category: 'crm', status: 'coming_soon' },
+  { id: 'salesforce', name: 'Salesforce', icon: '☁️', description: 'Migrate opportunities from Salesforce', category: 'crm', status: 'coming_soon' },
+  { id: 'pipedrive', name: 'Pipedrive', icon: '🟢', description: 'Import deals from Pipedrive', category: 'crm', status: 'coming_soon' },
+  { id: 'zoho', name: 'Zoho CRM', icon: '🔴', description: 'Import from Zoho CRM', category: 'crm', status: 'coming_soon' },
+  { id: 'monday', name: 'Monday.com', icon: '📊', description: 'Import from Monday Sales CRM', category: 'crm', status: 'coming_soon' },
+  
+  // Marketing Tools
+  { id: 'mailchimp', name: 'Mailchimp', icon: '🐵', description: 'Convert campaigns to deals', category: 'marketing', status: 'coming_soon' },
+  { id: 'activecampaign', name: 'ActiveCampaign', icon: '💙', description: 'Import deals from ActiveCampaign', category: 'marketing', status: 'coming_soon' },
+  
+  // File Upload
+  { id: 'csv', name: 'CSV / Excel', icon: '📄', description: 'Upload a spreadsheet file', category: 'file', status: 'available' },
+  { id: 'json', name: 'JSON', icon: '{ }', description: 'Upload JSON formatted data', category: 'file', status: 'coming_soon' },
+];
+
+export default function ImportDealsPage() {
+  const router = useRouter();
+  const [activeModule, setActiveModule] = useState('cro');
+  const [dragOver, setDragOver] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const categories = [
+    { id: 'crm', label: 'CRM Systems', icon: '💼' },
+    { id: 'marketing', label: 'Marketing Tools', icon: '📣' },
+    { id: 'file', label: 'File Upload', icon: '📁' },
+  ];
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(true);
+  }
+
+  function handleDragLeave() {
+    setDragOver(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      setSelectedFile(files[0]);
+    }
+  }
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setSelectedFile(files[0]);
+    }
+  }
+
+  function handleImportClick(source: ImportSource) {
+    if (source.status === 'coming_soon') {
+      alert(`${source.name} integration coming soon! We're working on making deal migration as seamless as possible.`);
+    } else if (source.id === 'csv') {
+      document.getElementById('csv-upload')?.click();
+    }
+  }
+
+  return (
+    <AuthGuard>
+    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      {/* Top Navigation */}
+      <nav style={{
+        background: 'white',
+        borderBottom: '2px solid var(--zander-border-gray)',
+        padding: '0 1.5rem',
+        height: '64px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000
+      }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+          <span style={{ fontSize: '1.5rem' }}>⚡</span>
+          <span style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)', letterSpacing: '-0.5px' }}>ZANDER</span>
+        </a>
+
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {['CRO', 'CFO', 'COO', 'CMO', 'CPO', 'CIO', 'EA'].map((module) => (
+            <button
+              key={module}
+              onClick={() => setActiveModule(module.toLowerCase())}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeModule === module.toLowerCase() ? 'var(--zander-red)' : 'transparent',
+                color: activeModule === module.toLowerCase() ? 'white' : 'var(--zander-gray)',
+                fontWeight: '600',
+                fontSize: '0.875rem',
+                cursor: 'pointer'
+              }}
+            >
+              {module}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: '600',
+            fontSize: '0.875rem'
+          }}>JW</div>
+          <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>Jonathan White</span>
+          <button onClick={logout} style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Logout</button>
+          <ThemeToggle />
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main style={{ marginTop: '64px', padding: '2rem', maxWidth: '1000px', margin: '64px auto 0' }}>
+        {/* Back Button */}
+        <button 
+          onClick={() => router.push('/pipeline')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: 'none',
+            border: 'none',
+            color: 'var(--zander-gray)',
+            cursor: 'pointer',
+            marginBottom: '1rem',
+            fontSize: '0.875rem'
+          }}
+        >
+          ← Back to Pipeline
+        </button>
+
+        {/* Page Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: '0 0 0.5rem 0' }}>
+            Import Deals
+          </h1>
+          <p style={{ color: 'var(--zander-gray)', margin: 0, fontSize: '1rem' }}>
+            Migrate your existing deals and opportunities into Zander
+          </p>
+        </div>
+
+        {/* Drag & Drop Zone */}
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          style={{
+            background: dragOver ? 'rgba(191, 10, 48, 0.05)' : 'white',
+            border: dragOver ? '2px dashed var(--zander-red)' : '2px dashed var(--zander-border-gray)',
+            borderRadius: '12px',
+            padding: '3rem',
+            textAlign: 'center',
+            marginBottom: '2rem',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📥</div>
+          <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 0.5rem 0' }}>
+            Drag & Drop Your File
+          </h3>
+          <p style={{ color: 'var(--zander-gray)', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
+            Drop a CSV or Excel file with your deals data
+          </p>
+          <input
+            type="file"
+            id="csv-upload"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+          <button
+            onClick={() => document.getElementById('csv-upload')?.click()}
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'var(--zander-red)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
+          >
+            Browse Files
+          </button>
+          {selectedFile && (
+            <div style={{
+              marginTop: '1rem',
+              padding: '0.75rem 1rem',
+              background: 'rgba(39, 174, 96, 0.1)',
+              borderRadius: '8px',
+              color: '#27AE60',
+              fontWeight: '500'
+            }}>
+              ✓ Selected: {selectedFile.name}
+              <button
+                onClick={() => alert('Deal import processing coming soon!')}
+                style={{
+                  marginLeft: '1rem',
+                  padding: '0.5rem 1rem',
+                  background: '#27AE60',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '0.875rem'
+                }}
+              >
+                Import Now
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Expected CSV Format */}
+        <div style={{
+          background: 'white',
+          border: '2px solid var(--zander-border-gray)',
+          borderRadius: '12px',
+          padding: '1.5rem',
+          marginBottom: '2rem'
+        }}>
+          <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 1rem 0', fontSize: '1rem' }}>
+            📋 Expected CSV Format
+          </h3>
+          <div style={{
+            background: 'var(--zander-off-white)',
+            padding: '1rem',
+            borderRadius: '8px',
+            fontFamily: 'monospace',
+            fontSize: '0.8rem',
+            overflowX: 'auto'
+          }}>
+            deal_name, deal_value, stage, probability, contact_email, expected_close_date<br/>
+            "Website Redesign", 25000, "PROSPECT", 25, "john@example.com", "2025-02-15"<br/>
+            "Marketing Campaign", 15000, "QUALIFIED", 50, "jane@example.com", "2025-03-01"
+          </div>
+          <p style={{ color: 'var(--zander-gray)', margin: '1rem 0 0 0', fontSize: '0.8rem' }}>
+            <strong>Stages:</strong> PROSPECT, QUALIFIED, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST
+          </p>
+        </div>
+
+        {/* Import Sources by Category */}
+        {categories.map((category) => {
+          const sources = importSources.filter(s => s.category === category.id);
+          return (
+            <div key={category.id} style={{ marginBottom: '2rem' }}>
+              <h2 style={{
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: 'var(--zander-navy)',
+                margin: '0 0 1rem 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <span>{category.icon}</span>
+                {category.label}
+              </h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '1rem'
+              }}>
+                {sources.map((source) => (
+                  <button
+                    key={source.id}
+                    onClick={() => handleImportClick(source)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      padding: '1rem 1.25rem',
+                      background: 'white',
+                      border: '2px solid var(--zander-border-gray)',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.2s ease',
+                      position: 'relative'
+                    }}
+                  >
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '10px',
+                      background: 'var(--zander-off-white)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem'
+                    }}>
+                      {source.icon}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{
+                        fontWeight: '600',
+                        color: 'var(--zander-navy)',
+                        marginBottom: '0.25rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}>
+                        {source.name}
+                        {source.status === 'coming_soon' && (
+                          <span style={{
+                            padding: '0.125rem 0.5rem',
+                            background: 'rgba(240, 179, 35, 0.2)',
+                            color: '#B8860B',
+                            borderRadius: '4px',
+                            fontSize: '0.6rem',
+                            fontWeight: '700',
+                            textTransform: 'uppercase'
+                          }}>Soon</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                        {source.description}
+                      </div>
+                    </div>
+                    <div style={{ color: 'var(--zander-gray)', fontSize: '1.25rem' }}>→</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Help Section */}
+        <div style={{
+          background: 'var(--zander-navy)',
+          borderRadius: '12px',
+          padding: '2rem',
+          color: 'white',
+          marginTop: '2rem'
+        }}>
+          <h3 style={{ margin: '0 0 0.75rem 0', fontSize: '1.25rem' }}>Need Help Migrating?</h3>
+          <p style={{ margin: '0 0 1rem 0', opacity: 0.9, fontSize: '0.9rem', lineHeight: 1.6 }}>
+            Our team can help you migrate deals from any CRM system. We offer white-glove onboarding 
+            to ensure your sales data transitions smoothly to Zander.
+          </p>
+          <button style={{
+            padding: '0.75rem 1.5rem',
+            background: 'var(--zander-gold)',
+            color: 'var(--zander-navy)',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: '700'
+          }}>
+            Contact Support
+          </button>
+        </div>
+      </main>
+    </div>
+    </AuthGuard>
+  );
+}

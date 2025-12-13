@@ -342,7 +342,9 @@ export default function PipelinePage() {
               {formatCurrency(totalPipelineValue)}
             </div>
           </div>
-          <button
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <a href="/pipeline/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+            <button
             onClick={() => setShowNewDealModal(true)}
             style={{
               padding: '0.75rem 1.5rem',
@@ -360,8 +362,7 @@ export default function PipelinePage() {
             + New Deal
           </button>
         </div>
-
-        {/* Filters Bar */}
+          </div>
         <div style={{
           background: 'white',
           border: '2px solid var(--zander-border-gray)',
