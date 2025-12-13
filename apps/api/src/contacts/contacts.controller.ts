@@ -9,21 +9,21 @@ export class ContactsController {
   @Public()
   @Get()
   async findAll() {
-    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
+    const tenantId = 'cmj4gfco20000pqr0f92r3gif';
     return this.contactsService.findAll(tenantId);
   }
 
   @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
+    const tenantId = 'cmj4gfco20000pqr0f92r3gif';
     return this.contactsService.findOne(tenantId, id);
   }
 
   @Public()
   @Post()
   async create(@Body() createContactDto: any) {
-    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
+    const tenantId = 'cmj4gfco20000pqr0f92r3gif';
     return this.contactsService.create(tenantId, createContactDto);
   }
 }

@@ -9,28 +9,28 @@ export class DealsController {
   @Public()
   @Get()
   async findAll() {
-    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
+    const tenantId = 'cmj4gfco20000pqr0f92r3gif';
     return this.dealsService.findAll(tenantId);
   }
 
   @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
+    const tenantId = 'cmj4gfco20000pqr0f92r3gif';
     return this.dealsService.findOne(tenantId, id);
   }
 
   @Public()
   @Post()
   async create(@Body() createDealDto: any) {
-    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
+    const tenantId = 'cmj4gfco20000pqr0f92r3gif';
     return this.dealsService.create(tenantId, createDealDto);
   }
 
   @Public()
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateDealDto: any) {
-    const tenantId = 'cmivq0r7s0000goa1v5fap9ga';
+    const tenantId = 'cmj4gfco20000pqr0f92r3gif';
     return this.dealsService.update(tenantId, id, updateDealDto);
   }
 }
