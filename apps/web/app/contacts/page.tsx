@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
+import { logout } from '../utils/auth';
 import AuthGuard from '../components/AuthGuard';
 
 interface Contact {
@@ -184,6 +185,7 @@ export default function ContactsPage() {
             fontSize: '0.875rem'
           }}>JW</div>
           <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>Jonathan White</span>
+          <button onClick={logout} style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Logout</button>
           <ThemeToggle />
         </div>
       </nav>
