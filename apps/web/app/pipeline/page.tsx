@@ -563,6 +563,15 @@ export default function PipelinePage() {
                               cursor: 'pointer',
                               fontSize: '0.75rem'
                             }}>📝</button>
+                            <button onClick={() => window.location.href = `/deals/${deal.id}`} style={{
+                              padding: '0.25rem 0.5rem',
+                              background: 'var(--zander-red)',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '0.75rem',
+                              color: 'white'
+                            }}>👁</button>
                           </div>
                           <div style={{
                             width: '28px',
