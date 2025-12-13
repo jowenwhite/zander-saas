@@ -15,10 +15,10 @@
     "@prisma/client": "^5.7.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "bcrypt": "^5.1.1",
     "prisma": "^5.7.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
-    "bcrypt": "^5.1.1",
-    "@types/bcrypt": "^5.0.2"
+    "typescript": "^5.3.3"
   }
 }

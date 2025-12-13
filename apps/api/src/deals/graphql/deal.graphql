@@ -1,0 +1,90 @@
+enum DealStage {
+  PROSPECT
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum DealPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+type Deal {
+  id: ID!
+  tenantId: ID!
+  dealName: String!
+  contactId: ID
+  contact: Contact
+  dealValue: Float!
+  probability: Int
+  stage: DealStage!
+  priority: DealPriority!
+  status: String!
+  expectedCloseDate: DateTime
+  actualCloseDate: DateTime
+  forecastedValue: Float
+  winProbability: Float
+  notes: String
+  nextSteps: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input CreateDealInput {
+  dealName: String!
+  contactId: ID
+  dealValue: Float!
+  probability: Int
+  stage: DealStage
+  priority: DealPriority
+  expectedCloseDate: DateTime
+  notes: String
+  nextSteps: String
+}
+
+input UpdateDealInput {
+  id: ID!
+  dealName: String
+  contactId: ID
+  dealValue: Float
+  probability: Int
+  stage: DealStage
+  priority: DealPriority
+  expectedCloseDate: DateTime
+  actualCloseDate: DateTime
+  notes: String
+  nextSteps: String
+}
+
+type PipelineMetrics {
+  totalPipelineValue: Float!
+  dealCountByStage: JSON
+  averageDealSize: Float!
+  winRate: Float!
+}
+
+type Query {
+  getDeal(id: ID!): Deal
+  listDeals(
+    stage: DealStage
+    priority: DealPriority
+    minValue: Float
+    maxValue: Float
+  ): [Deal!]!
+  getPipelineMetrics(tenantId: ID!): PipelineMetrics
+}
+
+type Mutation {
+  createDeal(input: CreateDealInput!): Deal!
+  updateDeal(input: UpdateDealInput!): Deal!
+  deleteDeal(id: ID!): Boolean!
+  moveDealStage(id: ID!, newStage: DealStage!): Deal!
+}
+
+scalar DateTime
+scalar JSON

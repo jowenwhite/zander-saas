@@ -9,7 +9,8 @@ async function bootstrap() {
     origin: 'http://localhost:3002',
     credentials: true,
   });
-  
+
+  // GraphQL Playground configuration
   await app.listen(3001);
   console.log('🚀 API running on http://localhost:3001');
 }

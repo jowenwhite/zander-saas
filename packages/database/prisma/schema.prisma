@@ -7,6 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum DealStage {
+  PROSPECT
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum DealPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
 model Tenant {
   id String @id @default(cuid())
   companyName String
@@ -16,20 +32,19 @@ model Tenant {
   users User[]
   contacts Contact[]
   deals Deal[]
-  
   @@map("tenants")
 }
 
 model User {
   id String @id @default(cuid())
   tenantId String
-  email String
+  email String @unique
   firstName String
   lastName String
+  password String @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  
   @@map("users")
 }
 
@@ -43,7 +58,6 @@ model Contact {
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
   deals Deal[]
-  
   @@map("contacts")
 }
 
@@ -54,13 +68,18 @@ model Deal {
   contactId String?
   dealValue Float
   probability Int @default(50)
-  stage String
+  stage DealStage @default(PROSPECT)
+  priority DealPriority @default(MEDIUM)
   status String @default("open")
-  closeDate DateTime?
+  expectedCloseDate DateTime?
+  actualCloseDate DateTime?
+  forecastedValue Float?
+  winProbability Float @default(0.5)
+  notes String?
+  nextSteps String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
   contact Contact? @relation(fields: [contactId], references: [id])
-  
   @@map("deals")
 }
