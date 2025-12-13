@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ThemeToggle from './components/ThemeToggle';
+import AuthGuard from './components/AuthGuard';
 
 interface Contact {
   id: string;
@@ -172,6 +173,7 @@ export default function CRODashboard() {
 
   if (loading) {
     return (
+
       <div style={{ 
         minHeight: '100vh', 
         display: 'flex', 
@@ -188,6 +190,8 @@ export default function CRODashboard() {
   }
 
   return (
+    <AuthGuard>
+
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       {/* Top Navigation */}
       <nav style={{
@@ -663,6 +667,7 @@ export default function CRODashboard() {
               {STAGES.map((stage) => {
                 const stageDeals = getDealsByStage(stage);
                 return (
+
                   <div key={stage} style={{
                     background: 'var(--zander-off-white)',
                     borderRadius: '8px',
@@ -1308,5 +1313,7 @@ export default function CRODashboard() {
         </div>
       )}
     </div>
+    </AuthGuard>
+
   );
 }

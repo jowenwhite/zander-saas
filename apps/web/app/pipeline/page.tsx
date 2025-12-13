@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
+import AuthGuard from '../components/AuthGuard';
 
 interface Contact {
   id: string;
@@ -169,6 +170,7 @@ export default function PipelinePage() {
 
   if (loading) {
     return (
+
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
@@ -179,6 +181,8 @@ export default function PipelinePage() {
   }
 
   return (
+    <AuthGuard>
+
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       {/* Top Navigation */}
       <nav style={{
@@ -428,6 +432,7 @@ export default function PipelinePage() {
             const isOver = dragOverStage === stage;
             
             return (
+
               <div
                 key={stage}
                 onDragOver={(e) => handleDragOver(e, stage)}
@@ -622,5 +627,7 @@ export default function PipelinePage() {
         </div>
       )}
     </div>
+    </AuthGuard>
+
   );
 }

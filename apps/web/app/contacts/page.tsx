@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
+import AuthGuard from '../components/AuthGuard';
 
 interface Contact {
   id: string;
@@ -114,6 +115,7 @@ export default function ContactsPage() {
 
   if (loading) {
     return (
+
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
@@ -124,6 +126,8 @@ export default function ContactsPage() {
   }
 
   return (
+    <AuthGuard>
+
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       {/* Top Navigation */}
       <nav style={{
@@ -512,6 +516,7 @@ export default function ContactsPage() {
               const isActive = hasActiveDeals(contact.id);
               
               return (
+
                 <div
                   key={contact.id}
                   style={{
@@ -636,6 +641,7 @@ export default function ContactsPage() {
                 {filteredContacts.map((contact) => {
                   const isActive = hasActiveDeals(contact.id);
                   return (
+
                     <tr key={contact.id} style={{ borderBottom: '1px solid var(--zander-border-gray)' }}>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -736,5 +742,7 @@ export default function ContactsPage() {
         </div>
       )}
     </div>
+    </AuthGuard>
+
   );
 }
