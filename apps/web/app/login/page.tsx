@@ -1,98 +1,265 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:3001/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.token) {
+        // Store the token
+        localStorage.setItem('zander_token', data.token);
+        localStorage.setItem('zander_user', JSON.stringify(data.user));
+        
+        // Redirect to dashboard
+        router.push('/');
+      } else {
+        setError(data.message || 'Invalid email or password');
+      }
+    } catch (err) {
+      setError('Unable to connect to server. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="flex min-h-screen">
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Navy Sidebar */}
-      <div className="w-1/3 bg-[#0C2340] flex flex-col justify-between p-12 text-white">
+      <div style={{
+        width: '33.333%',
+        background: 'linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '3rem',
+        color: 'white'
+      }}>
         <div>
-          <h1 className="text-4xl font-bold mb-4">Zander</h1>
-          <p className="text-2xl font-light opacity-90">Your AI-Powered Executive Team</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '2.5rem' }}>⚡</span>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: '700', margin: 0, letterSpacing: '-1px' }}>ZANDER</h1>
+          </div>
+          <p style={{ fontSize: '1.5rem', fontWeight: '300', opacity: 0.9, margin: 0 }}>
+            Your AI-Powered Executive Team
+          </p>
         </div>
         
         {/* Hamilton Quote */}
-        <div className="mt-auto">
-          <blockquote className="italic text-lg opacity-80 mb-6">
+        <div style={{ marginTop: 'auto' }}>
+          <blockquote style={{ 
+            fontStyle: 'italic', 
+            fontSize: '1.125rem', 
+            opacity: 0.8, 
+            marginBottom: '1.5rem',
+            lineHeight: 1.6,
+            borderLeft: '3px solid #F0B323',
+            paddingLeft: '1rem'
+          }}>
             "The true direction of commerce is not just the exchange of goods, but the expansion of human potential through strategic innovation."
           </blockquote>
-          <p className="font-semibold">— Alexander Hamilton</p>
+          <p style={{ fontWeight: '600', margin: 0, color: '#F0B323' }}>— Alexander Hamilton</p>
         </div>
         
         {/* 64 West Branding */}
-        <div className="text-sm opacity-70 mt-6">
-          By 64 West
+        <div style={{ fontSize: '0.875rem', opacity: 0.7, marginTop: '2rem' }}>
+          By 64 West Capital Partners
         </div>
       </div>
-      
+
       {/* Login Form */}
-      <div className="w-2/3 bg-white flex items-center justify-center">
-        <div className="w-full max-w-md">
-          <h2 className="text-3xl font-bold mb-2 text-[#0C2340]">Welcome Back</h2>
-          <p className="mb-8 text-gray-600">Sign in to access your Zander dashboard</p>
+      <div style={{
+        width: '66.667%',
+        background: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
+          <h2 style={{ 
+            fontSize: '2rem', 
+            fontWeight: '700', 
+            marginBottom: '0.5rem', 
+            color: '#0C2340' 
+          }}>Welcome Back</h2>
+          <p style={{ marginBottom: '2rem', color: '#6C757D' }}>
+            Sign in to access your Zander dashboard
+          </p>
           
-          <form className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          {error && (
+            <div style={{
+              background: 'rgba(191, 10, 48, 0.1)',
+              border: '1px solid #BF0A30',
+              color: '#BF0A30',
+              padding: '0.75rem 1rem',
+              borderRadius: '8px',
+              marginBottom: '1.5rem',
+              fontSize: '0.875rem'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '0.875rem', 
+                fontWeight: '600', 
+                color: '#343A40',
+                marginBottom: '0.5rem'
+              }}>
                 Email Address
               </label>
               <input
                 type="email"
-                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#BF0A30] focus:border-[#BF0A30]"
                 placeholder="Enter your email"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '2px solid #DEE2E6',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#BF0A30'}
+                onBlur={(e) => e.target.style.borderColor = '#DEE2E6'}
               />
             </div>
             
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '0.875rem', 
+                fontWeight: '600', 
+                color: '#343A40',
+                marginBottom: '0.5rem'
+              }}>
                 Password
               </label>
               <input
                 type="password"
-                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#BF0A30] focus:border-[#BF0A30]"
                 placeholder="Enter your password"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '2px solid #DEE2E6',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#BF0A30'}
+                onBlur={(e) => e.target.style.borderColor = '#DEE2E6'}
               />
             </div>
             
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              marginBottom: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <input
                   type="checkbox"
                   id="remember"
-                  className="h-4 w-4 text-[#BF0A30] focus:ring-[#BF0A30] border-gray-300 rounded"
+                  style={{ width: '16px', height: '16px', accentColor: '#BF0A30' }}
                 />
-                <label htmlFor="remember" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="remember" style={{ fontSize: '0.875rem', color: '#343A40' }}>
                   Remember me
                 </label>
               </div>
-              
-              <div className="text-sm">
-                <a href="#" className="font-medium text-[#BF0A30] hover:text-[#A00A28]">
-                  Forgot password?
-                </a>
-              </div>
+              <a href="#" style={{ 
+                fontSize: '0.875rem', 
+                color: '#BF0A30', 
+                textDecoration: 'none',
+                fontWeight: '500'
+              }}>
+                Forgot password?
+              </a>
             </div>
             
-            <div>
-              <button
-                type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#BF0A30] hover:bg-[#A00A28] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BF0A30]"
-              >
-                Sign In
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '0.875rem 1rem',
+                background: loading ? '#ccc' : 'linear-gradient(135deg, #BF0A30 0%, #A00A28 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                boxShadow: '0 4px 6px rgba(191, 10, 48, 0.2)'
+              }}
+              onMouseOver={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 8px rgba(191, 10, 48, 0.3)';
+                }
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 6px rgba(191, 10, 48, 0.2)';
+              }}
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
           </form>
           
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account? {' '}
-              <a href="/signup" className="font-medium text-[#BF0A30] hover:text-[#A00A28]">
+          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            <p style={{ fontSize: '0.875rem', color: '#6C757D' }}>
+              Don't have an account?{' '}
+              <a href="/signup" style={{ color: '#BF0A30', textDecoration: 'none', fontWeight: '600' }}>
                 Sign up
               </a>
             </p>
+          </div>
+
+          {/* Demo credentials hint */}
+          <div style={{
+            marginTop: '2rem',
+            padding: '1rem',
+            background: '#F8F9FA',
+            borderRadius: '8px',
+            fontSize: '0.875rem',
+            color: '#6C757D',
+            border: '1px solid #DEE2E6'
+          }}>
+            <strong style={{ color: '#0C2340' }}>Demo Account:</strong><br />
+            Email: test@example.com<br />
+            Password: password123
           </div>
         </div>
       </div>
