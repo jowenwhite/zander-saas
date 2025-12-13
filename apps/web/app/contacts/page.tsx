@@ -275,7 +275,9 @@ export default function ContactsPage() {
               Manage your contacts and relationships
             </p>
           </div>
-          <button
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <a href="/contacts/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+            <button
             onClick={() => setShowNewContactModal(true)}
             style={{
               padding: '0.75rem 1.5rem',
@@ -293,7 +295,7 @@ export default function ContactsPage() {
             + New Contact
           </button>
         </div>
-
+          </div>
         {/* Stats Cards */}
         <div style={{
           display: 'grid',
