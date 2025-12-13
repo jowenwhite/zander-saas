@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import ThemeToggle from './components/ThemeToggle';
 
 interface Contact {
   id: string;
@@ -32,7 +33,7 @@ interface Activity {
   dealId?: string;
 }
 
-const STAGES = ['Prospect', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won'];
+const STAGES = ['PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'];
 
 export default function CRODashboard() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -55,7 +56,7 @@ export default function CRODashboard() {
   const [dealForm, setDealForm] = useState({
     dealName: '',
     dealValue: '',
-    stage: 'Prospect',
+    stage: 'PROSPECT',
     probability: '25',
     contactId: ''
   });
@@ -117,7 +118,7 @@ export default function CRODashboard() {
         }),
       });
       if (response.ok) {
-        setDealForm({ dealName: '', dealValue: '', stage: 'Prospect', probability: '25', contactId: '' });
+        setDealForm({ dealName: '', dealValue: '', stage: 'PROSPECT', probability: '25', contactId: '' });
         setShowNewDealModal(false);
         fetchData();
       }
@@ -127,8 +128,8 @@ export default function CRODashboard() {
   }
 
   // Calculate metrics
-  const activeDeals = deals.filter(d => d.stage !== 'Closed Won' && d.stage !== 'Closed Lost');
-  const wonDeals = deals.filter(d => d.stage === 'Closed Won');
+  const activeDeals = deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST');
+  const wonDeals = deals.filter(d => d.stage === 'CLOSED_WON');
   const pipelineValue = activeDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
   const wonValue = wonDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
   const winRate = deals.length > 0 ? Math.round((wonDeals.length / deals.length) * 100) : 0;
@@ -244,6 +245,7 @@ export default function CRODashboard() {
             fontSize: '0.875rem'
           }}>JW</div>
           <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>Jonathan White</span>
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -545,13 +547,13 @@ export default function CRODashboard() {
               }}>+5</span>
             </div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
-              {deals.filter(d => d.stage === 'Negotiation').length}
+              {deals.filter(d => d.stage === 'NEGOTIATION').length}
             </div>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
               Closing This Week
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
-              Expected: {formatCurrency(deals.filter(d => d.stage === 'Negotiation').reduce((sum, d) => sum + d.dealValue, 0))}
+              Expected: {formatCurrency(deals.filter(d => d.stage === 'NEGOTIATION').reduce((sum, d) => sum + d.dealValue, 0))}
             </div>
           </div>
 
