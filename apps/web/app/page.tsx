@@ -290,14 +290,14 @@ export default function CRODashboard() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📊', label: 'Dashboard', active: true },
-              { icon: '📈', label: 'Pipeline', active: false },
-              { icon: '👥', label: 'Contacts', active: false },
-              { icon: '📉', label: 'Analytics', active: false },
+              { icon: '📊', label: 'Dashboard', href: '/', active: true },
+              { icon: '📈', label: 'Pipeline', href: '/pipeline', active: false },
+              { icon: '👥', label: 'Contacts', href: '/contacts', active: false },
+              { icon: '📉', label: 'Analytics', href: '/analytics', active: false },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a
-                  href="#"
+                  href={item.href || "#"}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -339,7 +339,7 @@ export default function CRODashboard() {
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a
-                  href="#"
+                  href={item.href || "#"}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
