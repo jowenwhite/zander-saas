@@ -35,6 +35,19 @@ interface Activity {
 
 const STAGES = ['PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'];
 
+// Helper to format stage names for display
+const formatStage = (stage: string) => {
+  const stageLabels: Record<string, string> = {
+    'PROSPECT': 'Prospect',
+    'QUALIFIED': 'Qualified',
+    'PROPOSAL': 'Proposal',
+    'NEGOTIATION': 'Negotiation',
+    'CLOSED_WON': 'Closed Won',
+    'CLOSED_LOST': 'Closed Lost'
+  };
+  return stageLabels[stage] || stage;
+};
+
 export default function CRODashboard() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -668,7 +681,7 @@ export default function CRODashboard() {
                         fontWeight: '600', 
                         color: 'var(--zander-navy)', 
                         fontSize: '0.875rem' 
-                      }}>{stage}</span>
+                      }}>{formatStage(stage)}</span>
                       <span style={{
                         padding: '0.25rem 0.5rem',
                         background: 'var(--zander-red)',
@@ -1085,7 +1098,7 @@ export default function CRODashboard() {
                   }}
                 >
                   {STAGES.map(stage => (
-                    <option key={stage} value={stage}>{stage}</option>
+                    <option key={stage} value={stage}>{formatStage(stage)}</option>
                   ))}
                 </select>
               </div>
