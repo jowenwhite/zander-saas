@@ -172,6 +172,7 @@ export default function FormsPage() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
           <div style={{
             width: '36px',
             height: '36px',
@@ -467,6 +468,7 @@ export default function FormsPage() {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                         <span style={{ fontSize: '1.5rem' }}>{category.icon}</span>
                         <div>
                           <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem' }}>{category.name}</div>

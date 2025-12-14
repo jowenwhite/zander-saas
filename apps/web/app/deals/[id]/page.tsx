@@ -264,6 +264,7 @@ export default function DealDetailPage() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
           <div style={{
             width: '36px',
             height: '36px',
@@ -413,6 +414,7 @@ export default function DealDetailPage() {
                   {deal.contact ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                         <span style={{ color: 'var(--zander-gray)' }}>✉️</span>
                         <div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Email</div>
@@ -423,6 +425,7 @@ export default function DealDetailPage() {
                       </div>
                       {deal.contact.phone && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                           <span style={{ color: 'var(--zander-gray)' }}>📞</span>
                           <div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Phone</div>
@@ -559,10 +562,12 @@ export default function DealDetailPage() {
                       borderBottom: '1px solid var(--zander-border-gray)'
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                         <span style={{ color: 'var(--zander-gray)' }}>📄</span>
                         <span style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>{doc.name}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                         <span style={{
                           padding: '0.25rem 0.75rem',
                           background: status.bg,
