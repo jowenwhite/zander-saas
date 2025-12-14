@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ThemeToggle from './components/ThemeToggle';
 import AuthGuard from './components/AuthGuard';
 import { logout } from './utils/auth';
@@ -51,6 +52,7 @@ const formatStage = (stage: string) => {
 };
 
 export default function CRODashboard() {
+  const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -702,7 +704,7 @@ export default function CRODashboard() {
                     </div>
 
                     {stageDeals.slice(0, 3).map((deal) => (
-                      <div key={deal.id} style={{
+                      <div key={deal.id} onClick={() => router.push('/deals/' + deal.id)} style={{
                         background: 'white',
                         border: '1px solid var(--zander-border-gray)',
                         borderRadius: '6px',
