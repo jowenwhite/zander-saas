@@ -751,8 +751,8 @@ export default function SettingsPage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
         <NavBar activeModule="cro" />
+        </nav>
 
         <Sidebar collapsed={sidebarCollapsed} />
 

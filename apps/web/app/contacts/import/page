@@ -12,36 +12,42 @@ interface ImportSource {
   name: string;
   icon: string;
   description: string;
-  category: 'crm' | 'marketing' | 'file';
+  category: 'mobile' | 'email' | 'productivity' | 'file';
   status: 'available' | 'coming_soon';
 }
 
 const importSources: ImportSource[] = [
-  // CRM Systems
-  { id: 'hubspot', name: 'HubSpot', icon: '🟠', description: 'Import deals from HubSpot CRM', category: 'crm', status: 'coming_soon' },
-  { id: 'salesforce', name: 'Salesforce', icon: '☁️', description: 'Migrate opportunities from Salesforce', category: 'crm', status: 'coming_soon' },
-  { id: 'pipedrive', name: 'Pipedrive', icon: '🟢', description: 'Import deals from Pipedrive', category: 'crm', status: 'coming_soon' },
-  { id: 'zoho', name: 'Zoho CRM', icon: '🔴', description: 'Import from Zoho CRM', category: 'crm', status: 'coming_soon' },
-  { id: 'monday', name: 'Monday.com', icon: '📊', description: 'Import from Monday Sales CRM', category: 'crm', status: 'coming_soon' },
+  // Mobile
+  { id: 'iphone', name: 'iPhone Contacts', icon: '📱', description: 'Import from iCloud or vCard export', category: 'mobile', status: 'coming_soon' },
+  { id: 'android', name: 'Android Contacts', icon: '🤖', description: 'Import via Google Contacts sync', category: 'mobile', status: 'coming_soon' },
   
-  // Marketing Tools
-  { id: 'mailchimp', name: 'Mailchimp', icon: '🐵', description: 'Convert campaigns to deals', category: 'marketing', status: 'coming_soon' },
-  { id: 'activecampaign', name: 'ActiveCampaign', icon: '💙', description: 'Import deals from ActiveCampaign', category: 'marketing', status: 'coming_soon' },
+  // Email Providers
+  { id: 'google', name: 'Google Contacts', icon: '🔴', description: 'Connect your Google account', category: 'email', status: 'coming_soon' },
+  { id: 'outlook', name: 'Microsoft Outlook', icon: '🔵', description: 'Import from Outlook/Office 365', category: 'email', status: 'coming_soon' },
+  { id: 'yahoo', name: 'Yahoo Mail', icon: '🟣', description: 'Import Yahoo contacts', category: 'email', status: 'coming_soon' },
+  
+  // Productivity Apps
+  { id: 'monday', name: 'Monday.com', icon: '📊', description: 'Import from Monday boards', category: 'productivity', status: 'coming_soon' },
+  { id: 'slack', name: 'Slack', icon: '💬', description: 'Import workspace members', category: 'productivity', status: 'coming_soon' },
+  { id: 'hubspot', name: 'HubSpot', icon: '🟠', description: 'Migrate from HubSpot CRM', category: 'productivity', status: 'coming_soon' },
+  { id: 'salesforce', name: 'Salesforce', icon: '☁️', description: 'Migrate from Salesforce', category: 'productivity', status: 'coming_soon' },
+  { id: 'mailchimp', name: 'Mailchimp', icon: '🐵', description: 'Import audience lists', category: 'productivity', status: 'coming_soon' },
   
   // File Upload
   { id: 'csv', name: 'CSV / Excel', icon: '📄', description: 'Upload a spreadsheet file', category: 'file', status: 'available' },
-  { id: 'json', name: 'JSON', icon: '{ }', description: 'Upload JSON formatted data', category: 'file', status: 'coming_soon' },
+  { id: 'vcard', name: 'vCard (.vcf)', icon: '👤', description: 'Upload vCard contact files', category: 'file', status: 'coming_soon' },
 ];
 
-export default function ImportDealsPage() {
+export default function ImportContactsPage() {
   const router = useRouter();
   const [activeModule, setActiveModule] = useState('cro');
   const [dragOver, setDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const categories = [
-    { id: 'crm', label: 'CRM Systems', icon: '💼' },
-    { id: 'marketing', label: 'Marketing Tools', icon: '📣' },
+    { id: 'mobile', label: 'Mobile Contacts', icon: '📱' },
+    { id: 'email', label: 'Email Providers', icon: '✉️' },
+    { id: 'productivity', label: 'Productivity Apps', icon: '⚡' },
     { id: 'file', label: 'File Upload', icon: '📁' },
   ];
 
@@ -72,7 +78,7 @@ export default function ImportDealsPage() {
 
   function handleImportClick(source: ImportSource) {
     if (source.status === 'coming_soon') {
-      alert(`${source.name} integration coming soon! We're working on making deal migration as seamless as possible.`);
+      alert(`${source.name} integration coming soon! We're working on making onboarding as seamless as possible.`);
     } else if (source.id === 'csv') {
       document.getElementById('csv-upload')?.click();
     }
@@ -81,15 +87,14 @@ export default function ImportDealsPage() {
   return (
     <AuthGuard>
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
-      {/* Top Navigation */}
       <NavBar activeModule="cro" />
-
+      </nav>
 
       {/* Main Content */}
       <main style={{ marginTop: '64px', padding: '2rem', maxWidth: '1000px', margin: '64px auto 0' }}>
         {/* Back Button */}
         <button 
-          onClick={() => router.push('/pipeline')}
+          onClick={() => router.push('/contacts')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -102,16 +107,16 @@ export default function ImportDealsPage() {
             fontSize: '0.875rem'
           }}
         >
-          ← Back to Pipeline
+          ← Back to Contacts
         </button>
 
         {/* Page Header */}
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: '0 0 0.5rem 0' }}>
-            Import Deals
+            Import Contacts
           </h1>
           <p style={{ color: 'var(--zander-gray)', margin: 0, fontSize: '1rem' }}>
-            Migrate your existing deals and opportunities into Zander
+            Bring your existing contacts into Zander from your favorite apps and services
           </p>
         </div>
 
@@ -135,12 +140,12 @@ export default function ImportDealsPage() {
             Drag & Drop Your File
           </h3>
           <p style={{ color: 'var(--zander-gray)', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
-            Drop a CSV or Excel file with your deals data
+            Drop a CSV, Excel, or vCard file here to import contacts
           </p>
           <input
             type="file"
             id="csv-upload"
-            accept=".csv,.xlsx,.xls"
+            accept=".csv,.xlsx,.xls,.vcf"
             onChange={handleFileSelect}
             style={{ display: 'none' }}
           />
@@ -169,7 +174,7 @@ export default function ImportDealsPage() {
             }}>
               ✓ Selected: {selectedFile.name}
               <button
-                onClick={() => alert('Deal import processing coming soon!')}
+                onClick={() => alert('CSV import processing coming soon!')}
                 style={{
                   marginLeft: '1rem',
                   padding: '0.5rem 1rem',
@@ -186,34 +191,6 @@ export default function ImportDealsPage() {
               </button>
             </div>
           )}
-        </div>
-
-        {/* Expected CSV Format */}
-        <div style={{
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
-          borderRadius: '12px',
-          padding: '1.5rem',
-          marginBottom: '2rem'
-        }}>
-          <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 1rem 0', fontSize: '1rem' }}>
-            📋 Expected CSV Format
-          </h3>
-          <div style={{
-            background: 'var(--zander-off-white)',
-            padding: '1rem',
-            borderRadius: '8px',
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
-            overflowX: 'auto'
-          }}>
-            deal_name, deal_value, stage, probability, contact_email, expected_close_date<br/>
-            "Website Redesign", 25000, "PROSPECT", 25, "john@example.com", "2025-02-15"<br/>
-            "Marketing Campaign", 15000, "QUALIFIED", 50, "jane@example.com", "2025-03-01"
-          </div>
-          <p style={{ color: 'var(--zander-gray)', margin: '1rem 0 0 0', fontSize: '0.8rem' }}>
-            <strong>Stages:</strong> PROSPECT, QUALIFIED, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST
-          </p>
         </div>
 
         {/* Import Sources by Category */}
@@ -310,10 +287,10 @@ export default function ImportDealsPage() {
           color: 'white',
           marginTop: '2rem'
         }}>
-          <h3 style={{ margin: '0 0 0.75rem 0', fontSize: '1.25rem' }}>Need Help Migrating?</h3>
+          <h3 style={{ margin: '0 0 0.75rem 0', fontSize: '1.25rem' }}>Need Help Importing?</h3>
           <p style={{ margin: '0 0 1rem 0', opacity: 0.9, fontSize: '0.9rem', lineHeight: 1.6 }}>
-            Our team can help you migrate deals from any CRM system. We offer white-glove onboarding 
-            to ensure your sales data transitions smoothly to Zander.
+            Our team can help you migrate contacts from any system. We offer white-glove onboarding 
+            to ensure your transition to Zander is seamless.
           </p>
           <button style={{
             padding: '0.75rem 1.5rem',
