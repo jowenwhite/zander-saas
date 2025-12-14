@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ThemeToggle from './components/ThemeToggle';
+import NavBar from './components/NavBar';
 import AuthGuard from './components/AuthGuard';
 import { logout } from './utils/auth';
 
@@ -196,80 +197,7 @@ export default function CRODashboard() {
     <AuthGuard>
 
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
-      {/* Top Navigation */}
-      <nav style={{
-        background: 'white',
-        borderBottom: '2px solid var(--zander-border-gray)',
-        padding: '0 1.5rem',
-        height: '64px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000
-      }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>⚡</span>
-          <span style={{ 
-            fontSize: '1.25rem', 
-            fontWeight: '700', 
-            color: 'var(--zander-navy)',
-            letterSpacing: '-0.5px'
-          }}>ZANDER</span>
-        </div>
-
-        {/* Module Switcher */}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {['CRO', 'CFO', 'COO', 'CMO', 'CPO', 'CIO', 'EA'].map((module) => (
-            <button
-              key={module}
-              onClick={() => setActiveModule(module.toLowerCase())}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: 'none',
-                background: activeModule === module.toLowerCase() 
-                  ? module === 'CRO' ? 'var(--zander-red)' 
-                  : module === 'CFO' ? '#27AE60'
-                  : module === 'COO' ? '#3498DB'
-                  : 'var(--zander-navy)'
-                  : 'transparent',
-                color: activeModule === module.toLowerCase() ? 'white' : 'var(--zander-gray)',
-                fontWeight: '600',
-                fontSize: '0.875rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              {module}
-            </button>
-          ))}
-        </div>
-
-        {/* User Menu */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/headquarters" style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem 1rem", background: "var(--zander-navy)", color: "white", borderRadius: "6px", textDecoration: "none", fontWeight: "600", fontSize: "0.875rem" }}>🏛️ HQ</a>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '600',
-            fontSize: '0.875rem'
-          }}>JW</div>
-          <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>Jonathan White</span>
-          <button onClick={logout} style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Logout</button>
-          <ThemeToggle />
-        </div>
-      </nav>
+      <NavBar activeModule={activeModule} />
 
       {/* Sidebar */}
       <aside style={{
