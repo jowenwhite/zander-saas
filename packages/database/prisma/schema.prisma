@@ -54,6 +54,11 @@ model Contact {
   firstName String
   lastName String
   email String
+  phone String?
+  company String?
+  title String?
+  source String?
+  notes String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
