@@ -240,12 +240,12 @@ export default function ContactsPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📧', label: 'Email Automation' },
-              { icon: '📄', label: 'Proposals' },
-              { icon: '🤖', label: 'AI Assistant' },
+              { icon: '📧', label: 'Email Automation', href: '/automation' },
+              { icon: '📄', label: 'Proposals', href: '/proposals' },
+              { icon: '🤖', label: 'AI Assistant', href: '/ai' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a href="#" style={{
+                <a href={item.href || "#"} style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.75rem',
