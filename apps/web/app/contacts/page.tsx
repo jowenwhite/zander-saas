@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ThemeToggle from '../components/ThemeToggle';
 import { logout } from '../utils/auth';
 import AuthGuard from '../components/AuthGuard';
@@ -25,6 +26,7 @@ interface Deal {
 }
 
 export default function ContactsPage() {
+  const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -523,6 +525,7 @@ export default function ContactsPage() {
 
                 <div
                   key={contact.id}
+                  onClick={() => router.push("/contacts/" + contact.id)}
                   style={{
                     background: 'white',
                     border: '2px solid var(--zander-border-gray)',
@@ -646,7 +649,7 @@ export default function ContactsPage() {
                   const isActive = hasActiveDeals(contact.id);
                   return (
 
-                    <tr key={contact.id} style={{ borderBottom: '1px solid var(--zander-border-gray)' }}>
+                    <tr key={contact.id} onClick={() => router.push("/contacts/" + contact.id)} style={{ borderBottom: '1px solid var(--zander-border-gray)', cursor: 'pointer' }}>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                           <div style={{
