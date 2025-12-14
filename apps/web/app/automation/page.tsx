@@ -217,7 +217,7 @@ export default function AutomationPage() {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
               { icon: '📧', label: 'Email Automation', href: '/automation', id: 'automation' },
-              { icon: '📄', label: 'Proposals', href: '/proposals', id: 'proposals' },
+              { icon: '📋', label: 'Forms', href: '/forms', id: 'forms' },
               { icon: '🤖', label: 'AI Assistant', href: '/ai', id: 'ai' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>

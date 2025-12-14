@@ -212,7 +212,7 @@ export default function AnalyticsPage() {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
               { icon: '📧', label: 'Email Automation', href: '/automation' },
-              { icon: '📄', label: 'Proposals', href: '/proposals' },
+              { icon: '📋', label: 'Forms', href: '/forms' },
               { icon: '🤖', label: 'AI Assistant', href: '/ai' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
