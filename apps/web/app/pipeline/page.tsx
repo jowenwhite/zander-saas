@@ -69,17 +69,25 @@ export default function PipelinePage() {
   async function fetchData() {
     try {
       const [dealsRes, contactsRes] = await Promise.all([
-        fetch('http://localhost:3001/deals'),
-        fetch('http://localhost:3001/contacts')
+        fetch('http://localhost:3001/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch('http://localhost:3001/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
       ]);
       
       if (dealsRes.ok) {
-        const dealsData = await dealsRes.json();
-        setDeals(Array.isArray(dealsData) ? dealsData : []);
+        const pipelineData = await dealsRes.json();
+        const allDeals = [
+          ...pipelineData.pipeline.PROSPECT,
+          ...pipelineData.pipeline.QUALIFIED,
+          ...pipelineData.pipeline.PROPOSAL,
+          ...pipelineData.pipeline.NEGOTIATION,
+          ...pipelineData.pipeline.CLOSED_WON,
+          ...(pipelineData.pipeline.CLOSED_LOST || [])
+        ];
+        setDeals(allDeals);
       }
       if (contactsRes.ok) {
         const contactsData = await contactsRes.json();
-        setContacts(Array.isArray(contactsData) ? contactsData : []);
+        setContacts(contactsData.data || []);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -93,7 +101,7 @@ export default function PipelinePage() {
     try {
       const response = await fetch('http://localhost:3001/deals', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify({
           dealName: dealForm.dealName,
           dealValue: parseFloat(dealForm.dealValue),
