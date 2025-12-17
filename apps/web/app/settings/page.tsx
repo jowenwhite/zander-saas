@@ -44,7 +44,7 @@ export default function SettingsPage() {
   });
 
   // Team State
-  const [team] = useState([
+  const [team, setTeam] = useState<any[]>([
     { id: 1, name: 'Jonathan White', email: 'jonathan@64west.com', role: 'Owner', keystone: 'Pipeline Value', status: 'active', avatar: 'JW' },
     { id: 2, name: 'David Sheets', email: 'david@64west.com', role: 'Admin', keystone: 'Leads/Month', status: 'active', avatar: 'DS' },
     { id: 3, name: 'Sarah Johnson', email: 'sarah@64west.com', role: 'Manager', keystone: 'On-Time Delivery', status: 'active', avatar: 'SJ' },
@@ -118,6 +118,8 @@ export default function SettingsPage() {
   // Loading state
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteForm, setInviteForm] = useState({ email: "", firstName: "", lastName: "", role: "member" });
 
   // Fetch profile and company data on mount
   useEffect(() => {
@@ -151,6 +153,22 @@ export default function SettingsPage() {
             ...prev,
             name: tenantData.companyName || '',
           }));
+        }
+        // Fetch team members
+        const teamRes = await fetch('http://localhost:3001/users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (teamRes.ok) {
+          const teamData = await teamRes.json();
+          setTeam(teamData.map((user: any) => ({
+            id: user.id,
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            role: user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Member',
+            phone: user.phone,
+            status: 'active',
+            avatar: `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase(),
+          })));
         }
       } catch (error) {
         console.error('Error fetching settings:', error);
@@ -215,6 +233,49 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error saving company:', error);
       alert('Error saving company settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+
+  // Invite new team member
+  const inviteUser = async () => {
+    if (!inviteForm.email || !inviteForm.firstName || !inviteForm.lastName) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    setSaving(true);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('http://localhost:3001/users/invite', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(inviteForm)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTeam(prev => [...prev, {
+          id: data.user.id,
+          name: `${data.user.firstName} ${data.user.lastName}`,
+          email: data.user.email,
+          role: data.user.role ? data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1) : 'Member',
+          status: 'invited',
+          avatar: `${data.user.firstName?.[0] || ''}${data.user.lastName?.[0] || ''}`.toUpperCase(),
+        }]);
+        setShowInviteModal(false);
+        setInviteForm({ email: '', firstName: '', lastName: '', role: 'member' });
+        alert('Invitation sent successfully!');
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Error sending invitation');
+      }
+    } catch (error) {
+      console.error('Error inviting user:', error);
+      alert('Error sending invitation');
     } finally {
       setSaving(false);
     }
@@ -535,7 +596,7 @@ export default function SettingsPage() {
           <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Team Members</h3>
           <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>{team.length} members</p>
         </div>
-        <button style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>+ Invite Member</button>
+        <button style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }} onClick={() => setShowInviteModal(true)}>+ Invite Member</button>
       </div>
 
       <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', overflow: 'hidden' }}>
@@ -918,6 +979,39 @@ export default function SettingsPage() {
           </div>
         </main>
       </div>
-    </AuthGuard>
+
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '450px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.3rem' }}>Invite Team Member</h3>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>First Name *</label>
+              <input type="text" value={inviteForm.firstName} onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Last Name *</label>
+              <input type="text" value={inviteForm.lastName} onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Email *</label>
+              <input type="email" value={inviteForm.email} onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+            </div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Role</label>
+              <select value={inviteForm.role} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}>
+                <option value="member">Member</option>
+                <option value="manager">Manager</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowInviteModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={inviteUser} disabled={saving} style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>{saving ? 'Sending...' : 'Send Invite'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+        </AuthGuard>
   );
 }
