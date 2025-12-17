@@ -10,6 +10,7 @@ import { AuthController } from './auth/auth.controller';
 import { PublicGuard } from './auth/public.guard';
 import { ContactsModule } from './contacts/contacts.module';
 import { DealsModule } from './deals/deals.module';
+import { ActivitiesModule } from './activities/activities.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { DealsModule } from './deals/deals.module';
       envFilePath: '.env',
     }),
     ContactsModule,
-    DealsModule
+    DealsModule,
+    ActivitiesModule
   ],
   controllers: [AppController, AuthController],
   providers: [

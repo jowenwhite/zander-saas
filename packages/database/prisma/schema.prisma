@@ -32,6 +32,7 @@ model Tenant {
   users User[]
   contacts Contact[]
   deals Deal[]
+  activities Activity[]
   @@map("tenants")
 }
 
@@ -45,6 +46,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
+  activities Activity[]
   @@map("users")
 }
 
@@ -62,6 +64,7 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
+  activities Activity[]
   deals Deal[]
   @@map("contacts")
 }
@@ -85,6 +88,31 @@ model Deal {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
+  activities Activity[]
   contact Contact? @relation(fields: [contactId], references: [id])
   @@map("deals")
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  tenantId    String
+  type        String   // 'email', 'call', 'meeting', 'note', 'task'
+  subject     String?
+  description String?
+  date        DateTime @default(now())
+  contactId   String?
+  dealId      String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  contact     Contact? @relation(fields: [contactId], references: [id])
+  deal        Deal?    @relation(fields: [dealId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([dealId])
+  @@map("activities")
 }
