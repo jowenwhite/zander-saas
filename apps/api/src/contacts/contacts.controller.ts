@@ -14,7 +14,12 @@ export class ContactsController {
   }
 
   // GET /contacts/:id - Get single contact
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Request() req) {
+    return this.contactsService.findOne(id, req.tenantId);
+  }
   // POST /contacts - Create new contact
+
   @Post()
   async create(@Body() data: any, @Request() req) {
     return this.contactsService.create(data, req.tenantId);

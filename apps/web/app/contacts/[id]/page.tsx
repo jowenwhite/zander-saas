@@ -80,25 +80,23 @@ export default function ContactDetailPage() {
   useEffect(() => {
     const fetchContact = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:3001/contacts/${params.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
+        const token = localStorage.getItem('zander_token');
+        const response = await fetch(
+          `http://localhost:3001/contacts/${params.id}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
         if (!response.ok) throw new Error('Contact not found');
-        
         const data = await response.json();
         setContact(data);
         setNotes(data.notes || '');
-
         // Fetch deals for this contact
-        const dealsResponse = await fetch(`http://localhost:3001/deals`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
+        const dealsResponse = await fetch(
+          `http://localhost:3001/deals`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
         if (dealsResponse.ok) {
           const allDeals = await dealsResponse.json();
-          const contactDeals = allDeals.filter((d: any) => d.contactId === data.id);
+          const contactDeals = allDeals.data.filter((d: any) => d.contactId === data.id);
           setDeals(contactDeals);
         }
       } catch (err) {
@@ -107,23 +105,24 @@ export default function ContactDetailPage() {
         setLoading(false);
       }
     };
-
     if (params.id) {
       fetchContact();
     }
   }, [params.id]);
-
   const handleSaveNotes = async () => {
     try {
-      const token = localStorage.getItem('token');
-      await fetch(`http://localhost:3001/contacts/${params.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ notes })
-      });
+      const token = localStorage.getItem('zander_token');
+      await fetch(
+        `http://localhost:3001/contacts/${params.id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ notes })
+        }
+      );
       setContact(prev => prev ? { ...prev, notes } : null);
       setIsEditingNotes(false);
     } catch (err) {
