@@ -53,7 +53,7 @@ export default function SettingsPage() {
   ]);
 
   // Pipeline Stages State
-  const [stages, setStages] = useState([
+  const [stages, setStages] = useState<any[]>([
     { id: 1, name: 'Prospect', probability: 10, color: '#6C757D' },
     { id: 2, name: 'Qualified', probability: 25, color: '#007BFF' },
     { id: 3, name: 'Proposal', probability: 50, color: '#F0B323' },
@@ -170,6 +170,22 @@ export default function SettingsPage() {
             avatar: `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase(),
           })));
         }
+        // Fetch pipeline stages
+        const stagesRes = await fetch('http://localhost:3001/pipeline-stages', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (stagesRes.ok) {
+          const stagesData = await stagesRes.json();
+          if (stagesData.length > 0) {
+            setStages(stagesData.map((stage: any) => ({
+              id: stage.id,
+              name: stage.name,
+              probability: stage.probability,
+              color: stage.color,
+              order: stage.order,
+            })));
+          }
+        }
       } catch (error) {
         console.error('Error fetching settings:', error);
       } finally {
@@ -278,6 +294,28 @@ export default function SettingsPage() {
       alert('Error sending invitation');
     } finally {
       setSaving(false);
+    }
+  };
+
+
+  // Update pipeline stage
+  const updateStage = async (stageId: string, updates: any) => {
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch(`http://localhost:3001/pipeline-stages/${stageId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setStages(prev => prev.map(s => s.id === stageId ? { ...s, ...updated } : s));
+      }
+    } catch (error) {
+      console.error('Error updating stage:', error);
     }
   };
 

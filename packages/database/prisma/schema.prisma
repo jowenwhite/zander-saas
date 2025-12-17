@@ -33,6 +33,7 @@ model Tenant {
   contacts Contact[]
   deals Deal[]
   activities Activity[]
+  pipelineStages PipelineStage[]
   @@map("tenants")
 }
 
@@ -118,4 +119,17 @@ model Activity {
   @@index([contactId])
   @@index([dealId])
   @@map("activities")
+}
+
+model PipelineStage {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  order       Int
+  probability Int      @default(0)
+  color       String   @default("#6C757D")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  @@map("pipeline_stages")
 }

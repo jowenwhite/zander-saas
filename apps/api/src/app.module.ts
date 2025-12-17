@@ -13,6 +13,7 @@ import { DealsModule } from './deals/deals.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
+import { PipelineStagesModule } from './pipeline-stages/pipeline-stages.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,7 +24,8 @@ import { UsersModule } from './users/users.module';
     DealsModule,
     ActivitiesModule,
     TenantsModule,
-    UsersModule
+    UsersModule,
+    PipelineStagesModule
   ],
   controllers: [AppController, AuthController],
   providers: [
