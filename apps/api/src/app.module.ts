@@ -14,6 +14,7 @@ import { ActivitiesModule } from './activities/activities.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
 import { PipelineStagesModule } from './pipeline-stages/pipeline-stages.module';
+import { FormsModule } from './forms/forms.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,7 +26,8 @@ import { PipelineStagesModule } from './pipeline-stages/pipeline-stages.module';
     ActivitiesModule,
     TenantsModule,
     UsersModule,
-    PipelineStagesModule
+    PipelineStagesModule,
+    FormsModule
   ],
   controllers: [AppController, AuthController],
   providers: [
