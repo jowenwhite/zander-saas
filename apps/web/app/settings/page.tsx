@@ -961,6 +961,90 @@ export default function SettingsPage() {
     </div>
   );
 
+
+  // Export data as CSV
+  const exportCSV = async () => {
+    const token = localStorage.getItem('zander_token');
+    try {
+      const [contactsRes, dealsRes] = await Promise.all([
+        fetch('http://localhost:3001/contacts/export', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch('http://localhost:3001/deals/export', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+      const contacts = await contactsRes.json();
+      const deals = await dealsRes.json();
+      
+      // Create CSV for contacts
+      const contactsCsv = [
+        ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Created'],
+        ...contacts.map((c: any) => [c.firstName, c.lastName, c.email, c.phone || '', c.company || '', c.createdAt])
+      ].map(row => row.join(',')).join('\n');
+      
+      // Create CSV for deals
+      const dealsCsv = [
+        ['Title', 'Value', 'Stage', 'Contact', 'Created'],
+        ...deals.map((d: any) => [d.title, d.value, d.stage, d.contact?.firstName || '', d.createdAt])
+      ].map(row => row.join(',')).join('\n');
+      
+      // Download contacts CSV
+      const contactsBlob = new Blob([contactsCsv], { type: 'text/csv' });
+      const contactsUrl = URL.createObjectURL(contactsBlob);
+      const contactsLink = document.createElement('a');
+      contactsLink.href = contactsUrl;
+      contactsLink.download = 'contacts_export.csv';
+      contactsLink.click();
+      
+      // Download deals CSV
+      const dealsBlob = new Blob([dealsCsv], { type: 'text/csv' });
+      const dealsUrl = URL.createObjectURL(dealsBlob);
+      const dealsLink = document.createElement('a');
+      dealsLink.href = dealsUrl;
+      dealsLink.download = 'deals_export.csv';
+      dealsLink.click();
+      
+      alert('Data exported successfully!');
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Error exporting data');
+    }
+  };
+
+  // Export data as JSON
+  const exportJSON = async () => {
+    const token = localStorage.getItem('zander_token');
+    try {
+      const [contactsRes, dealsRes, usersRes, stagesRes] = await Promise.all([
+        fetch('http://localhost:3001/contacts/export', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:3001/deals/export', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:3001/users', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:3001/pipeline-stages', { headers: { 'Authorization': `Bearer ${token}` } })
+      ]);
+      
+      const data = {
+        exportDate: new Date().toISOString(),
+        contacts: await contactsRes.json(),
+        deals: await dealsRes.json(),
+        team: await usersRes.json(),
+        pipelineStages: await stagesRes.json()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'zander_export.json';
+      link.click();
+      
+      alert('Data exported successfully!');
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Error exporting data');
+    }
+  };
+
   const renderDataTab = () => (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
@@ -970,7 +1054,7 @@ export default function SettingsPage() {
           <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
             <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>Download all your data in a portable format. This includes contacts, deals, communications, and settings.</p>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <button style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Export as CSV</button>
+              <button style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }} onClick={exportCSV}>Export as CSV</button>
               <button style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Export as JSON</button>
             </div>
           </div>
