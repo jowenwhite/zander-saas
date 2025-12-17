@@ -129,7 +129,10 @@ export default function DealDetailPage() {
 
   async function fetchDeal() {
     try {
-      const response = await fetch(`http://localhost:3001/deals/${dealId}`);
+      const response = await fetch(
+        `http://localhost:3001/deals/${dealId}`,
+        { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }
+      );
       if (response.ok) {
         const data = await response.json();
         setDeal(data);
@@ -143,14 +146,16 @@ export default function DealDetailPage() {
       setLoading(false);
     }
   }
-
   async function updateDealStage(newStage: string) {
     try {
-      const response = await fetch(`http://localhost:3001/deals/${dealId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stage: newStage }),
-      });
+      const response = await fetch(
+        `http://localhost:3001/deals/${dealId}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
+          body: JSON.stringify({ stage: newStage }),
+        }
+      );
       if (response.ok) {
         fetchDeal();
       }
@@ -158,14 +163,16 @@ export default function DealDetailPage() {
       console.error('Error updating deal:', error);
     }
   }
-
   async function saveNotes() {
     try {
-      const response = await fetch(`http://localhost:3001/deals/${dealId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes }),
-      });
+      const response = await fetch(
+        `http://localhost:3001/deals/${dealId}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
+          body: JSON.stringify({ notes }),
+        }
+      );
       if (response.ok) {
         setIsEditingNotes(false);
         fetchDeal();
@@ -174,6 +181,7 @@ export default function DealDetailPage() {
       console.error('Error saving notes:', error);
     }
   }
+
 
   function moveToNextStage() {
     if (!deal) return;
