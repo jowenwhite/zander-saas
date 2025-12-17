@@ -47,10 +47,10 @@ export default function AnalyticsPage() {
 
   async function fetchData() {
     try {
-      const response = await fetch('http://localhost:3001/deals');
+      const response = await fetch('http://localhost:3001/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } });
       if (response.ok) {
         const data = await response.json();
-        setDeals(Array.isArray(data) ? data : []);
+        const allDeals = [...(data.pipeline.PROSPECT || []), ...(data.pipeline.QUALIFIED || []), ...(data.pipeline.PROPOSAL || []), ...(data.pipeline.NEGOTIATION || []), ...(data.pipeline.CLOSED_WON || []), ...(data.pipeline.CLOSED_LOST || [])]; setDeals(allDeals);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
