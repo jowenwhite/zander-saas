@@ -974,8 +974,10 @@ export default function SettingsPage() {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
-      const contacts = await contactsRes.json();
-      const deals = await dealsRes.json();
+      const contactsData = await contactsRes.json();
+      const contacts = Array.isArray(contactsData) ? contactsData : (contactsData.data || []);
+      const dealsData = await dealsRes.json();
+      const deals = Array.isArray(dealsData) ? dealsData : (dealsData.data || []);
       
       // Create CSV for contacts
       const contactsCsv = [
@@ -1025,8 +1027,8 @@ export default function SettingsPage() {
       
       const data = {
         exportDate: new Date().toISOString(),
-        contacts: await contactsRes.json(),
-        deals: await dealsRes.json(),
+        contacts: await contactsRes.json().then(d => Array.isArray(d) ? d : (d.data || [])),
+        deals: await dealsRes.json().then(d => Array.isArray(d) ? d : (d.data || [])),
         team: await usersRes.json(),
         pipelineStages: await stagesRes.json()
       };
