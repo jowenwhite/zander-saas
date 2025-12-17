@@ -35,6 +35,9 @@ model Tenant {
   activities Activity[]
   pipelineStages PipelineStage[]
   forms Form[]
+  emailTemplates EmailTemplate[]
+  emailSequences EmailSequence[]
+  scheduledCommunications ScheduledCommunication[]
   @@map("tenants")
 }
 
@@ -72,6 +75,8 @@ model Contact {
   activities Activity[]
   deals Deal[]
   formSubmissions FormSubmission[]
+  sequenceEnrollments SequenceEnrollment[]
+  scheduledCommunications ScheduledCommunication[]
   @@map("contacts")
 }
 
@@ -160,4 +165,86 @@ model FormSubmission {
   form      Form     @relation(fields: [formId], references: [id])
   contact   Contact? @relation(fields: [contactId], references: [id])
   @@map("form_submissions")
+}
+
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  subject     String?
+  body        String?
+  type        String   @default("email") // email, sms, call
+  category    String?
+  stage       String?
+  status      String   @default("draft") // draft, active
+  variables   Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  sequenceSteps EmailSequenceStep[]
+  @@map("email_templates")
+}
+
+model EmailSequence {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  status      String   @default("draft") // draft, active, paused
+  triggerType String?  // manual, stage_change, form_submission
+  triggerConfig Json   @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  steps       EmailSequenceStep[]
+  enrollments SequenceEnrollment[]
+  @@map("email_sequences")
+}
+
+model EmailSequenceStep {
+  id          String   @id @default(cuid())
+  sequenceId  String
+  templateId  String
+  order       Int
+  delayDays   Int      @default(0)
+  delayHours  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sequence    EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  template    EmailTemplate @relation(fields: [templateId], references: [id])
+  @@map("email_sequence_steps")
+}
+
+model SequenceEnrollment {
+  id          String   @id @default(cuid())
+  sequenceId  String
+  contactId   String
+  dealId      String?
+  status      String   @default("active") // active, completed, paused, cancelled
+  currentStep Int      @default(0)
+  enrolledAt  DateTime @default(now())
+  completedAt DateTime?
+  sequence    EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  contact     Contact  @relation(fields: [contactId], references: [id])
+  @@map("sequence_enrollments")
+}
+
+model ScheduledCommunication {
+  id           String   @id @default(cuid())
+  tenantId     String
+  contactId    String
+  dealId       String?
+  templateId   String?
+  type         String   // email, sms, call
+  subject      String?
+  body         String?
+  scheduledFor DateTime
+  status       String   @default("pending") // pending, approved, sent, cancelled
+  needsApproval Boolean @default(false)
+  sentAt       DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  contact      Contact  @relation(fields: [contactId], references: [id])
+  @@map("scheduled_communications")
 }

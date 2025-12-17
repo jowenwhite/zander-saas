@@ -15,6 +15,7 @@ import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
 import { PipelineStagesModule } from './pipeline-stages/pipeline-stages.module';
 import { FormsModule } from './forms/forms.module';
+import { AutomationModule } from './automation/automation.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,7 +28,8 @@ import { FormsModule } from './forms/forms.module';
     TenantsModule,
     UsersModule,
     PipelineStagesModule,
-    FormsModule
+    FormsModule,
+    AutomationModule
   ],
   controllers: [AppController, AuthController],
   providers: [
