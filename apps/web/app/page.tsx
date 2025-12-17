@@ -86,15 +86,15 @@ export default function CRODashboard() {
   async function fetchData() {
     try {
       const [contactsRes, dealsRes] = await Promise.all([
-        fetch('http://localhost:3001/contacts'),
-        fetch('http://localhost:3001/deals'),
+        fetch('http://localhost:3001/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch('http://localhost:3001/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
       ]);
       
       if (contactsRes.ok && dealsRes.ok) {
         const contactsData = await contactsRes.json();
         const dealsData = await dealsRes.json();
-        setContacts(Array.isArray(contactsData) ? contactsData : []);
-        setDeals(Array.isArray(dealsData) ? dealsData : []);
+        setContacts(contactsData.data || []);
+        const allDeals = [...(dealsData.pipeline.PROSPECT || []), ...(dealsData.pipeline.QUALIFIED || []), ...(dealsData.pipeline.PROPOSAL || []), ...(dealsData.pipeline.NEGOTIATION || []), ...(dealsData.pipeline.CLOSED_WON || []), ...(dealsData.pipeline.CLOSED_LOST || [])]; setDeals(allDeals);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -108,7 +108,7 @@ export default function CRODashboard() {
     try {
       const response = await fetch('http://localhost:3001/contacts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify(contactForm),
       });
       if (response.ok) {
@@ -126,7 +126,7 @@ export default function CRODashboard() {
     try {
       const response = await fetch('http://localhost:3001/deals', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify({
           dealName: dealForm.dealName,
           dealValue: parseFloat(dealForm.dealValue),
