@@ -44,6 +44,7 @@ model User {
   lastName String
   password String @default("")
   phone String?
+  role String @default("member")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
@@ -58,6 +59,7 @@ model Contact {
   lastName String
   email String
   phone String?
+  role String @default("member")
   company String?
   title String?
   source String?

@@ -12,7 +12,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { DealsModule } from './deals/deals.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { TenantsModule } from './tenants/tenants.module';
-
+import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,7 +22,8 @@ import { TenantsModule } from './tenants/tenants.module';
     ContactsModule,
     DealsModule,
     ActivitiesModule,
-    TenantsModule
+    TenantsModule,
+    UsersModule
   ],
   controllers: [AppController, AuthController],
   providers: [
