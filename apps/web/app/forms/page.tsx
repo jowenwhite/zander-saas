@@ -99,6 +99,34 @@ const industryPacks: IndustryPack[] = [
       { name: 'Referral Request', description: 'Structured ask for referrals and introductions', category: 'Post-Sale & Service', fields: 6, status: 'active' },
     ]
   },
+  {
+    id: 'agency',
+    name: 'Agency Pack',
+    description: 'Marketing, creative, and digital agencies',
+    icon: '🎨',
+    status: 'available',
+    forms: [
+      { name: 'Creative Brief', description: 'Project creative direction and requirements', category: 'Client Intake', fields: 20, status: 'active' },
+      { name: 'Campaign Intake', description: 'Marketing campaign requirements gathering', category: 'Client Intake', fields: 16, status: 'active' },
+      { name: 'Brand Questionnaire', description: 'Brand identity and guidelines discovery', category: 'Discovery & Qualification', fields: 25, status: 'active' },
+      { name: 'Revision Request', description: 'Client revision and feedback submission', category: 'Project Delivery', fields: 8, status: 'active' },
+      { name: 'Project Approval', description: 'Final deliverable sign-off', category: 'Project Delivery', fields: 6, status: 'active' },
+    ]
+  },
+  {
+    id: 'realestate',
+    name: 'Real Estate',
+    description: 'Agents, brokers, and property management',
+    icon: '🏠',
+    status: 'coming_soon',
+    forms: []
+  },
+  {
+    id: 'healthcare',
+    name: 'Healthcare',
+    description: 'Medical practices and wellness providers',
+    icon: '🏥',
+    status: 'coming_soon',
     forms: []
   },
 ];
