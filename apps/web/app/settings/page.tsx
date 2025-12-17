@@ -298,6 +298,79 @@ export default function SettingsPage() {
   };
 
 
+
+  // Add new pipeline stage
+  const addStage = async () => {
+    const token = localStorage.getItem('zander_token');
+    const newOrder = stages.length;
+    try {
+      const res = await fetch('http://localhost:3001/pipeline-stages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: 'New Stage',
+          order: newOrder,
+          probability: 0,
+          color: '#6C757D'
+        })
+      });
+      if (res.ok) {
+        const newStage = await res.json();
+        setStages(prev => [...prev, newStage]);
+      }
+    } catch (error) {
+      console.error('Error adding stage:', error);
+    }
+  };
+
+  // Delete pipeline stage
+  const deleteStage = async (stageId: string) => {
+    if (!confirm('Are you sure you want to delete this stage?')) return;
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch(`http://localhost:3001/pipeline-stages/${stageId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setStages(prev => prev.filter(s => s.id !== stageId));
+      }
+    } catch (error) {
+      console.error('Error deleting stage:', error);
+    }
+  };
+
+  // Save all stages
+  const saveAllStages = async () => {
+    setSaving(true);
+    const token = localStorage.getItem('zander_token');
+    try {
+      await Promise.all(stages.map(stage =>
+        fetch(`http://localhost:3001/pipeline-stages/${stage.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: stage.name,
+            probability: stage.probability,
+            color: stage.color
+          })
+        })
+      ));
+      alert('Pipeline stages saved successfully!');
+    } catch (error) {
+      console.error('Error saving stages:', error);
+      alert('Error saving stages');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Update pipeline stage
   const updateStage = async (stageId: string, updates: any) => {
     const token = localStorage.getItem('zander_token');
@@ -700,7 +773,7 @@ export default function SettingsPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Pipeline Stages</h3>
-            <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.85rem' }}>+ Add Stage</button>
+            <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.85rem' }} onClick={addStage}>+ Add Stage</button>
           </div>
           <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem' }}>Drag to reorder stages. Deals will follow this sequence.</p>
 
@@ -735,12 +808,12 @@ export default function SettingsPage() {
                   />
                   <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>%</span>
                 </div>
-                <button style={{ padding: '0.35rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--zander-gray)' }}>🗑️</button>
+                <button style={{ padding: '0.35rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--zander-gray)' }} onClick={() => deleteStage(stage.id)}>🗑️</button>
               </div>
             ))}
           </div>
 
-          <button style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>Save Stages</button>
+          <button style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }} onClick={saveAllStages} disabled={saving}>{saving ? "Saving..." : "Save Stages"}</button>
         </div>
 
         <div>
