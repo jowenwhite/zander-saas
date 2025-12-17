@@ -37,6 +37,7 @@ export class PublicGuard implements CanActivate {
       }
       const decoded = jwt.verify(token, jwtSecret);
       request.user = decoded;
+      request.tenantId = (decoded as any).tenantId;
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');

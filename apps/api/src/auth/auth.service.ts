@@ -90,6 +90,62 @@ export class AuthService {
     };
   }
 
+
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        tenantId: true,
+        createdAt: true,
+        updatedAt: true,
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true,
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
+  }
+
+  async updateProfile(userId: string, data: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+  }) {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        tenantId: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    });
+
+    return user;
+  }
   private generateToken(user: {
     id: string;
     email: string;

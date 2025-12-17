@@ -11,6 +11,7 @@ import { PublicGuard } from './auth/public.guard';
 import { ContactsModule } from './contacts/contacts.module';
 import { DealsModule } from './deals/deals.module';
 import { ActivitiesModule } from './activities/activities.module';
+import { TenantsModule } from './tenants/tenants.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { ActivitiesModule } from './activities/activities.module';
     }),
     ContactsModule,
     DealsModule,
-    ActivitiesModule
+    ActivitiesModule,
+    TenantsModule
   ],
   controllers: [AppController, AuthController],
   providers: [
