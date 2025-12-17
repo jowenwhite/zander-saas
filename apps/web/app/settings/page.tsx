@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
@@ -113,6 +113,112 @@ export default function SettingsPage() {
       { id: 'INV-003', date: 'Oct 14, 2024', amount: '$99.00', status: 'paid' },
     ]
   });
+
+
+  // Loading state
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Fetch profile and company data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('zander_token');
+      if (!token) return;
+
+      try {
+        // Fetch user profile
+        const profileRes = await fetch('http://localhost:3001/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          setProfile(prev => ({
+            ...prev,
+            firstName: profileData.firstName || '',
+            lastName: profileData.lastName || '',
+            email: profileData.email || '',
+            phone: profileData.phone || '',
+          }));
+        }
+
+        // Fetch tenant/company data
+        const tenantRes = await fetch('http://localhost:3001/tenants/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (tenantRes.ok) {
+          const tenantData = await tenantRes.json();
+          setCompany(prev => ({
+            ...prev,
+            name: tenantData.companyName || '',
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Save profile changes
+  const saveProfile = async () => {
+    setSaving(true);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('http://localhost:3001/auth/me', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          phone: profile.phone,
+        })
+      });
+      if (res.ok) {
+        alert('Profile saved successfully!');
+      } else {
+        alert('Error saving profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Save company changes
+  const saveCompany = async () => {
+    setSaving(true);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('http://localhost:3001/tenants/me', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          companyName: company.name,
+        })
+      });
+      if (res.ok) {
+        alert('Company settings saved successfully!');
+      } else {
+        alert('Error saving company settings');
+      }
+    } catch (error) {
+      console.error('Error saving company:', error);
+      alert('Error saving company settings');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: '👤' },
@@ -254,7 +360,7 @@ export default function SettingsPage() {
             ))}
           </div>
 
-          <button style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>Save Changes</button>
+          <button onClick={saveProfile} disabled={saving} style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
         </div>
       </div>
     </div>
@@ -416,7 +522,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <button style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>Save Changes</button>
+          <button onClick={saveCompany} disabled={saving} style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
         </div>
       </div>
     </div>
