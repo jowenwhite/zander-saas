@@ -549,11 +549,8 @@ export default function CRODashboard() {
           </div>
         </div>
 
-        {/* Content Grid - Pipeline & Activity */}
+        {/* Pipeline Overview - Full Width */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr',
-          gap: '2rem',
           marginBottom: '2rem'
         }}>
           {/* Pipeline Preview */}
@@ -674,7 +671,15 @@ export default function CRODashboard() {
               })}
             </div>
           </div>
+        </div>
 
+        {/* Activity, Tasks & Follow-ups - 3 Column Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '1.5rem',
+          marginBottom: '2rem'
+        }}>
           {/* Activity Feed */}
           <div style={{
             background: 'white',
@@ -746,14 +751,6 @@ export default function CRODashboard() {
               ))}
             </ul>
           </div>
-        </div>
-
-        {/* Tasks Section */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '2rem'
-        }}>
           {/* Today's Tasks */}
           <div style={{
             background: 'white',
