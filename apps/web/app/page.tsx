@@ -56,6 +56,7 @@ export default function CRODashboard() {
   const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeModule, setActiveModule] = useState('cro');
   const [showNewDealModal, setShowNewDealModal] = useState(false);
@@ -163,13 +164,64 @@ export default function CRODashboard() {
     return 'Good evening';
   };
 
-  // Sample activities (would come from API in production)
-  const recentActivities: Activity[] = [
-    { id: '1', type: 'call', title: 'Called Precision Metal Works', description: 'Follow up on proposal', date: '2 hours ago' },
-    { id: '2', type: 'email', title: 'Sent quote to ProBuild', description: 'Kitchen cabinet quote', date: '4 hours ago' },
-    { id: '3', type: 'meeting', title: 'Demo with Elite HVAC', description: 'Product demonstration', date: 'Yesterday' },
-    { id: '4', type: 'note', title: 'Updated Georgia Furniture', description: 'Added requirements notes', date: 'Yesterday' },
-  ];
+  // Format activities from API
+  const formatTimeAgo = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays === 1) return 'Yesterday';
+    return `${diffDays} days ago`;
+  };
+
+  const recentActivities: Activity[] = activities.length > 0 
+    ? activities.slice(0, 5).map(a => ({
+        id: a.id,
+        type: a.type || 'note',
+        title: a.subject || 'Activity',
+        description: a.description || '',
+        date: formatTimeAgo(a.createdAt)
+      }))
+    : [
+        { id: '1', type: 'call', title: 'Called Precision Metal Works', description: 'Follow up on proposal', date: '2 hours ago' },
+        { id: '2', type: 'email', title: 'Sent quote to ProBuild', description: 'Kitchen cabinet quote', date: '4 hours ago' },
+        { id: '3', type: 'meeting', title: 'Demo with Elite HVAC', description: 'Product demonstration', date: 'Yesterday' },
+        { id: '4', type: 'note', title: 'Updated Georgia Furniture', description: 'Added requirements notes', date: 'Yesterday' },
+      ];
+
+  // Compute tasks from deals in PROPOSAL/NEGOTIATION stages
+  const todaysTasks = deals
+    .filter(d => d.stage === 'PROPOSAL' || d.stage === 'NEGOTIATION')
+    .slice(0, 3)
+    .map(d => ({
+      title: `Follow up with ${d.dealName.split(' - ')[1] || d.dealName}`,
+      detail: d.stage === 'PROPOSAL' ? 'Proposal pending review' : 'In negotiation',
+      priority: d.dealValue > 10000 ? 'high' : 'medium',
+      dealId: d.id
+    }));
+
+  // Compute follow-ups from deals with no recent activity (using deals not in CLOSED stages)
+  const followupsNeeded = deals
+    .filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST')
+    .filter(d => {
+      const lastUpdate = new Date(d.updatedAt);
+      const daysSince = Math.floor((Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
+      return daysSince >= 3;
+    })
+    .slice(0, 3)
+    .map(d => {
+      const lastUpdate = new Date(d.updatedAt);
+      const daysSince = Math.floor((Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
+      return {
+        title: d.dealName.split(' - ')[1] || d.dealName,
+        detail: `No contact in ${daysSince} days`,
+        overdue: daysSince >= 7,
+        dealId: d.id
+      };
+    });
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
@@ -703,7 +755,7 @@ export default function CRODashboard() {
 
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {recentActivities.map((activity) => (
-                <li key={activity.id} style={{
+                <li key={activity.id} onClick={() => router.push('/pipeline')} style={{
                   display: 'flex',
                   gap: '1rem',
                   padding: '1rem',
@@ -711,7 +763,9 @@ export default function CRODashboard() {
                   marginBottom: '0.75rem',
                   transition: 'background 0.2s ease',
                   cursor: 'pointer'
-                }}>
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(191, 10, 48, 0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                   <div style={{
                     width: '40px',
                     height: '40px',
@@ -766,12 +820,12 @@ export default function CRODashboard() {
               marginBottom: '1.5rem'
             }}>Today's Tasks</h3>
 
-            {[
+            {(todaysTasks.length > 0 ? todaysTasks : [
               { title: 'Follow up with Precision Metal Works', detail: 'Proposal sent 3 days ago', priority: 'high' },
               { title: 'Prepare demo for Elite HVAC', detail: 'Meeting tomorrow at 2pm', priority: 'high' },
               { title: 'Send quote to ProBuild Contractors', detail: 'Requested yesterday', priority: 'medium' }
-            ].map((task, i) => (
-              <div key={i} style={{
+            ]).map((task, i) => (
+              <div key={i} onClick={() => task.dealId && router.push("/pipeline")} style={{
                 display: 'flex',
                 alignItems: 'start',
                 gap: '0.75rem',
@@ -843,15 +897,15 @@ export default function CRODashboard() {
                 borderRadius: '50%',
                 fontWeight: '700',
                 fontSize: '0.875rem'
-              }}>2</span>
+              }}>{followupsNeeded.length || 3}</span>
             </div>
 
-            {[
+            {(followupsNeeded.length > 0 ? followupsNeeded : [
               { title: 'Georgia Furniture Co.', detail: 'No contact in 7 days', overdue: true },
               { title: 'Summit Financial Advisors', detail: 'Proposal expires in 2 days', overdue: false },
               { title: 'Atlanta Law Group', detail: 'Waiting for response (5 days)', overdue: true }
-            ].map((task, i) => (
-              <div key={i} style={{
+            ]).map((task, i) => (
+              <div key={i} onClick={() => task.dealId && router.push("/pipeline")} style={{
                 display: 'flex',
                 alignItems: 'start',
                 gap: '0.75rem',
