@@ -19,6 +19,7 @@ import { AutomationModule } from './automation/automation.module';
 import { AiModule } from './ai/ai.module';
 import { EmailModule } from './integrations/email/email.module';
 import { EmailMessagesModule } from './email-messages/email-messages.module';
+import { SmsMessagesModule } from './sms-messages/sms-messages.module';
 @Module({
   imports: [
     ConfigModule.forRoot({

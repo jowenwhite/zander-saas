@@ -39,6 +39,8 @@ model Tenant {
   emailSequences EmailSequence[]
   scheduledCommunications ScheduledCommunication[]
   emailMessages EmailMessage[]
+  smsMessages   SmsMessage[]
+  smsMessages   SmsMessage[]
   @@map("tenants")
 }
 
@@ -79,6 +81,8 @@ model Contact {
   sequenceEnrollments SequenceEnrollment[]
   scheduledCommunications ScheduledCommunication[]
   emailMessages EmailMessage[]
+  smsMessages   SmsMessage[]
+  smsMessages   SmsMessage[]
   @@map("contacts")
 }
 
@@ -277,4 +281,29 @@ model EmailMessage {
   @@index([threadId])
   @@index([messageId])
   @@map("email_messages")
+}
+
+model SmsMessage {
+  id          String    @id @default(cuid())
+  tenantId    String
+  contactId   String?
+  dealId      String?
+  direction   String    // 'inbound' | 'outbound'
+  fromNumber  String
+  toNumber    String
+  body        String
+  messageSid  String?   // Twilio message SID
+  status      String    @default("sent") // sent, delivered, failed, received
+  sentAt      DateTime
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([messageSid])
+  @@map("sms_messages")
 }
