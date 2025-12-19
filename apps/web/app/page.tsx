@@ -825,7 +825,7 @@ export default function CRODashboard() {
               { title: 'Prepare demo for Elite HVAC', detail: 'Meeting tomorrow at 2pm', priority: 'high' },
               { title: 'Send quote to ProBuild Contractors', detail: 'Requested yesterday', priority: 'medium' }
             ]).map((task, i) => (
-              <div key={i} onClick={() => task.dealId && router.push("/pipeline")} style={{
+              <div key={i} onClick={() => (task as any).dealId && router.push("/pipeline")} style={{
                 display: 'flex',
                 alignItems: 'start',
                 gap: '0.75rem',
@@ -905,7 +905,7 @@ export default function CRODashboard() {
               { title: 'Summit Financial Advisors', detail: 'Proposal expires in 2 days', overdue: false },
               { title: 'Atlanta Law Group', detail: 'Waiting for response (5 days)', overdue: true }
             ]).map((task, i) => (
-              <div key={i} onClick={() => task.dealId && router.push("/pipeline")} style={{
+              <div key={i} onClick={() => (task as any).dealId && router.push("/pipeline")} style={{
                 display: 'flex',
                 alignItems: 'start',
                 gap: '0.75rem',

@@ -144,6 +144,9 @@ export default function FormsPage() {
   const [saving, setSaving] = useState(false);
   const [activatingPack, setActivatingPack] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [viewingForm, setViewingForm] = useState<Form | null>(null);
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   const API_URL = 'https://api.zander.mcfapp.com';
 
@@ -246,6 +249,31 @@ export default function FormsPage() {
     } catch (err) {
       alert('Failed to delete form');
     }
+  };
+
+  const handleSubmitForm = async () => {
+    if (!viewingForm) return;
+    setSubmitting(true);
+    try {
+      const token = localStorage.getItem('zander_token');
+      const res = await fetch(`https://api.zander.mcfapp.com/forms/${viewingForm.id}/submit`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: formData })
+      });
+      if (res.ok) {
+        alert('Form submitted successfully!');
+        setViewingForm(null);
+        setFormData({});
+        fetchForms();
+      } else {
+        const err = await res.json();
+        alert('Error: ' + (err.message || 'Failed to submit'));
+      }
+    } catch (e) {
+      alert('Error submitting form');
+    }
+    setSubmitting(false);
   };
 
   const handleToggleStatus = async (form: Form) => {
@@ -878,6 +906,89 @@ export default function FormsPage() {
           </div>
         </div>
       </main>
+
+      {/* Form Viewer Modal */}
+      {viewingForm && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
+          }}>
+            <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
+              <h2 style={{ margin: 0 }}>{viewingForm.name}</h2>
+              {viewingForm.description && <p style={{ margin: '0.5rem 0 0', opacity: 0.8, fontSize: '0.9rem' }}>{viewingForm.description}</p>}
+            </div>
+            <div style={{ padding: '1.5rem' }}>
+              {viewingForm.fields && viewingForm.fields.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {viewingForm.fields.map((field: any) => (
+                    <div key={field.id}>
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                        {field.label} {field.required && <span style={{ color: 'var(--zander-red)' }}>*</span>}
+                      </label>
+                      {field.type === 'text' || field.type === 'email' ? (
+                        <input
+                          type={field.type}
+                          placeholder={field.placeholder || ''}
+                          value={formData[field.id] || ''}
+                          onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem' }}
+                        />
+                      ) : field.type === 'textarea' ? (
+                        <textarea
+                          placeholder={field.placeholder || ''}
+                          rows={field.rows || 3}
+                          value={formData[field.id] || ''}
+                          onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem', resize: 'vertical' }}
+                        />
+                      ) : field.type === 'select' ? (
+                        <select
+                          value={formData[field.id] || ''}
+                          onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem', background: 'white' }}
+                        >
+                          <option value="">Select...</option>
+                          {field.options?.map((opt: any) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          placeholder={field.placeholder || ''}
+                          value={formData[field.id] || ''}
+                          onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem' }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: '#666', textAlign: 'center', padding: '2rem' }}>This form has no fields configured yet.</p>
+              )}
+            </div>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #DEE2E6', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setViewingForm(null); setFormData({}); }}
+                style={{ padding: '0.75rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitForm}
+                disabled={submitting}
+                style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', opacity: submitting ? 0.7 : 1 }}
+              >
+                {submitting ? 'Submitting...' : 'Submit'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Form Modal */}
       {showCreateModal && (
