@@ -145,6 +145,7 @@ export default function FormsPage() {
   const [activatingPack, setActivatingPack] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [viewingForm, setViewingForm] = useState<Form | null>(null);
+  const [viewingSubmission, setViewingSubmission] = useState<FormSubmission | null>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -794,7 +795,7 @@ export default function FormsPage() {
                           </td>
                           <td style={{ padding: '1rem', textAlign: 'center' }}>
                             <button
-                              onClick={() => alert(`Submission Data:\n\n${JSON.stringify(submission.data, null, 2)}`)}
+                              onClick={() => setViewingSubmission(submission)}
                               style={{
                                 padding: '0.5rem 1rem',
                                 background: 'var(--zander-navy)',
@@ -984,6 +985,53 @@ export default function FormsPage() {
                 style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', opacity: submitting ? 0.7 : 1 }}
               >
                 {submitting ? 'Submitting...' : 'Submit'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submission Viewer Modal */}
+      {viewingSubmission && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
+          }}>
+            <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
+              <h2 style={{ margin: 0 }}>Submission Details</h2>
+              <p style={{ margin: '0.5rem 0 0', opacity: 0.8, fontSize: '0.9rem' }}>
+                Submitted: {new Date(viewingSubmission.createdAt).toLocaleString()}
+              </p>
+            </div>
+            <div style={{ padding: '1.5rem' }}>
+              {viewingSubmission.contact && (
+                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
+                  <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>Contact</h4>
+                  <p style={{ margin: 0 }}>{viewingSubmission.contact.firstName} {viewingSubmission.contact.lastName}</p>
+                  <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>{viewingSubmission.contact.email}</p>
+                </div>
+              )}
+              <h4 style={{ margin: '0 0 1rem', color: 'var(--zander-navy)' }}>Form Data</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {Object.entries(viewingSubmission.data || {}).map(([key, value]) => (
+                  <div key={key} style={{ padding: '0.75rem', background: '#f8f9fa', borderRadius: '6px' }}>
+                    <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>
+                      {key.replace(/_/g, ' ')}
+                    </div>
+                    <div style={{ color: '#333' }}>{String(value) || '-'}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #DEE2E6', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setViewingSubmission(null)}
+                style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Close
               </button>
             </div>
           </div>
