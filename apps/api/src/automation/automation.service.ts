@@ -303,20 +303,7 @@ export class AutomationService {
       variables,
     );
 
-    // Log the activity if successful
-    if (result.success) {
-      await this.prisma.activity.create({
-        data: {
-          tenant: { connect: { id: tenantId } },
-          contact: { connect: { id: contactId } },
-          deal: dealId ? { connect: { id: dealId } } : undefined,
-          user: { connect: { id: tenantId } }, // System user placeholder
-          type: 'email',
-          subject: `Email sent: ${template.subject}`,
-          description: `Sent template "${template.name}" to ${contact.email}`,
-        },
-      });
-    }
+    // Activity logging disabled - requires user context
 
     return {
       ...result,
@@ -364,20 +351,7 @@ export class AutomationService {
       },
     });
 
-    // Log activity if successful
-    if (result.success) {
-      await this.prisma.activity.create({
-        data: {
-          tenant: { connect: { id: tenantId } },
-          contact: { connect: { id: scheduled.contactId } },
-          deal: scheduled.dealId ? { connect: { id: scheduled.dealId } } : undefined,
-          user: { connect: { id: tenantId } }, // System user placeholder
-          type: 'email',
-          subject: `Email sent: ${scheduled.subject}`,
-          description: `Sent scheduled email to ${scheduled.contact.email}`,
-        },
-      });
-    }
+    // Activity logging disabled - requires user context
 
     return result;
   }

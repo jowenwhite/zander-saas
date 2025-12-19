@@ -86,6 +86,13 @@ export default function AutomationPage() {
   const [sequenceForm, setSequenceForm] = useState({ name: '', description: '', status: 'draft' });
   const [saving, setSaving] = useState(false);
   const [activatingPack, setActivatingPack] = useState<string | null>(null);
+  // Send Email Modal
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [sendingTemplate, setSendingTemplate] = useState<Template | null>(null);
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [selectedContactId, setSelectedContactId] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const API_URL = 'https://api.zander.mcfapp.com';
 
@@ -282,6 +289,51 @@ export default function AutomationPage() {
   const filteredComms = commFilter === 'all'
     ? communications
     : communications.filter(c => c.status === commFilter);
+
+  
+
+  const fetchContacts = async () => {
+    try {
+      const res = await fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        setContacts(data.data || data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch contacts:', err);
+    }
+  };
+
+  const handleSendTemplate = async (template: Template) => {
+    setSendingTemplate(template);
+    setSelectedContactId('');
+    setSendResult(null);
+    await fetchContacts();
+    setShowSendModal(true);
+  };
+
+  const sendEmailToContact = async () => {
+    if (!sendingTemplate || !selectedContactId) return;
+    setSendingEmail(true);
+    setSendResult(null);
+    try {
+      const res = await fetch(`${API_URL}/templates/${sendingTemplate.id}/send`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ contactId: selectedContactId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSendResult({ success: true, message: 'Email sent successfully to ' + data.recipient });
+      } else {
+        setSendResult({ success: false, message: data.error || 'Failed to send email' });
+      }
+    } catch (err) {
+      setSendResult({ success: false, message: 'Failed to send email' });
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -555,6 +607,7 @@ export default function AutomationPage() {
                             color: template.status === 'active' ? '#27AE60' : 'var(--zander-gray)',
                             borderRadius: '4px', fontSize: '0.65rem', fontWeight: '600', textTransform: 'uppercase'
                           }}>{template.status}</span>
+                          {template.type === 'email' && <button onClick={() => handleSendTemplate(template)} style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '0.75rem', cursor: 'pointer', marginRight: '0.5rem' }}>📤 Send</button>}
                           <button onClick={() => handleEditTemplate(template)} style={{ padding: '0.5rem 1rem', background: 'var(--zander-gold)', color: 'var(--zander-navy)', border: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
                           <button onClick={() => handleDeleteTemplate(template.id)} style={{ padding: '0.5rem 0.75rem', background: 'transparent', color: 'var(--zander-red)', border: '1px solid var(--zander-red)', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>🗑</button>
                         </div>
@@ -840,6 +893,39 @@ export default function AutomationPage() {
             
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
               <button onClick={() => setShowStarterPackModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: 'var(--zander-gray)' }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SEND EMAIL MODAL */}
+      {showSendModal && sendingTemplate && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', width: '500px', maxWidth: '90%' }}>
+            <h2 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>📤 Send Email</h2>
+            <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
+              <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>{sendingTemplate.name}</div>
+              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>{sendingTemplate.subject}</div>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Select Recipient</label>
+              <select value={selectedContactId} onChange={(e) => setSelectedContactId(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px' }}>
+                <option value="">Choose a contact...</option>
+                {(contacts || []).filter(c => c.email).map(c => (
+                  <option key={c.id} value={c.id}>{c.firstName} {c.lastName} ({c.email})</option>
+                ))}
+              </select>
+            </div>
+            {sendResult && (
+              <div style={{ padding: '1rem', borderRadius: '8px', marginBottom: '1rem', background: sendResult.success ? 'rgba(39,174,96,0.1)' : 'rgba(191,10,48,0.1)', color: sendResult.success ? '#27AE60' : 'var(--zander-red)' }}>
+                {sendResult.success ? '✅' : '❌'} {sendResult.message}
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <button onClick={() => setShowSendModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={sendEmailToContact} disabled={!selectedContactId || sendingEmail} style={{ padding: '0.75rem 1.5rem', background: !selectedContactId || sendingEmail ? 'var(--zander-gray)' : 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', cursor: !selectedContactId || sendingEmail ? 'not-allowed' : 'pointer' }}>
+                {sendingEmail ? 'Sending...' : 'Send Email'}
+              </button>
             </div>
           </div>
         </div>
