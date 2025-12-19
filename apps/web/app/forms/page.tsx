@@ -1016,7 +1016,7 @@ export default function FormsPage() {
               )}
               <h4 style={{ margin: '0 0 1rem', color: 'var(--zander-navy)' }}>Form Data</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {Object.entries(viewingSubmission.data || {}).map(([key, value]) => (
+                {Object.entries(viewingSubmission.data?.data || viewingSubmission.data || {}).map(([key, value]) => (
                   <div key={key} style={{ padding: '0.75rem', background: '#f8f9fa', borderRadius: '6px' }}>
                     <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>
                       {key.replace(/_/g, ' ')}
