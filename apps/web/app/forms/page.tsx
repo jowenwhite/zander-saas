@@ -702,7 +702,7 @@ export default function FormsPage() {
                                     {form.status}
                                   </span>
                                   <button
-                                    onClick={() => alert(`Form Builder coming soon!\n\nEdit form: ${form.name}`)}
+                                    onClick={() => { setViewingForm(form); setFormData({}); }}
                                     style={{
                                       padding: '0.5rem 1rem',
                                       background: 'var(--zander-gold)',
