@@ -18,6 +18,7 @@ import { FormsModule } from './forms/forms.module';
 import { AutomationModule } from './automation/automation.module';
 import { AiModule } from './ai/ai.module';
 import { EmailModule } from './integrations/email/email.module';
+import { EmailMessagesModule } from './email-messages/email-messages.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,7 +34,8 @@ import { EmailModule } from './integrations/email/email.module';
     FormsModule,
     AutomationModule,
     AiModule,
-    EmailModule
+    EmailModule,
+    EmailMessagesModule
   ],
   controllers: [AppController, AuthController],
   providers: [
