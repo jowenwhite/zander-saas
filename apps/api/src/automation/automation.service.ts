@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { EmailService } from '../integrations/email/email.service';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class AutomationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+  ) {}
 
   // ============ EMAIL TEMPLATES ============
   async getTemplates(tenantId: string) {
@@ -247,4 +251,193 @@ export class AutomationService {
       data: { status: 'cancelled' },
     });
   }
+
+
+  // ============ EMAIL SENDING ============
+  
+  async sendTemplateToContact(
+    tenantId: string,
+    templateId: string,
+    contactId: string,
+    dealId?: string,
+  ) {
+    // Get the template
+    const template = await this.prisma.emailTemplate.findFirst({
+      where: { id: templateId, tenantId },
+    });
+    if (!template) throw new Error('Template not found');
+
+    // Get the contact
+    const contact = await this.prisma.contact.findFirst({
+      where: { id: contactId, tenantId },
+    });
+    if (!contact) throw new Error('Contact not found');
+    if (!contact.email) throw new Error('Contact has no email address');
+
+    // Get deal if provided
+    let deal = null;
+    if (dealId) {
+      deal = await this.prisma.deal.findFirst({
+        where: { id: dealId, tenantId },
+      });
+    }
+
+    // Build variables for template substitution
+    const variables: Record<string, string> = {
+      firstName: contact.firstName || '',
+      lastName: contact.lastName || '',
+      fullName: `${contact.firstName || ''} ${contact.lastName || ''}`.trim(),
+      email: contact.email,
+      phone: contact.phone || '',
+      company: contact.company || '',
+      dealName: deal?.name || '',
+      dealValue: deal?.value ? `${deal.value.toLocaleString()}` : '',
+      dealStage: deal?.stage || '',
+    };
+
+    // Send the email
+    const result = await this.emailService.sendTemplateEmail(
+      contact.email,
+      template.subject,
+      template.body,
+      variables,
+    );
+
+    // Log the activity if successful
+    if (result.success) {
+      await this.prisma.activity.create({
+        data: {
+          tenant: { connect: { id: tenantId } },
+          contact: { connect: { id: contactId } },
+          deal: dealId ? { connect: { id: dealId } } : undefined,
+          user: { connect: { id: tenantId } }, // System user placeholder
+          type: 'email',
+          subject: `Email sent: ${template.subject}`,
+          description: `Sent template "${template.name}" to ${contact.email}`,
+        },
+      });
+    }
+
+    return {
+      ...result,
+      template: template.name,
+      recipient: contact.email,
+    };
+  }
+
+  async sendScheduledCommunication(tenantId: string, scheduledId: string) {
+    const scheduled = await this.prisma.scheduledCommunication.findFirst({
+      where: { id: scheduledId, tenantId },
+      include: { contact: true },
+    });
+
+    if (!scheduled) throw new Error('Scheduled communication not found');
+    if (scheduled.status !== 'approved' && scheduled.status !== 'pending') {
+      throw new Error('Communication is not ready to send');
+    }
+    if (!scheduled.contact?.email) {
+      throw new Error('Contact has no email address');
+    }
+
+    // Build variables
+    const variables: Record<string, string> = {
+      firstName: scheduled.contact.firstName || '',
+      lastName: scheduled.contact.lastName || '',
+      fullName: `${scheduled.contact.firstName || ''} ${scheduled.contact.lastName || ''}`.trim(),
+      email: scheduled.contact.email,
+    };
+
+    // Send the email
+    const result = await this.emailService.sendTemplateEmail(
+      scheduled.contact.email,
+      scheduled.subject,
+      scheduled.body,
+      variables,
+    );
+
+    // Update status
+    await this.prisma.scheduledCommunication.update({
+      where: { id: scheduledId },
+      data: {
+        status: result.success ? 'sent' : 'failed',
+        sentAt: result.success ? new Date() : null,
+      },
+    });
+
+    // Log activity if successful
+    if (result.success) {
+      await this.prisma.activity.create({
+        data: {
+          tenant: { connect: { id: tenantId } },
+          contact: { connect: { id: scheduled.contactId } },
+          deal: scheduled.dealId ? { connect: { id: scheduled.dealId } } : undefined,
+          user: { connect: { id: tenantId } }, // System user placeholder
+          type: 'email',
+          subject: `Email sent: ${scheduled.subject}`,
+          description: `Sent scheduled email to ${scheduled.contact.email}`,
+        },
+      });
+    }
+
+    return result;
+  }
+
+  async processSequenceStep(tenantId: string, enrollmentId: string) {
+    const enrollment = await this.prisma.sequenceEnrollment.findFirst({
+      where: { id: enrollmentId, status: 'active' },
+      include: {
+        sequence: {
+          include: {
+            steps: {
+              include: { template: true },
+              orderBy: { order: 'asc' },
+            },
+          },
+        },
+        contact: true,
+      },
+    });
+
+    if (!enrollment) throw new Error('Active enrollment not found');
+    if (enrollment.sequence.tenantId !== tenantId) throw new Error('Unauthorized');
+
+    const currentStep = enrollment.sequence.steps[enrollment.currentStep];
+    if (!currentStep) {
+      // Sequence complete
+      await this.prisma.sequenceEnrollment.update({
+        where: { id: enrollmentId },
+        data: { status: 'completed', completedAt: new Date() },
+      });
+      return { completed: true, message: 'Sequence completed' };
+    }
+
+    if (!enrollment.contact.email) {
+      throw new Error('Contact has no email address');
+    }
+
+    // Send the email for this step
+    const result = await this.sendTemplateToContact(
+      tenantId,
+      currentStep.templateId,
+      enrollment.contactId,
+      enrollment.dealId || undefined,
+    );
+
+    if (result.success) {
+      // Move to next step
+      await this.prisma.sequenceEnrollment.update({
+        where: { id: enrollmentId },
+        data: {
+          currentStep: enrollment.currentStep + 1,
+        },
+      });
+    }
+
+    return {
+      ...result,
+      stepNumber: enrollment.currentStep + 1,
+      totalSteps: enrollment.sequence.steps.length,
+    };
+  }
+
 }

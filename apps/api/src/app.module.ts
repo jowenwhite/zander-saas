@@ -17,6 +17,7 @@ import { PipelineStagesModule } from './pipeline-stages/pipeline-stages.module';
 import { FormsModule } from './forms/forms.module';
 import { AutomationModule } from './automation/automation.module';
 import { AiModule } from './ai/ai.module';
+import { EmailModule } from './integrations/email/email.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,7 +32,8 @@ import { AiModule } from './ai/ai.module';
     PipelineStagesModule,
     FormsModule,
     AutomationModule,
-    AiModule
+    AiModule,
+    EmailModule
   ],
   controllers: [AppController, AuthController],
   providers: [

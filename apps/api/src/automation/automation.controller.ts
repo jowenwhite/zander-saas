@@ -8,6 +8,7 @@ export class AutomationController {
   constructor(private readonly automationService: AutomationService) {}
 
   // ============ EMAIL TEMPLATES ============
+  
   @Get('templates')
   getTemplates(@Req() req: any) {
     return this.automationService.getTemplates(req.tenantId);
@@ -34,6 +35,7 @@ export class AutomationController {
   }
 
   // ============ EMAIL SEQUENCES ============
+  
   @Get('sequences')
   getSequences(@Req() req: any) {
     return this.automationService.getSequences(req.tenantId);
@@ -60,6 +62,7 @@ export class AutomationController {
   }
 
   // ============ SEQUENCE STEPS ============
+  
   @Post('sequences/:id/steps')
   addSequenceStep(@Req() req: any, @Param('id') sequenceId: string, @Body() body: any) {
     return this.automationService.addSequenceStep(req.tenantId, sequenceId, body);
@@ -76,6 +79,7 @@ export class AutomationController {
   }
 
   // ============ SCHEDULED COMMUNICATIONS ============
+  
   @Get('scheduled-communications')
   getScheduledCommunications(@Req() req: any, @Query('status') status?: string) {
     return this.automationService.getScheduledCommunications(req.tenantId, status);
@@ -102,6 +106,7 @@ export class AutomationController {
   }
 
   // ============ SEQUENCE ENROLLMENTS ============
+  
   @Post('sequences/:id/enroll')
   enrollContact(@Req() req: any, @Param('id') sequenceId: string, @Body() body: any) {
     return this.automationService.enrollContact(req.tenantId, sequenceId, body.contactId, body.dealId);
@@ -110,5 +115,31 @@ export class AutomationController {
   @Post('enrollments/:id/unenroll')
   unenrollContact(@Req() req: any, @Param('id') enrollmentId: string) {
     return this.automationService.unenrollContact(req.tenantId, enrollmentId);
+  }
+
+  // ============ EMAIL SENDING ============
+  
+  @Post('templates/:id/send')
+  sendTemplateToContact(
+    @Req() req: any,
+    @Param('id') templateId: string,
+    @Body() body: { contactId: string; dealId?: string }
+  ) {
+    return this.automationService.sendTemplateToContact(
+      req.tenantId,
+      templateId,
+      body.contactId,
+      body.dealId,
+    );
+  }
+
+  @Post('scheduled-communications/:id/send')
+  sendScheduledCommunication(@Req() req: any, @Param('id') id: string) {
+    return this.automationService.sendScheduledCommunication(req.tenantId, id);
+  }
+
+  @Post('enrollments/:id/process-step')
+  processSequenceStep(@Req() req: any, @Param('id') enrollmentId: string) {
+    return this.automationService.processSequenceStep(req.tenantId, enrollmentId);
   }
 }
