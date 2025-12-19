@@ -129,7 +129,7 @@ export default function SettingsPage() {
 
       try {
         // Fetch user profile
-        const profileRes = await fetch('http://localhost:3001/auth/me', {
+        const profileRes = await fetch('https://api.zander.mcfapp.com/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (profileRes.ok) {
@@ -144,7 +144,7 @@ export default function SettingsPage() {
         }
 
         // Fetch tenant/company data
-        const tenantRes = await fetch('http://localhost:3001/tenants/me', {
+        const tenantRes = await fetch('https://api.zander.mcfapp.com/tenants/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (tenantRes.ok) {
@@ -155,7 +155,7 @@ export default function SettingsPage() {
           }));
         }
         // Fetch team members
-        const teamRes = await fetch('http://localhost:3001/users', {
+        const teamRes = await fetch('https://api.zander.mcfapp.com/users', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (teamRes.ok) {
@@ -171,7 +171,7 @@ export default function SettingsPage() {
           })));
         }
         // Fetch pipeline stages
-        const stagesRes = await fetch('http://localhost:3001/pipeline-stages', {
+        const stagesRes = await fetch('https://api.zander.mcfapp.com/pipeline-stages', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (stagesRes.ok) {
@@ -201,7 +201,7 @@ export default function SettingsPage() {
     setSaving(true);
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch('http://localhost:3001/auth/me', {
+      const res = await fetch('https://api.zander.mcfapp.com/auth/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -231,7 +231,7 @@ export default function SettingsPage() {
     setSaving(true);
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch('http://localhost:3001/tenants/me', {
+      const res = await fetch('https://api.zander.mcfapp.com/tenants/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -264,7 +264,7 @@ export default function SettingsPage() {
     setSaving(true);
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch('http://localhost:3001/users/invite', {
+      const res = await fetch('https://api.zander.mcfapp.com/users/invite', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -304,7 +304,7 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     const newOrder = stages.length;
     try {
-      const res = await fetch('http://localhost:3001/pipeline-stages', {
+      const res = await fetch('https://api.zander.mcfapp.com/pipeline-stages', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -331,7 +331,7 @@ export default function SettingsPage() {
     if (!confirm('Are you sure you want to delete this stage?')) return;
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch(`http://localhost:3001/pipeline-stages/${stageId}`, {
+      const res = await fetch(`https://api.zander.mcfapp.com/pipeline-stages/${stageId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -349,7 +349,7 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     try {
       await Promise.all(stages.map(stage =>
-        fetch(`http://localhost:3001/pipeline-stages/${stage.id}`, {
+        fetch(`https://api.zander.mcfapp.com/pipeline-stages/${stage.id}`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -375,7 +375,7 @@ export default function SettingsPage() {
   const updateStage = async (stageId: string, updates: any) => {
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch(`http://localhost:3001/pipeline-stages/${stageId}`, {
+      const res = await fetch(`https://api.zander.mcfapp.com/pipeline-stages/${stageId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -967,10 +967,10 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     try {
       const [contactsRes, dealsRes] = await Promise.all([
-        fetch('http://localhost:3001/contacts/export', {
+        fetch('https://api.zander.mcfapp.com/contacts/export', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://localhost:3001/deals/export', {
+        fetch('https://api.zander.mcfapp.com/deals/export', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -1019,10 +1019,10 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     try {
       const [contactsRes, dealsRes, usersRes, stagesRes] = await Promise.all([
-        fetch('http://localhost:3001/contacts/export', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3001/deals/export', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3001/users', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3001/pipeline-stages', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('https://api.zander.mcfapp.com/contacts/export', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://api.zander.mcfapp.com/deals/export', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://api.zander.mcfapp.com/users', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://api.zander.mcfapp.com/pipeline-stages', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       
       const data = {

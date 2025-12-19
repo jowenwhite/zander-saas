@@ -130,7 +130,7 @@ export default function DealDetailPage() {
   async function fetchDeal() {
     try {
       const response = await fetch(
-        `http://localhost:3001/deals/${dealId}`,
+        `https://api.zander.mcfapp.com/deals/${dealId}`,
         { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }
       );
       if (response.ok) {
@@ -149,7 +149,7 @@ export default function DealDetailPage() {
   async function updateDealStage(newStage: string) {
     try {
       const response = await fetch(
-        `http://localhost:3001/deals/${dealId}`,
+        `https://api.zander.mcfapp.com/deals/${dealId}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
@@ -166,7 +166,7 @@ export default function DealDetailPage() {
   async function saveNotes() {
     try {
       const response = await fetch(
-        `http://localhost:3001/deals/${dealId}`,
+        `https://api.zander.mcfapp.com/deals/${dealId}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },

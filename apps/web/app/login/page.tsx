@@ -16,7 +16,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/auth/login', {
+      const response = await fetch('https://api.zander.mcfapp.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -257,9 +257,9 @@ export default function LoginPage() {
             color: '#6C757D',
             border: '1px solid #DEE2E6'
           }}>
-            <strong style={{ color: '#0C2340' }}>Demo Account:</strong><br />
-            Email: test@example.com<br />
-            Password: password123
+            <div><strong style={{ color: '#0C2340' }}>Demo Account:</strong></div>
+            <div>Email: dave@sixtyfourwest.com</div>
+            <div>Password: Zander2026!</div>
           </div>
         </div>
       </div>

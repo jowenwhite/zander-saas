@@ -69,8 +69,8 @@ export default function PipelinePage() {
   async function fetchData() {
     try {
       const [dealsRes, contactsRes] = await Promise.all([
-        fetch('http://localhost:3001/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
-        fetch('http://localhost:3001/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
+        fetch('https://api.zander.mcfapp.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch('https://api.zander.mcfapp.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
       ]);
       
       if (dealsRes.ok) {
@@ -99,7 +99,7 @@ export default function PipelinePage() {
   async function handleCreateDeal(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3001/deals', {
+      const response = await fetch('https://api.zander.mcfapp.com/deals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify({
@@ -122,7 +122,7 @@ export default function PipelinePage() {
 
   async function updateDealStage(dealId: string, newStage: string) {
     try {
-      const response = await fetch(`http://localhost:3001/deals/${dealId}`, {
+      const response = await fetch(`https://api.zander.mcfapp.com/deals/${dealId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stage: newStage }),

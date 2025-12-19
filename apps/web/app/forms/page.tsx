@@ -145,7 +145,7 @@ export default function FormsPage() {
   const [activatingPack, setActivatingPack] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-  const API_URL = 'http://localhost:3001';
+  const API_URL = 'https://api.zander.mcfapp.com';
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('zander_token');

@@ -82,7 +82,7 @@ export default function ContactDetailPage() {
       try {
         const token = localStorage.getItem('zander_token');
         const response = await fetch(
-          `http://localhost:3001/contacts/${params.id}`,
+          `https://api.zander.mcfapp.com/contacts/${params.id}`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
         if (!response.ok) throw new Error('Contact not found');
@@ -91,7 +91,7 @@ export default function ContactDetailPage() {
         setNotes(data.notes || '');
         // Fetch deals for this contact
         const dealsResponse = await fetch(
-          `http://localhost:3001/deals`,
+          `https://api.zander.mcfapp.com/deals`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
         if (dealsResponse.ok) {
@@ -113,7 +113,7 @@ export default function ContactDetailPage() {
     try {
       const token = localStorage.getItem('zander_token');
       await fetch(
-        `http://localhost:3001/contacts/${params.id}`,
+        `https://api.zander.mcfapp.com/contacts/${params.id}`,
         {
           method: 'PATCH',
           headers: {
