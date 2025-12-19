@@ -38,6 +38,7 @@ model Tenant {
   emailTemplates EmailTemplate[]
   emailSequences EmailSequence[]
   scheduledCommunications ScheduledCommunication[]
+  emailMessages EmailMessage[]
   @@map("tenants")
 }
 
@@ -77,6 +78,7 @@ model Contact {
   formSubmissions FormSubmission[]
   sequenceEnrollments SequenceEnrollment[]
   scheduledCommunications ScheduledCommunication[]
+  emailMessages EmailMessage[]
   @@map("contacts")
 }
 
@@ -247,4 +249,32 @@ model ScheduledCommunication {
   tenant       Tenant   @relation(fields: [tenantId], references: [id])
   contact      Contact  @relation(fields: [contactId], references: [id])
   @@map("scheduled_communications")
+}
+
+model EmailMessage {
+  id          String   @id @default(cuid())
+  tenantId    String
+  contactId   String?
+  dealId      String?
+  direction   String   // 'inbound' | 'outbound'
+  fromAddress String
+  toAddress   String
+  subject     String
+  body        String
+  htmlBody    String?
+  messageId   String?  // Resend message ID
+  inReplyTo   String?  // For threading - references parent messageId
+  threadId    String?  // Groups related emails
+  status      String   @default("sent") // sent, delivered, opened, failed, received
+  sentAt      DateTime
+  openedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  contact     Contact? @relation(fields: [contactId], references: [id])
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([threadId])
+  @@index([messageId])
+  @@map("email_messages")
 }
