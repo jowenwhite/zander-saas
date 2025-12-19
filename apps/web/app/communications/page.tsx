@@ -26,6 +26,27 @@ interface Sequence {
   createdAt: string;
 }
 
+
+interface EmailMessage {
+  id: string;
+  direction: 'inbound' | 'outbound';
+  fromAddress: string;
+  toAddress: string;
+  subject: string;
+  body: string;
+  htmlBody?: string;
+  status: string;
+  sentAt: string;
+  threadId?: string;
+  contact?: { id: string; firstName: string; lastName: string; email: string; };
+}
+
+interface Contact {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 interface ScheduledComm {
   id: string;
   contact: { firstName: string; lastName: string; email: string };
@@ -64,12 +85,19 @@ const starterTemplatePacks = {
   }
 };
 
-export default function AutomationPage() {
+export default function CommunicationsPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'templates' | 'sequences' | 'communications'>('templates');
+  const [activeTab, setActiveTab] = useState<'inbox' | 'templates' | 'sequences' | 'scheduled'>('inbox');
   const [templates, setTemplates] = useState<Template[]>([]);
   const [sequences, setSequences] = useState<Sequence[]>([]);
   const [communications, setCommunications] = useState<ScheduledComm[]>([]);
+  const [emails, setEmails] = useState<EmailMessage[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
+  const [showComposeModal, setShowComposeModal] = useState(false);
+  const [inboxFilter, setInboxFilter] = useState<'all' | 'inbound' | 'outbound'>('all');
+  const [composeForm, setComposeForm] = useState({ to: '', contactId: '', subject: '', body: '' });
+  const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [templateFilter, setTemplateFilter] = useState<'all' | 'email' | 'sms' | 'call'>('all');
   const [commFilter, setCommFilter] = useState<'all' | 'pending' | 'approved' | 'sent'>('all');
@@ -89,7 +117,6 @@ export default function AutomationPage() {
   // Send Email Modal
   const [showSendModal, setShowSendModal] = useState(false);
   const [sendingTemplate, setSendingTemplate] = useState<Template | null>(null);
-  const [contacts, setContacts] = useState<any[]>([]);
   const [selectedContactId, setSelectedContactId] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
@@ -111,15 +138,18 @@ export default function AutomationPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [templatesRes, sequencesRes, commsRes] = await Promise.all([
+      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes] = await Promise.all([
         fetch(`${API_URL}/templates`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sequences`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/scheduled-communications`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/email-messages`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() }),
       ]);
-      
       if (templatesRes.ok) setTemplates(await templatesRes.json());
       if (sequencesRes.ok) setSequences(await sequencesRes.json());
       if (commsRes.ok) setCommunications(await commsRes.json());
+      if (emailsRes.ok) setEmails(await emailsRes.json());
+      if (contactsRes.ok) { const data = await contactsRes.json(); setContacts(data.data || data); }
     } catch (err) {
       console.error('Failed to fetch automation data:', err);
     } finally {
@@ -405,7 +435,7 @@ export default function AutomationPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📧', label: 'Email Automation', href: '/automation', active: true },
+              { icon: '📬', label: 'Communications', href: '/communications', active: true },
               { icon: '📋', label: 'Forms', href: '/forms' },
               { icon: '🤖', label: 'AI Assistant', href: '/ai' },
             ].map((item) => (
@@ -438,10 +468,10 @@ export default function AutomationPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
             <div>
               <h1 style={{ fontSize: '2rem', fontWeight: '700', margin: '0 0 0.5rem 0' }}>
-                Email Automation
+                Communications Hub
               </h1>
               <p style={{ margin: 0, opacity: 0.9 }}>
-                Manage templates, sequences, and scheduled communications
+                Email, SMS, and call management - all in one place
               </p>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -514,9 +544,10 @@ export default function AutomationPage() {
         }}>
           <div style={{ display: 'flex', borderBottom: '2px solid var(--zander-border-gray)' }}>
             {[
+              { id: 'inbox', label: 'Inbox', icon: '📥' },
               { id: 'templates', label: 'Templates', icon: '📝' },
               { id: 'sequences', label: 'Sequences', icon: '🔄' },
-              { id: 'communications', label: 'Scheduled', icon: '📅' },
+              { id: 'scheduled', label: 'Scheduled', icon: '📅' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -537,6 +568,117 @@ export default function AutomationPage() {
           </div>
 
           <div style={{ padding: '1.5rem' }}>
+            {/* INBOX TAB */}
+            {activeTab === 'inbox' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {(['all', 'inbound', 'outbound'] as const).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setInboxFilter(f)}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          background: inboxFilter === f ? 'var(--zander-navy)' : 'white',
+                          color: inboxFilter === f ? 'white' : 'var(--zander-navy)',
+                          border: '1px solid var(--zander-border-gray)',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: inboxFilter === f ? '600' : '400'
+                        }}
+                      >
+                        {f === 'all' ? '📬 All' : f === 'inbound' ? '📥 Received' : '📤 Sent'}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setShowComposeModal(true)}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ✉️ Compose
+                  </button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: selectedEmail ? '350px 1fr' : '1fr', gap: '1rem' }}>
+                  <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', maxHeight: '500px', overflowY: 'auto' }}>
+                    {emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).length === 0 ? (
+                      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📭</div>
+                        <p>No emails yet</p>
+                      </div>
+                    ) : (
+                      emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).map(email => (
+                        <div
+                          key={email.id}
+                          onClick={() => setSelectedEmail(email)}
+                          style={{
+                            padding: '0.75rem 1rem',
+                            borderBottom: '1px solid var(--zander-border-gray)',
+                            cursor: 'pointer',
+                            background: selectedEmail?.id === email.id ? 'rgba(191, 10, 48, 0.05)' : 'transparent',
+                            borderLeft: selectedEmail?.id === email.id ? '3px solid var(--zander-red)' : '3px solid transparent'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                            <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                              {email.direction === 'inbound' ? email.fromAddress : email.toAddress}
+                            </span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                              {new Date(email.sentAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
+                              {email.direction === 'inbound' ? '📥' : '📤'}
+                            </span>
+                            <span style={{ fontSize: '0.8rem', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {email.subject}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {selectedEmail && (
+                    <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', padding: '1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{selectedEmail.subject}</h3>
+                        <button onClick={() => setSelectedEmail(null)} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)', marginBottom: '1rem' }}>
+                        <p><strong>From:</strong> {selectedEmail.fromAddress}</p>
+                        <p><strong>To:</strong> {selectedEmail.toAddress}</p>
+                        <p><strong>Date:</strong> {new Date(selectedEmail.sentAt).toLocaleString()}</p>
+                      </div>
+                      <hr style={{ border: 'none', borderTop: '1px solid var(--zander-border-gray)', margin: '1rem 0' }} />
+                      <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{selectedEmail.body}</div>
+                      <button
+                        onClick={() => {
+                          setComposeForm({
+                            to: selectedEmail.direction === 'inbound' ? selectedEmail.fromAddress : selectedEmail.toAddress,
+                            contactId: selectedEmail.contact?.id || '',
+                            subject: 'Re: ' + selectedEmail.subject.replace(/^Re: /, ''),
+                            body: '\n\n---\nOn ' + new Date(selectedEmail.sentAt).toLocaleString() + ', ' + selectedEmail.fromAddress + ' wrote:\n> ' + selectedEmail.body.split('\n').join('\n> ')
+                          });
+                          setShowComposeModal(true);
+                        }}
+                        style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        ↩️ Reply
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* TEMPLATES TAB */}
             {activeTab === 'templates' && (
               <div>
@@ -667,7 +809,7 @@ export default function AutomationPage() {
             )}
 
             {/* COMMUNICATIONS TAB */}
-            {activeTab === 'communications' && (
+            {activeTab === 'scheduled' && (
               <div>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                   {(['all', 'pending', 'approved', 'sent'] as const).map((filter) => (
@@ -927,6 +1069,53 @@ export default function AutomationPage() {
                 {sendingEmail ? 'Sending...' : 'Send Email'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compose Email Modal */}
+      {showComposeModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '12px', width: '600px', maxHeight: '80vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--zander-navy)' }}>New Email</h2>
+              <button onClick={() => setShowComposeModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setSending(true);
+              try {
+                const response = await fetch(`${API_URL}/email-messages/send`, {
+                  method: 'POST',
+                  headers: getAuthHeaders(),
+                  body: JSON.stringify({ to: composeForm.to, contactId: composeForm.contactId || undefined, subject: composeForm.subject, body: composeForm.body, htmlBody: '<div style="font-family: Arial, sans-serif;">' + composeForm.body.replace(/\n/g, '<br>') + '</div>' })
+                });
+                if (response.ok) { setShowComposeModal(false); setComposeForm({ to: '', contactId: '', subject: '', body: '' }); fetchData(); }
+                else { const err = await response.json(); alert('Failed: ' + (err.message || 'Unknown error')); }
+              } catch (error) { alert('Failed to send email'); }
+              finally { setSending(false); }
+            }} style={{ padding: '1.5rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>To</label>
+                <select value={composeForm.contactId} onChange={(e) => { const c = contacts.find(x => x.id === e.target.value); setComposeForm({ ...composeForm, contactId: e.target.value, to: c?.email || composeForm.to }); }} style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', marginBottom: '0.5rem' }}>
+                  <option value="">Select a contact or enter email below</option>
+                  {contacts.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName} ({c.email})</option>)}
+                </select>
+                <input type="email" value={composeForm.to} onChange={(e) => setComposeForm({ ...composeForm, to: e.target.value })} placeholder="Or enter email address" required style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }} />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Subject</label>
+                <input type="text" value={composeForm.subject} onChange={(e) => setComposeForm({ ...composeForm, subject: e.target.value })} required style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }} />
+              </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Message</label>
+                <textarea value={composeForm.body} onChange={(e) => setComposeForm({ ...composeForm, body: e.target.value })} required rows={10} style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }} />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" onClick={() => setShowComposeModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={sending} style={{ padding: '0.75rem 1.5rem', background: sending ? 'var(--zander-gray)' : 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sending ? 'not-allowed' : 'pointer' }}>{sending ? 'Sending...' : '📤 Send Email'}</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

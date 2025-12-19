@@ -435,7 +435,7 @@ export default function FormsPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📧', label: 'Email Automation', href: '/automation' },
+              { icon: '📬', label: 'Communications', href: '/communications' },
               { icon: '📋', label: 'Forms', href: '/forms', active: true },
               { icon: '🤖', label: 'AI Assistant', href: '/ai' },
             ].map((item) => (

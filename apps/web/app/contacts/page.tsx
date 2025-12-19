@@ -185,7 +185,7 @@ export default function ContactsPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📧', label: 'Email Automation', href: '/automation' },
+              { icon: '📬', label: 'Communications', href: '/communications' },
               { icon: '📋', label: 'Forms', href: '/forms' },
               { icon: '🤖', label: 'AI Assistant', href: '/ai' },
             ].map((item) => (
