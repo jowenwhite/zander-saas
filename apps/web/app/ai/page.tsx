@@ -87,7 +87,7 @@ const executives: Executive[] = [
     role: 'CMO',
     fullTitle: 'Chief Marketing Officer',
     reference: 'Marketing & Brand Expert',
-    personality: 'Creative, confident, and a master storyteller. Don sees the deeper narrative behind every brand and knows exactly how to make people feel something. He thinks in campaigns and speaks in headlines. Bold ideas come naturally, but always grounded in what actually moves the needle. Will push you to be braver with your marketing than you\'ve ever been.',
+    personality: "Creative, confident, and a master storyteller. Don sees the deeper narrative behind every brand and knows exactly how to make people feel something. He thinks in campaigns and speaks in headlines. Bold ideas come naturally, but always grounded in what actually moves the needle. Will push you to be braver with your marketing than you've ever been.",
     avatar: '🎨',
     color: '#F57C00',
     status: 'coming_soon',
@@ -105,18 +105,18 @@ const executives: Executive[] = [
     name: 'Ted',
     role: 'CPO',
     fullTitle: 'Chief People Officer',
-    reference: 'People & Culture Expert',
-    personality: "Relentlessly positive and genuinely believes in the potential of every person. Ted knows that business success comes down to people - hiring right, treating them well, and building a culture worth showing up for. Encouraging without being naive, he focuses on practical team development while never losing sight of the human element. Believes biscuits solve most problems.",
-    avatar: '🤝',
+    reference: 'Team & Culture Expert',
+    personality: "Warm, insightful, and deeply invested in people. Ted believes the best business results come from teams that genuinely thrive. He helps you build culture, navigate tricky conversations, and become the leader your team needs. Never preachy, always practical. Will remind you that your people are your greatest asset.",
+    avatar: '👥',
     color: '#0288D1',
     status: 'coming_soon',
     suggestedPrompts: [
       'How do I give constructive feedback?',
       'Help me write a job description',
-      'Ideas for team building activities',
-      'How do I handle a difficult employee conversation?',
       'What should I look for when hiring?',
-      'How do I build a positive company culture?',
+      'My team morale is low - what can I do?',
+      'Create an employee onboarding checklist',
+      'How do I handle a difficult employee?',
     ]
   },
   {
@@ -125,17 +125,17 @@ const executives: Executive[] = [
     role: 'CIO',
     fullTitle: 'Chief Information Officer',
     reference: 'Technology & Systems Expert',
-    personality: "Calm, knowledgeable, and always one step ahead. Jarvis understands technology at every level and has a gift for explaining complex systems in simple terms. Security-minded but practical, focused on solutions that actually work for your business. Never condescending, always helpful. Like having a brilliant tech advisor who actually speaks your language.",
-    avatar: '🖥️',
+    personality: "Logical, forward-thinking, and surprisingly patient with non-tech folks. Jarvis makes technology feel approachable and helps you leverage the right tools without overcomplicating things. He sees technology as a means to an end, not an end itself. Will save you from bad software decisions and help you work smarter.",
+    avatar: '💻',
     color: '#455A64',
     status: 'coming_soon',
     suggestedPrompts: [
-      'What tools should I use for my business?',
-      'How do I keep my data secure?',
-      'Explain this technical concept simply',
-      'Should I build or buy this software?',
-      'How do I choose the right CRM?',
-      'Help me understand cloud vs on-premise',
+      'What software should I use for X?',
+      'How do I automate this repetitive task?',
+      'Is my data secure enough?',
+      'Help me choose between these tools',
+      'What tech stack do I actually need?',
+      'How do I integrate my systems?',
     ]
   },
   {
@@ -144,38 +144,39 @@ const executives: Executive[] = [
     role: 'EA',
     fullTitle: 'Executive Assistant',
     reference: 'Organization & Productivity Expert',
-    personality: "Warm, organized, and somehow always one step ahead of what you need. Pam has a remarkable ability to anticipate problems before they happen and keeps everything running smoothly without making a fuss about it. Friendly and approachable, but don't mistake her warmth for lack of capability - she's the reason things actually get done. Your secret weapon for productivity.",
+    personality: "Organized, proactive, and three steps ahead. Pam keeps everything running smoothly and ensures nothing falls through the cracks. She manages your time like it's precious (because it is) and has an uncanny ability to anticipate what you need before you ask. Your secret weapon for staying sane.",
     avatar: '📋',
     color: '#C2185B',
     status: 'coming_soon',
     suggestedPrompts: [
-      'What should I prioritize today?',
-      'Help me draft a professional email',
-      'Create an agenda for my meeting',
-      'How do I manage my time better?',
-      "I'm overwhelmed - help me organize",
-      'Set up a follow-up system for me',
+      'Help me prioritize my tasks today',
+      'Create a meeting agenda',
+      'What should I delegate?',
+      'Help me manage my calendar better',
+      'Draft an email to reschedule a meeting',
+      'How do I stay organized with so much going on?',
     ]
-  },
+  }
 ];
+
+const API_URL = 'https://api.zander.mcfapp.com';
+
+const getAuthHeaders = () => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('zander_token') : null;
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+};
 
 export default function AIAssistantPage() {
   const [selectedExecutive, setSelectedExecutive] = useState<Executive>(executives[0]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showTeamModal, setShowTeamModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const API_URL = 'https://api.zander.mcfapp.com';
-
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('zander_token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -200,7 +201,6 @@ export default function AIAssistantPage() {
     setIsTyping(true);
 
     try {
-      // Build conversation history for context
       const conversationHistory = messages.map(m => ({
         role: m.role,
         content: m.content
@@ -221,14 +221,12 @@ export default function AIAssistantPage() {
       }
 
       const data = await response.json();
-      
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: data.content,
         timestamp: new Date()
       };
-
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('AI chat error:', error);
@@ -260,6 +258,7 @@ export default function AIAssistantPage() {
     if (exec.status === 'active') {
       setSelectedExecutive(exec);
       setMessages([]);
+      setShowTeamModal(false);
     } else {
       alert(`${exec.name} (${exec.fullTitle}) is coming soon!\n\n${exec.personality}`);
     }
@@ -269,237 +268,262 @@ export default function AIAssistantPage() {
     setMessages([]);
   };
 
+  // Standard sidebar items
+  const salesRevenueItems = [
+    { icon: '📊', label: 'Dashboard', href: '/' },
+    { icon: '📈', label: 'Pipeline', href: '/pipeline' },
+    { icon: '👥', label: 'Contacts', href: '/contacts' },
+    { icon: '📉', label: 'Analytics', href: '/analytics' },
+  ];
+
+  const toolsItems = [
+    { icon: '📧', label: 'Communications', href: '/communications' },
+    { icon: '📅', label: 'Schedule', href: '/schedule' },
+    { icon: '📋', label: 'Forms', href: '/forms' },
+    { icon: '🤖', label: `Ask ${selectedExecutive.name} (${selectedExecutive.role})`, href: '/ai', active: true },
+  ];
+
   return (
     <AuthGuard>
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
-      <NavBar activeModule="cro" />
+      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+        <NavBar activeModule="cro" />
 
-      {/* Main Layout */}
-      <div style={{ display: 'flex', marginTop: '64px', height: 'calc(100vh - 64px)' }}>
-        {/* Executive Sidebar */}
-        <aside style={{
-          width: '280px',
-          background: 'white',
-          borderRight: '2px solid var(--zander-border-gray)',
-          padding: '1.5rem',
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <h2 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)', fontSize: '1.25rem' }}>Your AI Team</h2>
-          <p style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem' }}>
-            Meet your virtual executives, each specialized to help you succeed.
-          </p>
-
-          <div style={{ flex: 1 }}>
-            {executives.map((exec) => (
-              <button
-                key={exec.id}
-                onClick={() => handleExecutiveChange(exec)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem',
-                  marginBottom: '0.5rem',
-                  background: selectedExecutive.id === exec.id ? `${exec.color}15` : 'transparent',
-                  border: selectedExecutive.id === exec.id ? `2px solid ${exec.color}` : '2px solid transparent',
-                  borderRadius: '8px',
-                  cursor: exec.status === 'active' ? 'pointer' : 'default',
-                  textAlign: 'left',
-                  opacity: exec.status === 'coming_soon' ? 0.6 : 1,
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: exec.status === 'active' ? exec.color : 'var(--zander-gray)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.25rem'
-                }}>
-                  {exec.avatar}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{exec.name}</span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>({exec.role})</span>
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{exec.fullTitle}</div>
-                </div>
-                {exec.status === 'coming_soon' && (
-                  <span style={{
-                    padding: '0.125rem 0.375rem',
-                    background: 'rgba(240, 179, 35, 0.2)',
-                    color: '#B8860B',
-                    borderRadius: '4px',
-                    fontSize: '0.6rem',
-                    fontWeight: '600'
-                  }}>SOON</span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* API Status */}
-          <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            background: 'rgba(39, 174, 96, 0.1)',
-            border: '1px solid rgba(39, 174, 96, 0.3)',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            color: 'var(--zander-navy)'
+        {/* Main Layout with Standard Sidebar */}
+        <div style={{ display: 'flex', marginTop: '64px', height: 'calc(100vh - 64px)' }}>
+          
+          {/* Standard Sidebar */}
+          <aside style={{
+            width: '240px',
+            background: 'white',
+            borderRight: '2px solid var(--zander-border-gray)',
+            height: 'calc(100vh - 64px)',
+            position: 'fixed',
+            top: '64px',
+            left: 0,
+            overflowY: 'auto',
+            zIndex: 900
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <span>🤖</span>
-              <strong>Powered by Claude AI</strong>
-            </div>
-            <p style={{ margin: 0, lineHeight: 1.5 }}>
-              {selectedExecutive.name} uses real AI to provide personalized advice based on your business data.
-            </p>
-          </div>
-
-          {/* Meeting Integration Note */}
-          <div style={{
-            marginTop: '0.75rem',
-            padding: '1rem',
-            background: 'rgba(191, 10, 48, 0.05)',
-            border: '1px solid rgba(191, 10, 48, 0.2)',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            color: 'var(--zander-navy)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <span>📹</span>
-              <strong>Coming Soon</strong>
-            </div>
-            <p style={{ margin: 0, lineHeight: 1.5 }}>
-              Meeting transcription & summaries with Zoom, Teams, and Google Meet integration.
-            </p>
-          </div>
-        </aside>
-
-        {/* Chat Area */}
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--zander-off-white)' }}>
-          {/* Executive Header */}
-          <div style={{
-            background: `linear-gradient(135deg, ${selectedExecutive.color} 0%, ${selectedExecutive.color}dd 100%)`,
-            padding: '1.5rem 2rem',
-            color: 'white'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{
-                  width: '56px',
-                  height: '56px',
-                  borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.75rem'
-                }}>
-                  {selectedExecutive.avatar}
-                </div>
-                <div>
-                  <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>
-                    Meet {selectedExecutive.name}
-                  </h1>
-                  <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9, fontSize: '0.9rem' }}>
-                    Your {selectedExecutive.fullTitle} • {selectedExecutive.reference}
-                  </p>
-                </div>
+            <div style={{ padding: '1.5rem 1rem 1rem' }}>
+              <div style={{
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                color: 'var(--zander-gray)',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                marginBottom: '0.75rem'
+              }}>
+                Sales & Revenue
               </div>
-              {messages.length > 0 && (
-                <button
-                  onClick={handleClearChat}
-                  style={{
-                    padding: '0.5rem 1rem',
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                {salesRevenueItems.map((item) => (
+                  <li key={item.label} style={{ marginBottom: '0.25rem' }}>
+                    
+                      href={item.href}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        color: 'var(--zander-navy)',
+                        background: 'transparent',
+                        fontWeight: '400',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div style={{ padding: '0 1rem' }}>
+              <div style={{
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                color: 'var(--zander-gray)',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                marginBottom: '0.75rem'
+              }}>
+                Tools
+              </div>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                {toolsItems.map((item) => (
+                  <li key={item.label} style={{ marginBottom: '0.25rem' }}>
+                    
+                      href={item.href}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        color: item.active ? 'var(--zander-red)' : 'var(--zander-navy)',
+                        background: item.active ? 'rgba(191,10,48,0.1)' : 'transparent',
+                        fontWeight: item.active ? '600' : '400',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+
+          {/* Chat Area - with margin for sidebar */}
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--zander-off-white)', marginLeft: '240px' }}>
+            {/* Executive Header */}
+            <div style={{
+              background: `linear-gradient(135deg, ${selectedExecutive.color} 0%, ${selectedExecutive.color}dd 100%)`,
+              padding: '1.5rem 2rem',
+              color: 'white'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
                     background: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    fontWeight: '500'
-                  }}
-                >
-                  🗑 Clear Chat
-                </button>
-              )}
-            </div>
-            <p style={{ margin: '1rem 0 0 0', opacity: 0.95, fontSize: '0.9rem', lineHeight: 1.6, maxWidth: '700px' }}>
-              {selectedExecutive.personality}
-            </p>
-          </div>
-
-          {/* Messages Area */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 2rem' }}>
-            {messages.length === 0 ? (
-              <div>
-                <div style={{
-                  textAlign: 'center',
-                  color: 'var(--zander-gray)',
-                  marginBottom: '2rem'
-                }}>
-                  <p style={{ fontSize: '1rem', margin: 0 }}>
-                    👋 Hey there! I'm {selectedExecutive.name}. How can I help you today?
-                  </p>
-                </div>
-
-                {/* Suggested Prompts */}
-                <div>
-                  <h3 style={{ color: 'var(--zander-navy)', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '600' }}>
-                    Suggested questions to get started:
-                  </h3>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
-                    {selectedExecutive.suggestedPrompts.map((prompt, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handlePromptClick(prompt)}
-                        style={{
-                          padding: '1rem',
-                          background: 'white',
-                          border: '2px solid var(--zander-border-gray)',
-                          borderRadius: '8px',
-                          textAlign: 'left',
-                          cursor: 'pointer',
-                          color: 'var(--zander-navy)',
-                          fontSize: '0.9rem',
-                          transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = selectedExecutive.color;
-                          e.currentTarget.style.background = `${selectedExecutive.color}08`;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
-                          e.currentTarget.style.background = 'white';
-                        }}
-                      >
-                        {prompt}
-                      </button>
-                    ))}
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.75rem'
+                  }}>
+                    {selectedExecutive.avatar}
+                  </div>
+                  <div>
+                    <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>
+                      Meet {selectedExecutive.name}
+                    </h1>
+                    <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9, fontSize: '0.9rem' }}>
+                      Your {selectedExecutive.fullTitle} • {selectedExecutive.reference}
+                    </p>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div>
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
+                {messages.length > 0 && (
+                  <button
+                    onClick={handleClearChat}
                     style={{
-                      display: 'flex',
-                      justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
-                      marginBottom: '1rem'
+                      padding: '0.5rem 1rem',
+                      background: 'rgba(255,255,255,0.2)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      fontWeight: '500'
                     }}
                   >
-                    {message.role === 'assistant' && (
+                    🗑 Clear Chat
+                  </button>
+                )}
+              </div>
+              <p style={{ margin: '1rem 0 0 0', opacity: 0.95, fontSize: '0.9rem', lineHeight: 1.6, maxWidth: '700px' }}>
+                {selectedExecutive.personality}
+              </p>
+            </div>
+
+            {/* Messages Area */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 2rem' }}>
+              {messages.length === 0 ? (
+                <div>
+                  <div style={{
+                    textAlign: 'center',
+                    color: 'var(--zander-gray)',
+                    marginBottom: '2rem'
+                  }}>
+                    <p style={{ fontSize: '1rem', margin: 0 }}>
+                      👋 Hey there! I'm {selectedExecutive.name}. How can I help you today?
+                    </p>
+                  </div>
+
+                  {/* Suggested Prompts */}
+                  <div>
+                    <h3 style={{ color: 'var(--zander-navy)', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '600' }}>
+                      Suggested questions to get started:
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+                      {selectedExecutive.suggestedPrompts.map((prompt, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handlePromptClick(prompt)}
+                          style={{
+                            padding: '1rem',
+                            background: 'white',
+                            border: '2px solid var(--zander-border-gray)',
+                            borderRadius: '8px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            color: 'var(--zander-navy)',
+                            fontSize: '0.9rem',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = selectedExecutive.color;
+                            e.currentTarget.style.background = `${selectedExecutive.color}08`;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+                            e.currentTarget.style.background = 'white';
+                          }}
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+                        marginBottom: '1rem'
+                      }}
+                    >
+                      {message.role === 'assistant' && (
+                        <div style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '50%',
+                          background: selectedExecutive.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginRight: '0.75rem',
+                          flexShrink: 0
+                        }}>
+                          {selectedExecutive.avatar}
+                        </div>
+                      )}
+                      <div style={{
+                        maxWidth: '70%',
+                        padding: '1rem 1.25rem',
+                        borderRadius: message.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                        background: message.role === 'user' ? 'var(--zander-navy)' : 'white',
+                        color: message.role === 'user' ? 'white' : 'var(--zander-navy)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                        whiteSpace: 'pre-wrap',
+                        lineHeight: 1.6
+                      }}>
+                        {message.content}
+                      </div>
+                    </div>
+                  ))}
+                  {isTyping && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <div style={{
                         width: '36px',
                         height: '36px',
@@ -507,136 +531,257 @@ export default function AIAssistantPage() {
                         background: selectedExecutive.color,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: '0.75rem',
-                        flexShrink: 0
+                        justifyContent: 'center'
                       }}>
                         {selectedExecutive.avatar}
                       </div>
-                    )}
-                    <div style={{
-                      maxWidth: '70%',
-                      padding: '1rem 1.25rem',
-                      borderRadius: message.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                      background: message.role === 'user' ? 'var(--zander-navy)' : 'white',
-                      color: message.role === 'user' ? 'white' : 'var(--zander-navy)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                      whiteSpace: 'pre-wrap',
-                      lineHeight: 1.6
-                    }}>
-                      {message.content}
+                      <div style={{
+                        padding: '1rem 1.25rem',
+                        background: 'white',
+                        borderRadius: '16px 16px 16px 4px',
+                        color: 'var(--zander-gray)'
+                      }}>
+                        <span style={{ display: 'inline-block', animation: 'pulse 1.5s infinite' }}>
+                          {selectedExecutive.name} is thinking...
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-
-                {isTyping && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      background: selectedExecutive.color,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      {selectedExecutive.avatar}
-                    </div>
-                    <div style={{
-                      padding: '1rem 1.25rem',
-                      background: 'white',
-                      borderRadius: '16px 16px 16px 4px',
-                      color: 'var(--zander-gray)'
-                    }}>
-                      <span style={{ display: 'inline-block', animation: 'pulse 1.5s infinite' }}>
-                        {selectedExecutive.name} is thinking...
-                      </span>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </div>
-
-          {/* Input Area */}
-          <div style={{
-            padding: '1rem 2rem 1.5rem',
-            background: 'white',
-            borderTop: '2px solid var(--zander-border-gray)'
-          }}>
-            <div style={{
-              display: 'flex',
-              gap: '0.75rem',
-              maxWidth: '800px',
-              margin: '0 auto'
-            }}>
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={`Ask ${selectedExecutive.name} anything...`}
-                disabled={isTyping}
-                style={{
-                  flex: 1,
-                  padding: '1rem 1.25rem',
-                  border: '2px solid var(--zander-border-gray)',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease',
-                  opacity: isTyping ? 0.7 : 1
-                }}
-                onFocus={(e) => e.target.style.borderColor = selectedExecutive.color}
-                onBlur={(e) => e.target.style.borderColor = 'var(--zander-border-gray)'}
-              />
-              <button
-                onClick={handleSend}
-                disabled={!inputValue.trim() || isTyping}
-                style={{
-                  padding: '1rem 1.5rem',
-                  background: inputValue.trim() && !isTyping ? selectedExecutive.color : 'var(--zander-gray)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontWeight: '600',
-                  cursor: inputValue.trim() && !isTyping ? 'pointer' : 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {isTyping ? '...' : 'Send'}
-                {!isTyping && <span>→</span>}
-              </button>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
             </div>
+
+            {/* Input Area */}
             <div style={{
-              textAlign: 'center',
-              margin: '0.75rem 0 0 0',
-              fontSize: '0.7rem',
-              color: 'var(--zander-gray)'
+              padding: '1rem 2rem 1.5rem',
+              background: 'white',
+              borderTop: '2px solid var(--zander-border-gray)'
             }}>
-              <p style={{ margin: '0 0 0.25rem 0' }}>
-                Press Enter to send • {selectedExecutive.name} has access to your deals and contacts
-              </p>
-              <p style={{ margin: 0, opacity: 0.8 }}>
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                maxWidth: '800px',
+                margin: '0 auto'
+              }}>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={`Ask ${selectedExecutive.name} anything...`}
+                  disabled={isTyping}
+                  style={{
+                    flex: 1,
+                    padding: '1rem 1.25rem',
+                    border: '2px solid var(--zander-border-gray)',
+                    borderRadius: '12px',
+                    fontSize: '1rem',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    opacity: isTyping ? 0.7 : 1
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = selectedExecutive.color}
+                  onBlur={(e) => e.target.style.borderColor = 'var(--zander-border-gray)'}
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!inputValue.trim() || isTyping}
+                  style={{
+                    padding: '1rem 1.5rem',
+                    background: inputValue.trim() && !isTyping ? selectedExecutive.color : 'var(--zander-gray)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    cursor: inputValue.trim() && !isTyping ? 'pointer' : 'not-allowed',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {isTyping ? '...' : 'Send'}
+                  {!isTyping && <span>→</span>}
+                </button>
+              </div>
+              {/* Subtle info text */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '1.5rem',
+                margin: '0.75rem 0 0 0',
+                fontSize: '0.7rem',
+                color: 'var(--zander-gray)'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <span>🤖</span> Powered by Claude AI
+                </span>
+                <span>•</span>
+                <span>Press Enter to send</span>
+                <span>•</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <span>📹</span> Meeting transcription coming soon
+                </span>
+              </div>
+              <p style={{ textAlign: 'center', margin: '0.5rem 0 0 0', fontSize: '0.65rem', color: 'var(--zander-gray)', opacity: 0.8 }}>
                 ⚠️ AI can make mistakes. Please verify important information before taking action.
               </p>
             </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
 
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
-    </div>
+        {/* Floating Button to Open AI Team Modal */}
+        <button
+          onClick={() => setShowTeamModal(true)}
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            right: '2rem',
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            background: selectedExecutive.color,
+            color: 'white',
+            border: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.5rem',
+            zIndex: 1000,
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+          }}
+          title="Switch AI Executive"
+        >
+          👥
+        </button>
+
+        {/* AI Team Modal */}
+        {showTeamModal && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 2000
+            }}
+            onClick={() => setShowTeamModal(false)}
+          >
+            <div
+              style={{
+                background: 'white',
+                borderRadius: '16px',
+                padding: '2rem',
+                maxWidth: '500px',
+                width: '90%',
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div>
+                  <h2 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.5rem' }}>Your AI Team</h2>
+                  <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+                    Meet your virtual executives
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowTeamModal(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    color: 'var(--zander-gray)'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {executives.map((exec) => (
+                  <button
+                    key={exec.id}
+                    onClick={() => handleExecutiveChange(exec)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      padding: '1rem',
+                      background: selectedExecutive.id === exec.id ? `${exec.color}15` : 'var(--zander-off-white)',
+                      border: selectedExecutive.id === exec.id ? `2px solid ${exec.color}` : '2px solid transparent',
+                      borderRadius: '12px',
+                      cursor: exec.status === 'active' ? 'pointer' : 'default',
+                      textAlign: 'left',
+                      opacity: exec.status === 'coming_soon' ? 0.6 : 1,
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      background: exec.status === 'active' ? exec.color : 'var(--zander-gray)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem'
+                    }}>
+                      {exec.avatar}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem' }}>{exec.name}</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>({exec.role})</span>
+                        {exec.status === 'coming_soon' && (
+                          <span style={{
+                            padding: '0.125rem 0.5rem',
+                            background: 'rgba(240, 179, 35, 0.2)',
+                            color: '#B8860B',
+                            borderRadius: '4px',
+                            fontSize: '0.65rem',
+                            fontWeight: '600'
+                          }}>SOON</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>{exec.fullTitle}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <style jsx>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+        `}</style>
+      </div>
     </AuthGuard>
   );
 }

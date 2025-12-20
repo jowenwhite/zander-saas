@@ -597,7 +597,7 @@ export default function CommunicationsPage() {
             {[
               { icon: '📬', label: 'Communications', href: '/communications', active: true },
               { icon: '📋', label: 'Forms', href: '/forms' },
-              { icon: '🤖', label: 'AI Assistant', href: '/ai' },
+              { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={{

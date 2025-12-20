@@ -248,8 +248,9 @@ export default function PipelinePage() {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
               { icon: '📬', label: 'Communications', href: '/communications' },
+              { icon: '📅', label: 'Schedule', href: '/schedule' },
               { icon: '📋', label: 'Forms', href: '/forms' },
-              { icon: '🤖', label: 'AI Assistant', href: '/ai' },
+              { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href || "#"} style={{

@@ -63,24 +63,42 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
       </div>
 
       {/* Module Switcher */}
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
-        {['CRO', 'CFO', 'COO', 'CMO', 'CPO', 'CIO', 'EA'].map((module) => (
+      <div style={{ display: 'flex', gap: '0.25rem' }}>
+        {[
+          { code: 'CRO', label: 'Sales' },
+          { code: 'CFO', label: 'Finance' },
+          { code: 'COO', label: 'Operations' },
+          { code: 'CMO', label: 'Marketing' },
+          { code: 'CPO', label: 'Team' },
+          { code: 'CIO', label: 'Tech' },
+          { code: 'EA', label: 'Tasks' }
+        ].map((module) => (
           <button
-            key={module}
-            onClick={() => setCurrentModule(module.toLowerCase())}
+            key={module.code}
+            onClick={() => setCurrentModule(module.code.toLowerCase())}
             style={{
-              padding: '0.5rem 1rem',
+              padding: '0.4rem 0.75rem 0.25rem',
               borderRadius: '6px',
               border: 'none',
-              background: currentModule === module.toLowerCase() ? moduleColors[module.toLowerCase()] : 'transparent',
-              color: currentModule === module.toLowerCase() ? 'white' : 'var(--zander-gray)',
+              background: currentModule === module.code.toLowerCase() ? moduleColors[module.code.toLowerCase()] : 'transparent',
+              color: currentModule === module.code.toLowerCase() ? 'white' : 'var(--zander-gray)',
               fontWeight: '600',
               fontSize: '0.875rem',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.1rem'
             }}
           >
-            {module}
+            <span>{module.code}</span>
+            <span style={{ 
+              fontSize: '0.65rem', 
+              fontWeight: '400',
+              opacity: currentModule === module.code.toLowerCase() ? 0.9 : 0.7,
+              letterSpacing: '0.3px'
+            }}>{module.label}</span>
           </button>
         ))}
       </div>
