@@ -205,7 +205,7 @@ export default function Navigation({ activePage }: NavigationProps) {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📧', label: 'Communications Hub' },
+              { icon: '📧', label: 'Communications' },
               { icon: '📄', label: 'Proposals' },
               { icon: '🤖', label: 'AI Assistant' },
             ].map((item) => (
