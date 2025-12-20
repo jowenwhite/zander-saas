@@ -21,6 +21,7 @@ import { EmailModule } from './integrations/email/email.module';
 import { EmailMessagesModule } from './email-messages/email-messages.module';
 import { SmsMessagesModule } from './sms-messages/sms-messages.module';
 import { CallLogsModule } from './call-logs/call-logs.module';
+import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -39,7 +40,8 @@ import { CallLogsModule } from './call-logs/call-logs.module';
     EmailModule,
     EmailMessagesModule,
     SmsMessagesModule,
-    CallLogsModule
+    CallLogsModule,
+    CalendarEventsModule
   ],
   controllers: [AppController, AuthController],
   providers: [
