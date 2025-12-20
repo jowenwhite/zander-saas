@@ -318,6 +318,7 @@ export default function AIAssistantPage() {
                 {salesRevenueItems.map((item) => (
                   <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                     
+                    <a
                       href={item.href}
                       style={{
                         display: 'flex',
@@ -355,6 +356,7 @@ export default function AIAssistantPage() {
                 {toolsItems.map((item) => (
                   <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                     
+                    <a
                       href={item.href}
                       style={{
                         display: 'flex',
@@ -633,40 +635,7 @@ export default function AIAssistantPage() {
           </main>
         </div>
 
-        {/* Floating Button to Open AI Team Modal */}
-        <button
-          onClick={() => setShowTeamModal(true)}
-          style={{
-            position: 'fixed',
-            bottom: '2rem',
-            right: '2rem',
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            background: selectedExecutive.color,
-            color: 'white',
-            border: 'none',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.5rem',
-            zIndex: 1000,
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)';
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-          }}
-          title="Switch AI Executive"
-        >
-          👥
-        </button>
+
 
         {/* AI Team Modal */}
         {showTeamModal && (

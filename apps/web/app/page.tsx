@@ -954,45 +954,7 @@ export default function CRODashboard() {
         </div>
       </main>
 
-      {/* AI Assistant Widget */}
-      <div style={{
-        position: 'fixed',
-        bottom: '2rem',
-        right: '2rem',
-        width: '60px',
-        height: '60px',
-        background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
-        borderRadius: '50%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        fontSize: '1.5rem',
-        cursor: 'pointer',
-        boxShadow: '0 8px 16px rgba(191, 10, 48, 0.3)',
-        transition: 'all 0.3s ease',
-        zIndex: 100
-      }}>
-        🤖
-        <div style={{
-          position: 'absolute',
-          top: '-4px',
-          right: '-4px',
-          width: '20px',
-          height: '20px',
-          background: 'var(--zander-gold)',
-          border: '2px solid white',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '0.7rem',
-          fontWeight: '700',
-          color: 'var(--zander-navy)'
-        }}>3</div>
-      </div>
-
-      {/* New Deal Modal */}
+            {/* New Deal Modal */}
       {showNewDealModal && (
         <div style={{
           position: 'fixed',
