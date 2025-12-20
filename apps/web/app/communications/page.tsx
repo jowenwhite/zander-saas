@@ -142,6 +142,7 @@ export default function CommunicationsPage() {
   const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
   const [sendingSms, setSendingSms] = useState(false);
   const [inboxFilter, setInboxFilter] = useState<'all' | 'inbound' | 'outbound'>('all');
+  const [callsFilter, setCallsFilter] = useState<'all' | 'scheduled' | 'completed'>('all');
   const [composeForm, setComposeForm] = useState({ to: '', contactId: '', subject: '', body: '' });
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -728,23 +729,47 @@ export default function CommunicationsPage() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {(['all', 'inbound', 'outbound'] as const).map((f) => (
-                      <button
-                        key={f}
-                        onClick={() => setInboxFilter(f)}
-                        style={{
-                          padding: '0.5rem 1rem',
-                          background: inboxFilter === f ? 'var(--zander-navy)' : 'white',
-                          color: inboxFilter === f ? 'white' : 'var(--zander-navy)',
-                          border: '1px solid var(--zander-border-gray)',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          fontWeight: inboxFilter === f ? '600' : '400'
-                        }}
-                      >
-                        {f === 'all' ? '📬 All' : f === 'inbound' ? '📥 Received' : '📤 Sent'}
-                      </button>
-                    ))}
+                    {messageType === 'calls' ? (
+                      <>
+                        {(['all', 'scheduled', 'completed'] as const).map((f) => (
+                          <button
+                            key={f}
+                            onClick={() => setCallsFilter(f)}
+                            style={{
+                              padding: '0.5rem 1rem',
+                              background: callsFilter === f ? 'var(--zander-navy)' : 'white',
+                              color: callsFilter === f ? 'white' : 'var(--zander-navy)',
+                              border: '1px solid var(--zander-border-gray)',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontWeight: callsFilter === f ? '600' : '400'
+                            }}
+                          >
+                            {f === 'all' ? '📞 All Calls' : f === 'scheduled' ? '📅 Scheduled' : '✅ Completed'}
+                          </button>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        {(['all', 'inbound', 'outbound'] as const).map((f) => (
+                          <button
+                            key={f}
+                            onClick={() => setInboxFilter(f)}
+                            style={{
+                              padding: '0.5rem 1rem',
+                              background: inboxFilter === f ? 'var(--zander-navy)' : 'white',
+                              color: inboxFilter === f ? 'white' : 'var(--zander-navy)',
+                              border: '1px solid var(--zander-border-gray)',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontWeight: inboxFilter === f ? '600' : '400'
+                            }}
+                          >
+                            {f === 'all' ? '📬 All' : f === 'inbound' ? '📥 Received' : '📤 Sent'}
+                          </button>
+                        ))}
+                      </>
+                    )}
                     {/* Message Type Toggle */}
                     <div style={{ display: 'flex', gap: '0.25rem', marginLeft: '1rem', background: '#f0f0f0', borderRadius: '6px', padding: '0.25rem' }}>
                       <button
@@ -906,14 +931,14 @@ export default function CommunicationsPage() {
                       )
                     ) : (
                       /* Call Logs */
-                      callLogs.filter(c => inboxFilter === 'all' || c.direction === inboxFilter).length === 0 ? (
+                      callLogs.filter(c => callsFilter === 'all' || (callsFilter === 'scheduled' ? c.status === 'scheduled' : c.status !== 'scheduled')).length === 0 ? (
                         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
                           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📞</div>
                           <p>No call logs yet</p>
                           <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Log your first call to get started</p>
                         </div>
                       ) : (
-                        callLogs.filter(c => inboxFilter === 'all' || c.direction === inboxFilter).map(call => (
+                        callLogs.filter(c => callsFilter === 'all' || (callsFilter === 'scheduled' ? c.status === 'scheduled' : c.status !== 'scheduled')).map(call => (
                           <div
                             key={call.id}
                             style={{
