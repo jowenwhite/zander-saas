@@ -36,7 +36,8 @@ import { SmsMessagesModule } from './sms-messages/sms-messages.module';
     AutomationModule,
     AiModule,
     EmailModule,
-    EmailMessagesModule
+    EmailMessagesModule,
+    SmsMessagesModule
   ],
   controllers: [AppController, AuthController],
   providers: [
