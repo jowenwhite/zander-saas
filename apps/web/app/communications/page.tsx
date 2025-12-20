@@ -608,6 +608,39 @@ export default function CommunicationsPage() {
                         {f === 'all' ? '📬 All' : f === 'inbound' ? '📥 Received' : '📤 Sent'}
                       </button>
                     ))}
+                    {/* Message Type Toggle */}
+                    <div style={{ display: 'flex', gap: '0.25rem', marginLeft: '1rem', background: '#f0f0f0', borderRadius: '6px', padding: '0.25rem' }}>
+                      <button
+                        onClick={() => setMessageType('email')}
+                        style={{
+                          padding: '0.4rem 0.75rem',
+                          background: messageType === 'email' ? 'white' : 'transparent',
+                          color: messageType === 'email' ? 'var(--zander-navy)' : '#666',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: messageType === 'email' ? '600' : '400',
+                          boxShadow: messageType === 'email' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                        }}
+                      >
+                        📧 Email
+                      </button>
+                      <button
+                        onClick={() => setMessageType('sms')}
+                        style={{
+                          padding: '0.4rem 0.75rem',
+                          background: messageType === 'sms' ? 'white' : 'transparent',
+                          color: messageType === 'sms' ? 'var(--zander-navy)' : '#666',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: messageType === 'sms' ? '600' : '400',
+                          boxShadow: messageType === 'sms' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                        }}
+                      >
+                        💬 SMS
+                      </button>
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowComposeModal(true)}
@@ -626,13 +659,14 @@ export default function CommunicationsPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: selectedEmail ? '350px 1fr' : '1fr', gap: '1rem' }}>
                   <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', maxHeight: '500px', overflowY: 'auto' }}>
-                    {emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).length === 0 ? (
-                      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
-                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📭</div>
-                        <p>No emails yet</p>
-                      </div>
-                    ) : (
-                      emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).map(email => (
+                    {messageType === 'email' ? (
+                      emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).length === 0 ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📭</div>
+                          <p>No emails yet</p>
+                        </div>
+                      ) : (
+                        emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).map(email => (
                         <div
                           key={email.id}
                           onClick={() => setSelectedEmail(email)}
@@ -662,6 +696,45 @@ export default function CommunicationsPage() {
                           </div>
                         </div>
                       ))
+                    )
+                    ) : (
+                      /* SMS Messages */
+                      smsMessages.filter(s => inboxFilter === 'all' || s.direction === inboxFilter).length === 0 ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</div>
+                          <p>No SMS messages yet</p>
+                          <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Configure Twilio to send SMS</p>
+                        </div>
+                      ) : (
+                        smsMessages.filter(s => inboxFilter === 'all' || s.direction === inboxFilter).map(sms => (
+                          <div
+                            key={sms.id}
+                            style={{
+                              padding: '0.75rem 1rem',
+                              borderBottom: '1px solid var(--zander-border-gray)',
+                              cursor: 'pointer',
+                              background: 'transparent'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                              <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                                {sms.direction === 'inbound' ? sms.fromNumber : sms.toNumber}
+                              </span>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                {new Date(sms.sentAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: sms.direction === 'inbound' ? '#e8f5e9' : '#fff3e0', color: sms.direction === 'inbound' ? '#2e7d32' : '#f57c00' }}>
+                                {sms.direction === 'inbound' ? '📥' : '📤'}
+                              </span>
+                              <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {sms.body.substring(0, 50)}{sms.body.length > 50 ? '...' : ''}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      )
                     )}
                   </div>
                   {selectedEmail && (
