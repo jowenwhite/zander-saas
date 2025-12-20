@@ -383,6 +383,37 @@ export default function CommunicationsPage() {
     }
   };
 
+
+  // Send SMS function
+  const handleSendSms = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!smsForm.to || !smsForm.body) return;
+    setSendingSms(true);
+    try {
+      const response = await fetch(`${API_URL}/sms-messages/send`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          to: smsForm.to.startsWith('+') ? smsForm.to : '+1' + smsForm.to.replace(/\D/g, ''),
+          body: smsForm.body,
+          contactId: smsForm.contactId || undefined
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setShowSmsCompose(false);
+        setSmsForm({ to: '', body: '', contactId: '' });
+        fetchData();
+      } else {
+        alert('Failed to send SMS: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      alert('Failed to send SMS');
+    } finally {
+      setSendingSms(false);
+    }
+  };
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'email': return '✉️';
@@ -643,7 +674,7 @@ export default function CommunicationsPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => setShowComposeModal(true)}
+                    onClick={() => messageType === 'email' ? setShowComposeModal(true) : setShowSmsCompose(true)}
                     style={{
                       padding: '0.75rem 1.5rem',
                       background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
@@ -654,7 +685,7 @@ export default function CommunicationsPage() {
                       cursor: 'pointer'
                     }}
                   >
-                    ✉️ Compose
+                    {messageType === 'email' ? '✉️ Compose Email' : '💬 Compose SMS'}
                   </button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: selectedEmail ? '350px 1fr' : '1fr', gap: '1rem' }}>
@@ -1205,6 +1236,67 @@ export default function CommunicationsPage() {
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowComposeModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={sending} style={{ padding: '0.75rem 1.5rem', background: sending ? 'var(--zander-gray)' : 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sending ? 'not-allowed' : 'pointer' }}>{sending ? 'Sending...' : '📤 Send Email'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* SMS Compose Modal */}
+      {showSmsCompose && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '12px', width: '500px', maxHeight: '80vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--zander-navy)' }}>💬 New SMS</h2>
+              <button onClick={() => setShowSmsCompose(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <form onSubmit={handleSendSms} style={{ padding: '1.5rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>To</label>
+                <select 
+                  value={smsForm.contactId} 
+                  onChange={(e) => { 
+                    const c = contacts.find(x => x.id === e.target.value); 
+                    setSmsForm({ ...smsForm, contactId: e.target.value, to: (c as any)?.phone || smsForm.to }); 
+                  }} 
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', marginBottom: '0.5rem' }}
+                >
+                  <option value="">Select a contact or enter number below</option>
+                  {contacts.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
+                </select>
+                <input 
+                  type="tel" 
+                  value={smsForm.to} 
+                  onChange={(e) => setSmsForm({ ...smsForm, to: e.target.value })} 
+                  placeholder="Phone number (e.g., 678-555-1234)" 
+                  required 
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }} 
+                />
+              </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>Message</label>
+                  <span style={{ fontSize: '0.75rem', color: smsForm.body.length > 160 ? 'var(--zander-red)' : 'var(--zander-gray)' }}>
+                    {smsForm.body.length}/160 {smsForm.body.length > 160 ? '(' + Math.ceil(smsForm.body.length / 160) + ' segments)' : ''}
+                  </span>
+                </div>
+                <textarea 
+                  value={smsForm.body} 
+                  onChange={(e) => setSmsForm({ ...smsForm, body: e.target.value })} 
+                  required 
+                  rows={4} 
+                  maxLength={480}
+                  placeholder="Type your message..."
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }} 
+                />
+                <p style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+                  SMS messages over 160 characters will be sent as multiple segments
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" onClick={() => setShowSmsCompose(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={sendingSms || !smsForm.to || !smsForm.body} style={{ padding: '0.75rem 1.5rem', background: sendingSms || !smsForm.to || !smsForm.body ? 'var(--zander-gray)' : 'linear-gradient(135deg, #27AE60 0%, #219a52 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sendingSms || !smsForm.to || !smsForm.body ? 'not-allowed' : 'pointer' }}>
+                  {sendingSms ? 'Sending...' : '💬 Send SMS'}
+                </button>
               </div>
             </form>
           </div>
