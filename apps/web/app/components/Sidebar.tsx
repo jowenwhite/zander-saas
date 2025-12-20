@@ -20,6 +20,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
 
   const toolsItems = [
     { icon: '📧', label: 'Communications', href: '/communications' },
+    { icon: '📅', label: 'Schedule', href: '/schedule' },
     { icon: '📋', label: 'Forms', href: '/forms' },
     { icon: '🤖', label: 'AI Assistant', href: '/ai' },
   ];

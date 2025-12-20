@@ -41,6 +41,7 @@ model Tenant {
   emailMessages EmailMessage[]
   smsMessages   SmsMessage[]
   callLogs      CallLog[]
+  calendarEvents      CalendarEvent[]
   @@map("tenants")
 }
 
@@ -57,6 +58,8 @@ model User {
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
   activities Activity[]
+  calendarEvents   CalendarEvent[]
+  eventAttendees   EventAttendee[]
   @@map("users")
 }
 
@@ -83,6 +86,8 @@ model Contact {
   emailMessages EmailMessage[]
   smsMessages   SmsMessage[]
   callLogs      CallLog[]
+  calendarEvents     CalendarEvent[]
+  eventAttendees     EventAttendee[]
   @@map("contacts")
 }
 
@@ -358,4 +363,109 @@ model CallLog {
   @@index([userId])
   @@index([type])
   @@map("call_logs")
+}
+
+model CalendarEvent {
+  id                String    @id @default(cuid())
+  tenantId          String
+  createdById       String
+  
+  // Event Details
+  title             String
+  description       String?
+  location          String?
+  meetingUrl        String?
+  meetingPlatform   String?   // 'zoom' | 'google_meet' | 'teams' | 'phone' | 'in_person'
+  
+  // Timing
+  startTime         DateTime
+  endTime           DateTime
+  allDay            Boolean   @default(false)
+  timezone          String    @default("America/New_York")
+  
+  // Type & Classification
+  eventType         String    @default("meeting") // 'meeting' | 'call' | 'task' | 'reminder' | 'block' | 'shift'
+  category          String?   // 'client' | 'internal' | 'personal' | 'work_shift'
+  priority          String    @default("normal") // 'low' | 'normal' | 'high' | 'urgent'
+  color             String?
+  
+  // Recording Compliance
+  willBeRecorded         Boolean   @default(false)
+  recordingConsentStatus String?   // 'pending' | 'obtained' | 'declined'
+  recordingConsentAt     DateTime?
+  recordingDisclosureSent Boolean  @default(false)
+  
+  // Linked Entities
+  contactId         String?
+  dealId            String?
+  callLogId         String?
+  
+  // Agenda & Preparation
+  agenda            String?
+  attachments       Json?     @default("[]")
+  prepNotes         String?
+  
+  // External Sync
+  externalEventId   String?
+  externalCalendar  String?   // 'google' | 'outlook' | 'calendly'
+  syncStatus        String?   // 'synced' | 'pending' | 'conflict'
+  lastSyncedAt      DateTime?
+  
+  // Status
+  status            String    @default("scheduled") // 'scheduled' | 'confirmed' | 'tentative' | 'cancelled' | 'completed'
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  tenant            Tenant    @relation(fields: [tenantId], references: [id])
+  createdBy         User      @relation(fields: [createdById], references: [id])
+  contact           Contact?  @relation(fields: [contactId], references: [id])
+  attendees         EventAttendee[]
+  reminders         EventReminder[]
+  
+  @@index([tenantId])
+  @@index([createdById])
+  @@index([contactId])
+  @@index([startTime])
+  @@index([status])
+  @@map("calendar_events")
+}
+
+model EventAttendee {
+  id                     String    @id @default(cuid())
+  eventId                String
+  userId                 String?
+  contactId              String?
+  email                  String?
+  name                   String?
+  responseStatus         String    @default("pending") // 'pending' | 'accepted' | 'declined' | 'tentative'
+  respondedAt            DateTime?
+  recordingConsentStatus String?   // 'pending' | 'consented' | 'declined'
+  recordingConsentAt     DateTime?
+  inviteSentAt           DateTime?
+  reminderSentAt         DateTime?
+  createdAt              DateTime  @default(now())
+  
+  event                  CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user                   User?     @relation(fields: [userId], references: [id])
+  contact                Contact?  @relation(fields: [contactId], references: [id])
+  
+  @@index([eventId])
+  @@index([userId])
+  @@index([contactId])
+  @@map("event_attendees")
+}
+
+model EventReminder {
+  id          String    @id @default(cuid())
+  eventId     String
+  type        String    // 'email' | 'sms' | 'push'
+  timing      Int       // Minutes before event
+  sent        Boolean   @default(false)
+  sentAt      DateTime?
+  
+  event       CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  @@index([eventId])
+  @@map("event_reminders")
 }
