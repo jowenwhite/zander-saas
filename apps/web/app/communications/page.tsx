@@ -1819,8 +1819,8 @@ export default function CommunicationsPage() {
                   }
                   setGeneratingSummary(true);
                   try {
-                    const token = localStorage.getItem('token');
-                    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/call-logs/' + selectedCall.id + '/generate-summary', {
+                    const token = localStorage.getItem('zander_token');
+                    const res = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/generate-summary', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                       body: JSON.stringify({ transcript: transcriptText })
