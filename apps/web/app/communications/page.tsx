@@ -132,6 +132,9 @@ export default function CommunicationsPage() {
   const [showLogCall, setShowLogCall] = useState(false);
   const [callForm, setCallForm] = useState({ type: 'manual_call', direction: 'outbound', toNumber: '', contactId: '', duration: '', outcome: 'completed', notes: '', platform: '' });
   const [savingCall, setSavingCall] = useState(false);
+  const [showScheduleMeeting, setShowScheduleMeeting] = useState(false);
+  const [meetingForm, setMeetingForm] = useState({ platform: 'zoom', meetingUrl: '', contactId: '', scheduledAt: '', notes: '' });
+  const [savingMeeting, setSavingMeeting] = useState(false);
   const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
   const [sendingSms, setSendingSms] = useState(false);
   const [inboxFilter, setInboxFilter] = useState<'all' | 'inbound' | 'outbound'>('all');
@@ -474,6 +477,45 @@ export default function CommunicationsPage() {
     }
   };
 
+  // Schedule Meeting function
+  const handleScheduleMeeting = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!meetingForm.meetingUrl || !meetingForm.scheduledAt) {
+      alert('Please enter meeting URL and scheduled time');
+      return;
+    }
+    setSavingMeeting(true);
+    try {
+      const response = await fetch(`${API_URL}/call-logs`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          type: 'online_meeting',
+          direction: 'outbound',
+          platform: meetingForm.platform,
+          meetingUrl: meetingForm.meetingUrl,
+          contactId: meetingForm.contactId || undefined,
+          scheduledAt: new Date(meetingForm.scheduledAt).toISOString(),
+          outcome: 'scheduled',
+          status: 'scheduled',
+          notes: meetingForm.notes,
+        })
+      });
+      if (response.ok) {
+        setShowScheduleMeeting(false);
+        setMeetingForm({ platform: 'zoom', meetingUrl: '', contactId: '', scheduledAt: '', notes: '' });
+        fetchData();
+      } else {
+        const err = await response.json();
+        alert('Failed to schedule meeting: ' + (err.message || 'Unknown error'));
+      }
+    } catch (error) {
+      alert('Failed to schedule meeting');
+    } finally {
+      setSavingMeeting(false);
+    }
+  };
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'email': return '✉️';
@@ -762,6 +804,23 @@ export default function CommunicationsPage() {
                   >
                     {messageType === 'email' ? '✉️ Compose Email' : messageType === 'sms' ? '💬 Compose SMS' : '📞 Log Call'}
                   </button>
+                  {messageType === 'calls' && (
+                    <button
+                      onClick={() => setShowScheduleMeeting(true)}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        marginLeft: '0.5rem'
+                      }}
+                    >
+                      🎥 Schedule Meeting
+                    </button>
+                  )}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: selectedEmail ? '350px 1fr' : '1fr', gap: '1rem' }}>
                   <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', maxHeight: '500px', overflowY: 'auto' }}>
@@ -1543,6 +1602,84 @@ export default function CommunicationsPage() {
                 <button type="button" onClick={() => setShowLogCall(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={savingCall || !callForm.type} style={{ padding: '0.75rem 1.5rem', background: savingCall || !callForm.type ? 'var(--zander-gray)' : 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingCall || !callForm.type ? 'not-allowed' : 'pointer' }}>
                   {savingCall ? 'Saving...' : '📞 Log Call'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Meeting Modal */}
+      {showScheduleMeeting && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '12px', width: '500px', maxHeight: '85vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px 12px 0 0' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'white' }}>🎥 Schedule Meeting</h2>
+              <button onClick={() => setShowScheduleMeeting(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'white' }}>×</button>
+            </div>
+            <form onSubmit={handleScheduleMeeting} style={{ padding: '1.5rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Platform *</label>
+                <select
+                  value={meetingForm.platform}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, platform: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                >
+                  <option value="zoom">📹 Zoom</option>
+                  <option value="google_meet">🎦 Google Meet</option>
+                  <option value="teams">👥 Microsoft Teams</option>
+                  <option value="other">🔗 Other</option>
+                </select>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Meeting URL *</label>
+                <input
+                  type="url"
+                  value={meetingForm.meetingUrl}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, meetingUrl: e.target.value })}
+                  placeholder="https://zoom.us/j/123456789 or meet.google.com/abc-defg-hij"
+                  required
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Scheduled Date & Time *</label>
+                <input
+                  type="datetime-local"
+                  value={meetingForm.scheduledAt}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, scheduledAt: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Contact (Optional)</label>
+                <select
+                  value={meetingForm.contactId}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, contactId: e.target.value })}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                >
+                  <option value="">-- Select Contact --</option>
+                  {contacts.map(c => (
+                    <option key={c.id} value={c.id}>{c.firstName} {c.lastName} - {c.email}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Notes / Agenda</label>
+                <textarea
+                  value={meetingForm.notes}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, notes: e.target.value })}
+                  rows={3}
+                  placeholder="Meeting agenda, topics to discuss, preparation needed..."
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" onClick={() => setShowScheduleMeeting(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={savingMeeting} style={{ padding: '0.75rem 1.5rem', background: savingMeeting ? 'var(--zander-gray)' : 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingMeeting ? 'not-allowed' : 'pointer' }}>
+                  {savingMeeting ? 'Scheduling...' : '🎥 Schedule Meeting'}
                 </button>
               </div>
             </form>
