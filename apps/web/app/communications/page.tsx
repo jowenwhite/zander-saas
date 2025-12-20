@@ -60,6 +60,7 @@ interface CallLog {
   toNumber?: string;
   platform?: string;
   meetingUrl?: string;
+  meetingId?: string;
   duration?: number;
   outcome?: string;
   status: string;
@@ -67,6 +68,9 @@ interface CallLog {
   recordingUrl?: string;
   transcription?: string;
   aiSummary?: string;
+  scheduledAt?: string;
+  startedAt?: string;
+  endedAt?: string;
   createdAt: string;
   contact?: { id: string; firstName: string; lastName: string; phone?: string; };
 }
@@ -916,15 +920,16 @@ export default function CommunicationsPage() {
                               padding: '0.75rem 1rem',
                               borderBottom: '1px solid var(--zander-border-gray)',
                               cursor: 'pointer',
-                              background: 'transparent'
+                              background: call.status === 'scheduled' ? 'rgba(25, 118, 210, 0.05)' : 'transparent',
+                              borderLeft: call.status === 'scheduled' ? '3px solid #1976d2' : '3px solid transparent'
                             }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                               <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
                                 {call.contact ? call.contact.firstName + ' ' + call.contact.lastName : (call.direction === 'inbound' ? call.fromNumber : call.toNumber) || 'Unknown'}
                               </span>
-                              <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
-                                {new Date(call.createdAt).toLocaleDateString()}
+                              <span style={{ fontSize: '0.7rem', color: call.status === 'scheduled' ? '#1976d2' : 'var(--zander-gray)' }}>
+                                {call.scheduledAt ? new Date(call.scheduledAt).toLocaleString() : new Date(call.createdAt).toLocaleDateString()}
                               </span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -934,13 +939,36 @@ export default function CommunicationsPage() {
                               <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: call.direction === 'inbound' ? '#e8f5e9' : '#fce4ec', color: call.direction === 'inbound' ? '#2e7d32' : '#c2185b' }}>
                                 {call.direction === 'inbound' ? '📥' : '📤'}
                               </span>
-                              <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {call.outcome || 'No outcome'} {call.duration ? '• ' + Math.floor(call.duration / 60) + 'm ' + (call.duration % 60) + 's' : ''}
-                              </span>
+                              {call.status === 'scheduled' ? (
+                                <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', borderRadius: '3px', background: '#e3f2fd', color: '#1976d2', fontWeight: '600' }}>
+                                  📅 SCHEDULED
+                                </span>
+                              ) : (
+                                <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {call.outcome || 'No outcome'} {call.duration ? '• ' + Math.floor(call.duration / 60) + 'm ' + (call.duration % 60) + 's' : ''}
+                                </span>
+                              )}
+                              {call.status === 'scheduled' && call.meetingUrl && (
+                                <a
+                                
+                                  href={call.meetingUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{ marginLeft: 'auto', padding: '0.25rem 0.75rem', background: 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)', color: 'white', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', textDecoration: 'none' }}
+                                >
+                                  🚀 Join
+                                </a>
+                              )}
                             </div>
                             {call.notes && (
                               <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {call.notes.substring(0, 60)}{call.notes.length > 60 ? '...' : ''}
+                              </div>
+                            )}
+                            {call.platform && call.type === 'online_meeting' && (
+                              <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+                                via {call.platform === 'zoom' ? '📹 Zoom' : call.platform === 'google_meet' ? '🎦 Google Meet' : call.platform === 'teams' ? '👥 Teams' : call.platform}
                               </div>
                             )}
                           </div>
