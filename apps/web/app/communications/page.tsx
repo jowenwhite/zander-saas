@@ -41,6 +41,17 @@ interface EmailMessage {
   contact?: { id: string; firstName: string; lastName: string; email: string; };
 }
 
+interface SmsMessage {
+  id: string;
+  direction: 'inbound' | 'outbound';
+  fromNumber: string;
+  toNumber: string;
+  body: string;
+  status: string;
+  sentAt: string;
+  contact?: { id: string; firstName: string; lastName: string; phone: string; };
+}
+
 interface Contact {
   id: string;
   firstName: string;
@@ -92,9 +103,14 @@ export default function CommunicationsPage() {
   const [sequences, setSequences] = useState<Sequence[]>([]);
   const [communications, setCommunications] = useState<ScheduledComm[]>([]);
   const [emails, setEmails] = useState<EmailMessage[]>([]);
+  const [smsMessages, setSmsMessages] = useState<SmsMessage[]>([]);
+  const [messageType, setMessageType] = useState<'email' | 'sms'>('email');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
   const [showComposeModal, setShowComposeModal] = useState(false);
+  const [showSmsCompose, setShowSmsCompose] = useState(false);
+  const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
+  const [sendingSms, setSendingSms] = useState(false);
   const [inboxFilter, setInboxFilter] = useState<'all' | 'inbound' | 'outbound'>('all');
   const [composeForm, setComposeForm] = useState({ to: '', contactId: '', subject: '', body: '' });
   const [sending, setSending] = useState(false);
@@ -138,18 +154,20 @@ export default function CommunicationsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes] = await Promise.all([
+      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes] = await Promise.all([
         fetch(`${API_URL}/templates`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sequences`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/scheduled-communications`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/email-messages`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/sms-messages`, { headers: getAuthHeaders() }),
       ]);
       if (templatesRes.ok) setTemplates(await templatesRes.json());
       if (sequencesRes.ok) setSequences(await sequencesRes.json());
       if (commsRes.ok) setCommunications(await commsRes.json());
       if (emailsRes.ok) setEmails(await emailsRes.json());
       if (contactsRes.ok) { const data = await contactsRes.json(); setContacts(data.data || data); }
+      if (smsRes && smsRes.ok) setSmsMessages(await smsRes.json());
     } catch (err) {
       console.error('Failed to fetch automation data:', err);
     } finally {

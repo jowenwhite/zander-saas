@@ -40,7 +40,6 @@ model Tenant {
   scheduledCommunications ScheduledCommunication[]
   emailMessages EmailMessage[]
   smsMessages   SmsMessage[]
-  smsMessages   SmsMessage[]
   @@map("tenants")
 }
 
@@ -81,7 +80,6 @@ model Contact {
   sequenceEnrollments SequenceEnrollment[]
   scheduledCommunications ScheduledCommunication[]
   emailMessages EmailMessage[]
-  smsMessages   SmsMessage[]
   smsMessages   SmsMessage[]
   @@map("contacts")
 }

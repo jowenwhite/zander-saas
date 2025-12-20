@@ -5,13 +5,13 @@ import * as Twilio from 'twilio';
 @Injectable()
 export class SmsMessagesService {
   private readonly logger = new Logger(SmsMessagesService.name);
-  private twilioClient: Twilio.Twilio;
+  private twilioClient: Twilio.Twilio | null = null;
 
   constructor(private prisma: PrismaService) {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
-    
-    if (accountSid && authToken) {
+
+    if (accountSid && authToken && accountSid !== 'your_account_sid_here') {
       this.twilioClient = Twilio.default(accountSid, authToken);
       this.logger.log('Twilio client initialized');
     } else {
@@ -34,17 +34,17 @@ export class SmsMessagesService {
     }
 
     try {
-      // Send via Twilio
       const message = await this.twilioClient.messages.create({
         body,
         from: fromNumber,
         to,
       });
 
-      this.logger.log(`SMS sent: ${message.sid}`);
+      this.logger.log('SMS sent: ' + message.sid);
 
-      // Store in database
-      const smsMessage = await this.prisma.smsMe      const smsMessage = await this.prisma.smntId,
+      const smsMessage = await this.prisma.smsMessage.create({
+        data: {
+          tenantId,
           contactId,
           dealId,
           direction: 'outbound',
@@ -59,7 +59,7 @@ export class SmsMessagesService {
 
       return { success: true, messageId: smsMessage.id, sid: message.sid };
     } catch (error) {
-      this.logger.error(`Failed to send SMS: ${error.message}`);
+      this.logger.error('Failed to send SMS: ' + error.message);
       throw error;
     }
   }
@@ -74,7 +74,8 @@ export class SmsMessagesService {
     return this.prisma.smsMessage.findMany({
       where: {
         tenantId,
-                                                                     irection }),
+        ...(contactId && { contactId }),
+        ...(direction && { direction }),
       },
       include: {
         contact: {
@@ -113,10 +114,8 @@ export class SmsMessagesService {
   }) {
     const { From, To, Body, MessageSid } = webhookData;
 
-    this.logger.log(`Inbound SMS from ${From}: ${Body.substring(0, 50)}...`);
+    this.logger.log('Inbound SMS from ' + From + ': ' + Body.substring(0, 50) + '...');
 
-    // Find contact by phone number across all tenants
-    // In production, you'd want to match the To number to a tenant's Twilio number
     const contact = await this.prisma.contact.findFirst({
       where: {
         phone: {
@@ -143,8 +142,7 @@ export class SmsMessagesService {
       return { success: true, messageId: smsMessage.id, matched: true };
     }
 
-    // Store without contact match - would need tenant resolution logic
-    this.logger.warn(`No contact found for phone: ${From}`);
+    this.logger.warn('No contact found for phone: ' + From);
     return { success: true, matched: false };
   }
 
@@ -154,7 +152,7 @@ export class SmsMessagesService {
   }) {
     const { MessageSid, MessageStatus } = webhookData;
 
-    this.logger.log(`SMS status update: ${MessageSid} -> ${MessageStatus}`);
+    this.logger.log('SMS status update: ' + MessageSid + ' -> ' + MessageStatus);
 
     const updated = await this.prisma.smsMessage.updateMany({
       where: { messageSid: MessageSid },
