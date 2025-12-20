@@ -19,7 +19,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
   ];
 
   const toolsItems = [
-    { icon: '📧', label: 'Email Automation', href: '/automation' },
+    { icon: '📧', label: 'Communications Hub', href: '/communications' },
     { icon: '📋', label: 'Forms', href: '/forms' },
     { icon: '🤖', label: 'AI Assistant', href: '/ai' },
   ];
