@@ -32,7 +32,7 @@ export class CalendarEventsController {
     attendees?: { userId?: string; contactId?: string; email?: string; name?: string }[];
     reminders?: { type: string; timing: number }[];
   }) {
-    return this.calendarEventsService.create(req.user.tenantId, req.user.id, {
+    return this.calendarEventsService.create(req.user.tenantId, req.user.userId, {
       ...body,
       startTime: new Date(body.startTime),
       endTime: new Date(body.endTime),

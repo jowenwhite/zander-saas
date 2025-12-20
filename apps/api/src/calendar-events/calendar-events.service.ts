@@ -33,11 +33,28 @@ export class CalendarEventsService {
 
     const event = await this.prisma.calendarEvent.create({
       data: {
-        tenantId,
-        createdById,
-        ...eventData,
-        // If recording is enabled, set consent to pending
-        recordingConsentStatus: data.willBeRecorded ? 'pending' : null,
+        tenant: { connect: { id: tenantId } },
+        createdBy: { connect: { id: createdById } },
+        title: eventData.title,
+        description: eventData.description,
+        location: eventData.location,
+        meetingUrl: eventData.meetingUrl,
+        meetingPlatform: eventData.meetingPlatform,
+        startTime: eventData.startTime,
+        endTime: eventData.endTime,
+        allDay: eventData.allDay,
+        timezone: eventData.timezone,
+        eventType: eventData.eventType,
+        category: eventData.category,
+        priority: eventData.priority,
+        color: eventData.color,
+        willBeRecorded: eventData.willBeRecorded,
+        recordingConsentStatus: eventData.willBeRecorded ? 'pending' : null,
+        agenda: eventData.agenda,
+        attachments: eventData.attachments,
+        prepNotes: eventData.prepNotes,
+        status: eventData.status,
+        contact: eventData.contactId ? { connect: { id: eventData.contactId } } : undefined,
       },
       include: {
         contact: true,
