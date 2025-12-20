@@ -87,6 +87,16 @@ export class CallLogsController {
     return { success: true };
   }
 
+  
+  @Post(':id/generate-summary')
+  async generateSummary(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() body: { transcript: string }
+  ) {
+    return this.callLogsService.generateSummary(req.user.tenantId, id, body.transcript);
+  }
+
   @Delete(':id')
   async remove(@Request() req, @Param('id') id: string) {
     await this.callLogsService.remove(req.user.tenantId, id);

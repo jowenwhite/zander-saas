@@ -137,6 +137,10 @@ export default function CommunicationsPage() {
   const [callForm, setCallForm] = useState({ type: 'manual_call', direction: 'outbound', toNumber: '', contactId: '', duration: '', outcome: 'completed', notes: '', platform: '' });
   const [savingCall, setSavingCall] = useState(false);
   const [showScheduleMeeting, setShowScheduleMeeting] = useState(false);
+  const [showCallDetails, setShowCallDetails] = useState(false);
+  const [selectedCall, setSelectedCall] = useState<CallLog | null>(null);
+  const [transcriptText, setTranscriptText] = useState('');
+  const [generatingSummary, setGeneratingSummary] = useState(false);
   const [meetingForm, setMeetingForm] = useState({ platform: 'zoom', meetingUrl: '', contactId: '', scheduledAt: '', notes: '' });
   const [savingMeeting, setSavingMeeting] = useState(false);
   const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
@@ -941,6 +945,7 @@ export default function CommunicationsPage() {
                         callLogs.filter(c => callsFilter === 'all' || (callsFilter === 'scheduled' ? c.status === 'scheduled' : c.status !== 'scheduled')).map(call => (
                           <div
                             key={call.id}
+                            onClick={() => { setSelectedCall(call); setTranscriptText(call.transcription || ''); setShowCallDetails(true); }}
                             style={{
                               padding: '0.75rem 1rem',
                               borderBottom: '1px solid var(--zander-border-gray)',
@@ -1736,6 +1741,128 @@ export default function CommunicationsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Call Details Modal */}
+      {showCallDetails && selectedCall && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px 12px 0 0' }}>
+              <div>
+                <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem' }}>📞 Call Details</h2>
+                <p style={{ margin: '0.25rem 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
+                  {selectedCall.contact ? selectedCall.contact.firstName + ' ' + selectedCall.contact.lastName : 'Unknown Contact'}
+                </p>
+              </div>
+              <button onClick={() => setShowCallDetails(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
+            </div>
+            
+            <div style={{ padding: '1.5rem' }}>
+              {/* Call Info */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Type</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.type === 'online_meeting' ? '🎥 Online Meeting' : selectedCall.type === 'voicemail_drop' ? '📱 Voicemail' : '📞 Phone Call'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Duration</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.duration ? Math.floor(selectedCall.duration / 60) + 'm ' + (selectedCall.duration % 60) + 's' : 'N/A'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Status</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600', color: selectedCall.status === 'completed' ? '#27ae60' : selectedCall.status === 'scheduled' ? '#1976d2' : '#666' }}>{selectedCall.status || 'Unknown'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Direction</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.direction === 'inbound' ? '📥 Inbound' : '📤 Outbound'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Outcome</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.outcome || 'N/A'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Date</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{new Date(selectedCall.createdAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+
+              {/* Notes */}
+              {selectedCall.notes && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>📝 Notes</h3>
+                  <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.6' }}>{selectedCall.notes}</div>
+                </div>
+              )}
+
+              {/* Transcript Section */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>📝 Transcript / Meeting Notes</h3>
+                <textarea
+                  value={transcriptText}
+                  onChange={(e) => setTranscriptText(e.target.value)}
+                  placeholder="Paste your call transcript, Zoom transcript export, meeting notes, or key points here..."
+                  style={{ width: '100%', minHeight: '150px', padding: '1rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.6', resize: 'vertical' }}
+                />
+                <p style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+                  Tip: You can paste transcripts from Zoom, Otter.ai, Google Meet, or type your own notes
+                </p>
+              </div>
+
+              {/* Generate Summary Button */}
+              <button
+                onClick={async () => {
+                  if (!transcriptText.trim()) {
+                    alert('Please enter transcript or notes first');
+                    return;
+                  }
+                  setGeneratingSummary(true);
+                  try {
+                    const token = localStorage.getItem('token');
+                    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/call-logs/' + selectedCall.id + '/generate-summary', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                      body: JSON.stringify({ transcript: transcriptText })
+                    });
+                    if (res.ok) {
+                      const data = await res.json();
+                      setSelectedCall({ ...selectedCall, transcription: data.transcription, aiSummary: data.aiSummary });
+                      // Update in the list too
+                      setCallLogs(callLogs.map(c => c.id === selectedCall.id ? { ...c, transcription: data.transcription, aiSummary: data.aiSummary } : c));
+                    } else {
+                      alert('Failed to generate summary');
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    alert('Error generating summary');
+                  }
+                  setGeneratingSummary(false);
+                }}
+                disabled={generatingSummary || !transcriptText.trim()}
+                style={{ width: '100%', padding: '0.75rem', background: generatingSummary ? '#ccc' : 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: generatingSummary ? 'not-allowed' : 'pointer', marginBottom: '1.5rem' }}
+              >
+                {generatingSummary ? '🤖 Generating Summary...' : '🤖 Generate AI Summary'}
+              </button>
+
+              {/* AI Summary Display */}
+              {selectedCall.aiSummary && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ background: 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem' }}>AI</span>
+                    Summary
+                  </h3>
+                  <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+                    {selectedCall.aiSummary}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+              <button onClick={() => setShowCallDetails(false)} style={{ padding: '0.5rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}>Close</button>
+            </div>
           </div>
         </div>
       )}
