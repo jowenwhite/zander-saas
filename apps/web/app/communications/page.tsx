@@ -52,6 +52,25 @@ interface SmsMessage {
   contact?: { id: string; firstName: string; lastName: string; phone: string; };
 }
 
+interface CallLog {
+  id: string;
+  type: string; // 'online_meeting' | 'voicemail_drop' | 'manual_call'
+  direction: 'inbound' | 'outbound';
+  fromNumber?: string;
+  toNumber?: string;
+  platform?: string;
+  meetingUrl?: string;
+  duration?: number;
+  outcome?: string;
+  status: string;
+  notes?: string;
+  recordingUrl?: string;
+  transcription?: string;
+  aiSummary?: string;
+  createdAt: string;
+  contact?: { id: string; firstName: string; lastName: string; phone?: string; };
+}
+
 interface Contact {
   id: string;
   firstName: string;
@@ -104,11 +123,15 @@ export default function CommunicationsPage() {
   const [communications, setCommunications] = useState<ScheduledComm[]>([]);
   const [emails, setEmails] = useState<EmailMessage[]>([]);
   const [smsMessages, setSmsMessages] = useState<SmsMessage[]>([]);
-  const [messageType, setMessageType] = useState<'email' | 'sms'>('email');
+  const [callLogs, setCallLogs] = useState<CallLog[]>([]);
+  const [messageType, setMessageType] = useState<'email' | 'sms' | 'calls'>('email');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
   const [showComposeModal, setShowComposeModal] = useState(false);
   const [showSmsCompose, setShowSmsCompose] = useState(false);
+  const [showLogCall, setShowLogCall] = useState(false);
+  const [callForm, setCallForm] = useState({ type: 'manual_call', direction: 'outbound', toNumber: '', contactId: '', duration: '', outcome: 'completed', notes: '', platform: '' });
+  const [savingCall, setSavingCall] = useState(false);
   const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
   const [sendingSms, setSendingSms] = useState(false);
   const [inboxFilter, setInboxFilter] = useState<'all' | 'inbound' | 'outbound'>('all');
@@ -154,13 +177,14 @@ export default function CommunicationsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes] = await Promise.all([
+      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes] = await Promise.all([
         fetch(`${API_URL}/templates`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sequences`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/scheduled-communications`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/email-messages`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sms-messages`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/call-logs`, { headers: getAuthHeaders() }),
       ]);
       if (templatesRes.ok) setTemplates(await templatesRes.json());
       if (sequencesRes.ok) setSequences(await sequencesRes.json());
@@ -168,6 +192,7 @@ export default function CommunicationsPage() {
       if (emailsRes.ok) setEmails(await emailsRes.json());
       if (contactsRes.ok) { const data = await contactsRes.json(); setContacts(data.data || data); }
       if (smsRes && smsRes.ok) setSmsMessages(await smsRes.json());
+      if (callLogsRes && callLogsRes.ok) setCallLogs(await callLogsRes.json());
     } catch (err) {
       console.error('Failed to fetch automation data:', err);
     } finally {
@@ -411,6 +436,41 @@ export default function CommunicationsPage() {
       alert('Failed to send SMS');
     } finally {
       setSendingSms(false);
+    }
+  };
+
+  // Log Call function
+  const handleLogCall = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!callForm.type) return;
+    setSavingCall(true);
+    try {
+      const response = await fetch(`${API_URL}/call-logs`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          type: callForm.type,
+          direction: callForm.direction,
+          toNumber: callForm.toNumber ? (callForm.toNumber.startsWith('+') ? callForm.toNumber : '+1' + callForm.toNumber.replace(/\D/g, '')) : undefined,
+          contactId: callForm.contactId || undefined,
+          duration: callForm.duration ? parseInt(callForm.duration) * 60 : undefined,
+          outcome: callForm.outcome,
+          notes: callForm.notes,
+          platform: callForm.platform || undefined,
+        })
+      });
+      if (response.ok) {
+        setShowLogCall(false);
+        setCallForm({ type: 'manual_call', direction: 'outbound', toNumber: '', contactId: '', duration: '', outcome: 'completed', notes: '', platform: '' });
+        fetchData();
+      } else {
+        const err = await response.json();
+        alert('Failed to log call: ' + (err.message || 'Unknown error'));
+      }
+    } catch (error) {
+      alert('Failed to log call');
+    } finally {
+      setSavingCall(false);
     }
   };
 
@@ -671,10 +731,25 @@ export default function CommunicationsPage() {
                       >
                         💬 SMS
                       </button>
+                      <button
+                        onClick={() => setMessageType('calls')}
+                        style={{
+                          padding: '0.4rem 0.75rem',
+                          background: messageType === 'calls' ? 'white' : 'transparent',
+                          color: messageType === 'calls' ? 'var(--zander-navy)' : '#666',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: messageType === 'calls' ? '600' : '400',
+                          boxShadow: messageType === 'calls' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                        }}
+                      >
+                        📞 Calls
+                      </button>
                     </div>
                   </div>
                   <button
-                    onClick={() => messageType === 'email' ? setShowComposeModal(true) : setShowSmsCompose(true)}
+                    onClick={() => messageType === 'email' ? setShowComposeModal(true) : messageType === 'sms' ? setShowSmsCompose(true) : setShowLogCall(true)}
                     style={{
                       padding: '0.75rem 1.5rem',
                       background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
@@ -685,7 +760,7 @@ export default function CommunicationsPage() {
                       cursor: 'pointer'
                     }}
                   >
-                    {messageType === 'email' ? '✉️ Compose Email' : '💬 Compose SMS'}
+                    {messageType === 'email' ? '✉️ Compose Email' : messageType === 'sms' ? '💬 Compose SMS' : '📞 Log Call'}
                   </button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: selectedEmail ? '350px 1fr' : '1fr', gap: '1rem' }}>
@@ -728,7 +803,7 @@ export default function CommunicationsPage() {
                         </div>
                       ))
                     )
-                    ) : (
+                    ) : messageType === 'sms' ? (
                       /* SMS Messages */
                       smsMessages.filter(s => inboxFilter === 'all' || s.direction === inboxFilter).length === 0 ? (
                         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
@@ -763,6 +838,52 @@ export default function CommunicationsPage() {
                                 {sms.body.substring(0, 50)}{sms.body.length > 50 ? '...' : ''}
                               </span>
                             </div>
+                          </div>
+                        ))
+                      )
+                    ) : (
+                      /* Call Logs */
+                      callLogs.filter(c => inboxFilter === 'all' || c.direction === inboxFilter).length === 0 ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📞</div>
+                          <p>No call logs yet</p>
+                          <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Log your first call to get started</p>
+                        </div>
+                      ) : (
+                        callLogs.filter(c => inboxFilter === 'all' || c.direction === inboxFilter).map(call => (
+                          <div
+                            key={call.id}
+                            style={{
+                              padding: '0.75rem 1rem',
+                              borderBottom: '1px solid var(--zander-border-gray)',
+                              cursor: 'pointer',
+                              background: 'transparent'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                              <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                                {call.contact ? call.contact.firstName + ' ' + call.contact.lastName : (call.direction === 'inbound' ? call.fromNumber : call.toNumber) || 'Unknown'}
+                              </span>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                {new Date(call.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: call.type === 'online_meeting' ? '#e3f2fd' : call.type === 'voicemail_drop' ? '#fff3e0' : '#f3e5f5', color: call.type === 'online_meeting' ? '#1976d2' : call.type === 'voicemail_drop' ? '#f57c00' : '#7b1fa2' }}>
+                                {call.type === 'online_meeting' ? '🎥' : call.type === 'voicemail_drop' ? '📱' : '📞'}
+                              </span>
+                              <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: call.direction === 'inbound' ? '#e8f5e9' : '#fce4ec', color: call.direction === 'inbound' ? '#2e7d32' : '#c2185b' }}>
+                                {call.direction === 'inbound' ? '📥' : '📤'}
+                              </span>
+                              <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {call.outcome || 'No outcome'} {call.duration ? '• ' + Math.floor(call.duration / 60) + 'm ' + (call.duration % 60) + 's' : ''}
+                              </span>
+                            </div>
+                            {call.notes && (
+                              <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {call.notes.substring(0, 60)}{call.notes.length > 60 ? '...' : ''}
+                              </div>
+                            )}
                           </div>
                         ))
                       )
@@ -1296,6 +1417,132 @@ export default function CommunicationsPage() {
                 <button type="button" onClick={() => setShowSmsCompose(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={sendingSms || !smsForm.to || !smsForm.body} style={{ padding: '0.75rem 1.5rem', background: sendingSms || !smsForm.to || !smsForm.body ? 'var(--zander-gray)' : 'linear-gradient(135deg, #27AE60 0%, #219a52 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sendingSms || !smsForm.to || !smsForm.body ? 'not-allowed' : 'pointer' }}>
                   {sendingSms ? 'Sending...' : '💬 Send SMS'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Log Call Modal */}
+      {showLogCall && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '12px', width: '550px', maxHeight: '85vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--zander-navy)' }}>📞 Log Call</h2>
+              <button onClick={() => setShowLogCall(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <form onSubmit={handleLogCall} style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Call Type *</label>
+                  <select
+                    value={callForm.type}
+                    onChange={(e) => setCallForm({ ...callForm, type: e.target.value })}
+                    required
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  >
+                    <option value="manual_call">📞 Manual Call</option>
+                    <option value="online_meeting">🎥 Online Meeting</option>
+                    <option value="voicemail_drop">📱 Voicemail Drop</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Direction *</label>
+                  <select
+                    value={callForm.direction}
+                    onChange={(e) => setCallForm({ ...callForm, direction: e.target.value })}
+                    required
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  >
+                    <option value="outbound">📤 Outbound</option>
+                    <option value="inbound">📥 Inbound</option>
+                  </select>
+                </div>
+              </div>
+              
+              {callForm.type === 'online_meeting' && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Platform</label>
+                  <select
+                    value={callForm.platform}
+                    onChange={(e) => setCallForm({ ...callForm, platform: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  >
+                    <option value="">Select platform...</option>
+                    <option value="zoom">Zoom</option>
+                    <option value="google_meet">Google Meet</option>
+                    <option value="teams">Microsoft Teams</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              )}
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Contact</label>
+                <select
+                  value={callForm.contactId}
+                  onChange={(e) => {
+                    const c = contacts.find(x => x.id === e.target.value);
+                    setCallForm({ ...callForm, contactId: e.target.value, toNumber: (c as any)?.phone || callForm.toNumber });
+                  }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', marginBottom: '0.5rem' }}
+                >
+                  <option value="">Select a contact or enter number below</option>
+                  {contacts.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
+                </select>
+                <input
+                  type="tel"
+                  value={callForm.toNumber}
+                  onChange={(e) => setCallForm({ ...callForm, toNumber: e.target.value })}
+                  placeholder="Phone number (optional)"
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Duration (minutes)</label>
+                  <input
+                    type="number"
+                    value={callForm.duration}
+                    onChange={(e) => setCallForm({ ...callForm, duration: e.target.value })}
+                    placeholder="e.g., 15"
+                    min="0"
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Outcome</label>
+                  <select
+                    value={callForm.outcome}
+                    onChange={(e) => setCallForm({ ...callForm, outcome: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  >
+                    <option value="completed">✅ Completed</option>
+                    <option value="voicemail">📫 Left Voicemail</option>
+                    <option value="no_answer">❌ No Answer</option>
+                    <option value="busy">🔴 Busy</option>
+                    <option value="cancelled">🚫 Cancelled</option>
+                    <option value="scheduled">📅 Scheduled</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Notes</label>
+                <textarea
+                  value={callForm.notes}
+                  onChange={(e) => setCallForm({ ...callForm, notes: e.target.value })}
+                  rows={4}
+                  placeholder="Call summary, action items, follow-up needed..."
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" onClick={() => setShowLogCall(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={savingCall || !callForm.type} style={{ padding: '0.75rem 1.5rem', background: savingCall || !callForm.type ? 'var(--zander-gray)' : 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingCall || !callForm.type ? 'not-allowed' : 'pointer' }}>
+                  {savingCall ? 'Saving...' : '📞 Log Call'}
                 </button>
               </div>
             </form>
