@@ -40,6 +40,7 @@ model Tenant {
   scheduledCommunications ScheduledCommunication[]
   emailMessages EmailMessage[]
   smsMessages   SmsMessage[]
+  callLogs      CallLog[]
   @@map("tenants")
 }
 
@@ -81,6 +82,7 @@ model Contact {
   scheduledCommunications ScheduledCommunication[]
   emailMessages EmailMessage[]
   smsMessages   SmsMessage[]
+  callLogs      CallLog[]
   @@map("contacts")
 }
 
@@ -304,4 +306,56 @@ model SmsMessage {
   @@index([contactId])
   @@index([messageSid])
   @@map("sms_messages")
+}
+
+model CallLog {
+  id              String    @id @default(cuid())
+  tenantId        String
+  contactId       String?
+  dealId          String?
+  userId          String?   // Who made/received the call
+  
+  // Call Type & Direction
+  type            String    // 'online_meeting' | 'voicemail_drop' | 'manual_call'
+  direction       String    // 'inbound' | 'outbound'
+  
+  // Phone/Meeting Details
+  fromNumber      String?
+  toNumber        String?
+  platform        String?   // 'zoom' | 'google_meet' | 'teams' | 'twilio' | 'phone'
+  meetingUrl      String?
+  meetingId       String?   // External meeting ID
+  
+  // Call Outcome & Duration
+  duration        Int?      // Duration in seconds
+  outcome         String?   // 'completed' | 'voicemail' | 'no_answer' | 'busy' | 'cancelled' | 'scheduled'
+  status          String    @default("completed") // 'scheduled' | 'in_progress' | 'completed' | 'missed'
+  
+  // Scripts & Notes
+  scriptId        String?   // Reference to template/script used
+  notes           String?
+  
+  // Recording & Transcription
+  recordingUrl    String?
+  transcription   String?   // Full transcription text
+  aiSummary       String?   // AI-generated summary
+  
+  // Voicemail Drop specific
+  voicemailTemplateId String?  // Pre-recorded voicemail template
+  
+  // Timestamps
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  endedAt         DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  contact         Contact?  @relation(fields: [contactId], references: [id])
+
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([userId])
+  @@index([type])
+  @@map("call_logs")
 }
