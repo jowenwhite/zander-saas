@@ -27,6 +27,9 @@ export default function SettingsPage() {
     weeklyDigest: true
   });
 
+  // User state (for API calls)
+  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+
   // Company State
   const [company, setCompany] = useState({
     name: '64 West Capital Partners',
@@ -62,6 +65,57 @@ export default function SettingsPage() {
   ]);
 
   // Integrations State
+  const [gmailConnected, setGmailConnected] = useState(false);
+  const [gmailEmail, setGmailEmail] = useState<string | null>(null);
+  const [syncingGmail, setSyncingGmail] = useState(false);
+
+  // Check Gmail connection status on load
+  useEffect(() => {
+    const checkGmailStatus = async () => {
+      if (!user?.id) return;
+      try {
+        const res = await fetch(`https://api.zander.mcfapp.com/gmail/status?userId=${user.id}`);
+        const data = await res.json();
+        setGmailConnected(data.connected);
+        setGmailEmail(data.email);
+      } catch (error) {
+        console.error('Failed to check Gmail status:', error);
+      }
+    };
+    checkGmailStatus();
+  }, [user?.id]);
+
+  const handleConnectGmail = () => {
+    if (!user?.id) return;
+    window.location.href = `https://api.zander.mcfapp.com/auth/google?state=${user.id}`;
+  };
+
+  const handleDisconnectGmail = async () => {
+    if (!user?.id) return;
+    window.location.href = `https://api.zander.mcfapp.com/auth/google/disconnect?userId=${user.id}`;
+  };
+
+  const handleSyncGmail = async () => {
+    if (!user?.id) return;
+    setSyncingGmail(true);
+    try {
+      const res = await fetch(`https://api.zander.mcfapp.com/gmail/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, maxResults: 50 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+      } else {
+        alert('Sync failed: ' + data.error);
+      }
+    } catch (error) {
+      alert('Sync failed');
+    } finally {
+      setSyncingGmail(false);
+    }
+  };
+
   const integrations = {
     accounting: [
       { id: 'quickbooks', name: 'QuickBooks', description: 'Sync invoices, payments, and financial data', icon: '📗', status: 'available', connected: false },
@@ -69,7 +123,7 @@ export default function SettingsPage() {
       { id: 'freshbooks', name: 'FreshBooks', description: 'Import invoices and expenses', icon: '📙', status: 'soon', connected: false },
     ],
     email: [
-      { id: 'gmail', name: 'Gmail / Google', description: 'Sync emails and calendar', icon: '📧', status: 'available', connected: true },
+      { id: 'gmail', name: 'Gmail / Google', description: gmailEmail ? `Connected: ${gmailEmail}` : 'Sync emails, contacts, and calendar', icon: '📧', status: 'available', connected: gmailConnected },
       { id: 'outlook', name: 'Microsoft Outlook', description: 'Connect Outlook/Office 365', icon: '📬', status: 'soon', connected: false },
       { id: 'resend', name: 'Resend', description: 'Transactional email sending', icon: '✉️', status: 'available', connected: true },
     ],
@@ -84,12 +138,12 @@ export default function SettingsPage() {
       { id: 'notion', name: 'Notion', description: 'Connect your workspace', icon: '📝', status: 'soon', connected: false },
     ],
     calendar: [
-      { id: 'gcal', name: 'Google Calendar', description: 'Sync meetings and events', icon: '📅', status: 'available', connected: true },
+      { id: 'gcal', name: 'Google Calendar', description: 'Sync meetings and events', icon: '📅', status: 'available', connected: gmailConnected },
       { id: 'outlook_cal', name: 'Outlook Calendar', description: 'Connect Outlook calendar', icon: '🗓️', status: 'soon', connected: false },
       { id: 'calendly', name: 'Calendly', description: 'Scheduling integration', icon: '⏰', status: 'soon', connected: false },
     ],
     storage: [
-      { id: 'gdrive', name: 'Google Drive', description: 'Store and access files', icon: '📁', status: 'available', connected: false },
+      { id: 'gdrive', name: 'Google Drive', description: 'Store and access files', icon: '📁', status: 'available', connected: gmailConnected },
       { id: 'dropbox', name: 'Dropbox', description: 'Connect Dropbox storage', icon: '📦', status: 'soon', connected: false },
       { id: 'onedrive', name: 'OneDrive', description: 'Microsoft cloud storage', icon: '☁️', status: 'soon', connected: false },
     ],
@@ -134,6 +188,7 @@ export default function SettingsPage() {
         });
         if (profileRes.ok) {
           const profileData = await profileRes.json();
+          setUser({ id: profileData.id, email: profileData.email });
           setProfile(prev => ({
             ...prev,
             firstName: profileData.firstName || '',
@@ -860,12 +915,12 @@ export default function SettingsPage() {
       {Object.entries(integrations).map(([category, items]) => (
         <div key={category} style={{ marginBottom: '2rem' }}>
           <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem', textTransform: 'capitalize' }}>
-            {category === 'crm' ? 'CRM & Sales' : category === 'email' ? 'Email & Communication' : category}
+            {category === 'crm' ? 'CRM & Sales' : category === 'email' ? 'Email & Communication' : category === 'calendar' ? 'Calendar & Scheduling' : category === 'storage' ? 'Cloud Storage' : category}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
             {items.map((integration) => (
-              <div key={integration.id} style={{ padding: '1.25rem', background: 'white', borderRadius: '10px', border: '2px solid var(--zander-border-gray)', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                <div style={{ width: '48px', height: '48px', background: 'var(--zander-off-white)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>{integration.icon}</div>
+              <div key={integration.id} style={{ padding: '1.25rem', background: 'white', borderRadius: '10px', border: integration.connected ? '2px solid #28A745' : '2px solid var(--zander-border-gray)', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                <div style={{ width: '48px', height: '48px', background: integration.connected ? 'rgba(40, 167, 69, 0.1)' : 'var(--zander-off-white)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>{integration.icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{integration.name}</span>
@@ -875,13 +930,25 @@ export default function SettingsPage() {
                   </div>
                   <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.8rem', color: 'var(--zander-gray)', lineHeight: '1.4' }}>{integration.description}</p>
                   {integration.connected ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28A745' }} />
                       <span style={{ fontSize: '0.8rem', color: '#28A745', fontWeight: '600' }}>Connected</span>
-                      <button style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-gray)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
+                      {integration.id === 'gmail' && (
+                        <button onClick={handleSyncGmail} disabled={syncingGmail} style={{ padding: '0.35rem 0.75rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: syncingGmail ? 'wait' : 'pointer', marginLeft: '0.5rem' }}>
+                          {syncingGmail ? 'Syncing...' : 'Sync Now'}
+                        </button>
+                      )}
+                      {(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive') && (
+                        <button onClick={handleDisconnectGmail} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-gray)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
+                      )}
                     </div>
                   ) : integration.status === 'available' ? (
-                    <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Connect</button>
+                    <button 
+                      onClick={(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive') ? handleConnectGmail : undefined}
+                      style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}
+                    >
+                      Connect
+                    </button>
                   ) : (
                     <button disabled style={{ padding: '0.5rem 1rem', background: 'var(--zander-off-white)', color: 'var(--zander-gray)', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'not-allowed' }}>Coming Soon</button>
                   )}
