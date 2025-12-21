@@ -22,6 +22,7 @@ import { EmailMessagesModule } from './email-messages/email-messages.module';
 import { SmsMessagesModule } from './sms-messages/sms-messages.module';
 import { CallLogsModule } from './call-logs/call-logs.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
+import { GoogleAuthModule } from './auth/google/google-auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,7 +42,8 @@ import { CalendarEventsModule } from './calendar-events/calendar-events.module';
     EmailMessagesModule,
     SmsMessagesModule,
     CallLogsModule,
-    CalendarEventsModule
+    CalendarEventsModule,
+    GoogleAuthModule
   ],
   controllers: [AppController, AuthController],
   providers: [
