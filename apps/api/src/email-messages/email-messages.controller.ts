@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, Request, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request, Logger } from '@nestjs/common';
 import { EmailMessagesService } from './email-messages.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -61,13 +61,35 @@ export class EmailMessagesController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('unread-count')
+  async getUnreadCount(@Request() req) {
+    const tenantId = req.user.tenantId;
+    return this.emailMessagesService.getUnreadCount(tenantId);
+  }
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Request() req, @Param('id') id: string) {
     const tenantId = req.user.tenantId;
     return this.emailMessagesService.findOne(tenantId, id);
   }
 
-  // Resend Inbound Webhook - no auth required (webhook from Resend)
+  
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/read')
+  async markAsRead(@Request() req, @Param('id') id: string) {
+    const tenantId = req.user.tenantId;
+    return this.emailMessagesService.markAsRead(tenantId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('mark-all-read')
+  async markAllAsRead(@Request() req) {
+    const tenantId = req.user.tenantId;
+    return this.emailMessagesService.markAllAsRead(tenantId);
+  }
+
+// Resend Inbound Webhook - no auth required (webhook from Resend)
   @Post('inbound-webhook')
   async handleInboundWebhook(@Body() payload: any) {
     this.logger.log('Received inbound email webhook');

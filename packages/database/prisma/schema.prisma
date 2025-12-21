@@ -276,6 +276,7 @@ model EmailMessage {
   inReplyTo   String?  // For threading - references parent messageId
   threadId    String?  // Groups related emails
   status      String   @default("sent") // sent, delivered, opened, failed, received
+  isRead      Boolean  @default(false)
   sentAt      DateTime
   openedAt    DateTime?
   createdAt   DateTime @default(now())

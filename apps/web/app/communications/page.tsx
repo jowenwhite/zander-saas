@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NavBar from '../components/NavBar';
+import Sidebar from '../components/Sidebar';
 import AuthGuard from '../components/AuthGuard';
 
 interface Template {
@@ -150,6 +151,7 @@ export default function CommunicationsPage() {
   const [composeForm, setComposeForm] = useState({ to: '', contactId: '', subject: '', body: '' });
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [templateFilter, setTemplateFilter] = useState<'all' | 'email' | 'sms' | 'call'>('all');
   const [commFilter, setCommFilter] = useState<'all' | 'pending' | 'approved' | 'sent'>('all');
   
@@ -189,7 +191,7 @@ export default function CommunicationsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes] = await Promise.all([
+      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes, unreadCountRes] = await Promise.all([
         fetch(`${API_URL}/templates`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sequences`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/scheduled-communications`, { headers: getAuthHeaders() }),
@@ -197,6 +199,7 @@ export default function CommunicationsPage() {
         fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sms-messages`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/call-logs`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/email-messages/unread-count`, { headers: getAuthHeaders() }),
       ]);
       if (templatesRes.ok) setTemplates(await templatesRes.json());
       if (sequencesRes.ok) setSequences(await sequencesRes.json());
@@ -205,6 +208,7 @@ export default function CommunicationsPage() {
       if (contactsRes.ok) { const data = await contactsRes.json(); setContacts(data.data || data); }
       if (smsRes && smsRes.ok) setSmsMessages(await smsRes.json());
       if (callLogsRes && callLogsRes.ok) setCallLogs(await callLogsRes.json());
+      if (unreadCountRes && unreadCountRes.ok) { const data = await unreadCountRes.json(); setUnreadCount(data.unreadCount || 0); }
     } catch (err) {
       console.error('Failed to fetch automation data:', err);
     } finally {
@@ -554,66 +558,7 @@ export default function CommunicationsPage() {
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       <NavBar activeModule="cro" />
 
-      {/* Sidebar */}
-      <aside style={{
-        position: 'fixed',
-        left: 0,
-        top: '64px',
-        bottom: 0,
-        width: '240px',
-        background: 'white',
-        borderRight: '2px solid var(--zander-border-gray)',
-        padding: '1.5rem 0',
-        overflow: 'hidden',
-        zIndex: 900
-      }}>
-        <div style={{ padding: '0 1rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Sales & Revenue
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📊', label: 'Dashboard', href: '/' },
-              { icon: '📈', label: 'Pipeline', href: '/pipeline' },
-              { icon: '👥', label: 'Contacts', href: '/contacts' },
-              { icon: '📉', label: 'Analytics', href: '/analytics' },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a href={item.href} style={{
-                  display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem',
-                  borderRadius: '8px', textDecoration: 'none', color: 'var(--zander-navy)', background: 'transparent'
-                }}>
-                  <span>{item.icon}</span><span>{item.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div style={{ padding: '0 1rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Tools
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📬', label: 'Communications', href: '/communications', active: true },
-              { icon: '📋', label: 'Forms', href: '/forms' },
-              { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a href={item.href} style={{
-                  display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem',
-                  borderRadius: '8px', textDecoration: 'none',
-                  color: item.active ? 'var(--zander-red)' : 'var(--zander-navy)',
-                  background: item.active ? 'rgba(191, 10, 48, 0.1)' : 'transparent',
-                  fontWeight: item.active ? '600' : '400'
-                }}>
-                  <span>{item.icon}</span><span>{item.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main style={{ marginLeft: '240px', marginTop: '64px', padding: '2rem' }}>
@@ -769,7 +714,7 @@ export default function CommunicationsPage() {
                               fontWeight: inboxFilter === f ? '600' : '400'
                             }}
                           >
-                            {f === 'all' ? '📬 All' : f === 'inbound' ? '📥 Received' : '📤 Sent'}
+                            {f === 'all' ? '📬 All' : f === 'inbound' ? `📥 Received${unreadCount > 0 ? ` (${unreadCount})` : ``}` : '📤 Sent'}
                           </button>
                         ))}
                       </>

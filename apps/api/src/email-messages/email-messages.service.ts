@@ -203,4 +203,29 @@ export class EmailMessagesService {
       data: { status, ...(status === 'opened' && { openedAt: new Date() }) },
     });
   }
+
+  async getUnreadCount(tenantId: string) {
+    const count = await this.prisma.emailMessage.count({
+      where: {
+        tenantId,
+        direction: 'inbound',
+        isRead: false,
+      },
+    });
+    return { unreadCount: count };
+  }
+
+  async markAsRead(tenantId: string, id: string) {
+    return this.prisma.emailMessage.update({
+      where: { id },
+      data: { isRead: true },
+    });
+  }
+
+  async markAllAsRead(tenantId: string) {
+    return this.prisma.emailMessage.updateMany({
+      where: { tenantId, direction: 'inbound', isRead: false },
+      data: { isRead: true },
+    });
+  }
 }

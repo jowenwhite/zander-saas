@@ -25,6 +25,19 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
     { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
   ];
 
+  const linkStyle = (active: boolean) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    padding: '0.75rem 1rem',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    color: active ? 'var(--zander-red)' : 'var(--zander-navy)',
+    background: active ? 'rgba(191,10,48,0.1)' : 'transparent',
+    fontWeight: active ? '600' : '400',
+    transition: 'all 0.2s ease'
+  });
+
   return (
     <aside style={{
       width: collapsed ? '64px' : '240px',
@@ -39,11 +52,11 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
       transition: 'width 0.3s ease'
     }}>
       <div style={{ padding: '1.5rem 1rem 1rem' }}>
-        <div style={{ 
-          fontSize: '0.75rem', 
-          fontWeight: '600', 
-          color: 'var(--zander-gray)', 
-          textTransform: 'uppercase', 
+        <div style={{
+          fontSize: '0.75rem',
+          fontWeight: '600',
+          color: 'var(--zander-gray)',
+          textTransform: 'uppercase',
           letterSpacing: '1px',
           marginBottom: '0.75rem',
           display: collapsed ? 'none' : 'block'
@@ -53,21 +66,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
           {salesRevenueItems.map((item) => (
             <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-              <a 
-                href={item.href} 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem 1rem', 
-                  borderRadius: '8px', 
-                  textDecoration: 'none', 
-                  color: isActive(item.href) ? 'var(--zander-red)' : 'var(--zander-navy)', 
-                  background: isActive(item.href) ? 'rgba(191,10,48,0.1)' : 'transparent', 
-                  fontWeight: isActive(item.href) ? '600' : '400',
-                  transition: 'all 0.2s ease'
-                }}
-              >
+              <a href={item.href} style={linkStyle(isActive(item.href))}>
                 <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
                 {!collapsed && <span>{item.label}</span>}
               </a>
@@ -77,11 +76,11 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
       </div>
 
       <div style={{ padding: '0 1rem' }}>
-        <div style={{ 
-          fontSize: '0.75rem', 
-          fontWeight: '600', 
-          color: 'var(--zander-gray)', 
-          textTransform: 'uppercase', 
+        <div style={{
+          fontSize: '0.75rem',
+          fontWeight: '600',
+          color: 'var(--zander-gray)',
+          textTransform: 'uppercase',
           letterSpacing: '1px',
           marginBottom: '0.75rem',
           display: collapsed ? 'none' : 'block'
@@ -91,21 +90,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
           {toolsItems.map((item) => (
             <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-              <a 
-                href={item.href} 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem 1rem', 
-                  borderRadius: '8px', 
-                  textDecoration: 'none', 
-                  color: isActive(item.href) ? 'var(--zander-red)' : 'var(--zander-navy)', 
-                  background: isActive(item.href) ? 'rgba(191,10,48,0.1)' : 'transparent', 
-                  fontWeight: isActive(item.href) ? '600' : '400',
-                  transition: 'all 0.2s ease'
-                }}
-              >
+              <a href={item.href} style={linkStyle(isActive(item.href))}>
                 <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
                 {!collapsed && <span>{item.label}</span>}
               </a>
