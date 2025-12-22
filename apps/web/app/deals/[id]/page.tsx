@@ -30,12 +30,18 @@ interface Deal {
   updatedAt: string;
 }
 
-interface Activity {
+interface TimelineItem {
   id: string;
-  type: 'call' | 'email' | 'meeting' | 'note' | 'stage_change';
+  type: 'email' | 'call' | 'sms' | 'note' | 'task' | 'meeting' | 'stage_change';
+  source?: 'activity' | 'email' | 'call' | 'sms';
   title: string;
   description: string;
   date: string;
+  direction?: string;
+  dealName?: string;
+  fromAddress?: string;
+  toAddress?: string;
+  status?: string;
 }
 
 interface DocumentItem {
@@ -117,11 +123,14 @@ export default function DealDetailPage() {
   ]);
 
   // Mock activities
-  const [activities] = useState<Activity[]>([
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
+  // Legacy hardcoded activities - now replaced by timeline
+  const legacyActivities: TimelineItem[] = [
     { id: '1', type: 'stage_change', title: 'Stage Changed', description: 'Moved to current stage', date: new Date().toISOString() },
     { id: '2', type: 'email', title: 'Email Sent', description: 'Sent proposal follow-up', date: new Date(Date.now() - 86400000).toISOString() },
-    { id: '3', type: 'call', title: 'Discovery Call', description: 'Initial requirements discussion', date: new Date(Date.now() - 172800000).toISOString() },
-  ]);
+    { id: '3', type: 'call', title: 'Discovery Call', description: 'Initial requirements discussion', date: new Date(Date.now() - 172800000).toISOString() }
+  ];
 
   useEffect(() => {
     fetchDeal();
@@ -137,6 +146,15 @@ export default function DealDetailPage() {
         const data = await response.json();
         setDeal(data);
         setNotes(data.notes || '');
+        // Fetch timeline for this deal
+        const timelineResponse = await fetch(
+          `https://api.zander.mcfapp.com/activities/timeline?dealId=${dealId}`,
+          { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }
+        );
+        if (timelineResponse.ok) {
+          const timelineData = await timelineResponse.json();
+          setTimeline(timelineData.data || []);
+        }
       } else {
         router.push('/pipeline');
       }
@@ -597,9 +615,9 @@ export default function DealDetailPage() {
                   </p>
                 </div>
 
-                {activities.length > 0 ? (
+                {timeline.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {activities.map((activity) => (
+                    {timeline.map((activity) => (
                       <div key={activity.id} style={{
                         display: 'flex',
                         gap: '1rem',
@@ -611,7 +629,7 @@ export default function DealDetailPage() {
                           width: '40px',
                           height: '40px',
                           borderRadius: '50%',
-                          background: activity.type === 'call' ? '#27AE60' 
+                          background: activity.type === 'call' ? '#27AE60' : activity.type === 'sms' ? '#9B59B6' 
                             : activity.type === 'email' ? '#3498DB'
                             : 'var(--zander-navy)',
                           display: 'flex',
@@ -620,10 +638,10 @@ export default function DealDetailPage() {
                           color: 'white',
                           fontSize: '1rem'
                         }}>
-                          {activity.type === 'call' ? '📞' : activity.type === 'email' ? '✉️' : '📊'}
+                          {activity.type === 'call' ? '📞' : activity.type === 'email' ? '✉️' : activity.type === 'sms' ? '💬' : activity.type === 'note' ? '📝' : '📊'}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{activity.title}</div>
+                          <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{activity.direction === 'inbound' ? '📥 ' : activity.direction === 'outbound' ? '📤 ' : ''}{activity.title}</div>
                           <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>{activity.description}</div>
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
