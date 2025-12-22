@@ -12,7 +12,17 @@ export class ActivitiesController {
     return this.activitiesService.findAll(req.tenantId, query);
   }
 
-  @Get(':id')
+  
+  @Get('timeline')
+  async getTimeline(@Request() req, @Query('contactId') contactId?: string, @Query('dealId') dealId?: string, @Query('limit') limit?: string) {
+    return this.activitiesService.getTimeline(req.tenantId, {
+      contactId,
+      dealId,
+      limit: limit ? parseInt(limit) : 50
+    });
+  }
+
+@Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
     return this.activitiesService.findOne(id, req.tenantId);
   }

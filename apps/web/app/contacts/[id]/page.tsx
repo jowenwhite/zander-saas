@@ -32,12 +32,18 @@ interface Deal {
   updatedAt: string;
 }
 
-interface Activity {
+interface TimelineItem {
   id: string;
-  type: 'email' | 'call' | 'meeting' | 'note' | 'form';
+  type: 'email' | 'call' | 'sms' | 'note' | 'task' | 'meeting';
+  source: 'activity' | 'email' | 'call' | 'sms';
+  title: string;
   description: string;
   date: string;
   dealName?: string;
+  direction?: string;
+  fromAddress?: string;
+  toAddress?: string;
+  status?: string;
 }
 
 interface FormSubmission {
@@ -74,6 +80,8 @@ export default function ContactDetailPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notes, setNotes] = useState('');
 
@@ -98,6 +106,15 @@ export default function ContactDetailPage() {
           const allDeals = await dealsResponse.json();
           const contactDeals = allDeals.data.filter((d: any) => d.contactId === data.id);
           setDeals(contactDeals);
+        }
+        // Fetch timeline for this contact
+        const timelineResponse = await fetch(
+          `https://api.zander.mcfapp.com/activities/timeline?contactId=${data.id}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        if (timelineResponse.ok) {
+          const timelineData = await timelineResponse.json();
+          setTimeline(timelineData.data || []);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load contact');
@@ -187,7 +204,7 @@ export default function ContactDetailPage() {
       case 'call': return '📞';
       case 'meeting': return '📅';
       case 'note': return '📝';
-      case 'form': return '📋';
+      case 'sms': return '💬';      case 'task': return '✅';      case 'form': return '📋';
       default: return '📌';
     }
   };
@@ -541,7 +558,9 @@ export default function ContactDetailPage() {
 
                   <h3 style={{ margin: '1.5rem 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>Recent Activity</h3>
                   <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem' }}>
-                    {sampleActivities.slice(0, 3).map((activity, index) => (
+                    {timeline.length === 0 ? (
+                      <p style={{ color: 'var(--zander-gray)', fontSize: '0.9rem' }}>No activity yet</p>
+                    ) : timeline.slice(0, 3).map((activity, index) => (
                       <div key={activity.id} style={{
                         display: 'flex',
                         gap: '0.75rem',
@@ -551,7 +570,7 @@ export default function ContactDetailPage() {
                       }}>
                         <span style={{ fontSize: '1rem' }}>{getActivityIcon(activity.type)}</span>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: '0.85rem', color: 'var(--zander-navy)' }}>{activity.description}</div>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--zander-navy)' }}>{activity.title || activity.description}</div>
                           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
                             {formatDateTime(activity.date)}
                           </div>
@@ -697,7 +716,7 @@ export default function ContactDetailPage() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {sampleActivities.map((activity) => (
+                  {timeline.map((activity) => (
                     <div
                       key={activity.id}
                       style={{
@@ -724,7 +743,7 @@ export default function ContactDetailPage() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: '500', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
-                          {activity.description}
+                          {activity.direction === 'inbound' ? '📥 ' : activity.direction === 'outbound' ? '📤 ' : ''}{activity.title || activity.description}
                         </div>
                         <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
                           <span>{formatDateTime(activity.date)}</span>
