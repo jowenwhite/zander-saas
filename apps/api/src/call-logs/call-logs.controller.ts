@@ -105,6 +105,15 @@ export class CallLogsController {
     return this.callLogsService.generateSummary(req.user.tenantId, id, body.transcript);
   }
 
+  @Post(':id/share-summary')
+  async shareSummary(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() body: { recipients: string[] }
+  ) {
+    return this.callLogsService.shareSummary(req.user.tenantId, id, body.recipients);
+  }
+
   @Delete(':id')
   async remove(@Request() req, @Param('id') id: string) {
     await this.callLogsService.remove(req.user.tenantId, id);

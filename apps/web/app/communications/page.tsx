@@ -143,6 +143,9 @@ export default function CommunicationsPage() {
   const [transcriptText, setTranscriptText] = useState('');
   const [generatingSummary, setGeneratingSummary] = useState(false);
   const [transcribingAudio, setTranscribingAudio] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [sharingEmails, setSharingEmails] = useState<string[]>([]);
+  const [sendingSummary, setSendingSummary] = useState(false);
   const [meetingForm, setMeetingForm] = useState({ platform: 'zoom', meetingUrl: '', contactId: '', scheduledAt: '', notes: '' });
   const [savingMeeting, setSavingMeeting] = useState(false);
   const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
@@ -1872,6 +1875,13 @@ export default function CommunicationsPage() {
                   <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
                     {selectedCall.aiSummary}
                   </div>
+                  {/* Share Summary Button */}
+                  <button
+                    onClick={() => setShowShareModal(true)}
+                    style={{ marginTop: '1rem', padding: '0.6rem 1.2rem', background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  >
+                    📧 Share Summary
+                  </button>
                 </div>
               )}
             </div>
@@ -1879,6 +1889,88 @@ export default function CommunicationsPage() {
             {/* Footer */}
             <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
               <button onClick={() => setShowCallDetails(false)} style={{ padding: '0.5rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Summary Modal */}
+      {showShareModal && selectedCall && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div style={{ background: 'white', borderRadius: '12px', width: '90%', maxWidth: '500px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', borderRadius: '12px 12px 0 0' }}>
+              <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem' }}>📧 Share Call Summary</h2>
+              <p style={{ margin: '0.25rem 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
+                {selectedCall.contact ? selectedCall.contact.firstName + ' ' + selectedCall.contact.lastName : 'Unknown Contact'} - {new Date(selectedCall.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+            <div style={{ padding: '1.5rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>Recipients (comma-separated emails)</label>
+                <input
+                  type="text"
+                  placeholder="john@company.com, jane@company.com"
+                  value={sharingEmails.join(', ')}
+                  onChange={(e) => setSharingEmails(e.target.value.split(',').map(s => s.trim()).filter(s => s))}
+                  style={{ width: '100%', padding: '0.75rem', border: '2px solid #ddd', borderRadius: '6px', fontSize: '0.95rem' }}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>Quick Add</label>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {selectedCall.contact?.email && (
+                    <button onClick={() => setSharingEmails(prev => prev.includes(selectedCall.contact.email) ? prev : [...prev, selectedCall.contact.email])} style={{ padding: '0.4rem 0.8rem', background: '#e8f4fd', border: '1px solid #3498db', borderRadius: '20px', fontSize: '0.8rem', cursor: 'pointer', color: '#2980b9' }}>
+                      + {selectedCall.contact.firstName} (Client)
+                    </button>
+                  )}
+                  <button onClick={() => setSharingEmails(prev => prev.includes('jonathan@sixtyfourwest.com') ? prev : [...prev, 'jonathan@sixtyfourwest.com'])} style={{ padding: '0.4rem 0.8rem', background: '#e8f4fd', border: '1px solid #3498db', borderRadius: '20px', fontSize: '0.8rem', cursor: 'pointer', color: '#2980b9' }}>
+                    + Jonathan (Team)
+                  </button>
+                  <button onClick={() => setSharingEmails(prev => prev.includes('dave@sixtyfourwest.com') ? prev : [...prev, 'dave@sixtyfourwest.com'])} style={{ padding: '0.4rem 0.8rem', background: '#e8f4fd', border: '1px solid #3498db', borderRadius: '20px', fontSize: '0.8rem', cursor: 'pointer', color: '#2980b9' }}>
+                    + Dave (Team)
+                  </button>
+                </div>
+              </div>
+              <div style={{ background: '#f8f9fa', padding: '1rem', borderRadius: '6px', marginBottom: '1rem', maxHeight: '150px', overflow: 'auto', fontSize: '0.85rem', color: '#666' }}>
+                <strong>Preview:</strong><br/>
+                Subject: Call Summary - {selectedCall.contact ? selectedCall.contact.firstName + ' ' + selectedCall.contact.lastName : 'Unknown'}<br/><br/>
+                {selectedCall.aiSummary ? selectedCall.aiSummary.substring(0, 200) + '...' : 'No summary available'}
+              </div>
+            </div>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+              <button onClick={() => { setShowShareModal(false); setSharingEmails([]); }} style={{ padding: '0.5rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
+              <button
+                onClick={async () => {
+                  if (sharingEmails.length === 0) {
+                    alert('Please add at least one recipient');
+                    return;
+                  }
+                  setSendingSummary(true);
+                  try {
+                    const token = localStorage.getItem('zander_token');
+                    const res = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/share-summary', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                      body: JSON.stringify({ recipients: sharingEmails })
+                    });
+                    if (res.ok) {
+                      alert('Summary shared successfully!');
+                      setShowShareModal(false);
+                      setSharingEmails([]);
+                    } else {
+                      alert('Failed to share summary');
+                    }
+                  } catch (err) {
+                    console.error('Share error:', err);
+                    alert('Error sharing summary');
+                  }
+                  setSendingSummary(false);
+                }}
+                disabled={sendingSummary || sharingEmails.length === 0}
+                style={{ padding: '0.5rem 1.5rem', background: sendingSummary ? '#ccc' : 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', color: 'white', border: 'none', borderRadius: '6px', cursor: sendingSummary ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+              >
+                {sendingSummary ? 'Sending...' : '📧 Send Summary'}
+              </button>
             </div>
           </div>
         </div>
