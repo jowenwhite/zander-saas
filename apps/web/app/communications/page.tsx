@@ -1741,6 +1741,29 @@ export default function CommunicationsPage() {
                 </div>
               )}
 
+              {/* Audio Recording Player */}
+              {selectedCall.recordingUrl && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    🎧 Call Recording
+                    <span style={{ background: '#e8f5e9', color: '#2e7d32', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>AUDIO</span>
+                  </h3>
+                  <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', borderRadius: '12px' }}>
+                    <audio
+                      controls
+                      src={selectedCall.recordingUrl}
+                      style={{ width: '100%', height: '40px' }}
+                      controlsList="nodownload"
+                    >
+                      Your browser does not support audio playback.
+                    </audio>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)' }}>
+                      <span>Duration: {selectedCall.duration ? Math.floor(selectedCall.duration / 60) + ':' + String(selectedCall.duration % 60).padStart(2, '0') : 'Unknown'}</span>
+                      <a href={selectedCall.recordingUrl} download style={{ color: '#90caf9', textDecoration: 'none' }}>⬇️ Download</a>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Transcript Section */}
               <div style={{ marginBottom: '1.5rem' }}>
                 <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>📝 Transcript / Meeting Notes</h3>
