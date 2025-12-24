@@ -142,6 +142,7 @@ export default function CommunicationsPage() {
   const [selectedCall, setSelectedCall] = useState<CallLog | null>(null);
   const [transcriptText, setTranscriptText] = useState('');
   const [generatingSummary, setGeneratingSummary] = useState(false);
+  const [transcribingAudio, setTranscribingAudio] = useState(false);
   const [meetingForm, setMeetingForm] = useState({ platform: 'zoom', meetingUrl: '', contactId: '', scheduledAt: '', notes: '' });
   const [savingMeeting, setSavingMeeting] = useState(false);
   const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
@@ -1761,6 +1762,37 @@ export default function CommunicationsPage() {
                       <span>Duration: {selectedCall.duration ? Math.floor(selectedCall.duration / 60) + ':' + String(selectedCall.duration % 60).padStart(2, '0') : 'Unknown'}</span>
                       <a href={selectedCall.recordingUrl} download style={{ color: '#90caf9', textDecoration: 'none' }}>⬇️ Download</a>
                     </div>
+                    {/* Transcribe Button */}
+                    <button
+                      onClick={async () => {
+                        setTranscribingAudio(true);
+                        try {
+                          const token = localStorage.getItem('zander_token');
+                          const res = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/transcribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                          });
+                          if (res.ok) {
+                            const data = await res.json();
+                            setTranscriptText(data.transcription);
+                            setSelectedCall({ ...selectedCall, transcription: data.transcription });
+                            setCallLogs(callLogs.map(c => c.id === selectedCall.id ? { ...c, transcription: data.transcription } : c));
+                          } else {
+                            const err = await res.text();
+                            console.error('Transcribe error:', err);
+                            alert('Failed to transcribe recording. Please try again.');
+                          }
+                        } catch (err) {
+                          console.error('Transcribe error:', err);
+                          alert('Error transcribing recording');
+                        }
+                        setTranscribingAudio(false);
+                      }}
+                      disabled={transcribingAudio}
+                      style={{ width: '100%', marginTop: '0.75rem', padding: '0.6rem', background: transcribingAudio ? '#555' : 'linear-gradient(135deg, #00b894 0%, #00a085 100%)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.9rem', fontWeight: '600', cursor: transcribingAudio ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                    >
+                      {transcribingAudio ? '🎙️ Transcribing with AI...' : '🎙️ Transcribe with Whisper AI'}
+                    </button>
                   </div>
                 </div>
               )}

@@ -88,6 +88,14 @@ export class CallLogsController {
   }
 
   
+  @Post(':id/transcribe')
+  async transcribeRecording(
+    @Request() req,
+    @Param('id') id: string,
+  ) {
+    return this.callLogsService.transcribeRecording(req.user.tenantId, id);
+  }
+
   @Post(':id/generate-summary')
   async generateSummary(
     @Request() req,
