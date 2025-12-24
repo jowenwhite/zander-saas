@@ -1777,6 +1777,23 @@ export default function CommunicationsPage() {
                             setTranscriptText(data.transcription);
                             setSelectedCall({ ...selectedCall, transcription: data.transcription });
                             setCallLogs(callLogs.map(c => c.id === selectedCall.id ? { ...c, transcription: data.transcription } : c));
+                            // Auto-chain to AI Summary generation
+                            setGeneratingSummary(true);
+                            try {
+                              const summaryRes = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/generate-summary', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                                body: JSON.stringify({ transcript: data.transcription })
+                              });
+                              if (summaryRes.ok) {
+                                const summaryData = await summaryRes.json();
+                                setSelectedCall(prev => ({ ...prev, transcription: data.transcription, aiSummary: summaryData.aiSummary }));
+                                setCallLogs(prev => prev.map(c => c.id === selectedCall.id ? { ...c, transcription: data.transcription, aiSummary: summaryData.aiSummary } : c));
+                              }
+                            } catch (summaryErr) {
+                              console.error('Auto-summary error:', summaryErr);
+                            }
+                            setGeneratingSummary(false);
                           } else {
                             const err = await res.text();
                             console.error('Transcribe error:', err);
@@ -1791,7 +1808,7 @@ export default function CommunicationsPage() {
                       disabled={transcribingAudio}
                       style={{ width: '100%', marginTop: '0.75rem', padding: '0.6rem', background: transcribingAudio ? '#555' : 'linear-gradient(135deg, #00b894 0%, #00a085 100%)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.9rem', fontWeight: '600', cursor: transcribingAudio ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                     >
-                      {transcribingAudio ? '🎙️ Transcribing with AI...' : '🎙️ Transcribe with Whisper AI'}
+                      {transcribingAudio ? '🎙️ Transcribing...' : generatingSummary ? '🤖 Generating Summary...' : '🎙️ Transcribe & Summarize'}
                     </button>
                   </div>
                 </div>
