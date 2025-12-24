@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../prisma.service';
 
 interface ResendInboundEmail {
   from: string;
@@ -172,7 +172,7 @@ export class InboundEmailService {
     const deal = await this.prisma.deal.findFirst({
       where: {
         contactId,
-        stage: { notIn: ['closed_won', 'closed_lost'] },
+        stage: { notIn: ['CLOSED_WON', 'CLOSED_LOST'] },
       },
       orderBy: { updatedAt: 'desc' },
     });

@@ -1,0 +1,32 @@
+FROM node:20-slim
+
+# Install OpenSSL for Prisma
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy root package files for workspace
+COPY package*.json ./
+
+# Copy packages/database for Prisma
+COPY packages/database ./packages/database
+
+# Copy api app
+COPY apps/api ./apps/api
+
+# Install all dependencies from root
+RUN npm install
+
+# Generate Prisma client
+WORKDIR /app/packages/database
+RUN npx prisma generate
+
+# Back to api and compile TypeScript
+WORKDIR /app/apps/api
+RUN npx tsc --outDir dist
+
+# Expose port
+EXPOSE 3001
+
+# Start the compiled JavaScript
+CMD ["node", "dist/main.js"]
