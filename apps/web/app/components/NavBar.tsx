@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { logout, getUser } from '../utils/auth';
 import ThemeToggle from './ThemeToggle';
+import TenantSwitcher from './TenantSwitcher';
 
 interface NavBarProps {
   activeModule?: string;
@@ -60,6 +61,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
           <span style={{ fontSize: '1.5rem' }}>⚡</span>
           <span style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)', letterSpacing: '-0.5px' }}>ZANDER</span>
         </a>
+        <TenantSwitcher />
       </div>
 
       {/* Module Switcher */}

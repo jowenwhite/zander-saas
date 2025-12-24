@@ -30,3 +30,20 @@ export function requireAuth(): boolean {
   }
   return true;
 }
+
+// Tenant management
+export function getActiveTenant(): any | null {
+  if (typeof window === 'undefined') return null;
+  const tenant = localStorage.getItem('zander_active_tenant');
+  return tenant ? JSON.parse(tenant) : null;
+}
+
+export function setActiveTenant(tenant: any): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('zander_active_tenant', JSON.stringify(tenant));
+}
+
+export function clearActiveTenant(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('zander_active_tenant');
+}
