@@ -147,6 +147,7 @@ export class AuthService {
     return user;
   }
   private generateToken(user: {
+    isSuperAdmin?: boolean;
     id: string;
     email: string;
     tenantId: string;
@@ -160,7 +161,8 @@ export class AuthService {
       { 
         sub: user.id, 
         email: user.email,
-        tenantId: user.tenantId 
+        tenantId: user.tenantId,
+        isSuperAdmin: user.isSuperAdmin || false 
       }, 
       jwtSecret, 
       { expiresIn: '1d' }

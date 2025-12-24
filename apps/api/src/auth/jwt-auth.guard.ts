@@ -29,6 +29,8 @@ export class JwtAuthGuard implements CanActivate {
 
       // Inject both user and tenantId into request
       request.user = {
+        sub: decoded.sub,
+        isSuperAdmin: decoded.isSuperAdmin || false,
         userId: decoded.sub,
         email: decoded.email,
         tenantId: decoded.tenantId

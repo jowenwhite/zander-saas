@@ -27,6 +27,7 @@ model Tenant {
   id String @id @default(cuid())
   companyName String
   subdomain String @unique
+  tenantType String @default("standard")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   users User[]
@@ -42,6 +43,7 @@ model Tenant {
   smsMessages   SmsMessage[]
   callLogs      CallLog[]
   calendarEvents      CalendarEvent[]
+  userTenantAccess    UserTenantAccess[]
   @@map("tenants")
 }
 
@@ -54,6 +56,7 @@ model User {
   password String @default("")
   phone String?
   role String @default("member")
+  isSuperAdmin Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
@@ -61,7 +64,20 @@ model User {
   calendarEvents   CalendarEvent[]
   eventAttendees   EventAttendee[]
   googleToken      GoogleToken?
+  tenantAccess UserTenantAccess[]
   @@map("users")
+}
+
+model UserTenantAccess {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  role      String   @default("member")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  @@unique([userId, tenantId])
+  @@map("user_tenant_access")
 }
 
 model Contact {
@@ -72,6 +88,7 @@ model Contact {
   email String
   phone String?
   role String @default("member")
+  isSuperAdmin Boolean @default(false)
   company String?
   title String?
   source String?

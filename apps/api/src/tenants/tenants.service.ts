@@ -16,11 +16,9 @@ export class TenantsService {
         updatedAt: true,
       }
     });
-
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
     }
-
     return tenant;
   }
 
@@ -42,7 +40,52 @@ export class TenantsService {
         updatedAt: true,
       }
     });
+    return tenant;
+  }
 
+  async getAccessibleTenants(userId: string, isSuperAdmin: boolean) {
+    if (isSuperAdmin) {
+      return this.prisma.tenant.findMany({
+        select: {
+          id: true,
+          companyName: true,
+          subdomain: true,
+          tenantType: true,
+        },
+        orderBy: { companyName: 'asc' }
+      });
+    }
+    const access = await this.prisma.userTenantAccess.findMany({
+      where: { userId },
+      include: {
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true,
+            tenantType: true,
+          }
+        }
+      }
+    });
+    return access.map(a => a.tenant);
+  }
+
+  async switchTenant(userId: string, targetTenantId: string, isSuperAdmin: boolean) {
+    if (!isSuperAdmin) {
+      const access = await this.prisma.userTenantAccess.findFirst({
+        where: { userId, tenantId: targetTenantId }
+      });
+      if (!access) {
+        throw new NotFoundException('You do not have access to this tenant');
+      }
+    }
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: targetTenantId }
+    });
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    }
     return tenant;
   }
 }
