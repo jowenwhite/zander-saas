@@ -247,20 +247,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Demo credentials hint */}
-          <div style={{
-            marginTop: '2rem',
-            padding: '1rem',
-            background: '#F8F9FA',
-            borderRadius: '8px',
-            fontSize: '0.875rem',
-            color: '#6C757D',
-            border: '1px solid #DEE2E6'
-          }}>
-            <div><strong style={{ color: '#0C2340' }}>Demo Account:</strong></div>
-            <div>Email: dave@sixtyfourwest.com</div>
-            <div>Password: Zander2026!</div>
-          </div>
         </div>
       </div>
     </div>
