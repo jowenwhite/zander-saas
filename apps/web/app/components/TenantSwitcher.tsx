@@ -34,7 +34,7 @@ export default function TenantSwitcher() {
         const token = getToken();
         if (!token) return;
 
-        const response = await fetch('http://localhost:3001/tenants/accessible', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tenants/accessible`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -66,7 +66,7 @@ export default function TenantSwitcher() {
       const token = getToken();
       if (!token) return;
 
-      const response = await fetch(`http://localhost:3001/tenants/switch/${tenant.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tenants/switch/${tenant.id}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
