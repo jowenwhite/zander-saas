@@ -46,6 +46,14 @@ interface TimelineItem {
   status?: string;
 }
 
+interface Activity {
+  id: string;
+  type: string;
+  description: string;
+  date: string;
+  dealName?: string;
+}
+
 interface FormSubmission {
   id: string;
   formName: string;

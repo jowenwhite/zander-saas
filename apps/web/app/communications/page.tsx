@@ -73,7 +73,7 @@ interface CallLog {
   startedAt?: string;
   endedAt?: string;
   createdAt: string;
-  contact?: { id: string; firstName: string; lastName: string; phone?: string; };
+  contact?: { id: string; firstName: string; lastName: string; phone?: string; email?: string; };
 }
 
 interface Contact {
@@ -1790,7 +1790,7 @@ export default function CommunicationsPage() {
                               });
                               if (summaryRes.ok) {
                                 const summaryData = await summaryRes.json();
-                                setSelectedCall(prev => ({ ...prev, transcription: data.transcription, aiSummary: summaryData.aiSummary }));
+                                setSelectedCall(prev => prev ? { ...prev, transcription: data.transcription, aiSummary: summaryData.aiSummary } : null);
                                 setCallLogs(prev => prev.map(c => c.id === selectedCall.id ? { ...c, transcription: data.transcription, aiSummary: summaryData.aiSummary } : c));
                               }
                             } catch (summaryErr) {
@@ -1919,7 +1919,7 @@ export default function CommunicationsPage() {
                 <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>Quick Add</label>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {selectedCall.contact?.email && (
-                    <button onClick={() => setSharingEmails(prev => prev.includes(selectedCall.contact.email) ? prev : [...prev, selectedCall.contact.email])} style={{ padding: '0.4rem 0.8rem', background: '#e8f4fd', border: '1px solid #3498db', borderRadius: '20px', fontSize: '0.8rem', cursor: 'pointer', color: '#2980b9' }}>
+                    <button onClick={() => setSharingEmails(prev => { const email = selectedCall.contact?.email; return email && !prev.includes(email) ? [...prev, email] : prev; })} style={{ padding: '0.4rem 0.8rem', background: '#e8f4fd', border: '1px solid #3498db', borderRadius: '20px', fontSize: '0.8rem', cursor: 'pointer', color: '#2980b9' }}>
                       + {selectedCall.contact.firstName} (Client)
                     </button>
                   )}
