@@ -9,7 +9,9 @@ async function bootstrap() {
     origin: [
       'http://localhost:3002',
       'https://zander.mcfapp.com',
-      'https://api.zander.mcfapp.com'
+      'https://api.zander.mcfapp.com',
+      'https://app.zanderos.com',
+      'https://api.zanderos.com'
     ],
     credentials: true,
   });

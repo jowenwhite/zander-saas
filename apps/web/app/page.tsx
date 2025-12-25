@@ -87,8 +87,8 @@ export default function CRODashboard() {
   async function fetchData() {
     try {
       const [contactsRes, dealsRes] = await Promise.all([
-        fetch('https://api.zander.mcfapp.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
-        fetch('https://api.zander.mcfapp.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch('https://api.zanderos.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
       ]);
       
       if (contactsRes.ok && dealsRes.ok) {
@@ -107,7 +107,7 @@ export default function CRODashboard() {
   async function handleCreateContact(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch('https://api.zander.mcfapp.com/contacts', {
+      const response = await fetch('https://api.zanderos.com/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify(contactForm),
@@ -125,7 +125,7 @@ export default function CRODashboard() {
   async function handleCreateDeal(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch('https://api.zander.mcfapp.com/deals', {
+      const response = await fetch('https://api.zanderos.com/deals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify({

@@ -50,7 +50,7 @@ interface Contact {
   email: string;
 }
 
-const API_URL = 'https://api.zander.mcfapp.com';
+const API_URL = 'https://api.zanderos.com';
 
 export default function SchedulePage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);

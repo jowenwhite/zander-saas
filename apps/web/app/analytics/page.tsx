@@ -47,7 +47,7 @@ export default function AnalyticsPage() {
 
   async function fetchData() {
     try {
-      const response = await fetch('https://api.zander.mcfapp.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } });
+      const response = await fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } });
       if (response.ok) {
         const data = await response.json();
         const allDeals = [...(data.pipeline.PROSPECT || []), ...(data.pipeline.QUALIFIED || []), ...(data.pipeline.PROPOSAL || []), ...(data.pipeline.NEGOTIATION || []), ...(data.pipeline.CLOSED_WON || []), ...(data.pipeline.CLOSED_LOST || [])]; setDeals(allDeals);

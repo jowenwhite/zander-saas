@@ -149,7 +149,7 @@ export default function FormsPage() {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [submitting, setSubmitting] = useState(false);
 
-  const API_URL = 'https://api.zander.mcfapp.com';
+  const API_URL = 'https://api.zanderos.com';
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('zander_token');
@@ -257,7 +257,7 @@ export default function FormsPage() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('zander_token');
-      const res = await fetch(`https://api.zander.mcfapp.com/forms/${viewingForm.id}/submit`, {
+      const res = await fetch(`https://api.zanderos.com/forms/${viewingForm.id}/submit`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: formData })

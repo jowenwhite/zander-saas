@@ -139,7 +139,7 @@ export default function DealDetailPage() {
   async function fetchDeal() {
     try {
       const response = await fetch(
-        `https://api.zander.mcfapp.com/deals/${dealId}`,
+        `https://api.zanderos.com/deals/${dealId}`,
         { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }
       );
       if (response.ok) {
@@ -148,7 +148,7 @@ export default function DealDetailPage() {
         setNotes(data.notes || '');
         // Fetch timeline for this deal
         const timelineResponse = await fetch(
-          `https://api.zander.mcfapp.com/activities/timeline?dealId=${dealId}`,
+          `https://api.zanderos.com/activities/timeline?dealId=${dealId}`,
           { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }
         );
         if (timelineResponse.ok) {
@@ -167,7 +167,7 @@ export default function DealDetailPage() {
   async function updateDealStage(newStage: string) {
     try {
       const response = await fetch(
-        `https://api.zander.mcfapp.com/deals/${dealId}`,
+        `https://api.zanderos.com/deals/${dealId}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
@@ -184,7 +184,7 @@ export default function DealDetailPage() {
   async function saveNotes() {
     try {
       const response = await fetch(
-        `https://api.zander.mcfapp.com/deals/${dealId}`,
+        `https://api.zanderos.com/deals/${dealId}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },

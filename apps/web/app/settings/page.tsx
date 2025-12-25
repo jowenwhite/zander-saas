@@ -74,7 +74,7 @@ export default function SettingsPage() {
     const checkGmailStatus = async () => {
       if (!user?.id) return;
       try {
-        const res = await fetch(`https://api.zander.mcfapp.com/gmail/status?userId=${user.id}`);
+        const res = await fetch(`https://api.zanderos.com/gmail/status?userId=${user.id}`);
         const data = await res.json();
         setGmailConnected(data.connected);
         setGmailEmail(data.email);
@@ -87,19 +87,19 @@ export default function SettingsPage() {
 
   const handleConnectGmail = () => {
     if (!user?.id) return;
-    window.location.href = `https://api.zander.mcfapp.com/auth/google?state=${user.id}`;
+    window.location.href = `https://api.zanderos.com/auth/google?state=${user.id}`;
   };
 
   const handleDisconnectGmail = async () => {
     if (!user?.id) return;
-    window.location.href = `https://api.zander.mcfapp.com/auth/google/disconnect?userId=${user.id}`;
+    window.location.href = `https://api.zanderos.com/auth/google/disconnect?userId=${user.id}`;
   };
 
   const handleSyncGmail = async () => {
     if (!user?.id) return;
     setSyncingGmail(true);
     try {
-      const res = await fetch(`https://api.zander.mcfapp.com/gmail/sync`, {
+      const res = await fetch(`https://api.zanderos.com/gmail/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, maxResults: 50 }),
@@ -183,7 +183,7 @@ export default function SettingsPage() {
 
       try {
         // Fetch user profile
-        const profileRes = await fetch('https://api.zander.mcfapp.com/auth/me', {
+        const profileRes = await fetch('https://api.zanderos.com/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (profileRes.ok) {
@@ -199,7 +199,7 @@ export default function SettingsPage() {
         }
 
         // Fetch tenant/company data
-        const tenantRes = await fetch('https://api.zander.mcfapp.com/tenants/me', {
+        const tenantRes = await fetch('https://api.zanderos.com/tenants/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (tenantRes.ok) {
@@ -210,7 +210,7 @@ export default function SettingsPage() {
           }));
         }
         // Fetch team members
-        const teamRes = await fetch('https://api.zander.mcfapp.com/users', {
+        const teamRes = await fetch('https://api.zanderos.com/users', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (teamRes.ok) {
@@ -226,7 +226,7 @@ export default function SettingsPage() {
           })));
         }
         // Fetch pipeline stages
-        const stagesRes = await fetch('https://api.zander.mcfapp.com/pipeline-stages', {
+        const stagesRes = await fetch('https://api.zanderos.com/pipeline-stages', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (stagesRes.ok) {
@@ -256,7 +256,7 @@ export default function SettingsPage() {
     setSaving(true);
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch('https://api.zander.mcfapp.com/auth/me', {
+      const res = await fetch('https://api.zanderos.com/auth/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -286,7 +286,7 @@ export default function SettingsPage() {
     setSaving(true);
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch('https://api.zander.mcfapp.com/tenants/me', {
+      const res = await fetch('https://api.zanderos.com/tenants/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -319,7 +319,7 @@ export default function SettingsPage() {
     setSaving(true);
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch('https://api.zander.mcfapp.com/users/invite', {
+      const res = await fetch('https://api.zanderos.com/users/invite', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -359,7 +359,7 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     const newOrder = stages.length;
     try {
-      const res = await fetch('https://api.zander.mcfapp.com/pipeline-stages', {
+      const res = await fetch('https://api.zanderos.com/pipeline-stages', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -386,7 +386,7 @@ export default function SettingsPage() {
     if (!confirm('Are you sure you want to delete this stage?')) return;
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch(`https://api.zander.mcfapp.com/pipeline-stages/${stageId}`, {
+      const res = await fetch(`https://api.zanderos.com/pipeline-stages/${stageId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -404,7 +404,7 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     try {
       await Promise.all(stages.map(stage =>
-        fetch(`https://api.zander.mcfapp.com/pipeline-stages/${stage.id}`, {
+        fetch(`https://api.zanderos.com/pipeline-stages/${stage.id}`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -430,7 +430,7 @@ export default function SettingsPage() {
   const updateStage = async (stageId: string, updates: any) => {
     const token = localStorage.getItem('zander_token');
     try {
-      const res = await fetch(`https://api.zander.mcfapp.com/pipeline-stages/${stageId}`, {
+      const res = await fetch(`https://api.zanderos.com/pipeline-stages/${stageId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1034,10 +1034,10 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     try {
       const [contactsRes, dealsRes] = await Promise.all([
-        fetch('https://api.zander.mcfapp.com/contacts/export', {
+        fetch('https://api.zanderos.com/contacts/export', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('https://api.zander.mcfapp.com/deals/export', {
+        fetch('https://api.zanderos.com/deals/export', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -1086,10 +1086,10 @@ export default function SettingsPage() {
     const token = localStorage.getItem('zander_token');
     try {
       const [contactsRes, dealsRes, usersRes, stagesRes] = await Promise.all([
-        fetch('https://api.zander.mcfapp.com/contacts/export', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://api.zander.mcfapp.com/deals/export', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://api.zander.mcfapp.com/users', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://api.zander.mcfapp.com/pipeline-stages', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('https://api.zanderos.com/contacts/export', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://api.zanderos.com/deals/export', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://api.zanderos.com/users', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://api.zanderos.com/pipeline-stages', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       
       const data = {

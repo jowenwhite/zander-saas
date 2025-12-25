@@ -159,7 +159,7 @@ const executives: Executive[] = [
   }
 ];
 
-const API_URL = 'https://api.zander.mcfapp.com';
+const API_URL = 'https://api.zanderos.com';
 
 const getAuthHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('zander_token') : null;

@@ -178,7 +178,7 @@ export default function CommunicationsPage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
 
-  const API_URL = 'https://api.zander.mcfapp.com';
+  const API_URL = 'https://api.zanderos.com';
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('zander_token');
@@ -1771,7 +1771,7 @@ export default function CommunicationsPage() {
                         setTranscribingAudio(true);
                         try {
                           const token = localStorage.getItem('zander_token');
-                          const res = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/transcribe', {
+                          const res = await fetch('https://api.zanderos.com/call-logs/' + selectedCall.id + '/transcribe', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                           });
@@ -1783,7 +1783,7 @@ export default function CommunicationsPage() {
                             // Auto-chain to AI Summary generation
                             setGeneratingSummary(true);
                             try {
-                              const summaryRes = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/generate-summary', {
+                              const summaryRes = await fetch('https://api.zanderos.com/call-logs/' + selectedCall.id + '/generate-summary', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                                 body: JSON.stringify({ transcript: data.transcription })
@@ -1840,7 +1840,7 @@ export default function CommunicationsPage() {
                   setGeneratingSummary(true);
                   try {
                     const token = localStorage.getItem('zander_token');
-                    const res = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/generate-summary', {
+                    const res = await fetch('https://api.zanderos.com/call-logs/' + selectedCall.id + '/generate-summary', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                       body: JSON.stringify({ transcript: transcriptText })
@@ -1948,7 +1948,7 @@ export default function CommunicationsPage() {
                   setSendingSummary(true);
                   try {
                     const token = localStorage.getItem('zander_token');
-                    const res = await fetch('https://api.zander.mcfapp.com/call-logs/' + selectedCall.id + '/share-summary', {
+                    const res = await fetch('https://api.zanderos.com/call-logs/' + selectedCall.id + '/share-summary', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                       body: JSON.stringify({ recipients: sharingEmails })

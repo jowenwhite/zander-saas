@@ -98,7 +98,7 @@ export default function ContactDetailPage() {
       try {
         const token = localStorage.getItem('zander_token');
         const response = await fetch(
-          `https://api.zander.mcfapp.com/contacts/${params.id}`,
+          `https://api.zanderos.com/contacts/${params.id}`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
         if (!response.ok) throw new Error('Contact not found');
@@ -107,7 +107,7 @@ export default function ContactDetailPage() {
         setNotes(data.notes || '');
         // Fetch deals for this contact
         const dealsResponse = await fetch(
-          `https://api.zander.mcfapp.com/deals`,
+          `https://api.zanderos.com/deals`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
         if (dealsResponse.ok) {
@@ -117,7 +117,7 @@ export default function ContactDetailPage() {
         }
         // Fetch timeline for this contact
         const timelineResponse = await fetch(
-          `https://api.zander.mcfapp.com/activities/timeline?contactId=${data.id}`,
+          `https://api.zanderos.com/activities/timeline?contactId=${data.id}`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
         if (timelineResponse.ok) {
@@ -138,7 +138,7 @@ export default function ContactDetailPage() {
     try {
       const token = localStorage.getItem('zander_token');
       await fetch(
-        `https://api.zander.mcfapp.com/contacts/${params.id}`,
+        `https://api.zanderos.com/contacts/${params.id}`,
         {
           method: 'PATCH',
           headers: {
