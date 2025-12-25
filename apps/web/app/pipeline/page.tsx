@@ -496,29 +496,30 @@ export default function PipelinePage() {
                         
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button style={{
-                              padding: '0.25rem 0.5rem',
-                              background: 'var(--zander-off-white)',
-                              border: '1px solid var(--zander-border-gray)',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              fontSize: '0.75rem'
+                            <button onClick={() => deal.contact?.email && (window.location.href = '/communications?compose=true&to=' + encodeURIComponent(deal.contact.email) + '&subject=' + encodeURIComponent('Re: ' + deal.dealName))} title="Send Email" style={{
+                              padding: '0.4rem 0.6rem',
+                              background: 'var(--zander-navy)',
+                              border: 'none',
+                              borderRadius: '6px',
+                              cursor: deal.contact?.email ? 'pointer' : 'not-allowed',
+                              fontSize: '1rem',
+                              opacity: deal.contact?.email ? 1 : 0.5
                             }}>📧</button>
-                            <button style={{
-                              padding: '0.25rem 0.5rem',
-                              background: 'var(--zander-off-white)',
-                              border: '1px solid var(--zander-border-gray)',
-                              borderRadius: '4px',
+                            <button onClick={() => window.location.href = '/deals/' + deal.id + '?tab=notes'} title="View Notes" style={{
+                              padding: '0.4rem 0.6rem',
+                              background: 'var(--zander-gold)',
+                              border: 'none',
+                              borderRadius: '6px',
                               cursor: 'pointer',
-                              fontSize: '0.75rem'
+                              fontSize: '1rem'
                             }}>📝</button>
-                            <button onClick={() => window.location.href = `/deals/${deal.id}`} style={{
-                              padding: '0.25rem 0.5rem',
+                            <button onClick={() => window.location.href = '/deals/' + deal.id} title="View Deal" style={{
+                              padding: '0.4rem 0.6rem',
                               background: 'var(--zander-red)',
                               border: 'none',
-                              borderRadius: '4px',
+                              borderRadius: '6px',
                               cursor: 'pointer',
-                              fontSize: '0.75rem',
+                              fontSize: '1rem',
                               color: 'white'
                             }}>👁</button>
                           </div>
