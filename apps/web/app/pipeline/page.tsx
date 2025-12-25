@@ -122,8 +122,8 @@ export default function PipelinePage() {
 
   async function updateDealStage(dealId: string, newStage: string) {
     try {
-      const response = await fetch(`https://api.zanderos.com/deals/${dealId}`, {
-        method: 'PUT',
+      const response = await fetch(`https://api.zanderos.com/deals/${dealId}/stage`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify({ stage: newStage }),
       });
