@@ -124,7 +124,7 @@ export default function PipelinePage() {
     try {
       const response = await fetch(`https://api.zanderos.com/deals/${dealId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify({ stage: newStage }),
       });
       if (response.ok) {
