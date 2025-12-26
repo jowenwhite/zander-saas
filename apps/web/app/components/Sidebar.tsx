@@ -1,30 +1,25 @@
 'use client';
-
 import { usePathname } from 'next/navigation';
-
 interface SidebarProps {
   collapsed?: boolean;
 }
-
 export default function Sidebar({ collapsed = false }: SidebarProps) {
   const pathname = usePathname();
-
-  const isActive = (href: string) => pathname === href;
-
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
   const salesRevenueItems = [
-    { icon: '📊', label: 'Dashboard', href: '/' },
-    { icon: '📈', label: 'Pipeline', href: '/pipeline' },
-    { icon: '👥', label: 'Contacts', href: '/contacts' },
-    { icon: '📉', label: 'Analytics', href: '/analytics' },
+    { icon: '📊', label: 'Production', href: '/production' },
+    { icon: '📁', label: 'Projects', href: '/projects' },
+    { icon: '👥', label: 'People', href: '/people' },
+    { icon: '📦', label: 'Products', href: '/products' },
   ];
-
-  const toolsItems = [
-    { icon: '📧', label: 'Communications', href: '/communications' },
+  const processItems = [
+    { icon: '📧', label: 'Communication', href: '/communication' },
     { icon: '📅', label: 'Schedule', href: '/schedule' },
     { icon: '📋', label: 'Forms', href: '/forms' },
+  ];
+  const aiItems = [
     { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
   ];
-
   const linkStyle = (active: boolean) => ({
     display: 'flex',
     alignItems: 'center',
@@ -37,7 +32,15 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
     fontWeight: active ? '600' : '400',
     transition: 'all 0.2s ease'
   });
-
+  const sectionHeaderStyle = {
+    fontSize: '0.75rem',
+    fontWeight: '600' as const,
+    color: 'var(--zander-gray)',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '1px',
+    marginBottom: '0.75rem',
+    display: collapsed ? 'none' : 'block'
+  };
   return (
     <aside style={{
       width: collapsed ? '64px' : '240px',
@@ -52,15 +55,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
       transition: 'width 0.3s ease'
     }}>
       <div style={{ padding: '1.5rem 1rem 1rem' }}>
-        <div style={{
-          fontSize: '0.75rem',
-          fontWeight: '600',
-          color: 'var(--zander-gray)',
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-          marginBottom: '0.75rem',
-          display: collapsed ? 'none' : 'block'
-        }}>
+        <div style={sectionHeaderStyle}>
           Sales & Revenue
         </div>
         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -74,21 +69,27 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
           ))}
         </ul>
       </div>
-
       <div style={{ padding: '0 1rem' }}>
-        <div style={{
-          fontSize: '0.75rem',
-          fontWeight: '600',
-          color: 'var(--zander-gray)',
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-          marginBottom: '0.75rem',
-          display: collapsed ? 'none' : 'block'
-        }}>
-          Tools
+        <div style={sectionHeaderStyle}>
+          Process
         </div>
         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-          {toolsItems.map((item) => (
+          {processItems.map((item) => (
+            <li key={item.label} style={{ marginBottom: '0.25rem' }}>
+              <a href={item.href} style={linkStyle(isActive(item.href))}>
+                <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+                {!collapsed && <span>{item.label}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div style={{ padding: '1rem 1rem 0' }}>
+        <div style={sectionHeaderStyle}>
+          AI
+        </div>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+          {aiItems.map((item) => (
             <li key={item.label} style={{ marginBottom: '0.25rem' }}>
               <a href={item.href} style={linkStyle(isActive(item.href))}>
                 <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>

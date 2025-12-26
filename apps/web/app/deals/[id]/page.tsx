@@ -51,7 +51,7 @@ interface DocumentItem {
   type: string;
 }
 
-const STAGES = ['PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'];
+const STAGES = ['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'];
 
 const formatStage = (stage: string) => {
   const stageLabels: Record<string, string> = {
@@ -60,7 +60,8 @@ const formatStage = (stage: string) => {
     'PROPOSAL': 'Proposal',
     'NEGOTIATION': 'Negotiation',
     'CLOSED_WON': 'Closed Won',
-    'CLOSED_LOST': 'Closed Lost'
+    'CLOSED_LOST': 'Closed Lost',
+    'LEAD': 'Lead'
   };
   return stageLabels[stage] || stage;
 };

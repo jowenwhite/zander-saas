@@ -7,7 +7,7 @@ import NavBar from '../components/NavBar';
 import { logout } from '../utils/auth';
 import AuthGuard from '../components/AuthGuard';
 
-interface Contact {
+interface Person {
   id: string;
   firstName: string;
   lastName: string;
@@ -23,21 +23,21 @@ interface Deal {
   dealName: string;
   dealValue: number;
   stage: string;
-  contactId: string | null;
+  personId: string | null;
 }
 
-export default function ContactsPage() {
+export default function PeoplePage() {
   const router = useRouter();
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [persons, setPersons] = useState<Person[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeModule, setActiveModule] = useState('cro');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [showNewContactModal, setShowNewContactModal] = useState(false);
+  const [showNewPersonModal, setShowNewPersonModal] = useState(false);
 
-  const [contactForm, setContactForm] = useState({
+  const [personForm, setPersonForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -52,14 +52,14 @@ export default function ContactsPage() {
 
   async function fetchData() {
     try {
-      const [contactsRes, dealsRes] = await Promise.all([
-        fetch('https://api.zanderos.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+      const [personsRes, dealsRes] = await Promise.all([
+        fetch('https://api.zanderos.com/persons', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
         fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
       ]);
       
-      if (contactsRes.ok) {
-        const contactsData = await contactsRes.json();
-        setContacts(contactsData.data || []);
+      if (personsRes.ok) {
+        const personsData = await personsRes.json();
+        setPersons(personsData.data || []);
       }
       if (dealsRes.ok) {
         const dealsData = await dealsRes.json();
@@ -72,50 +72,50 @@ export default function ContactsPage() {
     }
   }
 
-  async function handleCreateContact(e: React.FormEvent) {
+  async function handleCreatePerson(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch('https://api.zanderos.com/contacts', {
+      const response = await fetch('https://api.zanderos.com/persons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
-        body: JSON.stringify(contactForm),
+        body: JSON.stringify(personForm),
       });
       if (response.ok) {
-        setContactForm({ firstName: '', lastName: '', email: '', phone: '', company: '', title: '' });
-        setShowNewContactModal(false);
+        setPersonForm({ firstName: '', lastName: '', email: '', phone: '', company: '', title: '' });
+        setShowNewPersonModal(false);
         fetchData();
       }
     } catch (error) {
-      console.error('Error creating contact:', error);
+      console.error('Error creating person:', error);
     }
   }
 
   // Helper functions
-  const getContactDeals = (contactId: string) => deals.filter(d => d.contactId === contactId);
-  const hasActiveDeals = (contactId: string) => {
-    return deals.some(d => d.contactId === contactId && d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST');
+  const getPersonDeals = (personId: string) => deals.filter(d => d.personId === personId);
+  const hasActiveDeals = (personId: string) => {
+    return deals.some(d => d.personId === personId && d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST');
   };
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
   };
 
-  // Filter contacts
-  const filteredContacts = contacts.filter(contact => {
+  // Filter persons
+  const filteredPersons = persons.filter(person => {
     const matchesSearch = !searchTerm || 
-      `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (contact.company || '').toLowerCase().includes(searchTerm.toLowerCase());
+      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (person.company || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     if (filterStatus === 'all') return matchesSearch;
-    if (filterStatus === 'active') return matchesSearch && hasActiveDeals(contact.id);
-    if (filterStatus === 'inactive') return matchesSearch && !hasActiveDeals(contact.id);
+    if (filterStatus === 'active') return matchesSearch && hasActiveDeals(person.id);
+    if (filterStatus === 'inactive') return matchesSearch && !hasActiveDeals(person.id);
     return matchesSearch;
   });
 
   // Stats
-  const totalContacts = contacts.length;
-  const activeContacts = contacts.filter(c => hasActiveDeals(c.id)).length;
-  const uniqueCompanies = new Set(contacts.map(c => c.company).filter(Boolean)).size;
+  const totalPersons = persons.length;
+  const activePersons = persons.filter(c => hasActiveDeals(c.id)).length;
+  const uniqueCompanies = new Set(persons.map(c => c.company).filter(Boolean)).size;
 
   if (loading) {
     return (
@@ -123,7 +123,7 @@ export default function ContactsPage() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
-          <div style={{ color: 'var(--zander-gray)' }}>Loading Contacts...</div>
+          <div style={{ color: 'var(--zander-gray)' }}>Loading Persons...</div>
         </div>
       </div>
     );
@@ -156,7 +156,7 @@ export default function ContactsPage() {
             {[
               { icon: '📊', label: 'Dashboard', href: '/', active: false },
               { icon: '📈', label: 'Pipeline', href: '/pipeline', active: false },
-              { icon: '👥', label: 'Contacts', href: '/contacts', active: true },
+              { icon: '👥', label: 'People', href: '/persons', active: true },
               { icon: '📉', label: 'Analytics', href: '/analytics', active: false },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
@@ -215,16 +215,16 @@ export default function ContactsPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0, marginBottom: '0.5rem' }}>
-              Contacts
+              Persons
             </h1>
             <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
-              Manage your contacts and relationships
+              Manage your persons and relationships
             </p>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <a href="/contacts/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+            <a href="/persons/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
             <button
-            onClick={() => setShowNewContactModal(true)}
+            onClick={() => setShowNewPersonModal(true)}
             style={{
               padding: '0.75rem 1.5rem',
               borderRadius: '8px',
@@ -238,7 +238,7 @@ export default function ContactsPage() {
               gap: '0.5rem'
             }}
           >
-            + New Contact
+            + New Person
           </button>
         </div>
           </div>
@@ -269,9 +269,9 @@ export default function ContactsPage() {
               color: 'white'
             }}>👥</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
-              {totalContacts}
+              {totalPersons}
             </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Total Contacts</div>
+            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Total Persons</div>
           </div>
 
           <div style={{
@@ -294,7 +294,7 @@ export default function ContactsPage() {
               color: 'white'
             }}>✓</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
-              {activeContacts}
+              {activePersons}
             </div>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>With Active Deals</div>
           </div>
@@ -344,7 +344,7 @@ export default function ContactsPage() {
               color: 'white'
             }}>🆕</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
-              {contacts.filter(c => {
+              {persons.filter(c => {
                 const created = new Date(c.createdAt);
                 const monthAgo = new Date();
                 monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -372,7 +372,7 @@ export default function ContactsPage() {
             <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--zander-gray)' }}>🔍</span>
             <input
               type="text"
-              placeholder="Search contacts..."
+              placeholder="Search persons..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -442,8 +442,8 @@ export default function ContactsPage() {
           </div>
         </div>
 
-        {/* Contacts Grid/List */}
-        {filteredContacts.length === 0 ? (
+        {/* Persons Grid/List */}
+        {filteredPersons.length === 0 ? (
           <div style={{
             background: 'white',
             border: '2px solid var(--zander-border-gray)',
@@ -452,7 +452,7 @@ export default function ContactsPage() {
             textAlign: 'center'
           }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>👥</div>
-            <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No contacts found</h3>
+            <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No persons found</h3>
             <p style={{ color: 'var(--zander-gray)' }}>Try adjusting your search or filters</p>
           </div>
         ) : viewMode === 'grid' ? (
@@ -461,15 +461,15 @@ export default function ContactsPage() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
             gap: '1.5rem'
           }}>
-            {filteredContacts.map((contact) => {
-              const contactDeals = getContactDeals(contact.id);
-              const isActive = hasActiveDeals(contact.id);
+            {filteredPersons.map((person) => {
+              const personDeals = getPersonDeals(person.id);
+              const isActive = hasActiveDeals(person.id);
               
               return (
 
                 <div
-                  key={contact.id}
-                  onClick={() => router.push("/contacts/" + contact.id)}
+                  key={person.id}
+                  onClick={() => router.push("/persons/" + person.id)}
                   style={{
                     background: 'white',
                     border: '2px solid var(--zander-border-gray)',
@@ -492,20 +492,20 @@ export default function ContactsPage() {
                       fontWeight: '700',
                       fontSize: '1.25rem'
                     }}>
-                      {getInitials(contact.firstName, contact.lastName)}
+                      {getInitials(person.firstName, person.lastName)}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: '700', color: 'var(--zander-navy)', fontSize: '1.125rem', marginBottom: '0.25rem' }}>
-                        {contact.firstName} {contact.lastName}
+                        {person.firstName} {person.lastName}
                       </div>
-                      {contact.title && (
+                      {person.title && (
                         <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
-                          {contact.title}
+                          {person.title}
                         </div>
                       )}
-                      {contact.company && (
+                      {person.company && (
                         <div style={{ fontSize: '0.875rem', color: 'var(--zander-navy)', fontWeight: '500' }}>
-                          {contact.company}
+                          {person.company}
                         </div>
                       )}
                     </div>
@@ -514,12 +514,12 @@ export default function ContactsPage() {
                   <div style={{ marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
                       <span>📧</span>
-                      <span>{contact.email}</span>
+                      <span>{person.email}</span>
                     </div>
-                    {contact.phone && (
+                    {person.phone && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
                         <span>📱</span>
-                        <span>{contact.phone}</span>
+                        <span>{person.phone}</span>
                       </div>
                     )}
                   </div>
@@ -536,7 +536,7 @@ export default function ContactsPage() {
                           fontWeight: '600'
                         }}>Active Deal</span>
                       )}
-                      {contactDeals.length > 0 && (
+                      {personDeals.length > 0 && (
                         <span style={{
                           padding: '0.25rem 0.75rem',
                           borderRadius: '12px',
@@ -544,7 +544,7 @@ export default function ContactsPage() {
                           color: 'var(--zander-red)',
                           fontSize: '0.75rem',
                           fontWeight: '600'
-                        }}>{contactDeals.length} deal{contactDeals.length !== 1 ? 's' : ''}</span>
+                        }}>{personDeals.length} deal{personDeals.length !== 1 ? 's' : ''}</span>
                       )}
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -589,11 +589,11 @@ export default function ContactsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredContacts.map((contact) => {
-                  const isActive = hasActiveDeals(contact.id);
+                {filteredPersons.map((person) => {
+                  const isActive = hasActiveDeals(person.id);
                   return (
 
-                    <tr key={contact.id} onClick={() => router.push("/contacts/" + contact.id)} style={{ borderBottom: '1px solid var(--zander-border-gray)', cursor: 'pointer' }}>
+                    <tr key={person.id} onClick={() => router.push("/persons/" + person.id)} style={{ borderBottom: '1px solid var(--zander-border-gray)', cursor: 'pointer' }}>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
@@ -609,17 +609,17 @@ export default function ContactsPage() {
                             fontWeight: '600',
                             fontSize: '0.75rem'
                           }}>
-                            {getInitials(contact.firstName, contact.lastName)}
+                            {getInitials(person.firstName, person.lastName)}
                           </div>
                           <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
-                            {contact.firstName} {contact.lastName}
+                            {person.firstName} {person.lastName}
                           </span>
                         </div>
                       </td>
-                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{contact.title || '—'}</td>
-                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{contact.company || '—'}</td>
-                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{contact.email}</td>
-                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{contact.phone || '—'}</td>
+                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{person.title || '—'}</td>
+                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{person.company || '—'}</td>
+                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{person.email}</td>
+                      <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{person.phone || '—'}</td>
                       <td style={{ padding: '1rem' }}>
                         <span style={{
                           padding: '0.25rem 0.75rem',
@@ -651,43 +651,43 @@ export default function ContactsPage() {
         )}
       </main>
 
-      {/* New Contact Modal */}
-      {showNewContactModal && (
+      {/* New Person Modal */}
+      {showNewPersonModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
           <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', maxWidth: '500px', width: '90%' }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Contact</h2>
-            <form onSubmit={handleCreateContact}>
+            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Person</h2>
+            <form onSubmit={handleCreatePerson}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>First Name *</label>
-                  <input type="text" value={contactForm.firstName} onChange={(e) => setContactForm({...contactForm, firstName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
+                  <input type="text" value={personForm.firstName} onChange={(e) => setPersonForm({...personForm, firstName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
                 </div>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Last Name *</label>
-                  <input type="text" value={contactForm.lastName} onChange={(e) => setContactForm({...contactForm, lastName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
+                  <input type="text" value={personForm.lastName} onChange={(e) => setPersonForm({...personForm, lastName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
                 </div>
               </div>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Email *</label>
-                <input type="email" value={contactForm.email} onChange={(e) => setContactForm({...contactForm, email: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
+                <input type="email" value={personForm.email} onChange={(e) => setPersonForm({...personForm, email: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
               </div>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Phone</label>
-                <input type="tel" value={contactForm.phone} onChange={(e) => setContactForm({...contactForm, phone: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+                <input type="tel" value={personForm.phone} onChange={(e) => setPersonForm({...personForm, phone: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Company</label>
-                  <input type="text" value={contactForm.company} onChange={(e) => setContactForm({...contactForm, company: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+                  <input type="text" value={personForm.company} onChange={(e) => setPersonForm({...personForm, company: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
                 </div>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Title</label>
-                  <input type="text" value={contactForm.title} onChange={(e) => setContactForm({...contactForm, title: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+                  <input type="text" value={personForm.title} onChange={(e) => setPersonForm({...personForm, title: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowNewContactModal(false)} style={{ padding: '0.75rem 1.5rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', background: 'white', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
-                <button type="submit" style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Create Contact</button>
+                <button type="button" onClick={() => setShowNewPersonModal(false)} style={{ padding: '0.75rem 1.5rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', background: 'white', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
+                <button type="submit" style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Create Person</button>
               </div>
             </form>
           </div>

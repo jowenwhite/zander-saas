@@ -26,7 +26,7 @@ interface Deal {
   updatedAt: string;
 }
 
-const STAGES = ['PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'];
+const STAGES = ['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'];
 
 const formatStage = (stage: string) => {
   const stageLabels: Record<string, string> = {
@@ -35,7 +35,8 @@ const formatStage = (stage: string) => {
     'PROPOSAL': 'Proposal',
     'NEGOTIATION': 'Negotiation',
     'CLOSED_WON': 'Closed Won',
-    'CLOSED_LOST': 'Closed Lost'
+    'CLOSED_LOST': 'Closed Lost',
+    'LEAD': 'Lead'
   };
   return stageLabels[stage] || stage;
 };
@@ -44,7 +45,7 @@ const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 };
 
-export default function PipelinePage() {
+export default function ProjectsPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [draggedDeal, setDraggedDeal] = useState<Deal | null>(null);
@@ -57,7 +58,7 @@ export default function PipelinePage() {
   const [dealForm, setDealForm] = useState({
     dealName: '',
     dealValue: '',
-    stage: 'PROSPECT',
+    stage: 'LEAD',
     probability: '25',
     contactId: ''
   });
@@ -111,7 +112,7 @@ export default function PipelinePage() {
         }),
       });
       if (response.ok) {
-        setDealForm({ dealName: '', dealValue: '', stage: 'PROSPECT', probability: '25', contactId: '' });
+        setDealForm({ dealName: '', dealValue: '', stage: 'LEAD', probability: '25', contactId: '' });
         setShowNewDealModal(false);
         fetchData();
       }
