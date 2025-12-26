@@ -280,10 +280,10 @@ export default function ProductionPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📊', label: 'Dashboard', href: '/', active: true },
-              { icon: '📈', label: 'Pipeline', href: '/pipeline', active: false },
-              { icon: '👥', label: 'Contacts', href: '/contacts', active: false },
-              { icon: '📉', label: 'Analytics', href: '/analytics', active: false },
+              { icon: '📊', label: 'Production', href: '/production', active: true },
+              { icon: '📁', label: 'Projects', href: '/projects', active: false },
+              { icon: '👥', label: 'People', href: '/people', active: false },
+              { icon: '📦', label: 'Products', href: '/products', active: false },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a
@@ -323,7 +323,7 @@ export default function ProductionPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📬', label: 'Communications', href: '/communications' },
+              { icon: '📧', label: 'Communication', href: '/communication' },
               { icon: '📅', label: 'Schedule', href: '/schedule' },
               { icon: '📋', label: 'Forms', href: '/forms' },
               { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
@@ -479,7 +479,7 @@ export default function ProductionPage() {
             </div>
           </div>
 
-          {/* Pipeline Value */}
+          {/* Projects Value */}
           <div style={{
             background: 'white',
             border: '2px solid var(--zander-border-gray)',
@@ -513,7 +513,7 @@ export default function ProductionPage() {
               {formatCurrency(pipelineValue)}
             </div>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
-              Pipeline Value
+              Projects Value
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
               {activeDeals.length} active deals
@@ -603,7 +603,7 @@ export default function ProductionPage() {
           </div>
         </div>
 
-        {/* Pipeline Overview - Full Width */}
+        {/* Projects Overview - Full Width */}
         <div style={{
           marginBottom: '2rem'
         }}>
@@ -625,7 +625,7 @@ export default function ProductionPage() {
                 fontWeight: '700', 
                 color: 'var(--zander-navy)', 
                 margin: 0 
-              }}>Pipeline Overview</h3>
+              }}>Projects Overview</h3>
               <button style={{
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
