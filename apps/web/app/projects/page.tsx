@@ -177,7 +177,7 @@ export default function ProjectsPage() {
     return getDealsByStage(stage).reduce((sum, deal) => sum + deal.dealValue, 0);
   };
 
-  const totalPipelineValue = STAGES.reduce((sum, stage) => sum + getStageValue(stage), 0);
+  const totalProjectsValue = STAGES.reduce((sum, stage) => sum + getStageValue(stage), 0);
 
   if (loading) {
     return (
@@ -185,7 +185,7 @@ export default function ProjectsPage() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
-          <div style={{ color: 'var(--zander-gray)' }}>Loading Pipeline...</div>
+          <div style={{ color: 'var(--zander-gray)' }}>Loading Projects...</div>
         </div>
       </div>
     );
@@ -220,7 +220,7 @@ export default function ProjectsPage() {
               { icon: '📊', label: 'Production', href: '/production', active: false },
               { icon: '📁', label: 'Projects', href: '/projects', active: true },
               { icon: '👥', label: 'People', href: '/people', active: false },
-              { icon: '📉', label: 'Analytics', href: '/analytics', active: false },
+              { icon: '📦', label: 'Products', href: '/products', active: false },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={{
@@ -244,7 +244,7 @@ export default function ProjectsPage() {
 
         <div style={{ padding: '0 1rem' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Tools
+            Process
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
@@ -288,7 +288,7 @@ export default function ProjectsPage() {
               fontWeight: '700',
               fontSize: '1.25rem'
             }}>
-              {formatCurrency(totalPipelineValue)}
+              {formatCurrency(totalProjectsValue)}
             </div>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>

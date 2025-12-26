@@ -319,7 +319,7 @@ export default function ProductionPage() {
             marginBottom: '0.75rem',
             display: sidebarCollapsed ? 'none' : 'block'
           }}>
-            Tools
+            Process
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[

@@ -157,7 +157,7 @@ export default function PeoplePage() {
               { icon: '📊', label: 'Production', href: '/production', active: false },
               { icon: '📁', label: 'Projects', href: '/projects', active: false },
               { icon: '👥', label: 'People', href: '/persons', active: true },
-              { icon: '📉', label: 'Analytics', href: '/analytics', active: false },
+              { icon: '📦', label: 'Products', href: '/products', active: false },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={{
@@ -181,7 +181,7 @@ export default function PeoplePage() {
 
         <div style={{ padding: '0 1rem' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Tools
+            Process
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
