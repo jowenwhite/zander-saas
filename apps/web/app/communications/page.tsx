@@ -1012,13 +1012,13 @@ export default function CommunicationsPage() {
                           ➡️ Forward
                         </button>
                         <button
-                          onClick={() => { alert("Archive functionality coming soon"); }}
+                          onClick={async () => { try { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/email-messages/${selectedEmail.id}/archive`, { method: "PATCH", headers: { "Authorization": `Bearer ${localStorage.getItem("zander_token")}` } }); setSelectedEmail(null); fetchData(); } catch (e) { console.error(e); } }}
                           style={{ padding: "0.5rem 1rem", background: "var(--zander-gold)", color: "var(--zander-navy)", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           📥 Archive
                         </button>
                         <button
-                          onClick={() => { if(confirm("Delete this email?")) { alert("Delete functionality coming soon"); } }}
+                          onClick={async () => { if(confirm("Delete this email?")) { try { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/email-messages/${selectedEmail.id}/delete`, { method: "PATCH", headers: { "Authorization": `Bearer ${localStorage.getItem("zander_token")}` } }); setSelectedEmail(null); fetchData(); } catch (e) { console.error(e); } } }}
                           style={{ padding: "0.5rem 1rem", background: "transparent", color: "var(--zander-red)", border: "1px solid var(--zander-red)", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           🗑️ Delete

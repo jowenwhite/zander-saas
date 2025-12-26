@@ -294,6 +294,8 @@ model EmailMessage {
   threadId    String?  // Groups related emails
   status      String   @default("sent") // sent, delivered, opened, failed, received
   isRead      Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
   sentAt      DateTime
   openedAt    DateTime?
   createdAt   DateTime @default(now())

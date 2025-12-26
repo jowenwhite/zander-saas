@@ -82,6 +82,21 @@ export class EmailMessagesController {
     return this.emailMessagesService.markAsRead(tenantId, id);
   }
 
+  
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/archive')
+  async archiveEmail(@Request() req, @Param('id') id: string) {
+    const tenantId = req.user.tenantId;
+    return this.emailMessagesService.archiveEmail(tenantId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/delete')
+  async deleteEmail(@Request() req, @Param('id') id: string) {
+    const tenantId = req.user.tenantId;
+    return this.emailMessagesService.deleteEmail(tenantId, id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Patch('mark-all-read')
   async markAllAsRead(@Request() req) {

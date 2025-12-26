@@ -103,6 +103,8 @@ export class EmailMessagesService {
     return this.prisma.emailMessage.findMany({
       where: {
         tenantId,
+        isDeleted: false,
+        isArchived: false,
         ...(options?.contactId && { contactId: options.contactId }),
         ...(options?.dealId && { dealId: options.dealId }),
       },
@@ -219,6 +221,20 @@ export class EmailMessagesService {
     return this.prisma.emailMessage.update({
       where: { id },
       data: { isRead: true },
+    });
+  }
+
+  async archiveEmail(tenantId: string, id: string) {
+    return this.prisma.emailMessage.update({
+      where: { id, tenantId },
+      data: { isArchived: true },
+    });
+  }
+
+  async deleteEmail(tenantId: string, id: string) {
+    return this.prisma.emailMessage.update({
+      where: { id, tenantId },
+      data: { isDeleted: true },
     });
   }
 
