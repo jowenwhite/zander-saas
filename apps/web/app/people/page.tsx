@@ -28,7 +28,7 @@ interface Deal {
 
 export default function PeoplePage() {
   const router = useRouter();
-  const [persons, setPersons] = useState<Person[]>([]);
+  const [people, setPeople] = useState<Person[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeModule, setActiveModule] = useState('cro');
@@ -52,14 +52,14 @@ export default function PeoplePage() {
 
   async function fetchData() {
     try {
-      const [personsRes, dealsRes] = await Promise.all([
-        fetch('https://api.zanderos.com/persons', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+      const [peopleRes, dealsRes] = await Promise.all([
+        fetch('https://api.zanderos.com/people', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
         fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
       ]);
       
-      if (personsRes.ok) {
-        const personsData = await personsRes.json();
-        setPersons(personsData.data || []);
+      if (peopleRes.ok) {
+        const peopleData = await peopleRes.json();
+        setPeople(peopleData.data || []);
       }
       if (dealsRes.ok) {
         const dealsData = await dealsRes.json();
@@ -75,7 +75,7 @@ export default function PeoplePage() {
   async function handleCreatePerson(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch('https://api.zanderos.com/persons', {
+      const response = await fetch('https://api.zanderos.com/people', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify(personForm),
@@ -99,8 +99,8 @@ export default function PeoplePage() {
     return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
   };
 
-  // Filter persons
-  const filteredPersons = persons.filter(person => {
+  // Filter people
+  const filteredPeople = people.filter(person => {
     const matchesSearch = !searchTerm || 
       `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -113,9 +113,9 @@ export default function PeoplePage() {
   });
 
   // Stats
-  const totalPersons = persons.length;
-  const activePersons = persons.filter(c => hasActiveDeals(c.id)).length;
-  const uniqueCompanies = new Set(persons.map(c => c.company).filter(Boolean)).size;
+  const totalPeople = people.length;
+  const activePeople = people.filter(c => hasActiveDeals(c.id)).length;
+  const uniqueCompanies = new Set(people.map(c => c.company).filter(Boolean)).size;
 
   if (loading) {
     return (
@@ -123,7 +123,7 @@ export default function PeoplePage() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
-          <div style={{ color: 'var(--zander-gray)' }}>Loading Persons...</div>
+          <div style={{ color: 'var(--zander-gray)' }}>Loading People...</div>
         </div>
       </div>
     );
@@ -156,7 +156,7 @@ export default function PeoplePage() {
             {[
               { icon: '📊', label: 'Production', href: '/production', active: false },
               { icon: '📁', label: 'Projects', href: '/projects', active: false },
-              { icon: '👥', label: 'People', href: '/persons', active: true },
+              { icon: '👥', label: 'People', href: '/people', active: true },
               { icon: '📦', label: 'Products', href: '/products', active: false },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
@@ -215,14 +215,14 @@ export default function PeoplePage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0, marginBottom: '0.5rem' }}>
-              Persons
+              People
             </h1>
             <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
-              Manage your persons and relationships
+              Manage your people and relationships
             </p>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <a href="/persons/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+            <a href="/people/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
             <button
             onClick={() => setShowNewPersonModal(true)}
             style={{
@@ -269,9 +269,9 @@ export default function PeoplePage() {
               color: 'white'
             }}>👥</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
-              {totalPersons}
+              {totalPeople}
             </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Total Persons</div>
+            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Total People</div>
           </div>
 
           <div style={{
@@ -294,7 +294,7 @@ export default function PeoplePage() {
               color: 'white'
             }}>✓</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
-              {activePersons}
+              {activePeople}
             </div>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>With Active Deals</div>
           </div>
@@ -344,7 +344,7 @@ export default function PeoplePage() {
               color: 'white'
             }}>🆕</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
-              {persons.filter(c => {
+              {people.filter(c => {
                 const created = new Date(c.createdAt);
                 const monthAgo = new Date();
                 monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -372,7 +372,7 @@ export default function PeoplePage() {
             <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--zander-gray)' }}>🔍</span>
             <input
               type="text"
-              placeholder="Search persons..."
+              placeholder="Search people..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -442,8 +442,8 @@ export default function PeoplePage() {
           </div>
         </div>
 
-        {/* Persons Grid/List */}
-        {filteredPersons.length === 0 ? (
+        {/* People Grid/List */}
+        {filteredPeople.length === 0 ? (
           <div style={{
             background: 'white',
             border: '2px solid var(--zander-border-gray)',
@@ -452,7 +452,7 @@ export default function PeoplePage() {
             textAlign: 'center'
           }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>👥</div>
-            <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No persons found</h3>
+            <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No people found</h3>
             <p style={{ color: 'var(--zander-gray)' }}>Try adjusting your search or filters</p>
           </div>
         ) : viewMode === 'grid' ? (
@@ -461,7 +461,7 @@ export default function PeoplePage() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
             gap: '1.5rem'
           }}>
-            {filteredPersons.map((person) => {
+            {filteredPeople.map((person) => {
               const personDeals = getPersonDeals(person.id);
               const isActive = hasActiveDeals(person.id);
               
@@ -469,7 +469,7 @@ export default function PeoplePage() {
 
                 <div
                   key={person.id}
-                  onClick={() => router.push("/persons/" + person.id)}
+                  onClick={() => router.push("/people/" + person.id)}
                   style={{
                     background: 'white',
                     border: '2px solid var(--zander-border-gray)',
@@ -589,11 +589,11 @@ export default function PeoplePage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredPersons.map((person) => {
+                {filteredPeople.map((person) => {
                   const isActive = hasActiveDeals(person.id);
                   return (
 
-                    <tr key={person.id} onClick={() => router.push("/persons/" + person.id)} style={{ borderBottom: '1px solid var(--zander-border-gray)', cursor: 'pointer' }}>
+                    <tr key={person.id} onClick={() => router.push("/people/" + person.id)} style={{ borderBottom: '1px solid var(--zander-border-gray)', cursor: 'pointer' }}>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>

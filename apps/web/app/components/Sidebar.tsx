@@ -16,8 +16,6 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
     { icon: '📧', label: 'Communication', href: '/communication' },
     { icon: '📅', label: 'Schedule', href: '/schedule' },
     { icon: '📋', label: 'Forms', href: '/forms' },
-  ];
-  const aiItems = [
     { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
   ];
   const linkStyle = (active: boolean) => ({
@@ -75,21 +73,6 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
         </div>
         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
           {processItems.map((item) => (
-            <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-              <a href={item.href} style={linkStyle(isActive(item.href))}>
-                <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
-                {!collapsed && <span>{item.label}</span>}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div style={{ padding: '1rem 1rem 0' }}>
-        <div style={sectionHeaderStyle}>
-          AI
-        </div>
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-          {aiItems.map((item) => (
             <li key={item.label} style={{ marginBottom: '0.25rem' }}>
               <a href={item.href} style={linkStyle(isActive(item.href))}>
                 <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
