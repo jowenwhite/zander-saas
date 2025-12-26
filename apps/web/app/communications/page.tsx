@@ -1007,7 +1007,7 @@ export default function CommunicationsPage() {
                             });
                             setShowComposeModal(true);
                           }}
-                          style={{ padding: "0.5rem 1rem", background: "var(--zander-blue)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
+                          style={{ padding: "0.5rem 1rem", background: "#005687", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           ➡️ Forward
                         </button>
