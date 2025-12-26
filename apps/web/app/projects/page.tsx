@@ -217,9 +217,9 @@ export default function ProjectsPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📊', label: 'Dashboard', href: '/', active: false },
-              { icon: '📈', label: 'Pipeline', href: '/pipeline', active: true },
-              { icon: '👥', label: 'Contacts', href: '/contacts', active: false },
+              { icon: '📊', label: 'Production', href: '/production', active: false },
+              { icon: '📁', label: 'Projects', href: '/projects', active: true },
+              { icon: '👥', label: 'People', href: '/people', active: false },
               { icon: '📉', label: 'Analytics', href: '/analytics', active: false },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
@@ -248,7 +248,7 @@ export default function ProjectsPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📬', label: 'Communications', href: '/communications' },
+              { icon: '📧', label: 'Communication', href: '/communication' },
               { icon: '📅', label: 'Schedule', href: '/schedule' },
               { icon: '📋', label: 'Forms', href: '/forms' },
               { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },

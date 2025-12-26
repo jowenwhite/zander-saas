@@ -236,7 +236,7 @@ export default function DealDetailPage() {
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
           <div style={{ color: 'var(--zander-gray)' }}>Deal not found</div>
           <button onClick={() => router.push('/pipeline')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-            Back to Pipeline
+            Back to Projects
           </button>
         </div>
       </div>
@@ -270,7 +270,7 @@ export default function DealDetailPage() {
             fontSize: '0.875rem'
           }}
         >
-          ← Back to Pipeline
+          ← Back to Projects
         </button>
 
         {/* Modal-style Card */}
@@ -323,7 +323,7 @@ export default function DealDetailPage() {
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'documents', label: 'Forms & Documents' },
-              { id: 'communications', label: 'Communications' },
+              { id: 'communications', label: 'Communication' },
               { id: 'financial', label: 'Financial' }
             ].map((tab) => (
               <button
@@ -610,7 +610,7 @@ export default function DealDetailPage() {
                   borderRadius: '8px',
                   marginBottom: '2rem'
                 }}>
-                  <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Communications Timeline</h3>
+                  <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Communication Timeline</h3>
                   <p style={{ margin: 0, opacity: 0.8, fontSize: '0.9rem' }}>
                     View all interactions and scheduled communications with this client
                   </p>
@@ -654,7 +654,7 @@ export default function DealDetailPage() {
                 ) : (
                   <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>💬</div>
-                    <h4 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>Communications Timeline</h4>
+                    <h4 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>Communication Timeline</h4>
                     <p style={{ fontSize: '0.9rem' }}>Coming soon - View emails, calls, and scheduled follow-ups</p>
                   </div>
                 )}

@@ -154,8 +154,8 @@ export default function PeoplePage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📊', label: 'Dashboard', href: '/', active: false },
-              { icon: '📈', label: 'Pipeline', href: '/pipeline', active: false },
+              { icon: '📊', label: 'Production', href: '/production', active: false },
+              { icon: '📁', label: 'Projects', href: '/projects', active: false },
               { icon: '👥', label: 'People', href: '/persons', active: true },
               { icon: '📉', label: 'Analytics', href: '/analytics', active: false },
             ].map((item) => (
@@ -185,7 +185,7 @@ export default function PeoplePage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📬', label: 'Communications', href: '/communications' },
+              { icon: '📧', label: 'Communication', href: '/communication' },
               { icon: '📅', label: 'Schedule', href: '/schedule' },
               { icon: '📋', label: 'Forms', href: '/forms' },
               { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
