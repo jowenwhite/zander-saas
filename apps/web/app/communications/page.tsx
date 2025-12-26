@@ -968,78 +968,58 @@ export default function CommunicationsPage() {
                       </div>
                       <hr style={{ border: 'none', borderTop: '1px solid var(--zander-border-gray)', margin: '1rem 0' }} />
                       <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{selectedEmail.body}</div>
-                      <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                         <button
                           onClick={() => {
                             setComposeForm({
-                              to: selectedEmail.direction === 'inbound' ? selectedEmail.fromAddress : selectedEmail.toAddress,
-                              contactId: selectedEmail.contact?.id || '',
-                              subject: 'Re: ' + selectedEmail.subject.replace(/^Re: /, ''),
-                              body: '
-
----
-On ' + new Date(selectedEmail.sentAt).toLocaleString() + ', ' + selectedEmail.fromAddress + ' wrote:
-> ' + selectedEmail.body.split('
-').join('
-> ')
+                              to: selectedEmail.direction === "inbound" ? selectedEmail.fromAddress : selectedEmail.toAddress,
+                              contactId: selectedEmail.contact?.id || "",
+                              subject: "Re: " + selectedEmail.subject.replace(/^Re: /, ""),
+                              body: "\n\n---\nOn " + new Date(selectedEmail.sentAt).toLocaleString() + ", " + selectedEmail.fromAddress + " wrote:\n> " + selectedEmail.body.split("\n").join("\n> ")
                             });
                             setShowComposeModal(true);
                           }}
-                          style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+                          style={{ padding: "0.5rem 1rem", background: "var(--zander-navy)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           ↩️ Reply
                         </button>
                         <button
                           onClick={() => {
                             setComposeForm({
-                              to: selectedEmail.direction === 'inbound' ? selectedEmail.fromAddress : selectedEmail.toAddress,
-                              contactId: selectedEmail.contact?.id || '',
-                              subject: 'Re: ' + selectedEmail.subject.replace(/^Re: /, ''),
-                              body: '
-
----
-On ' + new Date(selectedEmail.sentAt).toLocaleString() + ', ' + selectedEmail.fromAddress + ' wrote:
-> ' + selectedEmail.body.split('
-').join('
-> ')
+                              to: selectedEmail.direction === "inbound" ? selectedEmail.fromAddress : selectedEmail.toAddress,
+                              contactId: selectedEmail.contact?.id || "",
+                              subject: "Re: " + selectedEmail.subject.replace(/^Re: /, ""),
+                              body: "\n\n---\nOn " + new Date(selectedEmail.sentAt).toLocaleString() + ", " + selectedEmail.fromAddress + " wrote:\n> " + selectedEmail.body.split("\n").join("\n> ")
                             });
                             setShowComposeModal(true);
                           }}
-                          style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+                          style={{ padding: "0.5rem 1rem", background: "var(--zander-navy)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           ↩️↩️ Reply All
                         </button>
                         <button
                           onClick={() => {
                             setComposeForm({
-                              to: '',
-                              contactId: '',
-                              subject: 'Fwd: ' + selectedEmail.subject.replace(/^Fwd: /, ''),
-                              body: '
-
----
-Forwarded message:
-From: ' + selectedEmail.fromAddress + '
-Date: ' + new Date(selectedEmail.sentAt).toLocaleString() + '
-Subject: ' + selectedEmail.subject + '
-
-' + selectedEmail.body
+                              to: "",
+                              contactId: "",
+                              subject: "Fwd: " + selectedEmail.subject.replace(/^Fwd: /, ""),
+                              body: "\n\n---\nForwarded message:\nFrom: " + selectedEmail.fromAddress + "\nDate: " + new Date(selectedEmail.sentAt).toLocaleString() + "\nSubject: " + selectedEmail.subject + "\n\n" + selectedEmail.body
                             });
                             setShowComposeModal(true);
                           }}
-                          style={{ padding: '0.5rem 1rem', background: 'var(--zander-blue)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+                          style={{ padding: "0.5rem 1rem", background: "var(--zander-blue)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           ➡️ Forward
                         </button>
                         <button
-                          onClick={() => { alert('Archive functionality coming soon'); }}
-                          style={{ padding: '0.5rem 1rem', background: 'var(--zander-gold)', color: 'var(--zander-navy)', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+                          onClick={() => { alert("Archive functionality coming soon"); }}
+                          style={{ padding: "0.5rem 1rem", background: "var(--zander-gold)", color: "var(--zander-navy)", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           📥 Archive
                         </button>
                         <button
-                          onClick={() => { if(confirm('Delete this email?')) { alert('Delete functionality coming soon'); } }}
-                          style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--zander-red)', border: '1px solid var(--zander-red)', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+                          onClick={() => { if(confirm("Delete this email?")) { alert("Delete functionality coming soon"); } }}
+                          style={{ padding: "0.5rem 1rem", background: "transparent", color: "var(--zander-red)", border: "1px solid var(--zander-red)", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           🗑️ Delete
                         </button>
@@ -1049,8 +1029,7 @@ Subject: ' + selectedEmail.subject + '
                 </div>
               </div>
             )}
-
-            {/* TEMPLATES TAB */}
+                        {/* TEMPLATES TAB */}
             {activeTab === 'templates' && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
