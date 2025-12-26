@@ -953,6 +953,317 @@ export default function ProductionPage() {
             ))}
           </div>
         </div>
+
+        {/* Analytics Section */}
+        <div style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '1.5rem' }}>
+            📊 Analytics
+          </h2>
+          
+          {/* Analytics Metrics Row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
+            <div style={{
+              background: 'white',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '12px',
+              padding: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem'
+                }}>💰</div>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                {formatCurrency(deals.reduce((sum, d) => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST' ? sum + d.dealValue : sum, 0))}
+              </div>
+              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Total Pipeline</div>
+            </div>
+
+            <div style={{
+              background: 'white',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '12px',
+              padding: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem'
+                }}>🎯</div>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                {formatCurrency(deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + (d.dealValue * d.probability / 100), 0))}
+              </div>
+              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Weighted Pipeline</div>
+            </div>
+
+            <div style={{
+              background: 'white',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '12px',
+              padding: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #3498DB 0%, #2471a3 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem'
+                }}>📊</div>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                {(() => {
+                  const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
+                  const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
+                  return won + lost > 0 ? ((won / (won + lost)) * 100).toFixed(1) : '0';
+                })()}%
+              </div>
+              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Win Rate</div>
+            </div>
+
+            <div style={{
+              background: 'white',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '12px',
+              padding: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #9B59B6 0%, #7d3c98 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem'
+                }}>📈</div>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                {(() => {
+                  const activeDeals = deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST');
+                  const total = activeDeals.reduce((sum, d) => sum + d.dealValue, 0);
+                  return activeDeals.length > 0 ? formatCurrency(total / activeDeals.length) : '$0';
+                })()}
+              </div>
+              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Avg Deal Size</div>
+            </div>
+          </div>
+
+          {/* Charts Row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+            {/* Pipeline Funnel */}
+            <div style={{
+              background: 'white',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '12px',
+              padding: '1.5rem'
+            }}>
+              <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.25rem' }}>Pipeline Funnel</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'].map((stage) => {
+                  const stageDeals = deals.filter(d => d.stage === stage);
+                  const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
+                  const maxValue = Math.max(...['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'].map(s => deals.filter(d => d.stage === s).reduce((sum, d) => sum + d.dealValue, 0)), 1);
+                  const stageLabels: Record<string, string> = { 'LEAD': 'Lead', 'PROSPECT': 'Prospect', 'QUALIFIED': 'Qualified', 'PROPOSAL': 'Proposal', 'NEGOTIATION': 'Negotiation', 'CLOSED_WON': 'Closed Won' };
+                  return (
+                    <div key={stage} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div style={{ width: '100px', fontSize: '0.875rem', color: 'var(--zander-navy)', fontWeight: '500' }}>
+                        {stageLabels[stage] || stage}
+                      </div>
+                      <div style={{ flex: 1, height: '32px', background: 'var(--zander-off-white)', borderRadius: '6px', overflow: 'hidden' }}>
+                        <div style={{
+                          width: `${(stageValue / maxValue) * 100}%`,
+                          height: '100%',
+                          background: stage === 'CLOSED_WON' ? 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' : 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+                          borderRadius: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          paddingLeft: '0.75rem',
+                          minWidth: stageValue > 0 ? '60px' : '0'
+                        }}>
+                          {stageValue > 0 && (
+                            <span style={{ color: 'white', fontSize: '0.75rem', fontWeight: '600' }}>
+                              {formatCurrency(stageValue)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ width: '50px', textAlign: 'right', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+                        {stageDeals.length}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Win/Loss Summary */}
+            <div style={{
+              background: 'white',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '12px',
+              padding: '1.5rem'
+            }}>
+              <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.25rem' }}>Win/Loss Summary</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Won</span>
+                    <span style={{ color: '#27AE60', fontWeight: '600' }}>{deals.filter(d => d.stage === 'CLOSED_WON').length} deals</span>
+                  </div>
+                  <div style={{ height: '8px', background: 'var(--zander-off-white)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: (() => {
+                        const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
+                        const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
+                        return won + lost > 0 ? `${(won / (won + lost)) * 100}%` : '0%';
+                      })(),
+                      height: '100%',
+                      background: '#27AE60',
+                      borderRadius: '4px'
+                    }}></div>
+                  </div>
+                  <div style={{ marginTop: '0.5rem', fontSize: '1.25rem', fontWeight: '700', color: '#27AE60' }}>
+                    {formatCurrency(deals.filter(d => d.stage === 'CLOSED_WON').reduce((sum, d) => sum + d.dealValue, 0))}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Lost</span>
+                    <span style={{ color: 'var(--zander-red)', fontWeight: '600' }}>{deals.filter(d => d.stage === 'CLOSED_LOST').length} deals</span>
+                  </div>
+                  <div style={{ height: '8px', background: 'var(--zander-off-white)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: (() => {
+                        const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
+                        const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
+                        return won + lost > 0 ? `${(lost / (won + lost)) * 100}%` : '0%';
+                      })(),
+                      height: '100%',
+                      background: 'var(--zander-red)',
+                      borderRadius: '4px'
+                    }}></div>
+                  </div>
+                  <div style={{ marginTop: '0.5rem', fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-red)' }}>
+                    {formatCurrency(deals.filter(d => d.stage === 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}
+                  </div>
+                </div>
+
+                <div style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  background: 'var(--zander-off-white)',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
+                    Conversion Rate
+                  </div>
+                  <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+                    {(() => {
+                      const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
+                      const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
+                      return won + lost > 0 ? ((won / (won + lost)) * 100).toFixed(1) : '0';
+                    })()}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stage Breakdown Table */}
+          <div style={{
+            background: 'white',
+            border: '2px solid var(--zander-border-gray)',
+            borderRadius: '12px',
+            overflow: 'hidden'
+          }}>
+            <div style={{ padding: '1.5rem', borderBottom: '2px solid var(--zander-border-gray)' }}>
+              <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.25rem' }}>Stage Breakdown</h3>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: 'var(--zander-off-white)' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--zander-navy)' }}>Stage</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>Deals</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>Value</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>Avg Deal</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>% of Pipeline</th>
+                </tr>
+              </thead>
+              <tbody>
+                {['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'].map((stage) => {
+                  const stageDeals = deals.filter(d => d.stage === stage);
+                  const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
+                  const totalPipeline = deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0);
+                  const stageLabels: Record<string, string> = { 'LEAD': 'Lead', 'PROSPECT': 'Prospect', 'QUALIFIED': 'Qualified', 'PROPOSAL': 'Proposal', 'NEGOTIATION': 'Negotiation', 'CLOSED_WON': 'Closed Won' };
+                  return (
+                    <tr key={stage} style={{ borderBottom: '1px solid var(--zander-border-gray)' }}>
+                      <td style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            background: stage === 'CLOSED_WON' ? '#27AE60' : 'var(--zander-red)'
+                          }}></div>
+                          <span style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>{stageLabels[stage] || stage}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'right', color: 'var(--zander-gray)' }}>{stageDeals.length}</td>
+                      <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>{formatCurrency(stageValue)}</td>
+                      <td style={{ padding: '1rem', textAlign: 'right', color: 'var(--zander-gray)' }}>
+                        {stageDeals.length > 0 ? formatCurrency(stageValue / stageDeals.length) : '$0'}
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'right', color: 'var(--zander-gray)' }}>
+                        {totalPipeline > 0 ? ((stageValue / totalPipeline) * 100).toFixed(1) : '0'}%
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr style={{ background: 'var(--zander-navy)' }}>
+                  <td style={{ padding: '1rem', fontWeight: '700', color: 'white' }}>Total</td>
+                  <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{deals.filter(d => d.stage !== 'CLOSED_LOST').length}</td>
+                  <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}</td>
+                  <td style={{ padding: '1rem', textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
+                    {(() => {
+                      const filteredDeals = deals.filter(d => d.stage !== 'CLOSED_LOST');
+                      const total = filteredDeals.reduce((sum, d) => sum + d.dealValue, 0);
+                      return filteredDeals.length > 0 ? formatCurrency(total / filteredDeals.length) : '$0';
+                    })()}
+                  </td>
+                  <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>100%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
       </main>
 
             {/* New Deal Modal */}
