@@ -406,10 +406,10 @@ export default function FormsPage() {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📊', label: 'Dashboard', href: '/' },
-              { icon: '📈', label: 'Pipeline', href: '/pipeline' },
-              { icon: '👥', label: 'Contacts', href: '/contacts' },
-              { icon: '📉', label: 'Analytics', href: '/analytics' },
+              { icon: '📊', label: 'Production', href: '/production' },
+              { icon: '📁', label: 'Projects', href: '/projects' },
+              { icon: '👥', label: 'People', href: '/people' },
+              { icon: '📦', label: 'Products', href: '/products' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={{
@@ -431,11 +431,11 @@ export default function FormsPage() {
         </div>
         <div style={{ padding: '0 1rem' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Tools
+            Process
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📬', label: 'Communications', href: '/communications' },
+              { icon: '📧', label: 'Communication', href: '/communication' },
               { icon: '📅', label: 'Schedule', href: '/schedule' },
               { icon: '📋', label: 'Forms', href: '/forms', active: true },
               { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },

@@ -270,14 +270,14 @@ export default function AIAssistantPage() {
 
   // Standard sidebar items
   const salesRevenueItems = [
-    { icon: '📊', label: 'Dashboard', href: '/' },
-    { icon: '📈', label: 'Pipeline', href: '/pipeline' },
-    { icon: '👥', label: 'Contacts', href: '/contacts' },
-    { icon: '📉', label: 'Analytics', href: '/analytics' },
+    { icon: '📊', label: 'Production', href: '/production' },
+    { icon: '📁', label: 'Projects', href: '/projects' },
+    { icon: '👥', label: 'People', href: '/people' },
+    { icon: '📦', label: 'Products', href: '/products' },
   ];
 
   const toolsItems = [
-    { icon: '📧', label: 'Communications', href: '/communications' },
+    { icon: '📧', label: 'Communication', href: '/communication' },
     { icon: '📅', label: 'Schedule', href: '/schedule' },
     { icon: '📋', label: 'Forms', href: '/forms' },
     { icon: '🤖', label: `Ask ${selectedExecutive.name} (${selectedExecutive.role})`, href: '/ai', active: true },
@@ -350,7 +350,7 @@ export default function AIAssistantPage() {
                 letterSpacing: '1px',
                 marginBottom: '0.75rem'
               }}>
-                Tools
+                Process
               </div>
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 {toolsItems.map((item) => (
