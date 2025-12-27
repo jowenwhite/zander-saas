@@ -24,6 +24,7 @@ import { CallLogsModule } from './call-logs/call-logs.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 import { GoogleAuthModule } from './auth/google/google-auth.module';
 import { ProductsModule } from './products/products.module';
+import { BillingModule } from './billing/billing.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -45,7 +46,8 @@ import { ProductsModule } from './products/products.module';
     CallLogsModule,
     CalendarEventsModule,
     GoogleAuthModule,
-    ProductsModule
+    ProductsModule,
+    BillingModule
   ],
   controllers: [AppController, AuthController],
   providers: [

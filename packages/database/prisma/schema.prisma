@@ -70,6 +70,13 @@ model Tenant {
   calendarEvents      CalendarEvent[]
   userTenantAccess    UserTenantAccess[]
   products      Product[]
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  subscriptionStatus   String?
+  subscriptionTier     String?
+  subscriptionCohort   String?
+  trialEndsAt          DateTime?
+  rateLockExpiresAt    DateTime?
   @@map("tenants")
 }
 model User {
@@ -533,4 +540,22 @@ model GoogleToken {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
   @@map("google_tokens")
+}
+
+
+model WaitlistEntry {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  name              String
+  spotNumber        Int      @unique
+  stripePaymentId   String?
+  depositAmount     Int      @default(4900)
+  depositPaidAt     DateTime?
+  depositRefundedAt DateTime?
+  convertedAt       DateTime?
+  convertedTenantId String?
+  status            String   @default("pending")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@map("waitlist_entries")
 }
