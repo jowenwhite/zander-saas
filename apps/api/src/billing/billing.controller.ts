@@ -111,15 +111,13 @@ export class BillingController {
     );
   }
 
-  // ============================================
-  // ADMIN MIGRATION ENDPOINT (temporary)
-  // ============================================
+
   @Public()
-  @Post('migrate-waitlist')
-  async migrateWaitlist() {
+  @Post('migrate-tenant-stripe')
+  async migrateTenantStripe() {
     try {
-      await this.billingService.createWaitlistTable();
-      return { success: true, message: 'Waitlist table created' };
+      await this.billingService.migrateTenantStripeColumns();
+      return { success: true, message: 'Tenant Stripe columns added' };
     } catch (error) {
       return { success: false, error: error.message };
     }
