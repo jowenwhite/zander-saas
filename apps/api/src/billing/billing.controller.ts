@@ -57,8 +57,8 @@ export class BillingController {
       req.user.tenantId,
       req.user.email,
       body.priceId,
-      `${baseUrl}/settings/billing?success=true`,
-      `${baseUrl}/settings/billing?canceled=true`,
+      `${baseUrl}/settings?tab=billing&success=true`,
+      `${baseUrl}/settings?tab=billing&canceled=true`,
       body.cohort || 'public',
       14,
     );
@@ -107,7 +107,7 @@ export class BillingController {
     const baseUrl = process.env.FRONTEND_URL || 'https://app.zanderos.com';
     return this.billingService.createBillingPortalSession(
       req.user.tenantId,
-      body.returnUrl || `${baseUrl}/settings/billing`,
+      body.returnUrl || `${baseUrl}/settings?tab=billing`,
     );
   }
 
