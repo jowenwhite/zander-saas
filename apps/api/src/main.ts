@@ -1,9 +1,46 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as express from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  
+  const app = await NestFactory.create(AppModule, {
+    // Disable body parsing - we'll handle it manually for webhooks
+    bodyParser: false,
+  });
+
+  // Custom body parser that preserves raw body for webhooks
+  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (req.originalUrl === '/webhooks/stripe') {
+      // For Stripe webhooks, capture raw body
+      let rawBody = '';
+      req.setEncoding('utf8');
+      req.on('data', (chunk) => {
+        rawBody += chunk;
+      });
+      req.on('end', () => {
+        (req as any).rawBody = rawBody;
+        try {
+          req.body = JSON.parse(rawBody);
+        } catch (e) {
+          req.body = {};
+        }
+        next();
+      });
+    } else {
+      // For all other routes, use standard JSON parsing
+      express.json()(req, res, next);
+    }
+  });
+
+  // URL-encoded body parser for non-webhook routes
+  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (req.originalUrl !== '/webhooks/stripe') {
+      express.urlencoded({ extended: true })(req, res, next);
+    } else {
+      next();
+    }
+  });
+
   // Enable CORS for frontend (local and Cloudflare)
   app.enableCors({
     origin: [
@@ -15,7 +52,7 @@ async function bootstrap() {
     ],
     credentials: true,
   });
-  
+
   await app.listen(3001);
   console.log('🚀 API running on http://localhost:3001');
 }
