@@ -150,23 +150,111 @@ export default function SettingsPage() {
   };
 
   // Billing State
-  const [billing] = useState({
-    plan: 'Professional',
-    price: '$99',
-    interval: 'month',
-    nextBilling: 'January 14, 2025',
-    paymentMethod: {
-      type: 'card',
-      last4: '4242',
-      brand: 'Visa',
-      expiry: '12/26'
-    },
-    invoices: [
-      { id: 'INV-001', date: 'Dec 14, 2024', amount: '$99.00', status: 'paid' },
-      { id: 'INV-002', date: 'Nov 14, 2024', amount: '$99.00', status: 'paid' },
-      { id: 'INV-003', date: 'Oct 14, 2024', amount: '$99.00', status: 'paid' },
-    ]
-  });
+  const [billing, setBilling] = useState<any>(null);
+  const [prices, setPrices] = useState<any[]>([]);
+  const [billingLoading, setBillingLoading] = useState(true);
+  const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [selectedInterval, setSelectedInterval] = useState<'month' | 'year'>('month');
+
+  // Fetch billing data and prices
+  useEffect(() => {
+    const fetchBillingData = async () => {
+      const token = localStorage.getItem('zander_token');
+      setBillingLoading(true);
+      try {
+        // Fetch prices (public endpoint)
+        const pricesRes = await fetch('https://api.zanderos.com/billing/prices');
+        const pricesData = await pricesRes.json();
+        setPrices(Array.isArray(pricesData) ? pricesData : []);
+
+        // Fetch current subscription (authenticated)
+        if (token) {
+          const subRes = await fetch('https://api.zanderos.com/billing/subscription', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (subRes.ok) {
+            const subData = await subRes.json();
+            setBilling(subData);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch billing data:', error);
+      } finally {
+        setBillingLoading(false);
+      }
+    };
+    fetchBillingData();
+  }, []);
+
+  const handleCheckout = async (priceId: string) => {
+    const token = localStorage.getItem('zander_token');
+    setUpgradeLoading(true);
+    try {
+      const res = await fetch('https://api.zanderos.com/billing/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ priceId, cohort: 'public' })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Checkout failed:', error);
+    } finally {
+      setUpgradeLoading(false);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('https://api.zanderos.com/billing/portal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Failed to open billing portal:', error);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!confirm('Are you sure you want to cancel your subscription? You will retain access until the end of your billing period.')) return;
+    const token = localStorage.getItem('zander_token');
+    try {
+      await fetch('https://api.zanderos.com/billing/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ immediate: false })
+      });
+      alert('Subscription cancelled. You will retain access until the end of your billing period.');
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to cancel subscription:', error);
+    }
+  };
+
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount / 100);
+  };
+
+  const getPricesByTier = (tier: string) => {
+    return prices.filter(p => p.metadata?.tier === tier);
+  };
 
 
   // Loading state
@@ -961,73 +1049,251 @@ export default function SettingsPage() {
     </div>
   );
 
-  const renderBillingTab = () => (
-    <div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-        <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Current Plan</h3>
-          
-          <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px', color: 'white', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-              <div>
-                <div style={{ fontSize: '0.8rem', opacity: 0.8, marginBottom: '0.25rem' }}>Current Plan</div>
-                <div style={{ fontSize: '1.75rem', fontWeight: '700' }}>{billing.plan}</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '2rem', fontWeight: '700' }}>{billing.price}</div>
-                <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>per {billing.interval}</div>
-              </div>
-            </div>
-            <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>Next billing date: {billing.nextBilling}</div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <button style={{ padding: '0.75rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Change Plan</button>
-            <button style={{ padding: '0.75rem', background: 'white', color: '#DC3545', border: '2px solid #DC3545', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel Subscription</button>
-          </div>
-
-          <h3 style={{ margin: '2rem 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Payment Method</h3>
-          
-          <div style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ width: '48px', height: '32px', background: 'white', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--zander-border-gray)' }}>
-              <span style={{ fontWeight: '700', color: '#1A1F71' }}>VISA</span>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>•••• •••• •••• {billing.paymentMethod.last4}</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Expires {billing.paymentMethod.expiry}</div>
-            </div>
-            <button style={{ padding: '0.5rem 1rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}>Update</button>
+  const renderBillingTab = () => {
+    if (billingLoading) {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '4rem' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+            <div style={{ color: 'var(--zander-gray)' }}>Loading billing information...</div>
           </div>
         </div>
+      );
+    }
 
-        <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Billing History</h3>
-          
-          <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 100px', padding: '0.75rem 1rem', background: 'var(--zander-navy)', color: 'white', fontWeight: '600', fontSize: '0.8rem' }}>
-              <div>Invoice</div>
-              <div>Date</div>
-              <div>Amount</div>
-              <div style={{ textAlign: 'center' }}>Status</div>
-            </div>
-            {billing.invoices.map((invoice) => (
-              <div key={invoice.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 100px', padding: '1rem', borderBottom: '1px solid var(--zander-border-gray)', alignItems: 'center', background: 'white' }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{invoice.id}</div>
-                <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>{invoice.date}</div>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{invoice.amount}</div>
-                <div style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: 'rgba(40, 167, 69, 0.1)', color: '#28A745', textTransform: 'uppercase' }}>{invoice.status}</span>
+    const tiers = [
+      { id: 'starter', name: 'Starter', description: '1 AI Executive', executives: 1, teamMembers: 3, storage: '5GB' },
+      { id: 'professional', name: 'Professional', description: '3 AI Executives', executives: 3, teamMembers: 10, storage: '25GB', popular: true },
+      { id: 'business', name: 'Business', description: 'All 7 AI Executives', executives: 7, teamMembers: 25, storage: '100GB' },
+      { id: 'enterprise', name: 'Enterprise', description: 'White Glove Service', executives: 7, teamMembers: 'Unlimited', storage: 'Unlimited' }
+    ];
+
+    return (
+      <div>
+        {/* Current Subscription */}
+        {billing ? (
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Current Subscription</h3>
+            <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px', color: 'white', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.8, marginBottom: '0.25rem' }}>Current Plan</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: '700' }}>{billing.items?.[0]?.productName || 'Free'}</div>
+                  <div style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '0.5rem' }}>
+                    Status: <span style={{ 
+                      padding: '0.25rem 0.5rem', 
+                      borderRadius: '4px', 
+                      background: billing.status === 'active' ? 'rgba(40, 167, 69, 0.3)' : billing.status === 'trialing' ? 'rgba(240, 179, 35, 0.3)' : 'rgba(220, 53, 69, 0.3)',
+                      textTransform: 'capitalize'
+                    }}>{billing.status}</span>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '2rem', fontWeight: '700' }}>{billing.items?.[0]?.amount ? formatPrice(billing.items[0].amount) : '$0'}</div>
+                  <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>per {billing.items?.[0]?.interval || 'month'}</div>
                 </div>
               </div>
-            ))}
+              {billing.trialEnd && new Date(billing.trialEnd) > new Date() && (
+                <div style={{ fontSize: '0.85rem', opacity: 0.9, background: 'rgba(240, 179, 35, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', marginBottom: '0.5rem' }}>
+                  ⏰ Trial ends: {new Date(billing.trialEnd).toLocaleDateString()}
+                </div>
+              )}
+              {billing.cancelAtPeriodEnd && (
+                <div style={{ fontSize: '0.85rem', opacity: 0.9, background: 'rgba(220, 53, 69, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', marginBottom: '0.5rem' }}>
+                  ⚠️ Cancels at period end: {new Date(billing.currentPeriodEnd).toLocaleDateString()}
+                </div>
+              )}
+              <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>
+                Next billing: {new Date(billing.currentPeriodEnd).toLocaleDateString()}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={handleManageBilling}
+                style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                💳 Manage Payment Method
+              </button>
+              {!billing.cancelAtPeriodEnd && (
+                <button 
+                  onClick={handleCancelSubscription}
+                  style={{ padding: '0.75rem 1.5rem', background: 'white', color: '#DC3545', border: '2px solid #DC3545', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  Cancel Subscription
+                </button>
+              )}
+            </div>
           </div>
+        ) : (
+          <div style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--zander-off-white)', borderRadius: '12px', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🚀</div>
+            <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No Active Subscription</div>
+            <div style={{ color: 'var(--zander-gray)', fontSize: '0.9rem' }}>Choose a plan below to get started with Zander</div>
+          </div>
+        )}
 
-          <button style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}>Download All Invoices</button>
+        {/* Billing Interval Toggle */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', background: 'var(--zander-off-white)', borderRadius: '8px', padding: '4px' }}>
+            <button
+              onClick={() => setSelectedInterval('month')}
+              style={{
+                padding: '0.5rem 1.5rem',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                background: selectedInterval === 'month' ? 'white' : 'transparent',
+                color: selectedInterval === 'month' ? 'var(--zander-navy)' : 'var(--zander-gray)',
+                boxShadow: selectedInterval === 'month' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+              }}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setSelectedInterval('year')}
+              style={{
+                padding: '0.5rem 1.5rem',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                background: selectedInterval === 'year' ? 'white' : 'transparent',
+                color: selectedInterval === 'year' ? 'var(--zander-navy)' : 'var(--zander-gray)',
+                boxShadow: selectedInterval === 'year' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+              }}
+            >
+              Annual <span style={{ fontSize: '0.75rem', color: '#28A745', marginLeft: '0.25rem' }}>Save 20%</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Pricing Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+          {tiers.map((tier) => {
+            const tierPrices = prices.filter(p => p.metadata?.tier === tier.id);
+            const price = tierPrices.find(p => p.interval === selectedInterval) || tierPrices.find(p => p.interval === 'month');
+            const isCurrentPlan = billing?.items?.[0]?.productName?.toLowerCase().includes(tier.id);
+
+            return (
+              <div
+                key={tier.id}
+                style={{
+                  padding: '1.5rem',
+                  background: 'white',
+                  borderRadius: '12px',
+                  border: tier.popular ? '2px solid var(--zander-red)' : '2px solid var(--zander-border-gray)',
+                  position: 'relative',
+                  boxShadow: tier.popular ? '0 4px 12px rgba(191, 10, 48, 0.15)' : 'none'
+                }}
+              >
+                {tier.popular && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '-12px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'var(--zander-red)',
+                    color: 'white',
+                    padding: '0.25rem 1rem',
+                    borderRadius: '20px',
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    textTransform: 'uppercase'
+                  }}>
+                    Most Popular
+                  </div>
+                )}
+                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                  <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{tier.name}</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>{tier.description}</div>
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                  {price ? (
+                    <>
+                      <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>
+                        {formatPrice(price.amount)}
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
+                        per {price.interval === 'year' ? 'year' : 'month'}
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>Contact Us</div>
+                  )}
+                </div>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                    <span style={{ color: '#28A745' }}>✓</span>
+                    <span>{tier.executives} AI Executive{tier.executives > 1 ? 's' : ''}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                    <span style={{ color: '#28A745' }}>✓</span>
+                    <span>{tier.teamMembers} Team Members</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                    <span style={{ color: '#28A745' }}>✓</span>
+                    <span>{tier.storage} Storage</span>
+                  </div>
+                </div>
+                {tier.id === 'enterprise' ? (
+                  <button
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: 'var(--zander-navy)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => window.location.href = 'mailto:sales@zanderos.com?subject=Enterprise Inquiry'}
+                  >
+                    Contact Sales
+                  </button>
+                ) : isCurrentPlan ? (
+                  <button
+                    disabled
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: 'var(--zander-off-white)',
+                      color: 'var(--zander-gray)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'not-allowed'
+                    }}
+                  >
+                    Current Plan
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => price && handleCheckout(price.id)}
+                    disabled={upgradeLoading || !price}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: tier.popular ? 'var(--zander-red)' : 'white',
+                      color: tier.popular ? 'white' : 'var(--zander-navy)',
+                      border: tier.popular ? 'none' : '2px solid var(--zander-navy)',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: upgradeLoading ? 'wait' : 'pointer',
+                      opacity: upgradeLoading ? 0.7 : 1
+                    }}
+                  >
+                    {upgradeLoading ? 'Processing...' : billing ? 'Upgrade' : 'Start 14-Day Trial'}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
-    </div>
-  );
-
+    );
+  };
 
   // Export data as CSV
   const exportCSV = async () => {
