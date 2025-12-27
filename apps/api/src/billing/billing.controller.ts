@@ -17,7 +17,6 @@ export class BillingController {
   // ============================================
   // PUBLIC ENDPOINTS
   // ============================================
-
   @Public()
   @Get('prices')
   async getPrices() {
@@ -41,7 +40,6 @@ export class BillingController {
   // ============================================
   // AUTHENTICATED ENDPOINTS
   // ============================================
-
   @UseGuards(JwtAuthGuard)
   @Get('subscription')
   async getSubscription(@Request() req: any) {
@@ -62,7 +60,7 @@ export class BillingController {
       `${baseUrl}/settings/billing?success=true`,
       `${baseUrl}/settings/billing?canceled=true`,
       body.cohort || 'public',
-      14, // 14-day trial
+      14,
     );
   }
 
@@ -111,5 +109,19 @@ export class BillingController {
       req.user.tenantId,
       body.returnUrl || `${baseUrl}/settings/billing`,
     );
+  }
+
+  // ============================================
+  // ADMIN MIGRATION ENDPOINT (temporary)
+  // ============================================
+  @Public()
+  @Post('migrate-waitlist')
+  async migrateWaitlist() {
+    try {
+      await this.billingService.createWaitlistTable();
+      return { success: true, message: 'Waitlist table created' };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   }
 }

@@ -332,4 +332,28 @@ export class BillingService {
         };
       });
   }
+
+  // ============================================
+  // MIGRATION HELPER (temporary)
+  // ============================================
+  async createWaitlistTable(): Promise<void> {
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS waitlist_entries (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        "spotNumber" INTEGER UNIQUE NOT NULL,
+        "stripePaymentId" TEXT,
+        "depositAmount" INTEGER DEFAULT 4900,
+        "depositPaidAt" TIMESTAMP(3),
+        "depositRefundedAt" TIMESTAMP(3),
+        "convertedAt" TIMESTAMP(3),
+        "convertedTenantId" TEXT,
+        status TEXT DEFAULT 'pending',
+        "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL
+      );
+    `);
+    this.logger.log('Waitlist table created successfully');
+  }
 }
