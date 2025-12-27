@@ -1212,7 +1212,7 @@ export default function SettingsPage() {
                   {price ? (
                     <>
                       <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>
-                        {formatPrice(price.amount)}
+                        {formatPrice(price.interval === 'year' ? price.amount / 12 : price.amount)}
                       </div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
                         per month{price.interval === 'year' && ' (billed annually)'}
