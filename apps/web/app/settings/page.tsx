@@ -1065,7 +1065,7 @@ export default function SettingsPage() {
       { id: 'starter', name: 'Starter', description: '1 AI Executive', executives: 1, teamMembers: 3, storage: '5GB' },
       { id: 'professional', name: 'Professional', description: '3 AI Executives', executives: 3, teamMembers: 10, storage: '25GB', popular: true },
       { id: 'business', name: 'Business', description: 'All 7 AI Executives', executives: 7, teamMembers: 25, storage: '100GB' },
-      { id: 'enterprise', name: 'Enterprise', description: 'White Glove Service', executives: 7, teamMembers: 'Unlimited', storage: 'Unlimited' }
+      { id: 'enterprise', name: 'Enterprise', description: 'White Glove Service', executives: 7, teamMembers: 'Custom', storage: 'Unlimited', customFeatures: ['White Label Branding', 'Custom Software by Project'] }
     ];
 
     return (
@@ -1215,7 +1215,7 @@ export default function SettingsPage() {
                         {formatPrice(price.amount)}
                       </div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
-                        per {price.interval === 'year' ? 'year' : 'month'}
+                        per month{price.interval === 'year' && ' (billed annually)'}
                       </div>
                     </>
                   ) : (
@@ -1235,24 +1235,14 @@ export default function SettingsPage() {
                     <span style={{ color: '#28A745' }}>✓</span>
                     <span>{tier.storage} Storage</span>
                   </div>
+                  {tier.customFeatures && tier.customFeatures.map((feature: string, idx: number) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                      <span style={{ color: '#28A745' }}>✓</span>
+                      <span>{feature}</span>
+                    </div>
+                  ))}
                 </div>
-                {tier.id === 'enterprise' ? (
-                  <button
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      background: 'var(--zander-navy)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => window.location.href = 'mailto:sales@zanderos.com?subject=Enterprise Inquiry'}
-                  >
-                    Contact Sales
-                  </button>
-                ) : isCurrentPlan ? (
+                {isCurrentPlan ? (
                   <button
                     disabled
                     style={{
