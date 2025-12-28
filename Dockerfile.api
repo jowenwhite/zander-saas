@@ -28,5 +28,5 @@ RUN npx tsc --outDir dist
 # Expose port
 EXPOSE 3001
 
-# Start the compiled JavaScript
-CMD ["node", "dist/main.js"]
+# Run migration and start the app
+CMD npx prisma db push --schema=/app/packages/database/prisma/schema.prisma --skip-generate && node dist/main.js
