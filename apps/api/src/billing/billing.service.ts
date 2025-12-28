@@ -357,14 +357,4 @@ export class BillingService {
     this.logger.log('Waitlist table created successfully');
   }
 
-  async migrateTenantStripeColumns(): Promise<void> {
-    await this.prisma.$executeRawUnsafe('ALTER TABLE tenants ADD COLUMN IF NOT EXISTS "stripeCustomerId" TEXT');
-    await this.prisma.$executeRawUnsafe('ALTER TABLE tenants ADD COLUMN IF NOT EXISTS "stripeSubscriptionId" TEXT');
-    await this.prisma.$executeRawUnsafe('ALTER TABLE tenants ADD COLUMN IF NOT EXISTS "subscriptionStatus" TEXT');
-    await this.prisma.$executeRawUnsafe('ALTER TABLE tenants ADD COLUMN IF NOT EXISTS "subscriptionTier" TEXT');
-    await this.prisma.$executeRawUnsafe('ALTER TABLE tenants ADD COLUMN IF NOT EXISTS "subscriptionCohort" TEXT');
-    await this.prisma.$executeRawUnsafe('ALTER TABLE tenants ADD COLUMN IF NOT EXISTS "trialEndsAt" TIMESTAMP(3)');
-    await this.prisma.$executeRawUnsafe('ALTER TABLE tenants ADD COLUMN IF NOT EXISTS "rateLockExpiresAt" TIMESTAMP(3)');
-    this.logger.log('Tenant Stripe columns added successfully');
-  }
 }

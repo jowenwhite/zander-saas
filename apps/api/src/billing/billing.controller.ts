@@ -112,14 +112,4 @@ export class BillingController {
   }
 
 
-  @Public()
-  @Post('migrate-tenant-stripe')
-  async migrateTenantStripe() {
-    try {
-      await this.billingService.migrateTenantStripeColumns();
-      return { success: true, message: 'Tenant Stripe columns added' };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }
 }
