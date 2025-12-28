@@ -89,6 +89,8 @@ model User {
   phone String?
   role String @default("member")
   isSuperAdmin Boolean @default(false)
+  resetToken       String?
+  resetTokenExpiry DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id])
@@ -120,6 +122,8 @@ model Contact {
   role String @default("member")
   primaryRole PersonRole @default(CLIENT)
   isSuperAdmin Boolean @default(false)
+  resetToken       String?
+  resetTokenExpiry DateTime?
   company String?
   title String?
   source String?

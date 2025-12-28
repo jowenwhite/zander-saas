@@ -197,7 +197,7 @@ export default function LoginPage() {
                   Remember me
                 </label>
               </div>
-              <a href="#" style={{ 
+              <a href="/forgot-password" style={{ 
                 fontSize: '0.875rem', 
                 color: '#BF0A30', 
                 textDecoration: 'none',
