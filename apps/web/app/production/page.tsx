@@ -409,7 +409,7 @@ export default function ProductionPage() {
                 gap: '0.5rem'
               }}
             >
-              + New Deal
+              + New Project
             </button>
             <button
               onClick={() => setShowNewContactModal(true)}
@@ -426,7 +426,7 @@ export default function ProductionPage() {
                 gap: '0.5rem'
               }}
             >
-              + New Contact
+              + New Person
             </button>
           </div>
         </div>
@@ -1266,7 +1266,7 @@ export default function ProductionPage() {
         </div>
       </main>
 
-            {/* New Deal Modal */}
+            {/* New Project Modal */}
       {showNewDealModal && (
         <div style={{
           position: 'fixed',
@@ -1287,7 +1287,7 @@ export default function ProductionPage() {
             maxWidth: '500px',
             width: '90%'
           }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Deal</h2>
+            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Project</h2>
             <form onSubmit={handleCreateDeal}>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
@@ -1424,7 +1424,7 @@ export default function ProductionPage() {
         </div>
       )}
 
-      {/* New Contact Modal */}
+      {/* New Person Modal */}
       {showNewContactModal && (
         <div style={{
           position: 'fixed',
@@ -1445,7 +1445,7 @@ export default function ProductionPage() {
             maxWidth: '500px',
             width: '90%'
           }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Contact</h2>
+            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Person</h2>
             <form onSubmit={handleCreateContact}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>

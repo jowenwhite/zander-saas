@@ -495,7 +495,7 @@ export default function FormsPage() {
                 gap: '0.5rem'
               }}
             >
-              + Create Form
+              + New Form
             </button>
           </div>
         </div>
@@ -1039,7 +1039,7 @@ export default function FormsPage() {
         </div>
       )}
 
-      {/* Create Form Modal */}
+      {/* New Form Modal */}
       {showCreateModal && (
         <div style={{
           position: 'fixed',
@@ -1178,7 +1178,7 @@ export default function FormsPage() {
                   cursor: saving || !newForm.name.trim() ? 'not-allowed' : 'pointer'
                 }}
               >
-                {saving ? 'Creating...' : 'Create Form'}
+                {saving ? 'Creating Form...' : 'New Form'}
               </button>
             </div>
           </div>

@@ -308,7 +308,7 @@ export default function ProjectsPage() {
               gap: '0.5rem'
             }}
           >
-            + New Deal
+            + New Project
           </button>
         </div>
           </div>
@@ -547,11 +547,11 @@ export default function ProjectsPage() {
         </div>
       </main>
 
-      {/* New Deal Modal */}
+      {/* New Project Modal */}
       {showNewDealModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
           <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', maxWidth: '500px', width: '90%' }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Deal</h2>
+            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Project</h2>
             <form onSubmit={handleCreateDeal}>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Deal Name *</label>

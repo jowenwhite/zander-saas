@@ -510,7 +510,7 @@ export default function ContactDetailPage() {
                         gap: '0.5rem'
                       }}
                     >
-                      + New Deal
+                      + New Project
                     </button>
                   </div>
                 </div>
@@ -636,7 +636,7 @@ export default function ContactDetailPage() {
                       fontSize: '0.875rem'
                     }}
                   >
-                    + New Deal
+                    + New Project
                   </button>
                 </div>
 
