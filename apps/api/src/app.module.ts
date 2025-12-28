@@ -23,6 +23,7 @@ import { SmsMessagesModule } from './sms-messages/sms-messages.module';
 import { CallLogsModule } from './call-logs/call-logs.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 import { GoogleAuthModule } from './auth/google/google-auth.module';
+import { MicrosoftAuthModule } from './auth/microsoft/microsoft-auth.module';
 import { ProductsModule } from './products/products.module';
 import { BillingModule } from './billing/billing.module';
 @Module({
@@ -46,6 +47,7 @@ import { BillingModule } from './billing/billing.module';
     CallLogsModule,
     CalendarEventsModule,
     GoogleAuthModule,
+    MicrosoftAuthModule,
     ProductsModule,
     BillingModule
   ],

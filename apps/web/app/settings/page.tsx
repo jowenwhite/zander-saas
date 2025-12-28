@@ -68,6 +68,11 @@ export default function SettingsPage() {
   const [gmailConnected, setGmailConnected] = useState(false);
   const [gmailEmail, setGmailEmail] = useState<string | null>(null);
   const [syncingGmail, setSyncingGmail] = useState(false);
+  
+  // Outlook/Microsoft state
+  const [outlookConnected, setOutlookConnected] = useState(false);
+  const [outlookEmail, setOutlookEmail] = useState<string | null>(null);
+  const [syncingOutlook, setSyncingOutlook] = useState(false);
 
   // Check Gmail connection status on load
   useEffect(() => {
@@ -83,6 +88,20 @@ export default function SettingsPage() {
       }
     };
     checkGmailStatus();
+    
+    // Check Outlook status
+    const checkOutlookStatus = async () => {
+      if (!user?.id) return;
+      try {
+        const res = await fetch(`https://api.zanderos.com/auth/microsoft/status?userId=${user.id}`);
+        const data = await res.json();
+        setOutlookConnected(data.connected);
+        setOutlookEmail(data.email);
+      } catch (error) {
+        console.error('Failed to check Outlook status:', error);
+      }
+    };
+    checkOutlookStatus();
   }, [user?.id]);
 
   const handleConnectGmail = () => {
@@ -116,6 +135,17 @@ export default function SettingsPage() {
     }
   };
 
+  // Outlook/Microsoft handlers
+  const handleConnectOutlook = () => {
+    if (!user?.id) return;
+    window.location.href = `https://api.zanderos.com/auth/microsoft?state=${user.id}`;
+  };
+
+  const handleDisconnectOutlook = async () => {
+    if (!user?.id) return;
+    window.location.href = `https://api.zanderos.com/auth/microsoft/disconnect?userId=${user.id}`;
+  };
+
   const integrations = {
     accounting: [
       { id: 'quickbooks', name: 'QuickBooks', description: 'Sync invoices, payments, and financial data', icon: '📗', status: 'available', connected: false },
@@ -124,7 +154,7 @@ export default function SettingsPage() {
     ],
     email: [
       { id: 'gmail', name: 'Gmail / Google', description: gmailEmail ? `Connected: ${gmailEmail}` : 'Sync emails, contacts, and calendar', icon: '📧', status: 'available', connected: gmailConnected },
-      { id: 'outlook', name: 'Microsoft Outlook', description: 'Connect Outlook/Office 365', icon: '📬', status: 'soon', connected: false },
+      { id: 'outlook', name: 'Microsoft Outlook', description: outlookEmail ? `Connected: ${outlookEmail}` : 'Connect Outlook/Office 365', icon: '📬', status: 'available', connected: outlookConnected },
       { id: 'resend', name: 'Resend', description: 'Transactional email sending', icon: '✉️', status: 'available', connected: true },
     ],
     crm: [
@@ -1021,18 +1051,18 @@ export default function SettingsPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28A745' }} />
                       <span style={{ fontSize: '0.8rem', color: '#28A745', fontWeight: '600' }}>Connected</span>
-                      {integration.id === 'gmail' && (
-                        <button onClick={handleSyncGmail} disabled={syncingGmail} style={{ padding: '0.35rem 0.75rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: syncingGmail ? 'wait' : 'pointer', marginLeft: '0.5rem' }}>
+                      {(integration.id === 'gmail' || integration.id === 'outlook') && (
+                        <button onClick={integration.id === 'gmail' ? handleSyncGmail : undefined} disabled={integration.id === 'gmail' ? syncingGmail : syncingOutlook} style={{ padding: '0.35rem 0.75rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: syncingGmail ? 'wait' : 'pointer', marginLeft: '0.5rem' }}>
                           {syncingGmail ? 'Syncing...' : 'Sync Now'}
                         </button>
                       )}
-                      {(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive') && (
-                        <button onClick={handleDisconnectGmail} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-gray)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
+                      {(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive' || integration.id === 'outlook') && (
+                        <button onClick={integration.id === 'outlook' ? handleDisconnectOutlook : handleDisconnectGmail} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-gray)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
                       )}
                     </div>
                   ) : integration.status === 'available' ? (
                     <button 
-                      onClick={(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive') ? handleConnectGmail : undefined}
+                      onClick={integration.id === 'outlook' ? handleConnectOutlook : (integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive') ? handleConnectGmail : undefined}
                       style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}
                     >
                       Connect
