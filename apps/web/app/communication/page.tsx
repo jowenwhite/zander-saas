@@ -731,7 +731,7 @@ export default function CommunicationsPage() {
                   cursor: 'pointer'
                 }}
               >
-                📦 Starter Packs
+                🏛️ The Treasury
               </button>
               <button
                 onClick={() => { setEditingTemplate(null); setTemplateForm({ name: '', subject: '', body: '', type: 'email', category: '', stage: '', status: 'draft' }); setShowTemplateModal(true); }}
@@ -745,7 +745,7 @@ export default function CommunicationsPage() {
                   cursor: 'pointer'
                 }}
               >
-                + New Template
+                + New Campaign
               </button>
             </div>
           </div>

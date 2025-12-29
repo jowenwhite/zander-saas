@@ -360,7 +360,7 @@ export default function SchedulePage() {
                   gap: '0.5rem'
                 }}
               >
-                + New Event
+                + New Assembly
               </button>
             </div>
           </div>
@@ -814,7 +814,7 @@ export default function SchedulePage() {
               background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
             }}>
               <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
-                <h2 style={{ margin: 0 }}>Schedule New Event</h2>
+                <h2 style={{ margin: 0 }}>New Assembly</h2>
               </div>
               <div style={{ padding: '1.5rem' }}>
                 {/* Title */}
