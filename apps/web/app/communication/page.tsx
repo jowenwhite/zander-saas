@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NavBar from '../components/NavBar';
@@ -50,6 +51,20 @@ interface CampaignStep {
   subject?: string;
   content: string;
   status: string;
+}
+
+interface TreasuryItem {
+  id: string;
+  type: string;
+  name: string;
+  description?: string;
+  category?: string;
+  executive?: string;
+  industry?: string;
+  channels: string[];
+  content: any;
+  stepCount?: number;
+  duration?: string;
 }
 
 
@@ -154,6 +169,14 @@ export default function CommunicationsPage() {
   const [campaignFilter, setCampaignFilter] = useState<'all' | 'active' | 'draft' | 'paused'>('all');
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [showTreasuryModal, setShowTreasuryModal] = useState(false);
+  const [treasuryItems, setTreasuryItems] = useState<TreasuryItem[]>([]);
+  const [treasuryLoading, setTreasuryLoading] = useState(false);
+  const [treasuryFilter, setTreasuryFilter] = useState<{
+    category: string;
+    executive: string;
+    industry: string;
+    channels: string[];
+  }>({ category: '', executive: '', industry: '', channels: [] });
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [communications, setCommunications] = useState<ScheduledComm[]>([]);
   const [emails, setEmails] = useState<EmailMessage[]>([]);
@@ -311,6 +334,63 @@ export default function CommunicationsPage() {
       alert('Failed to delete campaign');
     }
   };
+
+  const fetchTreasuryItems = async () => {
+    setTreasuryLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('type', 'campaign');
+      if (treasuryFilter.category) params.append('category', treasuryFilter.category);
+      if (treasuryFilter.executive) params.append('executive', treasuryFilter.executive);
+      if (treasuryFilter.industry) params.append('industry', treasuryFilter.industry);
+      if (treasuryFilter.channels.length > 0) params.append('channels', treasuryFilter.channels.join(','));
+      
+      const res = await fetch(`${API_URL}/treasury/campaigns?${params.toString()}`, {
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        setTreasuryItems(await res.json());
+      }
+    } catch (err) {
+      console.error('Failed to fetch treasury items:', err);
+    } finally {
+      setTreasuryLoading(false);
+    }
+  };
+
+  const handleAddFromTreasury = async (item: TreasuryItem) => {
+    try {
+      const res = await fetch(`${API_URL}/campaigns`, {
+        method: 'POST',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: item.name,
+          description: item.description,
+          type: item.content?.type || 'multi',
+          channels: item.channels,
+          status: 'draft',
+          isFromTreasury: true,
+          steps: item.content?.steps || []
+        })
+      });
+      if (res.ok) {
+        const newCampaign = await res.json();
+        setCampaigns([newCampaign, ...campaigns]);
+        setShowTreasuryModal(false);
+        alert(`"${item.name}" added to your campaigns!`);
+      }
+    } catch (err) {
+      console.error('Failed to add from treasury:', err);
+      alert('Failed to add campaign from treasury');
+    }
+  };
+
+  // Fetch treasury items when modal opens
+  React.useEffect(() => {
+    if (showTreasuryModal) {
+      fetchTreasuryItems();
+    }
+  }, [showTreasuryModal, treasuryFilter]);
 
   const handleEditTemplate = (template: Template) => {
     setEditingTemplate(template);
@@ -2122,6 +2202,257 @@ export default function CommunicationsPage() {
           </div>
         </div>
       )}
+
+      {/* TREASURY MODAL */}
+      {showTreasuryModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '900px',
+            maxHeight: '85vh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, var(--zander-gold) 0%, #d4a017 100%)',
+              padding: '1.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <h2 style={{ margin: 0, color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  🏛️ The Treasury
+                </h2>
+                <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-navy)', opacity: 0.8, fontSize: '0.9rem' }}>
+                  Pre-built campaign templates ready to customize
+                </p>
+              </div>
+              <button
+                onClick={() => setShowTreasuryModal(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.3)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  cursor: 'pointer',
+                  fontSize: '1.2rem',
+                  color: 'var(--zander-navy)'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Filters */}
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--zander-border-gray)', background: '#f8f9fa' }}>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Category</label>
+                  <select
+                    value={treasuryFilter.category}
+                    onChange={(e) => setTreasuryFilter({ ...treasuryFilter, category: e.target.value })}
+                    style={{ padding: '0.5rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', minWidth: '150px' }}
+                  >
+                    <option value="">All Categories</option>
+                    <option value="sales">Sales & Revenue</option>
+                    <option value="operations">Operations</option>
+                    <option value="finance">Finance</option>
+                    <option value="hr">Team & HR</option>
+                    <option value="marketing">Marketing</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Executive</label>
+                  <select
+                    value={treasuryFilter.executive}
+                    onChange={(e) => setTreasuryFilter({ ...treasuryFilter, executive: e.target.value })}
+                    style={{ padding: '0.5rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', minWidth: '120px' }}
+                  >
+                    <option value="">All</option>
+                    <option value="CRO">CRO</option>
+                    <option value="COO">COO</option>
+                    <option value="CFO">CFO</option>
+                    <option value="CMO">CMO</option>
+                    <option value="CPO">CPO</option>
+                    <option value="CIO">CIO</option>
+                    <option value="EA">EA</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Industry</label>
+                  <select
+                    value={treasuryFilter.industry}
+                    onChange={(e) => setTreasuryFilter({ ...treasuryFilter, industry: e.target.value })}
+                    style={{ padding: '0.5rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', minWidth: '150px' }}
+                  >
+                    <option value="">All Industries</option>
+                    <option value="cabinet_millwork">Cabinet & Millwork</option>
+                    <option value="home_services">Home Services</option>
+                    <option value="professional_services">Professional Services</option>
+                    <option value="general">General</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Channels</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {['email', 'sms', 'phone'].map((ch) => (
+                      <button
+                        key={ch}
+                        onClick={() => {
+                          const channels = treasuryFilter.channels.includes(ch)
+                            ? treasuryFilter.channels.filter(c => c !== ch)
+                            : [...treasuryFilter.channels, ch];
+                          setTreasuryFilter({ ...treasuryFilter, channels });
+                        }}
+                        style={{
+                          padding: '0.5rem 0.75rem',
+                          background: treasuryFilter.channels.includes(ch) ? 'var(--zander-navy)' : 'white',
+                          color: treasuryFilter.channels.includes(ch) ? 'white' : 'var(--zander-navy)',
+                          border: '1px solid var(--zander-border-gray)',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        {ch === 'email' ? '📧' : ch === 'sms' ? '💬' : '📞'} {ch}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem' }}>
+              {treasuryLoading ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                  Loading treasury items...
+                </div>
+              ) : treasuryItems.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Templates Found</h3>
+                  <p style={{ color: 'var(--zander-gray)' }}>
+                    {treasuryFilter.category || treasuryFilter.executive || treasuryFilter.industry || treasuryFilter.channels.length > 0
+                      ? 'Try adjusting your filters to see more templates'
+                      : 'Campaign templates will appear here as they are added'}
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                  {treasuryItems.map((item) => (
+                    <div
+                      key={item.id}
+                      style={{
+                        background: 'white',
+                        border: '2px solid var(--zander-border-gray)',
+                        borderRadius: '12px',
+                        padding: '1.25rem',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--zander-gold)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(240, 179, 35, 0.2)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
+                        <h4 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1rem' }}>{item.name}</h4>
+                        {item.executive && (
+                          <span style={{
+                            padding: '0.2rem 0.5rem',
+                            background: 'rgba(12, 35, 64, 0.1)',
+                            color: 'var(--zander-navy)',
+                            borderRadius: '4px',
+                            fontSize: '0.65rem',
+                            fontWeight: '600'
+                          }}>
+                            {item.executive}
+                          </span>
+                        )}
+                      </div>
+
+                      {item.description && (
+                        <p style={{ color: 'var(--zander-gray)', fontSize: '0.85rem', margin: '0 0 1rem 0', lineHeight: '1.4' }}>
+                          {item.description}
+                        </p>
+                      )}
+
+                      {/* Channel badges */}
+                      <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                        {item.channels.map((ch) => (
+                          <span
+                            key={ch}
+                            style={{
+                              padding: '0.2rem 0.5rem',
+                              background: ch === 'email' ? 'rgba(191, 10, 48, 0.1)' : ch === 'sms' ? 'rgba(39, 174, 96, 0.1)' : 'rgba(12, 35, 64, 0.1)',
+                              color: ch === 'email' ? 'var(--zander-red)' : ch === 'sms' ? '#27AE60' : 'var(--zander-navy)',
+                              borderRadius: '4px',
+                              fontSize: '0.65rem',
+                              fontWeight: '600'
+                            }}
+                          >
+                            {ch === 'email' ? '📧' : ch === 'sms' ? '💬' : '📞'} {ch}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Meta info */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--zander-border-gray)' }}>
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                          {item.stepCount && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{item.stepCount} steps</span>
+                          )}
+                          {item.duration && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{item.duration}</span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleAddFromTreasury(item)}
+                          style={{
+                            padding: '0.5rem 1rem',
+                            background: 'var(--zander-gold)',
+                            color: 'var(--zander-navy)',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontWeight: '600',
+                            fontSize: '0.75rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          + Add
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
     </AuthGuard>
   );
