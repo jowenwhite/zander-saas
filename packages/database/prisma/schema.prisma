@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum DealStage {
   LEAD
   PROSPECT
@@ -14,12 +16,14 @@ enum DealStage {
   CLOSED_WON
   CLOSED_LOST
 }
+
 enum DealPriority {
   LOW
   MEDIUM
   HIGH
   CRITICAL
 }
+
 enum PersonRole {
   CLIENT
   VENDOR
@@ -27,6 +31,7 @@ enum PersonRole {
   PARTNER
   REFERRAL
 }
+
 enum ProductType {
   PHYSICAL
   SERVICE
@@ -35,11 +40,13 @@ enum ProductType {
   ACCESS
   BUNDLE
 }
+
 enum ProductStatus {
   ACTIVE
   DRAFT
   DISCONTINUED
 }
+
 enum PricingModel {
   SIMPLE
   TIERED
@@ -48,60 +55,66 @@ enum PricingModel {
   COST_PLUS
   CUSTOM
 }
+
 model Tenant {
-  id String @id @default(cuid())
-  companyName String
-  subdomain String @unique
-  tenantType String @default("standard")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users User[]
-  contacts Contact[]
-  deals Deal[]
-  activities Activity[]
-  pipelineStages PipelineStage[]
-  forms Form[]
-  emailTemplates EmailTemplate[]
-  emailSequences EmailSequence[]
+  id                      String                   @id @default(cuid())
+  companyName             String
+  subdomain               String                   @unique
+  tenantType              String                   @default("standard")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  users                   User[]
+  contacts                Contact[]
+  deals                   Deal[]
+  activities              Activity[]
+  pipelineStages          PipelineStage[]
+  forms                   Form[]
+  emailTemplates          EmailTemplate[]
+  emailSequences          EmailSequence[]
   scheduledCommunications ScheduledCommunication[]
-  emailMessages EmailMessage[]
-  smsMessages   SmsMessage[]
-  callLogs      CallLog[]
-  calendarEvents      CalendarEvent[]
-  userTenantAccess    UserTenantAccess[]
-  products      Product[]
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  subscriptionStatus   String?
-  subscriptionTier     String?
-  subscriptionCohort   String?
-  trialEndsAt          DateTime?
-  rateLockExpiresAt    DateTime?
+  emailMessages           EmailMessage[]
+  smsMessages             SmsMessage[]
+  callLogs                CallLog[]
+  calendarEvents          CalendarEvent[]
+  userTenantAccess        UserTenantAccess[]
+  products                Product[]
+  campaigns               Campaign[]
+  stripeCustomerId        String?
+  stripeSubscriptionId    String?
+  subscriptionStatus      String?
+  subscriptionTier        String?
+  subscriptionCohort      String?
+  trialEndsAt             DateTime?
+  rateLockExpiresAt       DateTime?
+
   @@map("tenants")
 }
+
 model User {
-  id String @id @default(cuid())
-  tenantId String
-  email String @unique
-  firstName String
-  lastName String
-  password String @default("")
-  phone String?
-  role String @default("member")
-  isSuperAdmin Boolean @default(false)
+  id               String             @id @default(cuid())
+  tenantId         String
+  email            String             @unique
+  firstName        String
+  lastName         String
+  password         String             @default("")
+  phone            String?
+  role             String             @default("member")
+  isSuperAdmin     Boolean            @default(false)
   resetToken       String?
   resetTokenExpiry DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-  activities Activity[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  tenant           Tenant             @relation(fields: [tenantId], references: [id])
+  activities       Activity[]
   calendarEvents   CalendarEvent[]
   eventAttendees   EventAttendee[]
   googleToken      GoogleToken?
   microsoftToken   MicrosoftToken?
-  tenantAccess UserTenantAccess[]
+  tenantAccess     UserTenantAccess[]
+
   @@map("users")
 }
+
 model UserTenantAccess {
   id        String   @id @default(cuid())
   userId    String
@@ -110,117 +123,128 @@ model UserTenantAccess {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
   @@unique([userId, tenantId])
   @@map("user_tenant_access")
 }
+
 model Contact {
-  id String @id @default(cuid())
-  tenantId String
-  firstName String
-  lastName String
-  email String
-  phone String?
-  role String @default("member")
-  primaryRole PersonRole @default(CLIENT)
-  isSuperAdmin Boolean @default(false)
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  company String?
-  title String?
-  source String?
-  notes String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-  activities Activity[]
-  deals Deal[]
-  formSubmissions FormSubmission[]
-  sequenceEnrollments SequenceEnrollment[]
+  id                      String                   @id @default(cuid())
+  tenantId                String
+  firstName               String
+  lastName                String
+  email                   String
+  phone                   String?
+  role                    String                   @default("member")
+  primaryRole             PersonRole               @default(CLIENT)
+  isSuperAdmin            Boolean                  @default(false)
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  company                 String?
+  title                   String?
+  source                  String?
+  notes                   String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  tenant                  Tenant                   @relation(fields: [tenantId], references: [id])
+  activities              Activity[]
+  deals                   Deal[]
+  formSubmissions         FormSubmission[]
+  sequenceEnrollments     SequenceEnrollment[]
   scheduledCommunications ScheduledCommunication[]
-  emailMessages EmailMessage[]
-  smsMessages   SmsMessage[]
-  callLogs      CallLog[]
-  calendarEvents     CalendarEvent[]
-  eventAttendees     EventAttendee[]
+  emailMessages           EmailMessage[]
+  smsMessages             SmsMessage[]
+  callLogs                CallLog[]
+  calendarEvents          CalendarEvent[]
+  eventAttendees          EventAttendee[]
+  campaignEnrollments     CampaignEnrollment[]
+
   @@map("contacts")
 }
+
 model Deal {
-  id String @id @default(cuid())
-  tenantId String
-  dealName String
-  contactId String?
-  dealValue Float
-  probability Int @default(50)
-  stage DealStage @default(LEAD)
-  priority DealPriority @default(MEDIUM)
-  status String @default("open")
+  id                String            @id @default(cuid())
+  tenantId          String
+  dealName          String
+  contactId         String?
+  dealValue         Float
+  probability       Int               @default(50)
+  stage             DealStage         @default(LEAD)
+  priority          DealPriority      @default(MEDIUM)
+  status            String            @default("open")
   expectedCloseDate DateTime?
-  actualCloseDate DateTime?
-  forecastedValue Float?
-  winProbability Float @default(0.5)
-  notes String?
-  nextSteps String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-  activities Activity[]
-  contact Contact? @relation(fields: [contactId], references: [id])
-  lineItems ProjectLineItem[]
+  actualCloseDate   DateTime?
+  forecastedValue   Float?
+  winProbability    Float             @default(0.5)
+  notes             String?
+  nextSteps         String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  tenant            Tenant            @relation(fields: [tenantId], references: [id])
+  activities        Activity[]
+  contact           Contact?          @relation(fields: [contactId], references: [id])
+  lineItems         ProjectLineItem[]
+
   @@map("deals")
 }
+
 model Product {
-  id              String   @id @default(cuid())
-  tenantId        String
-  name            String
-  description     String?
-  sku             String?
-  category        String?
-  type            ProductType @default(SERVICE)
-  status          ProductStatus @default(ACTIVE)
-  pricingModel    PricingModel @default(SIMPLE)
-  basePrice       Decimal? @db.Decimal(10, 2)
-  unit            String   @default("each")
-  costOfGoods     Decimal? @db.Decimal(10, 2)
-  costUnit        String?
-  targetMargin    Decimal? @db.Decimal(5, 2)
-  pricingTiers    Json?
-  pricingOptions  Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  lineItems       ProjectLineItem[]
+  id             String            @id @default(cuid())
+  tenantId       String
+  name           String
+  description    String?
+  sku            String?
+  category       String?
+  type           ProductType       @default(SERVICE)
+  status         ProductStatus     @default(ACTIVE)
+  pricingModel   PricingModel      @default(SIMPLE)
+  basePrice      Decimal?          @db.Decimal(10, 2)
+  unit           String            @default("each")
+  costOfGoods    Decimal?          @db.Decimal(10, 2)
+  costUnit       String?
+  targetMargin   Decimal?          @db.Decimal(5, 2)
+  pricingTiers   Json?
+  pricingOptions Json?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  tenant         Tenant            @relation(fields: [tenantId], references: [id])
+  lineItems      ProjectLineItem[]
+
   @@index([tenantId])
   @@index([category])
   @@index([status])
   @@map("products")
 }
+
 model ProjectLineItem {
-  id              String   @id @default(cuid())
-  projectId       String
-  productId       String?
-  name            String
-  description     String?
-  quantity        Decimal  @default(1) @db.Decimal(10, 2)
-  unit            String   @default("each")
-  unitPrice       Decimal  @db.Decimal(10, 2)
-  discount        Decimal? @db.Decimal(10, 2)
-  discountType    String?
-  total           Decimal  @db.Decimal(10, 2)
-  configuration   Json?
-  notes           String?
-  sortOrder       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  project         Deal     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  product         Product? @relation(fields: [productId], references: [id])
+  id            String   @id @default(cuid())
+  projectId     String
+  productId     String?
+  name          String
+  description   String?
+  quantity      Decimal  @default(1) @db.Decimal(10, 2)
+  unit          String   @default("each")
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  discount      Decimal? @db.Decimal(10, 2)
+  discountType  String?
+  total         Decimal  @db.Decimal(10, 2)
+  configuration Json?
+  notes         String?
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  project       Deal     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  product       Product? @relation(fields: [productId], references: [id])
+
   @@index([projectId])
   @@index([productId])
   @@map("project_line_items")
 }
+
 model Activity {
   id          String   @id @default(cuid())
   tenantId    String
-  type        String   // 'email', 'call', 'meeting', 'note', 'task'
+  type        String // 'email', 'call', 'meeting', 'note', 'task'
   subject     String?
   description String?
   date        DateTime @default(now())
@@ -233,11 +257,13 @@ model Activity {
   contact     Contact? @relation(fields: [contactId], references: [id])
   deal        Deal?    @relation(fields: [dealId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
+
   @@index([tenantId])
   @@index([contactId])
   @@index([dealId])
   @@map("activities")
 }
+
 model PipelineStage {
   id          String   @id @default(cuid())
   tenantId    String
@@ -248,22 +274,27 @@ model PipelineStage {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
   @@map("pipeline_stages")
 }
+
 model Form {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   tenantId    String
   name        String
   description String?
-  fields      Json     @default("[]")
-  settings    Json     @default("{}")
-  status      String   @default("draft")
+  fields      Json             @default("[]")
+  settings    Json             @default("{}")
+  status      String           @default("draft")
+  formType    String           @default("form") // "form" | "sop"
   submissions FormSubmission[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
+
   @@map("forms")
 }
+
 model FormSubmission {
   id        String   @id @default(cuid())
   formId    String
@@ -272,125 +303,139 @@ model FormSubmission {
   createdAt DateTime @default(now())
   form      Form     @relation(fields: [formId], references: [id])
   contact   Contact? @relation(fields: [contactId], references: [id])
+
   @@map("form_submissions")
 }
+
 model EmailTemplate {
-  id          String   @id @default(cuid())
-  tenantId    String
-  name        String
-  subject     String?
-  body        String?
-  type        String   @default("email") // email, sms, call
-  category    String?
-  stage       String?
-  status      String   @default("draft") // draft, active
-  variables   Json     @default("[]")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  id            String              @id @default(cuid())
+  tenantId      String
+  name          String
+  subject       String?
+  body          String?
+  type          String              @default("email") // email, sms, call
+  category      String?
+  stage         String?
+  status        String              @default("draft") // draft, active
+  variables     Json                @default("[]")
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  tenant        Tenant              @relation(fields: [tenantId], references: [id])
   sequenceSteps EmailSequenceStep[]
+
   @@map("email_templates")
 }
+
 model EmailSequence {
-  id          String   @id @default(cuid())
-  tenantId    String
-  name        String
-  description String?
-  status      String   @default("draft") // draft, active, paused
-  triggerType String?  // manual, stage_change, form_submission
-  triggerConfig Json   @default("{}")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
-  steps       EmailSequenceStep[]
-  enrollments SequenceEnrollment[]
+  id            String               @id @default(cuid())
+  tenantId      String
+  name          String
+  description   String?
+  status        String               @default("draft") // draft, active, paused
+  triggerType   String? // manual, stage_change, form_submission
+  triggerConfig Json                 @default("{}")
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  tenant        Tenant               @relation(fields: [tenantId], references: [id])
+  steps         EmailSequenceStep[]
+  enrollments   SequenceEnrollment[]
+
   @@map("email_sequences")
 }
+
 model EmailSequenceStep {
-  id          String   @id @default(cuid())
-  sequenceId  String
-  templateId  String
-  order       Int
-  delayDays   Int      @default(0)
-  delayHours  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  sequence    EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
-  template    EmailTemplate @relation(fields: [templateId], references: [id])
+  id         String        @id @default(cuid())
+  sequenceId String
+  templateId String
+  order      Int
+  delayDays  Int           @default(0)
+  delayHours Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  sequence   EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  template   EmailTemplate @relation(fields: [templateId], references: [id])
+
   @@map("email_sequence_steps")
 }
+
 model SequenceEnrollment {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   sequenceId  String
   contactId   String
   dealId      String?
-  status      String   @default("active") // active, completed, paused, cancelled
-  currentStep Int      @default(0)
-  enrolledAt  DateTime @default(now())
+  status      String        @default("active") // active, completed, paused, cancelled
+  currentStep Int           @default(0)
+  enrolledAt  DateTime      @default(now())
   completedAt DateTime?
   sequence    EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
-  contact     Contact  @relation(fields: [contactId], references: [id])
+  contact     Contact       @relation(fields: [contactId], references: [id])
+
   @@map("sequence_enrollments")
 }
+
 model ScheduledCommunication {
-  id           String   @id @default(cuid())
-  tenantId     String
-  contactId    String
-  dealId       String?
-  templateId   String?
-  type         String   // email, sms, call
-  subject      String?
-  body         String?
-  scheduledFor DateTime
-  status       String   @default("pending") // pending, approved, sent, cancelled
-  needsApproval Boolean @default(false)
-  sentAt       DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  tenant       Tenant   @relation(fields: [tenantId], references: [id])
-  contact      Contact  @relation(fields: [contactId], references: [id])
+  id            String    @id @default(cuid())
+  tenantId      String
+  contactId     String
+  dealId        String?
+  templateId    String?
+  type          String // email, sms, call
+  subject       String?
+  body          String?
+  scheduledFor  DateTime
+  status        String    @default("pending") // pending, approved, sent, cancelled
+  needsApproval Boolean   @default(false)
+  sentAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  contact       Contact   @relation(fields: [contactId], references: [id])
+
   @@map("scheduled_communications")
 }
+
 model EmailMessage {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   tenantId    String
   contactId   String?
   dealId      String?
-  direction   String   // 'inbound' | 'outbound'
+  direction   String // 'inbound' | 'outbound'
   fromAddress String
   toAddress   String
   subject     String
   body        String
   htmlBody    String?
-  messageId   String?  // Resend message ID
-  inReplyTo   String?  // For threading - references parent messageId
-  threadId    String?  // Groups related emails
-  status      String   @default("sent") // sent, delivered, opened, failed, received
-  isRead      Boolean  @default(false)
-  isArchived  Boolean  @default(false)
-  isDeleted   Boolean  @default(false)
+  messageId   String? // Resend message ID
+  inReplyTo   String? // For threading - references parent messageId
+  threadId    String? // Groups related emails
+  status      String    @default("sent") // sent, delivered, opened, failed, received
+  isRead      Boolean   @default(false)
+  isArchived  Boolean   @default(false)
+  isDeleted   Boolean   @default(false)
   sentAt      DateTime
   openedAt    DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
-  contact     Contact? @relation(fields: [contactId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+
   @@index([tenantId])
   @@index([contactId])
   @@index([threadId])
   @@index([messageId])
   @@map("email_messages")
 }
+
 model SmsMessage {
   id          String    @id @default(cuid())
   tenantId    String
   contactId   String?
   dealId      String?
-  direction   String    // 'inbound' | 'outbound'
+  direction   String // 'inbound' | 'outbound'
   fromNumber  String
   toNumber    String
   body        String
-  messageSid  String?   // Twilio message SID
+  messageSid  String? // Twilio message SID
   status      String    @default("sent") // sent, delivered, failed, received
   sentAt      DateTime
   deliveredAt DateTime?
@@ -398,100 +443,105 @@ model SmsMessage {
   updatedAt   DateTime  @updatedAt
   tenant      Tenant    @relation(fields: [tenantId], references: [id])
   contact     Contact?  @relation(fields: [contactId], references: [id])
+
   @@index([tenantId])
   @@index([contactId])
   @@index([messageSid])
   @@map("sms_messages")
 }
+
 model CallLog {
-  id              String    @id @default(cuid())
-  tenantId        String
-  contactId       String?
-  dealId          String?
-  userId          String?   // Who made/received the call
+  id                  String    @id @default(cuid())
+  tenantId            String
+  contactId           String?
+  dealId              String?
+  userId              String? // Who made/received the call
   // Call Type & Direction
-  type            String    // 'online_meeting' | 'voicemail_drop' | 'manual_call'
-  direction       String    // 'inbound' | 'outbound'
+  type                String // 'online_meeting' | 'voicemail_drop' | 'manual_call'
+  direction           String // 'inbound' | 'outbound'
   // Phone/Meeting Details
-  fromNumber      String?
-  toNumber        String?
-  platform        String?   // 'zoom' | 'google_meet' | 'teams' | 'twilio' | 'phone'
-  meetingUrl      String?
-  meetingId       String?   // External meeting ID
+  fromNumber          String?
+  toNumber            String?
+  platform            String? // 'zoom' | 'google_meet' | 'teams' | 'twilio' | 'phone'
+  meetingUrl          String?
+  meetingId           String? // External meeting ID
   // Call Outcome & Duration
-  duration        Int?      // Duration in seconds
-  outcome         String?   // 'completed' | 'voicemail' | 'no_answer' | 'busy' | 'cancelled' | 'scheduled'
-  status          String    @default("completed") // 'scheduled' | 'in_progress' | 'completed' | 'missed'
+  duration            Int? // Duration in seconds
+  outcome             String? // 'completed' | 'voicemail' | 'no_answer' | 'busy' | 'cancelled' | 'scheduled'
+  status              String    @default("completed") // 'scheduled' | 'in_progress' | 'completed' | 'missed'
   // Scripts & Notes
-  scriptId        String?   // Reference to template/script used
-  notes           String?
+  scriptId            String? // Reference to template/script used
+  notes               String?
   // Recording & Transcription
-  recordingUrl    String?
-  transcription   String?   // Full transcription text
-  aiSummary       String?   // AI-generated summary
+  recordingUrl        String?
+  transcription       String? // Full transcription text
+  aiSummary           String? // AI-generated summary
   // Voicemail Drop specific
-  voicemailTemplateId String?  // Pre-recorded voicemail template
+  voicemailTemplateId String? // Pre-recorded voicemail template
   // Timestamps
-  scheduledAt     DateTime?
-  startedAt       DateTime?
-  endedAt         DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  tenant          Tenant    @relation(fields: [tenantId], references: [id])
-  contact         Contact?  @relation(fields: [contactId], references: [id])
+  scheduledAt         DateTime?
+  startedAt           DateTime?
+  endedAt             DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  tenant              Tenant    @relation(fields: [tenantId], references: [id])
+  contact             Contact?  @relation(fields: [contactId], references: [id])
+
   @@index([tenantId])
   @@index([contactId])
   @@index([userId])
   @@index([type])
   @@map("call_logs")
 }
+
 model CalendarEvent {
-  id                String    @id @default(cuid())
-  tenantId          String
-  createdById       String
+  id                      String          @id @default(cuid())
+  tenantId                String
+  createdById             String
   // Event Details
-  title             String
-  description       String?
-  location          String?
-  meetingUrl        String?
-  meetingPlatform   String?   // 'zoom' | 'google_meet' | 'teams' | 'phone' | 'in_person'
+  title                   String
+  description             String?
+  location                String?
+  meetingUrl              String?
+  meetingPlatform         String? // 'zoom' | 'google_meet' | 'teams' | 'phone' | 'in_person'
   // Timing
-  startTime         DateTime
-  endTime           DateTime
-  allDay            Boolean   @default(false)
-  timezone          String    @default("America/New_York")
+  startTime               DateTime
+  endTime                 DateTime
+  allDay                  Boolean         @default(false)
+  timezone                String          @default("America/New_York")
   // Type & Classification
-  eventType         String    @default("meeting") // 'meeting' | 'call' | 'task' | 'reminder' | 'block' | 'shift'
-  category          String?   // 'client' | 'internal' | 'personal' | 'work_shift'
-  priority          String    @default("normal") // 'low' | 'normal' | 'high' | 'urgent'
-  color             String?
+  eventType               String          @default("meeting") // 'meeting' | 'call' | 'task' | 'reminder' | 'block' | 'shift'
+  category                String? // 'client' | 'internal' | 'personal' | 'work_shift'
+  priority                String          @default("normal") // 'low' | 'normal' | 'high' | 'urgent'
+  color                   String?
   // Recording Compliance
-  willBeRecorded         Boolean   @default(false)
-  recordingConsentStatus String?   // 'pending' | 'obtained' | 'declined'
-  recordingConsentAt     DateTime?
-  recordingDisclosureSent Boolean  @default(false)
+  willBeRecorded          Boolean         @default(false)
+  recordingConsentStatus  String? // 'pending' | 'obtained' | 'declined'
+  recordingConsentAt      DateTime?
+  recordingDisclosureSent Boolean         @default(false)
   // Linked Entities
-  contactId         String?
-  dealId            String?
-  callLogId         String?
+  contactId               String?
+  dealId                  String?
+  callLogId               String?
   // Agenda & Preparation
-  agenda            String?
-  attachments       Json?     @default("[]")
-  prepNotes         String?
+  agenda                  String?
+  attachments             Json?           @default("[]")
+  prepNotes               String?
   // External Sync
-  externalEventId   String?
-  externalCalendar  String?   // 'google' | 'outlook' | 'calendly'
-  syncStatus        String?   // 'synced' | 'pending' | 'conflict'
-  lastSyncedAt      DateTime?
+  externalEventId         String?
+  externalCalendar        String? // 'google' | 'outlook' | 'calendly'
+  syncStatus              String? // 'synced' | 'pending' | 'conflict'
+  lastSyncedAt            DateTime?
   // Status
-  status            String    @default("scheduled") // 'scheduled' | 'confirmed' | 'tentative' | 'cancelled' | 'completed'
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  tenant            Tenant    @relation(fields: [tenantId], references: [id])
-  createdBy         User      @relation(fields: [createdById], references: [id])
-  contact           Contact?  @relation(fields: [contactId], references: [id])
-  attendees         EventAttendee[]
-  reminders         EventReminder[]
+  status                  String          @default("scheduled") // 'scheduled' | 'confirmed' | 'tentative' | 'cancelled' | 'completed'
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  tenant                  Tenant          @relation(fields: [tenantId], references: [id])
+  createdBy               User            @relation(fields: [createdById], references: [id])
+  contact                 Contact?        @relation(fields: [contactId], references: [id])
+  attendees               EventAttendee[]
+  reminders               EventReminder[]
+
   @@index([tenantId])
   @@index([createdById])
   @@index([contactId])
@@ -499,83 +549,182 @@ model CalendarEvent {
   @@index([status])
   @@map("calendar_events")
 }
+
 model EventAttendee {
-  id                     String    @id @default(cuid())
+  id                     String        @id @default(cuid())
   eventId                String
   userId                 String?
   contactId              String?
   email                  String?
   name                   String?
-  responseStatus         String    @default("pending") // 'pending' | 'accepted' | 'declined' | 'tentative'
+  responseStatus         String        @default("pending") // 'pending' | 'accepted' | 'declined' | 'tentative'
   respondedAt            DateTime?
-  recordingConsentStatus String?   // 'pending' | 'consented' | 'declined'
+  recordingConsentStatus String? // 'pending' | 'consented' | 'declined'
   recordingConsentAt     DateTime?
   inviteSentAt           DateTime?
   reminderSentAt         DateTime?
-  createdAt              DateTime  @default(now())
+  createdAt              DateTime      @default(now())
   event                  CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user                   User?     @relation(fields: [userId], references: [id])
-  contact                Contact?  @relation(fields: [contactId], references: [id])
+  user                   User?         @relation(fields: [userId], references: [id])
+  contact                Contact?      @relation(fields: [contactId], references: [id])
+
   @@index([eventId])
   @@index([userId])
   @@index([contactId])
   @@map("event_attendees")
 }
+
 model EventReminder {
-  id          String    @id @default(cuid())
-  eventId     String
-  type        String    // 'email' | 'sms' | 'push'
-  timing      Int       // Minutes before event
-  sent        Boolean   @default(false)
-  sentAt      DateTime?
-  event       CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  id      String        @id @default(cuid())
+  eventId String
+  type    String // 'email' | 'sms' | 'push'
+  timing  Int // Minutes before event
+  sent    Boolean       @default(false)
+  sentAt  DateTime?
+  event   CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
   @@index([eventId])
   @@map("event_reminders")
 }
+
 model GoogleToken {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  email         String
-  accessToken   String   @db.Text
-  refreshToken  String?  @db.Text
-  expiresAt     DateTime?
-  scope         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  email        String
+  accessToken  String    @db.Text
+  refreshToken String?   @db.Text
+  expiresAt    DateTime?
+  scope        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@map("google_tokens")
 }
 
-
 model WaitlistEntry {
-  id                String   @id @default(cuid())
-  email             String   @unique
+  id                String    @id @default(cuid())
+  email             String    @unique
   name              String
-  spotNumber        Int      @unique
+  spotNumber        Int       @unique
   stripePaymentId   String?
-  depositAmount     Int      @default(4900)
+  depositAmount     Int       @default(4900)
   depositPaidAt     DateTime?
   depositRefundedAt DateTime?
   convertedAt       DateTime?
   convertedTenantId String?
-  status            String   @default("pending")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  status            String    @default("pending")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
   @@map("waitlist_entries")
 }
 
 model MicrosoftToken {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  email         String
-  accessToken   String   @db.Text
-  refreshToken  String?  @db.Text
-  expiresAt     DateTime?
-  scope         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  email        String
+  accessToken  String    @db.Text
+  refreshToken String?   @db.Text
+  expiresAt    DateTime?
+  scope        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@map("microsoft_tokens")
+}
+
+// ============================================
+// CAMPAIGN SYSTEM (Replaces Templates + Sequences)
+// ============================================
+
+model Campaign {
+  id             String   @id @default(cuid())
+  tenantId       String
+  name           String
+  description    String?
+  type           String   @default("multi") // "single" | "multi"
+  channels       String[] @default(["email"]) // ["email", "sms", "phone"]
+  status         String   @default("draft") // "draft" | "active" | "paused"
+  triggerType    String? // "manual" | "stage_change" | "form_submission"
+  triggerConfig  Json     @default("{}")
+  isFromTreasury Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant      Tenant               @relation(fields: [tenantId], references: [id])
+  steps       CampaignStep[]
+  enrollments CampaignEnrollment[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("campaigns")
+}
+
+model CampaignStep {
+  id         String   @id @default(cuid())
+  campaignId String
+  order      Int
+  channel    String // "email" | "sms" | "phone"
+  dayOffset  Int      @default(0)
+  hourOffset Int      @default(0)
+  subject    String? // For email
+  content    String   @db.Text
+  status     String   @default("active")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@map("campaign_steps")
+}
+
+model CampaignEnrollment {
+  id          String    @id @default(cuid())
+  campaignId  String
+  contactId   String
+  dealId      String?
+  status      String    @default("active") // "active" | "completed" | "paused" | "cancelled"
+  currentStep Int       @default(0)
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact  Contact  @relation(fields: [contactId], references: [id])
+
+  @@index([campaignId])
+  @@index([contactId])
+  @@map("campaign_enrollments")
+}
+
+// ============================================
+// THE TREASURY (Pre-built Templates Library)
+// ============================================
+
+model TreasuryItem {
+  id          String   @id @default(cuid())
+  type        String // "campaign" | "form" | "sop" | "assembly" | "pipeline" | "product"
+  name        String
+  description String?
+  category    String? // "sales" | "operations" | "finance" | "hr" | "marketing"
+  executive   String? // "CRO" | "COO" | "CFO" | "CMO" | "CPO" | "CIO" | "EA"
+  industry    String? // "cabinet_millwork" | "home_services" | "professional_services" | "general"
+  channels    String[] @default([]) // For campaigns: ["email", "sms", "phone"]
+  content     Json // The actual template data
+  stepCount   Int? // For campaigns: number of steps
+  duration    String? // For campaigns: "7 days", "14 days", etc.
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([category])
+  @@index([executive])
+  @@index([industry])
+  @@map("treasury_items")
 }
