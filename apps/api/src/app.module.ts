@@ -26,6 +26,7 @@ import { GoogleAuthModule } from './auth/google/google-auth.module';
 import { MicrosoftAuthModule } from './auth/microsoft/microsoft-auth.module';
 import { ProductsModule } from './products/products.module';
 import { BillingModule } from './billing/billing.module';
+import { CampaignsModule } from './campaigns/campaigns.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
