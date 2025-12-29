@@ -12,6 +12,7 @@ interface Form {
   settings: any;
   status: 'active' | 'draft';
   category?: string;
+  formType?: 'form' | 'sop';
   createdAt: string;
   updatedAt: string;
   _count: { submissions: number };
@@ -133,7 +134,8 @@ const industryPacks: IndustryPack[] = [
 
 export default function FormsPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'library' | 'submissions' | 'packs'>('library');
+  const [activeTab, setActiveTab] = useState<'forms' | 'sops' | 'submissions'>('forms');
+  const [showTreasuryModal, setShowTreasuryModal] = useState(false);
   const [forms, setForms] = useState<Form[]>([]);
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -333,7 +335,7 @@ export default function FormsPage() {
       }
       setForms([...forms, ...createdForms]);
       alert(`Successfully added ${createdForms.length} forms from ${pack.name} pack!`);
-      setActiveTab('library');
+      setActiveTab('forms');
     } catch (err) {
       alert('Failed to activate pack. Some forms may have been created.');
     } finally {
@@ -539,9 +541,9 @@ export default function FormsPage() {
           {/* Tab Headers */}
           <div style={{ display: 'flex', borderBottom: '2px solid var(--zander-border-gray)' }}>
             {[
-              { id: 'library', label: 'Forms Library', icon: '📚' },
+              { id: 'forms', label: 'Forms', icon: '📋' },
+              { id: 'sops', label: 'SOPs', icon: '📖' },
               { id: 'submissions', label: 'Submissions', icon: '📥' },
-              { id: 'packs', label: 'Industry Packs', icon: '📦' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -571,7 +573,7 @@ export default function FormsPage() {
           {/* Tab Content */}
           <div style={{ padding: '1.5rem' }}>
             {/* FORMS LIBRARY TAB */}
-            {activeTab === 'library' && (
+            {activeTab === 'forms' && (
               <div>
                 {loading ? (
                   <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
@@ -591,7 +593,7 @@ export default function FormsPage() {
                     <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem' }}>Get started by activating an Industry Pack or creating a custom form</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                       <button
-                        onClick={() => setActiveTab('packs')}
+                        onClick={() => setShowTreasuryModal(true)}
                         style={{
                           padding: '0.75rem 1.5rem',
                           background: 'var(--zander-navy)',
@@ -602,7 +604,7 @@ export default function FormsPage() {
                           cursor: 'pointer'
                         }}
                       >
-                        Browse Industry Packs
+                        🏛️ Browse Treasury
                       </button>
                       <button
                         onClick={() => setShowCreateModal(true)}
@@ -819,8 +821,8 @@ export default function FormsPage() {
               </div>
             )}
 
-            {/* INDUSTRY PACKS TAB */}
-            {activeTab === 'packs' && (
+            {/* SOPs TAB */}
+            {activeTab === 'sops' && (
               <div>
                 <div style={{
                   background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
@@ -829,83 +831,89 @@ export default function FormsPage() {
                   color: 'white',
                   marginBottom: '1.5rem'
                 }}>
-                  <h3 style={{ margin: '0 0 0.5rem 0' }}>Industry Form Packs</h3>
+                  <h3 style={{ margin: '0 0 0.5rem 0' }}>Standard Operating Procedures</h3>
                   <p style={{ margin: 0, opacity: 0.9, fontSize: '0.9rem' }}>
-                    Pre-built form collections tailored for specific industries. Click "Activate" to add all forms from a pack to your library.
+                    Document your business processes and workflows. SOPs help ensure consistency and quality across your team.
                   </p>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                  {industryPacks.map((pack) => (
-                    <div
-                      key={pack.id}
-                      style={{
-                        background: 'white',
-                        border: '2px solid var(--zander-border-gray)',
-                        borderRadius: '12px',
-                        padding: '1.5rem',
-                        opacity: pack.status === 'coming_soon' ? 0.7 : 1
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                        <span style={{ fontSize: '2.5rem' }}>{pack.icon}</span>
-                        {pack.status === 'coming_soon' && (
-                          <span style={{
-                            padding: '0.25rem 0.5rem',
-                            background: 'rgba(240, 179, 35, 0.2)',
-                            color: '#B8860B',
-                            borderRadius: '4px',
-                            fontSize: '0.6rem',
-                            fontWeight: '700',
-                            textTransform: 'uppercase'
-                          }}>Coming Soon</span>
-                        )}
-                      </div>
-                      <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)', fontSize: '1.2rem' }}>{pack.name}</h4>
-                      <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>{pack.description}</p>
-                      
-                      {pack.forms.length > 0 && (
-                        <div style={{ marginBottom: '1rem' }}>
-                          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
-                            Included Forms:
-                          </div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)', maxHeight: '100px', overflow: 'auto' }}>
-                            {pack.forms.slice(0, 5).map((f, i) => (
-                              <div key={i} style={{ padding: '0.25rem 0' }}>• {f.name}</div>
-                            ))}
-                            {pack.forms.length > 5 && (
-                              <div style={{ padding: '0.25rem 0', fontStyle: 'italic' }}>+ {pack.forms.length - 5} more...</div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
-                        <span style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', fontWeight: '600' }}>
-                          {pack.forms.length} forms
-                        </span>
-                        <button
-                          onClick={() => handleActivatePack(pack)}
-                          disabled={activatingPack === pack.id || pack.status === 'coming_soon'}
-                          style={{
-                            padding: '0.5rem 1.25rem',
-                            background: pack.status === 'coming_soon' ? 'var(--zander-gray)' : activatingPack === pack.id ? 'var(--zander-gray)' : 'var(--zander-red)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            fontWeight: '600',
-                            fontSize: '0.875rem',
-                            cursor: pack.status === 'coming_soon' || activatingPack === pack.id ? 'not-allowed' : 'pointer'
-                          }}
-                        >
-                          {activatingPack === pack.id ? 'Adding...' : pack.status === 'coming_soon' ? 'Coming Soon' : 'Activate Pack →'}
-                        </button>
-                      </div>
+                {forms.filter(f => f.formType === 'sop').length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '3rem' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📖</div>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No SOPs Yet</h3>
+                    <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem' }}>Create your first Standard Operating Procedure or browse The Treasury for templates</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                      <button
+                        onClick={() => setShowTreasuryModal(true)}
+                        style={{
+                          padding: '0.75rem 1.5rem',
+                          background: 'var(--zander-gold)',
+                          color: 'var(--zander-navy)',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🏛️ Browse Treasury
+                      </button>
+                      <button
+                        onClick={() => setShowCreateModal(true)}
+                        style={{
+                          padding: '0.75rem 1.5rem',
+                          background: 'var(--zander-red)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        + Create SOP
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                    {forms.filter(f => f.formType === 'sop').map((sop) => (
+                      <div
+                        key={sop.id}
+                        style={{
+                          background: 'white',
+                          border: '2px solid var(--zander-border-gray)',
+                          borderRadius: '8px',
+                          padding: '1.25rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onClick={() => setViewingForm(sop)}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
+                          <h4 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1rem' }}>{sop.name}</h4>
+                          <span style={{
+                            padding: '0.2rem 0.5rem',
+                            background: sop.status === 'active' ? 'rgba(39, 174, 96, 0.1)' : 'rgba(108, 117, 125, 0.1)',
+                            color: sop.status === 'active' ? '#27AE60' : '#6c757d',
+                            borderRadius: '4px',
+                            fontSize: '0.7rem',
+                            fontWeight: '600',
+                            textTransform: 'uppercase'
+                          }}>{sop.status}</span>
+                        </div>
+                        {sop.description && (
+                          <p style={{ margin: '0 0 0.75rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                            {sop.description}
+                          </p>
+                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                          <span>📖 {sop.fields?.length || 0} steps</span>
+                          <span>{new Date(sop.updatedAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            )}          </div>
         </div>
       </main>
 
@@ -1180,6 +1188,77 @@ export default function FormsPage() {
               >
                 {saving ? 'Creating Form...' : 'New Form'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TREASURY MODAL */}
+      {showTreasuryModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '900px',
+            maxHeight: '85vh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, var(--zander-gold) 0%, #d4a017 100%)',
+              padding: '1.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <h2 style={{ margin: 0, color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  🏛️ The Treasury
+                </h2>
+                <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-navy)', opacity: 0.8, fontSize: '0.9rem' }}>
+                  Pre-built form and SOP templates ready to customize
+                </p>
+              </div>
+              <button
+                onClick={() => setShowTreasuryModal(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.3)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  cursor: 'pointer',
+                  fontSize: '1.2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            {/* Content */}
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
+                <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>Treasury Coming Soon</h3>
+                <p style={{ margin: 0 }}>Pre-built form and SOP templates will be available here.</p>
+                <p style={{ margin: '1rem 0 0 0', fontSize: '0.9rem' }}>Browse by industry, executive role, or category.</p>
+              </div>
             </div>
           </div>
         </div>
