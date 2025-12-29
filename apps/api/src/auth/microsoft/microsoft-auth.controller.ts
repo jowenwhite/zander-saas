@@ -17,6 +17,7 @@ export class MicrosoftAuthController {
       process.env.MICROSOFT_CALLBACK_URL || 'http://localhost:3001/auth/microsoft/callback'
     );
     const scope = encodeURIComponent([
+      'User.Read',
       'openid',
       'profile',
       'email',

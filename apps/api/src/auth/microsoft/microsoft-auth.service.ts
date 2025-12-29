@@ -38,6 +38,8 @@ export class MicrosoftAuthService {
     });
 
     if (!profileResponse.ok) {
+      const profileError = await profileResponse.text();
+      this.logger.error(`Profile fetch failed: ${profileError}`);
       throw new Error('Failed to get user profile');
     }
 
