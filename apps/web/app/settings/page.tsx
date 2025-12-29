@@ -145,6 +145,27 @@ export default function SettingsPage() {
     if (!user?.id) return;
     window.location.href = `https://api.zanderos.com/auth/microsoft/disconnect?userId=${user.id}`;
   };
+  const handleSyncOutlook = async () => {
+    if (!user?.id) return;
+    setSyncingOutlook(true);
+    try {
+      const res = await fetch('https://api.zanderos.com/outlook/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, maxResults: 50 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Synced ${data.synced} Outlook emails`);
+      } else {
+        alert('Sync failed: ' + data.error);
+      }
+    } catch (error) {
+      alert('Sync failed');
+    } finally {
+      setSyncingOutlook(false);
+    }
+  };
 
   const integrations = {
     accounting: [
