@@ -1052,8 +1052,8 @@ export default function SettingsPage() {
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28A745' }} />
                       <span style={{ fontSize: '0.8rem', color: '#28A745', fontWeight: '600' }}>Connected</span>
                       {(integration.id === 'gmail' || integration.id === 'outlook') && (
-                        <button onClick={integration.id === 'gmail' ? handleSyncGmail : undefined} disabled={integration.id === 'gmail' ? syncingGmail : syncingOutlook} style={{ padding: '0.35rem 0.75rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: syncingGmail ? 'wait' : 'pointer', marginLeft: '0.5rem' }}>
-                          {syncingGmail ? 'Syncing...' : 'Sync Now'}
+                        <button onClick={integration.id === 'gmail' ? handleSyncGmail : handleSyncOutlook} disabled={integration.id === 'gmail' ? syncingGmail : syncingOutlook} style={{ padding: '0.35rem 0.75rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: (integration.id === 'gmail' ? syncingGmail : syncingOutlook) ? 'wait' : 'pointer', marginLeft: '0.5rem' }}>
+                          {(integration.id === 'gmail' ? syncingGmail : syncingOutlook) ? 'Syncing...' : 'Sync Now'}
                         </button>
                       )}
                       {(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive' || integration.id === 'outlook') && (
