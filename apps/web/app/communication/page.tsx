@@ -27,6 +27,31 @@ interface Sequence {
   createdAt: string;
 }
 
+interface Campaign {
+  id: string;
+  name: string;
+  description?: string;
+  type: 'single' | 'multi';
+  channels: string[];
+  status: 'active' | 'paused' | 'draft';
+  triggerType?: string;
+  isFromTreasury: boolean;
+  steps: CampaignStep[];
+  _count?: { enrollments: number };
+  createdAt: string;
+}
+
+interface CampaignStep {
+  id: string;
+  order: number;
+  channel: 'email' | 'sms' | 'phone';
+  dayOffset: number;
+  hourOffset: number;
+  subject?: string;
+  content: string;
+  status: string;
+}
+
 
 interface EmailMessage {
   id: string;
@@ -122,9 +147,14 @@ const starterTemplatePacks = {
 
 export default function CommunicationsPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'inbox' | 'templates' | 'sequences' | 'scheduled'>('inbox');
+  const [activeTab, setActiveTab] = useState<'inbox' | 'campaigns' | 'scheduled'>('inbox');
   const [templates, setTemplates] = useState<Template[]>([]);
   const [sequences, setSequences] = useState<Sequence[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaignFilter, setCampaignFilter] = useState<'all' | 'active' | 'draft' | 'paused'>('all');
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [showTreasuryModal, setShowTreasuryModal] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [communications, setCommunications] = useState<ScheduledComm[]>([]);
   const [emails, setEmails] = useState<EmailMessage[]>([]);
   const [smsMessages, setSmsMessages] = useState<SmsMessage[]>([]);
@@ -195,7 +225,7 @@ export default function CommunicationsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes, unreadCountRes] = await Promise.all([
+      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes, unreadCountRes, campaignsRes] = await Promise.all([
         fetch(`${API_URL}/templates`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sequences`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/scheduled-communications`, { headers: getAuthHeaders() }),
@@ -204,6 +234,7 @@ export default function CommunicationsPage() {
         fetch(`${API_URL}/sms-messages`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/call-logs`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/email-messages/unread-count`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/campaigns`, { headers: getAuthHeaders() }),
       ]);
       if (templatesRes.ok) setTemplates(await templatesRes.json());
       if (sequencesRes.ok) setSequences(await sequencesRes.json());
@@ -213,6 +244,7 @@ export default function CommunicationsPage() {
       if (smsRes && smsRes.ok) setSmsMessages(await smsRes.json());
       if (callLogsRes && callLogsRes.ok) setCallLogs(await callLogsRes.json());
       if (unreadCountRes && unreadCountRes.ok) { const data = await unreadCountRes.json(); setUnreadCount(data.unreadCount || 0); }
+      if (campaignsRes && campaignsRes.ok) setCampaigns(await campaignsRes.json());
     } catch (err) {
       console.error('Failed to fetch automation data:', err);
     } finally {
@@ -626,15 +658,15 @@ export default function CommunicationsPage() {
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>{loading ? '...' : templates.length}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Templates</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>{loading ? '...' : campaigns.length}</div>
+              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Campaigns</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#27AE60' }}>{loading ? '...' : sequences.length}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Sequences</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#27AE60' }}>{loading ? '...' : campaigns.filter(c => c.status === 'active').length}</div>
+              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Active</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{loading ? '...' : sequences.reduce((sum, s) => sum + (s._count?.enrollments || 0), 0)}</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{loading ? '...' : campaigns.reduce((sum, c) => sum + (c._count?.enrollments || 0), 0)}</div>
               <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Active Enrollments</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
@@ -654,8 +686,7 @@ export default function CommunicationsPage() {
           <div style={{ display: 'flex', borderBottom: '2px solid var(--zander-border-gray)' }}>
             {[
               { id: 'inbox', label: 'Inbox', icon: '📥' },
-              { id: 'templates', label: 'Templates', icon: '📝' },
-              { id: 'sequences', label: 'Sequences', icon: '🔄' },
+              { id: 'campaigns', label: 'Campaigns', icon: '🚀' },
               { id: 'scheduled', label: 'Scheduled', icon: '📅' },
             ].map((tab) => (
               <button
