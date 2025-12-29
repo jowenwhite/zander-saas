@@ -131,7 +131,7 @@ export class TreasuryController {
     return this.treasuryService.remove(id);
   }
 
-  @Post('seed')
+    @Post('seed')
   async seed() {
     const treasuryItems = [
       // CAMPAIGN TEMPLATES
