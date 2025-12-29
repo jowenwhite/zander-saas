@@ -60,6 +60,7 @@ export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [showTreasuryModal, setShowTreasuryModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -345,23 +346,42 @@ export default function SchedulePage() {
                   {formatDateFull(today.toISOString())} • {todayEvents.length} event{todayEvents.length !== 1 ? 's' : ''} today • {upcomingCount} upcoming
                 </p>
               </div>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  background: 'var(--zander-gold)',
-                  color: 'var(--zander-navy)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                + New Assembly
-              </button>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button
+                  onClick={() => setShowTreasuryModal(true)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'rgba(255,255,255,0.2)',
+                    color: 'white',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  🏛️ The Treasury
+                </button>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'var(--zander-gold)',
+                    color: 'var(--zander-navy)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  + New Assembly
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1232,6 +1252,77 @@ export default function SchedulePage() {
                   >
                     Close
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TREASURY MODAL */}
+        {showTreasuryModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{
+              background: 'white',
+              borderRadius: '12px',
+              width: '90%',
+              maxWidth: '900px',
+              maxHeight: '85vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              {/* Header */}
+              <div style={{
+                background: 'linear-gradient(135deg, var(--zander-gold) 0%, #d4a017 100%)',
+                padding: '1.5rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <h2 style={{ margin: 0, color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    🏛️ The Treasury
+                  </h2>
+                  <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-navy)', opacity: 0.8, fontSize: '0.9rem' }}>
+                    Pre-built assembly templates ready to customize
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowTreasuryModal(false)}
+                  style={{
+                    background: 'rgba(255,255,255,0.3)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '36px',
+                    height: '36px',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+              {/* Content */}
+              <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>Treasury Coming Soon</h3>
+                  <p style={{ margin: 0 }}>Pre-built assembly templates will be available here.</p>
+                  <p style={{ margin: '1rem 0 0 0', fontSize: '0.9rem' }}>Meeting agendas, call scripts, and event templates by industry.</p>
                 </div>
               </div>
             </div>
