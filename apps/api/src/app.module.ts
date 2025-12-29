@@ -51,7 +51,9 @@ import { TreasuryModule } from './treasury/treasury.module';
     GoogleAuthModule,
     MicrosoftAuthModule,
     ProductsModule,
-    BillingModule
+    BillingModule,
+    CampaignsModule,
+    TreasuryModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
