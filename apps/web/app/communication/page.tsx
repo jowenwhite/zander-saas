@@ -293,6 +293,25 @@ export default function CommunicationsPage() {
     }
   };
 
+  const handleEditCampaign = (campaign: Campaign) => {
+    setEditingCampaign(campaign);
+    setShowCampaignModal(true);
+  };
+
+  const handleDeleteCampaign = async (id: string) => {
+    if (!confirm('Delete this campaign?')) return;
+    try {
+      await fetch(`${API_URL}/campaigns/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      setCampaigns(campaigns.filter(c => c.id !== id));
+    } catch (err) {
+      console.error('Failed to delete campaign:', err);
+      alert('Failed to delete campaign');
+    }
+  };
+
   const handleEditTemplate = (template: Template) => {
     setEditingTemplate(template);
     setTemplateForm({
@@ -410,6 +429,10 @@ export default function CommunicationsPage() {
   const filteredTemplates = templateFilter === 'all' 
     ? templates 
     : templates.filter(t => t.type === templateFilter);
+
+  const filteredCampaigns = campaignFilter === 'all'
+    ? campaigns
+    : campaigns.filter(c => c.status === campaignFilter);
 
   const filteredComms = commFilter === 'all'
     ? communications
@@ -1060,6 +1083,187 @@ export default function CommunicationsPage() {
                 </div>
               </div>
             )}
+            {/* CAMPAIGNS TAB */}
+            {activeTab === 'campaigns' && (
+              <div>
+                {/* Header with buttons */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {(['all', 'active', 'draft', 'paused'] as const).map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => setCampaignFilter(filter)}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          background: campaignFilter === filter ? 'var(--zander-navy)' : 'white',
+                          color: campaignFilter === filter ? 'white' : 'var(--zander-navy)',
+                          border: '1px solid var(--zander-border-gray)',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: '500',
+                          textTransform: 'capitalize'
+                        }}
+                      >
+                        {filter === 'all' ? 'All Campaigns' : filter}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button
+                      onClick={() => setShowTreasuryModal(true)}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        background: 'var(--zander-gold)',
+                        color: 'var(--zander-navy)',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      🏛️ The Treasury
+                    </button>
+                    <button
+                      onClick={() => setShowCampaignModal(true)}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        background: 'var(--zander-red)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      + New Campaign
+                    </button>
+                  </div>
+                </div>
+
+                {/* Campaign List */}
+                {loading ? (
+                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>Loading campaigns...</div>
+                ) : filteredCampaigns.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '3rem' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚀</div>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Campaigns Yet</h3>
+                    <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem' }}>Create multi-step outreach campaigns or browse The Treasury for ready-made templates</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                      <button onClick={() => setShowTreasuryModal(true)} style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-gold)', color: 'var(--zander-navy)', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                        🏛️ Browse Treasury
+                      </button>
+                      <button onClick={() => setShowCampaignModal(true)} style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                        + Create Campaign
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1rem' }}>
+                    {filteredCampaigns.map((campaign) => (
+                      <div 
+                        key={campaign.id} 
+                        style={{ 
+                          background: 'white', 
+                          border: '2px solid var(--zander-border-gray)', 
+                          borderRadius: '12px', 
+                          padding: '1.5rem',
+                          transition: 'border-color 0.2s'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
+                          <div>
+                            <h4 style={{ margin: '0 0 0.25rem 0', color: 'var(--zander-navy)' }}>{campaign.name}</h4>
+                            {campaign.isFromTreasury && <span style={{ fontSize: '0.65rem', color: 'var(--zander-gold)', fontWeight: '600' }}>🏛️ FROM TREASURY</span>}
+                          </div>
+                          <span style={{
+                            padding: '0.25rem 0.5rem',
+                            background: campaign.status === 'active' ? 'rgba(39, 174, 96, 0.1)' : campaign.status === 'paused' ? 'rgba(240, 179, 35, 0.1)' : 'rgba(108, 117, 125, 0.1)',
+                            color: campaign.status === 'active' ? '#27AE60' : campaign.status === 'paused' ? '#B8860B' : 'var(--zander-gray)',
+                            borderRadius: '4px', 
+                            fontSize: '0.65rem', 
+                            fontWeight: '600', 
+                            textTransform: 'uppercase'
+                          }}>
+                            {campaign.status}
+                          </span>
+                        </div>
+
+                        {campaign.description && (
+                          <p style={{ color: 'var(--zander-gray)', fontSize: '0.85rem', margin: '0 0 1rem 0', lineHeight: '1.4' }}>
+                            {campaign.description}
+                          </p>
+                        )}
+
+                        {/* Channel Indicators */}
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                          {campaign.channels.includes('email') && (
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(191, 10, 48, 0.1)', color: 'var(--zander-red)', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
+                              📧 Email
+                            </span>
+                          )}
+                          {campaign.channels.includes('sms') && (
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(39, 174, 96, 0.1)', color: '#27AE60', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
+                              💬 SMS
+                            </span>
+                          )}
+                          {campaign.channels.includes('phone') && (
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(12, 35, 64, 0.1)', color: 'var(--zander-navy)', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
+                              📞 Phone
+                            </span>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
+                          <div style={{ display: 'flex', gap: '1rem' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                              {campaign.steps?.length || 0} steps
+                            </span>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                              {campaign._count?.enrollments || 0} enrolled
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button 
+                              onClick={() => handleEditCampaign(campaign)} 
+                              style={{ 
+                                padding: '0.5rem 1rem', 
+                                background: 'var(--zander-gold)', 
+                                color: 'var(--zander-navy)', 
+                                border: 'none', 
+                                borderRadius: '6px', 
+                                fontWeight: '600', 
+                                fontSize: '0.75rem', 
+                                cursor: 'pointer' 
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteCampaign(campaign.id)} 
+                              style={{ 
+                                padding: '0.5rem 0.75rem', 
+                                background: 'transparent', 
+                                color: 'var(--zander-red)', 
+                                border: '1px solid var(--zander-red)', 
+                                borderRadius: '6px', 
+                                fontSize: '0.75rem', 
+                                cursor: 'pointer' 
+                              }}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* COMMUNICATIONS TAB */}
             {activeTab === 'scheduled' && (
               <div>
