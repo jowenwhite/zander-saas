@@ -922,7 +922,7 @@ export default function SchedulePage() {
           </div>
         </main>
 
-        {/* Create Event Modal */}
+        {/* Create Assembly Modal */}
         {showCreateModal && (
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -1137,7 +1137,7 @@ export default function SchedulePage() {
                     cursor: saving ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {saving ? 'Creating...' : 'Create Event'}
+                  {saving ? 'Creating...' : 'Create Assembly'}
                 </button>
               </div>
             </div>
