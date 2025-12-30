@@ -140,31 +140,52 @@ export default function SchedulePage() {
     }
   }, [showTreasuryModal, treasuryFilter]);
 
-  const handleAddFromTreasury = async (item: TreasuryItem) => {
-    try {
-      // Create a new calendar event from the assembly template
-      const res = await fetch(`${API_URL}/calendar-events`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          title: item.name,
-          description: item.description,
-          duration: item.duration || '30',
-          eventType: 'meeting',
-          status: 'scheduled',
-          startTime: new Date().toISOString(),
-          endTime: new Date(Date.now() + 60 * 60 * 1000).toISOString()
-        })
-      });
-      if (res.ok) {
-        await fetchEvents();
-        setShowTreasuryModal(false);
-        alert(`Added "${item.name}" assembly template!`);
-      }
-    } catch (err) {
-      console.error('Failed to add from treasury:', err);
-      alert('Failed to add template');
-    }
+  const handleAddFromTreasury = (item: TreasuryItem) => {
+    // Parse duration from template (e.g., "30 min", "45 min", "90 min")
+    const durationMatch = item.duration?.match(/(\d+)/);
+    const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+    
+    // Calculate default start time (next hour, rounded up)
+    const now = new Date();
+    const startTime = new Date(now);
+    startTime.setHours(startTime.getHours() + 1, 0, 0, 0); // Next hour, on the hour
+    
+    // Calculate end time based on template duration
+    const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
+    
+    // Format for datetime-local input (YYYY-MM-DDTHH:MM)
+    const formatForInput = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+    
+    // Pre-populate the new event form with Treasury template data
+    setNewEvent({
+      title: item.name,
+      description: item.description || '',
+      location: '',
+      meetingUrl: '',
+      meetingPlatform: '',
+      startTime: formatForInput(startTime),
+      endTime: formatForInput(endTime),
+      allDay: false,
+      eventType: 'meeting',
+      category: item.category === 'sales' ? 'client' : 'internal',
+      priority: 'normal',
+      willBeRecorded: false,
+      contactId: '',
+      agenda: item.description || '',
+      attendees: [],
+      reminders: [{ type: 'email', timing: 15 }]
+    });
+    
+    // Close Treasury modal and open Create modal
+    setShowTreasuryModal(false);
+    setShowCreateModal(true);
   };
 
 
