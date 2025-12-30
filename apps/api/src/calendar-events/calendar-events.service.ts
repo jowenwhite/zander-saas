@@ -25,6 +25,7 @@ export class CalendarEventsService {
     agenda?: string;
     attachments?: any;
     prepNotes?: string;
+    attachedItems?: any;
     status?: string;
     attendees?: { userId?: string; contactId?: string; email?: string; name?: string }[];
     reminders?: { type: string; timing: number }[];
@@ -53,6 +54,7 @@ export class CalendarEventsService {
         agenda: eventData.agenda,
         attachments: eventData.attachments,
         prepNotes: eventData.prepNotes,
+        attachedItems: eventData.attachedItems,
         status: eventData.status,
         contact: eventData.contactId ? { connect: { id: eventData.contactId } } : undefined,
       },

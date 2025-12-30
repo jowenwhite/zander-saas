@@ -28,6 +28,7 @@ export class CalendarEventsController {
     agenda?: string;
     attachments?: any;
     prepNotes?: string;
+    attachedItems?: any;
     status?: string;
     attendees?: { userId?: string; contactId?: string; email?: string; name?: string }[];
     reminders?: { type: string; timing: number }[];
@@ -116,6 +117,7 @@ export class CalendarEventsController {
     agenda?: string;
     attachments?: any;
     prepNotes?: string;
+    attachedItems?: any;
     status?: string;
   }) {
     return this.calendarEventsService.update(req.user.tenantId, id, {

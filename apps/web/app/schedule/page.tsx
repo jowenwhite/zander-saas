@@ -24,6 +24,7 @@ interface CalendarEvent {
   contactId?: string;
   dealId?: string;
   agenda?: string;
+  attachedItems?: { treasuryItemId: string; type: string; name: string }[];
   prepNotes?: string;
   status: string;
   contact?: { id: string; firstName: string; lastName: string; email: string };
@@ -75,6 +76,8 @@ export default function SchedulePage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
   const [showTreasuryModal, setShowTreasuryModal] = useState(false);
+  const [showAttachTreasuryPicker, setShowAttachTreasuryPicker] = useState(false);
+  const [allTreasuryItems, setAllTreasuryItems] = useState<any[]>([]);
   const [treasuryItems, setTreasuryItems] = useState<TreasuryItem[]>([]);
   const [treasuryLoading, setTreasuryLoading] = useState(false);
   const [treasuryFilter, setTreasuryFilter] = useState<{
@@ -101,6 +104,7 @@ export default function SchedulePage() {
     willBeRecorded: false,
     contactId: '',
     agenda: '',
+    attachedItems: [] as { treasuryItemId: string; type: string; name: string }[],
     attendees: [] as { contactId?: string; email?: string; name?: string }[],
     reminders: [{ type: 'email', timing: 15 }]
   });
@@ -139,6 +143,61 @@ export default function SchedulePage() {
       fetchTreasuryItems();
     }
   }, [showTreasuryModal, treasuryFilter]);
+
+  // Fetch ALL treasury items for attachment picker
+  const fetchAllTreasuryItems = async () => {
+    try {
+      const res = await fetch(`${API_URL}/treasury`, {
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        setAllTreasuryItems(await res.json());
+      }
+    } catch (err) {
+      console.error('Failed to fetch all treasury items:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (showAttachTreasuryPicker) {
+      fetchAllTreasuryItems();
+    }
+  }, [showAttachTreasuryPicker]);
+
+  // Helper to get icon for treasury item type
+  const getTreasuryTypeIcon = (type: string) => {
+    switch (type) {
+      case 'form': return '📋';
+      case 'sop': return '📑';
+      case 'campaign': return '📧';
+      case 'assembly': return '📅';
+      default: return '📄';
+    }
+  };
+
+  // Add item to attachedItems
+  const handleAttachItem = (item: any) => {
+    const alreadyAttached = newEvent.attachedItems.some(a => a.treasuryItemId === item.id);
+    if (!alreadyAttached) {
+      setNewEvent({
+        ...newEvent,
+        attachedItems: [...newEvent.attachedItems, {
+          treasuryItemId: item.id,
+          type: item.type,
+          name: item.name
+        }]
+      });
+    }
+    setShowAttachTreasuryPicker(false);
+  };
+
+  // Remove item from attachedItems
+  const handleRemoveAttachedItem = (treasuryItemId: string) => {
+    setNewEvent({
+      ...newEvent,
+      attachedItems: newEvent.attachedItems.filter(a => a.treasuryItemId !== treasuryItemId)
+    });
+  };
 
   const handleAddFromTreasury = (item: TreasuryItem) => {
     // Parse duration from template (e.g., "30 min", "45 min", "90 min")
@@ -179,6 +238,7 @@ export default function SchedulePage() {
       willBeRecorded: false,
       contactId: '',
       agenda: item.description || '',
+      attachedItems: [],
       attendees: [],
       reminders: [{ type: 'email', timing: 15 }]
     });
@@ -324,6 +384,7 @@ export default function SchedulePage() {
       willBeRecorded: false,
       contactId: '',
       agenda: '',
+      attachedItems: [],
       attendees: [],
       reminders: [{ type: 'email', timing: 15 }]
     });
@@ -1116,6 +1177,69 @@ export default function SchedulePage() {
                 </div>
               </div>
 
+
+                {/* Attach from Treasury */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    📎 Attached Items from Treasury
+                  </label>
+                  
+                  {/* Attached Items List */}
+                  {newEvent.attachedItems.length > 0 && (
+                    <div style={{ marginBottom: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {newEvent.attachedItems.map((item) => (
+                        <div
+                          key={item.treasuryItemId}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.5rem 0.75rem',
+                            background: 'var(--zander-off-white)',
+                            borderRadius: '6px',
+                            border: '1px solid var(--zander-border-gray)'
+                          }}
+                        >
+                          <span>{getTreasuryTypeIcon(item.type)}</span>
+                          <span style={{ fontSize: '0.9rem' }}>{item.name}</span>
+                          <button
+                            onClick={() => handleRemoveAttachedItem(item.treasuryItemId)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '0 0.25rem',
+                              color: 'var(--zander-gray)',
+                              fontSize: '1.1rem'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Add Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowAttachTreasuryPicker(true)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: 'white',
+                      border: '2px dashed var(--zander-border-gray)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      color: 'var(--zander-navy)',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    <span>+</span> Attach from Treasury
+                  </button>
+                </div>
               {/* Modal Footer */}
               <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button
@@ -1268,6 +1392,43 @@ export default function SchedulePage() {
                   </div>
                 )}
 
+                {/* Attached Items */}
+                {selectedEvent.attachedItems && selectedEvent.attachedItems.length > 0 && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>📎 Attached Items</h4>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {selectedEvent.attachedItems.map((item: any, index: number) => (
+                        <div
+                          key={index}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.5rem 0.75rem',
+                            background: 'var(--zander-off-white)',
+                            borderRadius: '6px',
+                            border: '1px solid var(--zander-border-gray)',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <span>{getTreasuryTypeIcon(item.type)}</span>
+                          <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{item.name}</span>
+                          <span style={{
+                            background: item.type === 'form' ? 'rgba(191, 10, 48, 0.1)' : item.type === 'sop' ? 'rgba(0, 86, 135, 0.1)' : 'rgba(240, 179, 35, 0.2)',
+                            color: item.type === 'form' ? 'var(--zander-red)' : item.type === 'sop' ? 'var(--zander-blue)' : '#b8860b',
+                            padding: '0.1rem 0.4rem',
+                            borderRadius: '4px',
+                            fontSize: '0.65rem',
+                            fontWeight: '600',
+                            textTransform: 'uppercase'
+                          }}>
+                            {item.type}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {/* Description */}
                 {selectedEvent.description && (
                   <div style={{ marginBottom: '1rem' }}>
@@ -1525,6 +1686,81 @@ export default function SchedulePage() {
                         >
                           + Use Template
                         </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Treasury Picker Modal for Attachments */}
+        {showAttachTreasuryPicker && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100
+          }}>
+            <div style={{
+              background: 'white', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column'
+            }}>
+              <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0 }}>📎 Attach from Treasury</h3>
+                <button
+                  onClick={() => setShowAttachTreasuryPicker(false)}
+                  style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}
+                >
+                  ×
+                </button>
+              </div>
+              <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+                {allTreasuryItems.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+                    <p>Loading items...</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                    {allTreasuryItems.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => handleAttachItem(item)}
+                        style={{
+                          border: '2px solid var(--zander-border-gray)',
+                          borderRadius: '8px',
+                          padding: '1rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          opacity: newEvent.attachedItems.some(a => a.treasuryItemId === item.id) ? 0.5 : 1
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--zander-gold)'; e.currentTarget.style.background = 'var(--zander-off-white)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.background = 'white'; }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                          <span style={{ fontSize: '1.25rem' }}>{getTreasuryTypeIcon(item.type)}</span>
+                          <span style={{
+                            background: item.type === 'form' ? 'rgba(191, 10, 48, 0.1)' : item.type === 'sop' ? 'rgba(0, 86, 135, 0.1)' : item.type === 'campaign' ? 'rgba(240, 179, 35, 0.2)' : 'rgba(12, 35, 64, 0.1)',
+                            color: item.type === 'form' ? 'var(--zander-red)' : item.type === 'sop' ? 'var(--zander-blue)' : item.type === 'campaign' ? '#b8860b' : 'var(--zander-navy)',
+                            padding: '0.15rem 0.5rem',
+                            borderRadius: '4px',
+                            fontSize: '0.7rem',
+                            fontWeight: '600',
+                            textTransform: 'uppercase'
+                          }}>
+                            {item.type}
+                          </span>
+                        </div>
+                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.95rem' }}>{item.name}</div>
+                        {item.description && (
+                          <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)', marginTop: '0.25rem', lineHeight: '1.4' }}>
+                            {item.description.length > 60 ? item.description.substring(0, 60) + '...' : item.description}
+                          </div>
+                        )}
+                        {newEvent.attachedItems.some(a => a.treasuryItemId === item.id) && (
+                          <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--zander-green)', fontWeight: '600' }}>
+                            ✓ Already attached
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
