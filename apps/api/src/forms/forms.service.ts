@@ -33,6 +33,7 @@ export class FormsService {
   async create(tenantId: string, data: {
     name: string;
     description?: string;
+    formType?: string;
     fields?: any[];
     settings?: any;
   }) {
@@ -41,6 +42,7 @@ export class FormsService {
         tenantId,
         name: data.name,
         description: data.description,
+        formType: data.formType || 'form',
         fields: data.fields || [],
         settings: data.settings || {},
         status: 'draft',

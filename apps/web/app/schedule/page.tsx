@@ -1313,7 +1313,7 @@ export default function SchedulePage() {
                       color: 'var(--zander-gray)'
                     }}
                   >
-                    Cancel Event
+                    Cancel Assembly
                   </button>
                   <button
                     onClick={() => { setShowEventModal(false); setSelectedEvent(null); }}
