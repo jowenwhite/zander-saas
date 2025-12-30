@@ -248,7 +248,7 @@ const treasuryItems = [
         { time: '5-15 min', topic: 'Discovery questions - understand needs, budget, timeline' },
         { time: '15-25 min', topic: 'Solution overview & value proposition' },
         { time: '25-30 min', topic: 'Next steps & scheduling' },
-      ]
+      ],
     }
   },
   {
@@ -288,7 +288,7 @@ const treasuryItems = [
         { time: '45-70 min', topic: 'Style selection - doors, finishes, hardware' },
         { time: '70-85 min', topic: 'Budget discussion & options' },
         { time: '85-90 min', topic: 'Next steps & timeline' },
-      ]
+      ],
     }
   },
   {

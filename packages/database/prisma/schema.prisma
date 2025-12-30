@@ -299,7 +299,8 @@ model FormSubmission {
   id        String   @id @default(cuid())
   formId    String
   data      Json
-  contactId String?
+  contactId       String?
+  calendarEventId String?
   createdAt DateTime @default(now())
   form      Form     @relation(fields: [formId], references: [id])
   contact   Contact? @relation(fields: [contactId], references: [id])
@@ -525,6 +526,7 @@ model CalendarEvent {
   callLogId               String?
   // Agenda & Preparation
   agenda                  String?
+  attachedItems           Json?           // Array of { treasuryItemId, type, name } from Treasury
   attachments             Json?           @default("[]")
   prepNotes               String?
   // External Sync
