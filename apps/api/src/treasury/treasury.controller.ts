@@ -6,6 +6,7 @@ import { Public } from '../auth/public.decorator';
 export class TreasuryController {
   constructor(private readonly treasuryService: TreasuryService) {}
 
+  @Public()
   @Get()
   async findAll(
     @Query('type') type?: string,
