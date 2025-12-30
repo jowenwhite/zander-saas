@@ -568,23 +568,42 @@ export default function FormsPage() {
                 Create, manage, and track form submissions
               </p>
             </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              style={{
-                padding: '0.75rem 1.5rem',
-                background: 'var(--zander-gold)',
-                color: 'var(--zander-navy)',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-            >
-              + New Form
-            </button>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                onClick={() => setShowTreasuryModal(true)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderRadius: '8px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                🏛️ The Treasury
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'var(--zander-gold)',
+                  color: 'var(--zander-navy)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                + New Form
+              </button>
+            </div>
           </div>
         </div>
 
