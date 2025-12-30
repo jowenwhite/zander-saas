@@ -132,33 +132,6 @@ interface ScheduledComm {
   needsApproval: boolean;
 }
 
-// Starter template packs
-const starterTemplatePacks = {
-  sales: {
-    name: 'Sales Outreach Pack',
-    description: 'Essential templates for sales follow-up and nurturing',
-    templates: [
-      { name: 'New Lead Welcome', subject: 'Thanks for reaching out!', type: 'email', category: 'Welcome', stage: 'PROSPECT', status: 'active', body: 'Hi {{firstName}},\n\nThank you for your interest in our services. I wanted to personally reach out and introduce myself.\n\nI\'d love to learn more about your project and how we can help. Would you have 15 minutes this week for a quick call?\n\nBest regards' },
-      { name: 'Week 1 Follow-Up', subject: 'Checking in on your project', type: 'email', category: 'Follow-up', stage: 'PROSPECT', status: 'active', body: 'Hi {{firstName}},\n\nI wanted to follow up on my previous message. I understand you\'re busy, but I\'d still love the opportunity to discuss your project.\n\nIs there a better time to connect?\n\nBest regards' },
-      { name: 'Week 2 Follow-Up', subject: 'Quick update request', type: 'email', category: 'Follow-up', stage: 'PROSPECT', status: 'active', body: 'Hi {{firstName}},\n\nI hope this finds you well. I\'m reaching out one more time to see if you\'re still interested in discussing your project.\n\nIf now isn\'t the right time, just let me know and I\'ll follow up in a few months.\n\nBest regards' },
-      { name: 'Proposal Sent', subject: 'Your proposal is ready', type: 'email', category: 'Proposal', stage: 'PROPOSAL', status: 'active', body: 'Hi {{firstName}},\n\nGreat news! I\'ve attached your customized proposal for review.\n\nPlease take a look and let me know if you have any questions. I\'m happy to walk through it with you at your convenience.\n\nBest regards' },
-      { name: 'Quote Follow-Up', subject: 'Questions about your quote?', type: 'email', category: 'Follow-up', stage: 'PROPOSAL', status: 'active', body: 'Hi {{firstName}},\n\nI wanted to check in and see if you had a chance to review the proposal I sent over.\n\nDo you have any questions I can help answer?\n\nBest regards' },
-      { name: 'Thank You - Closed Won', subject: 'Welcome aboard!', type: 'email', category: 'Closing', stage: 'CLOSED_WON', status: 'active', body: 'Hi {{firstName}},\n\nThank you so much for choosing us! We\'re thrilled to work with you on this project.\n\nOur team will be in touch shortly to kick things off. In the meantime, please don\'t hesitate to reach out with any questions.\n\nWelcome aboard!' },
-      { name: 'Re-engagement', subject: 'We\'d love to reconnect', type: 'email', category: 'Re-engagement', stage: 'CLOSED_LOST', status: 'active', body: 'Hi {{firstName}},\n\nIt\'s been a while since we last connected. I wanted to reach out and see how things are going.\n\nIf your situation has changed or you\'re considering new projects, I\'d love to chat.\n\nBest regards' },
-    ]
-  },
-  appointments: {
-    name: 'Appointment Pack',
-    description: 'SMS and call templates for scheduling',
-    templates: [
-      { name: 'Quick Check-In SMS', type: 'sms', category: 'Follow-up', stage: 'PROSPECT', status: 'active', body: 'Hi {{firstName}}, just checking in on your project. Any questions I can help with? - {{senderName}}' },
-      { name: 'Appointment Reminder SMS', type: 'sms', category: 'Reminder', status: 'active', body: 'Hi {{firstName}}, reminder: your appointment is tomorrow at {{appointmentTime}}. Reply to confirm or reschedule.' },
-      { name: 'Discovery Call Script', type: 'call', category: 'Sales Call', stage: 'PROSPECT', status: 'active', body: '1. Introduction & rapport building\n2. Understand their current situation\n3. Identify pain points and goals\n4. Present how we can help\n5. Discuss timeline and budget\n6. Set next steps' },
-      { name: 'Follow-Up Call Script', type: 'call', category: 'Follow-up', stage: 'QUALIFIED', status: 'active', body: '1. Reference previous conversation\n2. Address any concerns raised\n3. Provide additional information\n4. Ask qualifying questions\n5. Move toward proposal/next step' },
-      { name: 'Closing Call Script', type: 'call', category: 'Closing', stage: 'NEGOTIATION', status: 'active', body: '1. Review proposal highlights\n2. Address final objections\n3. Discuss terms and timeline\n4. Ask for the business\n5. Outline next steps after signing' },
-    ]
-  }
-};
 
 export default function CommunicationsPage() {
   const router = useRouter();
@@ -215,7 +188,6 @@ export default function CommunicationsPage() {
   // Modals
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showSequenceModal, setShowSequenceModal] = useState(false);
-  const [showStarterPackModal, setShowStarterPackModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [editingSequence, setEditingSequence] = useState<Sequence | null>(null);
   
@@ -223,7 +195,6 @@ export default function CommunicationsPage() {
   const [templateForm, setTemplateForm] = useState({ name: '', subject: '', body: '', type: 'email', category: '', stage: '', status: 'draft' });
   const [sequenceForm, setSequenceForm] = useState({ name: '', description: '', status: 'draft' });
   const [saving, setSaving] = useState(false);
-  const [activatingPack, setActivatingPack] = useState<string | null>(null);
   // Send Email Modal
   const [showSendModal, setShowSendModal] = useState(false);
   const [sendingTemplate, setSendingTemplate] = useState<Template | null>(null);
@@ -444,40 +415,6 @@ export default function CommunicationsPage() {
       setSequences(sequences.filter(s => s.id !== id));
     } catch (err) {
       alert('Failed to delete sequence');
-    }
-  };
-
-  // Starter Pack Activation
-  const handleActivatePack = async (packKey: string) => {
-    const pack = starterTemplatePacks[packKey as keyof typeof starterTemplatePacks];
-    if (!pack) return;
-    
-    const existingNames = templates.map(t => t.name.toLowerCase());
-    const newTemplates = pack.templates.filter(t => !existingNames.includes(t.name.toLowerCase()));
-    
-    if (newTemplates.length === 0) {
-      alert(`All templates from ${pack.name} are already in your library!`);
-      return;
-    }
-    
-    if (!confirm(`Add ${newTemplates.length} templates from ${pack.name}?`)) return;
-    
-    setActivatingPack(packKey);
-    try {
-      for (const template of newTemplates) {
-        await fetch(`${API_URL}/templates`, {
-          method: 'POST',
-          headers: getAuthHeaders(),
-          body: JSON.stringify(template)
-        });
-      }
-      await fetchData();
-      alert(`Successfully added ${newTemplates.length} templates!`);
-      setShowStarterPackModal(false);
-    } catch (err) {
-      alert('Failed to activate pack');
-    } finally {
-      setActivatingPack(null);
     }
   };
 
@@ -719,20 +656,7 @@ export default function CommunicationsPage() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button
-                onClick={() => setShowStarterPackModal(true)}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  background: 'white',
-                  color: 'var(--zander-red)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: '700',
-                  cursor: 'pointer'
-                }}
-              >
-                🏛️ The Treasury
-              </button>
+              
               <button
                 onClick={() => { setEditingTemplate(null); setTemplateForm({ name: '', subject: '', body: '', type: 'email', category: '', stage: '', status: 'draft' }); setShowTemplateModal(true); }}
                 style={{
@@ -1521,61 +1445,6 @@ export default function CommunicationsPage() {
           </div>
         </div>
       )}
-
-      {/* Starter Pack Modal */}
-      {showStarterPackModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflow: 'auto' }}>
-            <h2 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>Template Starter Packs</h2>
-            <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>Pre-built template collections to get you started quickly</p>
-            
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              {Object.entries(starterTemplatePacks).map(([key, pack]) => (
-                <div key={key} style={{ border: '2px solid var(--zander-border-gray)', borderRadius: '12px', padding: '1.5rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                    <div>
-                      <h3 style={{ margin: '0 0 0.25rem 0', color: 'var(--zander-navy)' }}>{pack.name}</h3>
-                      <p style={{ margin: 0, color: 'var(--zander-gray)', fontSize: '0.9rem' }}>{pack.description}</p>
-                    </div>
-                    <span style={{ background: 'var(--zander-off-white)', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{pack.templates.length} templates</span>
-                  </div>
-                  
-                  <div style={{ marginBottom: '1rem', maxHeight: '120px', overflow: 'auto' }}>
-                    {pack.templates.map((t, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0', fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
-                        <span>{getTypeIcon(t.type)}</span>
-                        <span>{t.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <button
-                    onClick={() => handleActivatePack(key)}
-                    disabled={activatingPack === key}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      background: activatingPack === key ? 'var(--zander-gray)' : 'var(--zander-red)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontWeight: '600',
-                      cursor: activatingPack === key ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    {activatingPack === key ? 'Adding Templates...' : 'Activate Pack'}
-                  </button>
-                </div>
-              ))}
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-              <button onClick={() => setShowStarterPackModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: 'var(--zander-gray)' }}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* SEND EMAIL MODAL */}
       {showSendModal && sendingTemplate && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
