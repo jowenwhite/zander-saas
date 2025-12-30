@@ -52,6 +52,20 @@ interface Contact {
 
 const API_URL = 'https://api.zanderos.com';
 
+interface TreasuryItem {
+  id: string;
+  type: string;
+  name: string;
+  description?: string;
+  category?: string;
+  executive?: string;
+  industry?: string;
+  channels: string[];
+  content: any;
+  stepCount?: number;
+  duration?: string;
+}
+
 export default function SchedulePage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -61,6 +75,13 @@ export default function SchedulePage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
   const [showTreasuryModal, setShowTreasuryModal] = useState(false);
+  const [treasuryItems, setTreasuryItems] = useState<TreasuryItem[]>([]);
+  const [treasuryLoading, setTreasuryLoading] = useState(false);
+  const [treasuryFilter, setTreasuryFilter] = useState<{
+    category: string;
+    executive: string;
+    industry: string;
+  }>({ category: '', executive: '', industry: '' });
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -91,6 +112,62 @@ export default function SchedulePage() {
       'Content-Type': 'application/json'
     };
   };
+  // Fetch Treasury Items for Assemblies
+  const fetchTreasuryItems = async () => {
+    setTreasuryLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (treasuryFilter.category) params.append('category', treasuryFilter.category);
+      if (treasuryFilter.executive) params.append('executive', treasuryFilter.executive);
+      if (treasuryFilter.industry) params.append('industry', treasuryFilter.industry);
+      
+      const res = await fetch(`${API_URL}/treasury/assemblies?${params.toString()}`, {
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        setTreasuryItems(await res.json());
+      }
+    } catch (err) {
+      console.error('Failed to fetch treasury items:', err);
+    } finally {
+      setTreasuryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showTreasuryModal) {
+      fetchTreasuryItems();
+    }
+  }, [showTreasuryModal, treasuryFilter]);
+
+  const handleAddFromTreasury = async (item: TreasuryItem) => {
+    try {
+      // Create a new calendar event from the assembly template
+      const res = await fetch(`${API_URL}/calendar-events`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: item.name,
+          description: item.description,
+          duration: item.duration || '30',
+          eventType: 'meeting',
+          status: 'scheduled',
+          startTime: new Date().toISOString(),
+          endTime: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+        })
+      });
+      if (res.ok) {
+        await fetchEvents();
+        setShowTreasuryModal(false);
+        alert(`Added "${item.name}" assembly template!`);
+      }
+    } catch (err) {
+      console.error('Failed to add from treasury:', err);
+      alert('Failed to add template');
+    }
+  };
+
+
 
   useEffect(() => {
     fetchEvents();
@@ -1316,14 +1393,121 @@ export default function SchedulePage() {
                   ×
                 </button>
               </div>
+              {/* Filters */}
+              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <select
+                  value={treasuryFilter.category}
+                  onChange={(e) => setTreasuryFilter({ ...treasuryFilter, category: e.target.value })}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                >
+                  <option value="">All Categories</option>
+                  <option value="sales">Sales</option>
+                  <option value="meeting">Meeting</option>
+                  <option value="onboarding">Onboarding</option>
+                  <option value="operations">Operations</option>
+                </select>
+                <select
+                  value={treasuryFilter.executive}
+                  onChange={(e) => setTreasuryFilter({ ...treasuryFilter, executive: e.target.value })}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                >
+                  <option value="">All Executives</option>
+                  <option value="CRO">CRO</option>
+                  <option value="CFO">CFO</option>
+                  <option value="COO">COO</option>
+                  <option value="CMO">CMO</option>
+                </select>
+                <select
+                  value={treasuryFilter.industry}
+                  onChange={(e) => setTreasuryFilter({ ...treasuryFilter, industry: e.target.value })}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                >
+                  <option value="">All Industries</option>
+                  <option value="general">General</option>
+                  <option value="cabinet_millwork">Cabinet & Millwork</option>
+                  <option value="professional_services">Professional Services</option>
+                  <option value="trades">Trades</option>
+                </select>
+              </div>
               {/* Content */}
               <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
-                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
-                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>Treasury Coming Soon</h3>
-                  <p style={{ margin: 0 }}>Pre-built assembly templates will be available here.</p>
-                  <p style={{ margin: '1rem 0 0 0', fontSize: '0.9rem' }}>Meeting agendas, call scripts, and event templates by industry.</p>
-                </div>
+                {treasuryLoading ? (
+                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+                    <p>Loading templates...</p>
+                  </div>
+                ) : treasuryItems.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Templates Found</h3>
+                    <p style={{ margin: 0 }}>Try adjusting your filters or check back later for new templates.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                    {treasuryItems.map((item) => (
+                      <div
+                        key={item.id}
+                        style={{
+                          border: '2px solid var(--zander-border-gray)',
+                          borderRadius: '12px',
+                          padding: '1.25rem',
+                          transition: 'all 0.2s ease',
+                          cursor: 'pointer'
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--zander-gold)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
+                          <span style={{ fontSize: '1.5rem' }}>📅</span>
+                          {item.duration && (
+                            <span style={{
+                              background: 'rgba(0, 86, 135, 0.1)',
+                              color: 'var(--zander-blue)',
+                              padding: '0.25rem 0.5rem',
+                              borderRadius: '4px',
+                              fontSize: '0.7rem',
+                              fontWeight: '600'
+                            }}>
+                              {item.duration}
+                            </span>
+                          )}
+                        </div>
+                        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>{item.name}</h4>
+                        <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                          {item.description || 'No description available'}
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                          {item.executive && (
+                            <span style={{ background: 'var(--zander-off-white)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--zander-navy)' }}>
+                              {item.executive}
+                            </span>
+                          )}
+                          {item.industry && (
+                            <span style={{ background: 'var(--zander-off-white)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--zander-navy)' }}>
+                              {item.industry.replace('_', ' ')}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleAddFromTreasury(item)}
+                          style={{
+                            width: '100%',
+                            padding: '0.6rem',
+                            background: 'var(--zander-navy)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          + Use Template
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
