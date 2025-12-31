@@ -46,4 +46,45 @@ export class UsersController {
   async remove(@Param('id') id: string, @Request() req) {
     return this.usersService.remove(id, req.tenantId, req.user.sub);
   }
+
+  // ==================== ONBOARDING ENDPOINTS ====================
+
+  @Get('onboarding/status')
+  async getOnboardingStatus(@Request() req) {
+    return this.usersService.getOnboardingStatus(req.user.sub);
+  }
+
+  @Patch('onboarding/step')
+  async updateOnboardingStep(
+    @Request() req,
+    @Body() data: { step: number }
+  ) {
+    return this.usersService.updateOnboardingStep(req.user.sub, data.step);
+  }
+
+  @Patch('onboarding/focus-area')
+  async setOnboardingFocusArea(
+    @Request() req,
+    @Body() data: { focusArea: string }
+  ) {
+    return this.usersService.setOnboardingFocusArea(req.user.sub, data.focusArea);
+  }
+
+  @Patch('onboarding/checklist')
+  async updateOnboardingChecklist(
+    @Request() req,
+    @Body() data: { checklist: Record<string, boolean> }
+  ) {
+    return this.usersService.updateOnboardingChecklist(req.user.sub, data.checklist);
+  }
+
+  @Post('onboarding/complete')
+  async completeOnboarding(@Request() req) {
+    return this.usersService.completeOnboarding(req.user.sub);
+  }
+
+  @Post('onboarding/first-login')
+  async recordFirstLogin(@Request() req) {
+    return this.usersService.recordFirstLogin(req.user.sub);
+  }
 }

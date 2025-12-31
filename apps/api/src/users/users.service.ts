@@ -150,4 +150,103 @@ export class UsersService {
 
     return { success: true, message: 'User removed successfully' };
   }
+
+  // ==================== ONBOARDING METHODS ====================
+
+  async getOnboardingStatus(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        firstName: true,
+        onboardingCompleted: true,
+        onboardingStep: true,
+        onboardingFocusArea: true,
+        onboardingChecklist: true,
+        firstLoginAt: true,
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async updateOnboardingStep(userId: string, step: number) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { onboardingStep: step },
+      select: {
+        id: true,
+        onboardingStep: true,
+        onboardingCompleted: true,
+      },
+    });
+  }
+
+  async setOnboardingFocusArea(userId: string, focusArea: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { onboardingFocusArea: focusArea },
+      select: {
+        id: true,
+        onboardingFocusArea: true,
+      },
+    });
+  }
+
+  async updateOnboardingChecklist(userId: string, checklist: Record<string, boolean>) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { onboardingChecklist: checklist },
+      select: {
+        id: true,
+        onboardingChecklist: true,
+      },
+    });
+  }
+
+  async completeOnboarding(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { 
+        onboardingCompleted: true,
+        firstLoginAt: new Date(),
+      },
+      select: {
+        id: true,
+        onboardingCompleted: true,
+        firstLoginAt: true,
+      },
+    });
+  }
+
+  async recordFirstLogin(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { firstLoginAt: true },
+    });
+
+    // Only set firstLoginAt if it hasn't been set before
+    if (!user?.firstLoginAt) {
+      return this.prisma.user.update({
+        where: { id: userId },
+        data: { firstLoginAt: new Date() },
+        select: {
+          id: true,
+          firstLoginAt: true,
+        },
+      });
+    }
+
+    return { id: userId, firstLoginAt: user.firstLoginAt };
+  }
 }
