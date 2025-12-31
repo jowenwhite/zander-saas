@@ -110,7 +110,7 @@ export default function AdminTreasuryPage() {
       channels: [],
       duration: '',
       stepCount: 0,
-      content: activeTab === 'form' ? { fields: [] } : activeTab === 'sop' ? { steps: [] } : { steps: [] }
+      content: { fields: [] as FormField[] }
     });
     setShowModal(true);
     setError(null);
