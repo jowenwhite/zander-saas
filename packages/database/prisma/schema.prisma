@@ -112,6 +112,13 @@ model User {
   microsoftToken   MicrosoftToken?
   tenantAccess     UserTenantAccess[]
   formSubmissionUpdates FormSubmission[]
+  
+  // Onboarding
+  onboardingCompleted  Boolean   @default(false)
+  onboardingStep       Int       @default(0)
+  onboardingFocusArea  String?
+  onboardingChecklist  Json?
+  firstLoginAt         DateTime?
 
   @@map("users")
 }
