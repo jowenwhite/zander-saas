@@ -1,10 +1,16 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException } from '@nestjs/common';
 import { TreasuryService } from './treasury.service';
 import { Public } from '../auth/public.decorator';
 
 @Controller('treasury')
 export class TreasuryController {
   constructor(private readonly treasuryService: TreasuryService) {}
+
+  private checkSuperAdmin(req: any) {
+    if (!req.user?.isSuperAdmin) {
+      throw new ForbiddenException('SuperAdmin access required');
+    }
+  }
 
   @Public()
   @Get()
@@ -91,6 +97,7 @@ export class TreasuryController {
 
   @Post()
   async create(
+    @Request() req,
     @Body() data: {
       type: string;
       name: string;
@@ -104,11 +111,13 @@ export class TreasuryController {
       duration?: string;
     }
   ) {
+    this.checkSuperAdmin(req);
     return this.treasuryService.create(data);
   }
 
   @Patch(':id')
   async update(
+    @Request() req,
     @Param('id') id: string,
     @Body() data: {
       name?: string;
@@ -124,16 +133,19 @@ export class TreasuryController {
       sortOrder?: number;
     }
   ) {
+    this.checkSuperAdmin(req);
     return this.treasuryService.update(id, data);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Request() req, @Param('id') id: string) {
+    this.checkSuperAdmin(req);
     return this.treasuryService.remove(id);
   }
 
     @Post('seed')
-  async seed() {
+  async seed(@Request() req) {
+    this.checkSuperAdmin(req);
     const treasuryItems = [
       // CAMPAIGN TEMPLATES
       { type: 'campaign', name: 'New Lead Nurture', description: 'Welcome new leads with a 5-step email sequence over 14 days', category: 'sales', executive: 'CRO', industry: 'general', channels: ['email'], stepCount: 5, duration: '14 days', sortOrder: 1, content: { steps: [{ day: 0, channel: 'email', subject: 'Welcome to {{company}}' }] } },

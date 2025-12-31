@@ -1,10 +1,22 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 interface SidebarProps {
   collapsed?: boolean;
 }
 export default function Sidebar({ collapsed = false }: SidebarProps) {
   const pathname = usePathname();
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('zander_user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setIsSuperAdmin(user.isSuperAdmin || false);
+      } catch (e) {}
+    }
+  }, []);
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
   const salesRevenueItems = [
     { icon: '📊', label: 'Production', href: '/production' },
@@ -82,6 +94,23 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
           ))}
         </ul>
       </div>
+
+      {/* Admin Section - SuperAdmin Only */}
+      {isSuperAdmin && (
+        <div style={{ padding: '1rem', borderTop: '2px solid var(--zander-border-gray)', marginTop: '1rem' }}>
+          <div style={sectionHeaderStyle}>
+            Admin
+          </div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            <li style={{ marginBottom: '0.25rem' }}>
+              <a href="/admin/treasury" style={linkStyle(isActive('/admin/treasury'))}>
+                <span style={{ fontSize: '1.1rem' }}>🏛️</span>
+                {!collapsed && <span>Treasury Admin</span>}
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
     </aside>
   );
 }
