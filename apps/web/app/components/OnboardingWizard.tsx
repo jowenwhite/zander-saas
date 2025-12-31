@@ -43,15 +43,21 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
   const handleFocusSelect = (id: string) => {
     setFocusArea(id);
     // Save to API
-    fetch('/api/users/onboarding/focus-area', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/users/onboarding/focus-area', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('zander_token'),
+      },
       body: JSON.stringify({ focusArea: id }),
     });
   };
 
   const handleComplete = async () => {
-    await fetch('/api/users/onboarding/complete', { method: 'POST' });
+    await fetch(process.env.NEXT_PUBLIC_API_URL + '/users/onboarding/complete', { 
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('zander_token') },
+    });
     onComplete();
   };
 

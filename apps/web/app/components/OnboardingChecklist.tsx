@@ -32,7 +32,9 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
     // Load checklist state from API
     const loadChecklist = async () => {
       try {
-        const res = await fetch('/api/users/onboarding/status');
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/users/onboarding/status', {
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('zander_token') },
+        });
         if (res.ok) {
           const data = await res.json();
           if (data.onboardingChecklist) {
@@ -61,9 +63,12 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
       [item.id]: item.completed,
     }), {});
 
-    await fetch('/api/users/onboarding/checklist', {
+    await fetch(process.env.NEXT_PUBLIC_API_URL + '/users/onboarding/checklist', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('zander_token'),
+      },
       body: JSON.stringify({ checklist: checklistState }),
     });
   };
