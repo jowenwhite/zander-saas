@@ -7,6 +7,7 @@ import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import { logout } from '../utils/auth';
 import Sidebar from '../components/Sidebar';
+import OnboardingWizard from '../components/OnboardingWizard';
 
 interface Contact {
   id: string;
@@ -65,6 +66,11 @@ export default function ProductionPage() {
   const [showNewContactModal, setShowNewContactModal] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showWidgetSettings, setShowWidgetSettings] = useState(false);
+  
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [companyName, setCompanyName] = useState('');
   
   // Widget configuration - which KPIs to show in each slot
   const [widgetConfig, setWidgetConfig] = useState<string[]>(() => {
@@ -148,7 +154,38 @@ export default function ProductionPage() {
 
   useEffect(() => {
     fetchData();
+    checkOnboardingStatus();
   }, []);
+  
+  async function checkOnboardingStatus() {
+    try {
+      const token = localStorage.getItem('zander_token');
+      if (!token) return;
+      
+      const res = await fetch('https://api.zanderos.com/users/onboarding/status', {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUserName(data.firstName || 'there');
+        setCompanyName(data.tenant?.companyName || 'your company');
+        
+        // Show wizard if onboarding not completed
+        if (!data.onboardingCompleted) {
+          setShowOnboarding(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check onboarding:', error);
+    }
+  }
+  
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    // Refresh the sidebar to show checklist
+    window.location.reload();
+  };
 
   async function fetchData() {
     try {
@@ -313,6 +350,13 @@ export default function ProductionPage() {
 
   return (
     <AuthGuard>
+      {/* Onboarding Wizard Modal */}
+      <OnboardingWizard
+        isOpen={showOnboarding}
+        onComplete={handleOnboardingComplete}
+        userName={userName}
+        companyName={companyName}
+      />
 
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       <NavBar activeModule={activeModule} />
