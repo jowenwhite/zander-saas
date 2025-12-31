@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
+import Sidebar from '../components/Sidebar';
 
 interface Form {
   id: string;
@@ -149,6 +150,7 @@ const industryPacks: IndustryPack[] = [
 
 export default function FormsPage() {
   const router = useRouter();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<'forms' | 'sops' | 'submissions'>('forms');
   const [showTreasuryModal, setShowTreasuryModal] = useState(false);
   const [treasuryItems, setTreasuryItems] = useState<TreasuryItem[]>([]);
@@ -475,79 +477,7 @@ export default function FormsPage() {
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       <NavBar activeModule="cro" />
 
-      {/* Sidebar */}
-      <aside style={{
-        position: 'fixed',
-        left: 0,
-        top: '64px',
-        bottom: 0,
-        width: '240px',
-        background: 'white',
-        borderRight: '2px solid var(--zander-border-gray)',
-        padding: '1.5rem 0',
-        overflow: 'hidden',
-        zIndex: 900
-      }}>
-        <div style={{ padding: '0 1rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Sales & Revenue
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📊', label: 'Production', href: '/production' },
-              { icon: '📁', label: 'Projects', href: '/projects' },
-              { icon: '👥', label: 'People', href: '/people' },
-              { icon: '📦', label: 'Products', href: '/products' },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a href={item.href} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: 'var(--zander-navy)',
-                  background: 'transparent'
-                }}>
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div style={{ padding: '0 1rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Process
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📧', label: 'Communication', href: '/communication' },
-              { icon: '📅', label: 'Schedule', href: '/schedule' },
-              { icon: '📋', label: 'Forms', href: '/forms', active: true },
-              { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a href={item.href} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: item.active ? 'var(--zander-red)' : 'var(--zander-navy)',
-                  background: item.active ? 'rgba(191, 10, 48, 0.1)' : 'transparent',
-                  fontWeight: item.active ? '600' : '400'
-                }}>
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+      <Sidebar collapsed={sidebarCollapsed} />
 
       {/* Main Content */}
       <main style={{ marginLeft: '240px', marginTop: '64px', padding: '2rem' }}>

@@ -5,6 +5,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import { logout } from '../utils/auth';
 import AuthGuard from '../components/AuthGuard';
+import Sidebar from '../components/Sidebar';
 
 interface Contact {
   id: string;
@@ -46,6 +47,7 @@ const formatCurrency = (value: number) => {
 };
 
 export default function ProjectsPage() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [draggedDeal, setDraggedDeal] = useState<Deal | null>(null);
@@ -198,79 +200,7 @@ export default function ProjectsPage() {
       {/* Top Navigation */}
       <NavBar activeModule="cro" />
 
-      {/* Sidebar */}
-      <aside style={{
-        position: 'fixed',
-        left: 0,
-        top: '64px',
-        bottom: 0,
-        width: '240px',
-        background: 'white',
-        borderRight: '2px solid var(--zander-border-gray)',
-        padding: '1.5rem 0',
-        overflow: 'hidden',
-        zIndex: 900
-      }}>
-        <div style={{ padding: '0 1rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Sales & Revenue
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📊', label: 'Production', href: '/production', active: false },
-              { icon: '📁', label: 'Projects', href: '/projects', active: true },
-              { icon: '👥', label: 'People', href: '/people', active: false },
-              { icon: '📦', label: 'Products', href: '/products', active: false },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a href={item.href} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: item.active ? 'var(--zander-red)' : 'var(--zander-navy)',
-                  background: item.active ? 'rgba(191, 10, 48, 0.1)' : 'transparent',
-                  fontWeight: item.active ? '600' : '400'
-                }}>
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div style={{ padding: '0 1rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-            Process
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📧', label: 'Communication', href: '/communication' },
-              { icon: '📅', label: 'Schedule', href: '/schedule' },
-              { icon: '📋', label: 'Forms', href: '/forms' },
-              { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a href={item.href || "#"} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: 'var(--zander-navy)'
-                }}>
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+      <Sidebar collapsed={sidebarCollapsed} />
 
       {/* Main Content */}
       <main style={{ marginLeft: '240px', marginTop: '64px', padding: '2rem' }}>

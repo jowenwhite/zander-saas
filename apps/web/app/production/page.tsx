@@ -6,6 +6,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import { logout } from '../utils/auth';
+import Sidebar from '../components/Sidebar';
 
 interface Contact {
   id: string;
@@ -252,104 +253,7 @@ export default function ProductionPage() {
     <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       <NavBar activeModule={activeModule} />
 
-      {/* Sidebar */}
-      <aside style={{
-        position: 'fixed',
-        left: 0,
-        top: '64px',
-        bottom: 0,
-        width: sidebarCollapsed ? '64px' : '240px',
-        background: 'white',
-        borderRight: '2px solid var(--zander-border-gray)',
-        padding: '1.5rem 0',
-        transition: 'width 0.3s ease',
-        overflow: 'hidden',
-        zIndex: 900
-      }}>
-        <div style={{ padding: '0 1rem', marginBottom: '1.5rem' }}>
-          <div style={{ 
-            fontSize: '0.75rem', 
-            fontWeight: '600', 
-            color: 'var(--zander-gray)', 
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            marginBottom: '0.75rem',
-            display: sidebarCollapsed ? 'none' : 'block'
-          }}>
-            Sales & Revenue
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📊', label: 'Production', href: '/production', active: true },
-              { icon: '📁', label: 'Projects', href: '/projects', active: false },
-              { icon: '👥', label: 'People', href: '/people', active: false },
-              { icon: '📦', label: 'Products', href: '/products', active: false },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a
-                  href={item.href || "#"}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    color: item.active ? 'var(--zander-red)' : 'var(--zander-navy)',
-                    background: item.active ? 'rgba(191, 10, 48, 0.1)' : 'transparent',
-                    fontWeight: item.active ? '600' : '400',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <span>{item.icon}</span>
-                  {!sidebarCollapsed && <span>{item.label}</span>}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div style={{ padding: '0 1rem' }}>
-          <div style={{ 
-            fontSize: '0.75rem', 
-            fontWeight: '600', 
-            color: 'var(--zander-gray)', 
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            marginBottom: '0.75rem',
-            display: sidebarCollapsed ? 'none' : 'block'
-          }}>
-            Process
-          </div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {[
-              { icon: '📧', label: 'Communication', href: '/communication' },
-              { icon: '📅', label: 'Schedule', href: '/schedule' },
-              { icon: '📋', label: 'Forms', href: '/forms' },
-              { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
-            ].map((item) => (
-              <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                <a
-                  href={item.href || "#"}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    color: 'var(--zander-navy)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <span>{item.icon}</span>
-                  {!sidebarCollapsed && <span>{item.label}</span>}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+      <Sidebar collapsed={sidebarCollapsed} />
 
       {/* Main Content */}
       <main style={{ 

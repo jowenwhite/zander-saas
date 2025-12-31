@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
+import Sidebar from '../components/Sidebar';
 
 interface Message {
   id: string;
@@ -175,6 +176,7 @@ export default function AIAssistantPage() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showTeamModal, setShowTeamModal] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -292,93 +294,7 @@ export default function AIAssistantPage() {
         <div style={{ display: 'flex', marginTop: '64px', height: 'calc(100vh - 64px)' }}>
           
           {/* Standard Sidebar */}
-          <aside style={{
-            width: '240px',
-            background: 'white',
-            borderRight: '2px solid var(--zander-border-gray)',
-            height: 'calc(100vh - 64px)',
-            position: 'fixed',
-            top: '64px',
-            left: 0,
-            overflowY: 'auto',
-            zIndex: 900
-          }}>
-            <div style={{ padding: '1.5rem 1rem 1rem' }}>
-              <div style={{
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                color: 'var(--zander-gray)',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                marginBottom: '0.75rem'
-              }}>
-                Sales & Revenue
-              </div>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                {salesRevenueItems.map((item) => (
-                  <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                    
-                    <a
-                      href={item.href}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '0.75rem 1rem',
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        color: 'var(--zander-navy)',
-                        background: 'transparent',
-                        fontWeight: '400',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
-                      <span>{item.label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div style={{ padding: '0 1rem' }}>
-              <div style={{
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                color: 'var(--zander-gray)',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                marginBottom: '0.75rem'
-              }}>
-                Process
-              </div>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                {toolsItems.map((item) => (
-                  <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-                    
-                    <a
-                      href={item.href}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '0.75rem 1rem',
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        color: item.active ? 'var(--zander-red)' : 'var(--zander-navy)',
-                        background: item.active ? 'rgba(191,10,48,0.1)' : 'transparent',
-                        fontWeight: item.active ? '600' : '400',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
-                      <span>{item.label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+          <Sidebar collapsed={sidebarCollapsed} />
 
           {/* Chat Area - with margin for sidebar */}
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--zander-off-white)', marginLeft: '240px' }}>
