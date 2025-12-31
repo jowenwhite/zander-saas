@@ -91,6 +91,7 @@ export default function SchedulePage() {
   // Form completion modal state
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedFormForCompletion, setSelectedFormForCompletion] = useState<{ formId: string; formName: string; calendarEventId: string; contactId?: string } | null>(null);
+  const [formSubmissionStatuses, setFormSubmissionStatuses] = useState<Record<string, { status: string; version: number; updatedAt: string }>>({});
 
   // New event form state
   const [newEvent, setNewEvent] = useState({
@@ -132,6 +133,34 @@ export default function SchedulePage() {
       });
       setShowFormModal(true);
     }
+  };
+
+  // Fetch form submission statuses for an event
+  const fetchFormStatuses = async (eventId: string, attachedItems: any[]) => {
+    const formItems = attachedItems.filter(item => item.type === 'form');
+    if (formItems.length === 0) return;
+    
+    const statuses: Record<string, { status: string; version: number; updatedAt: string }> = {};
+    for (const item of formItems) {
+      try {
+        const res = await fetch(`${API_URL}/forms/${item.treasuryItemId}/event/${eventId}`, {
+          headers: getAuthHeaders()
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            statuses[item.treasuryItemId] = {
+              status: data.status,
+              version: data.version,
+              updatedAt: data.updatedAt
+            };
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching form status:', err);
+      }
+    }
+    setFormSubmissionStatuses(statuses);
   };
 
   // Fetch Treasury Items for Assemblies
@@ -181,6 +210,15 @@ export default function SchedulePage() {
       fetchAllTreasuryItems();
     }
   }, [showAttachTreasuryPicker]);
+
+  // Fetch form statuses when event modal opens
+  useEffect(() => {
+    if (showEventModal && selectedEvent && selectedEvent.attachedItems) {
+      fetchFormStatuses(selectedEvent.id, selectedEvent.attachedItems);
+    } else {
+      setFormSubmissionStatuses({});
+    }
+  }, [showEventModal, selectedEvent]);
 
   // Helper to get icon for treasury item type
   const getTreasuryTypeIcon = (type: string) => {
@@ -1434,17 +1472,49 @@ export default function SchedulePage() {
                         >
                           <span>{getTreasuryTypeIcon(item.type)}</span>
                           <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{item.name}</span>
-                          <span style={{
-                            background: item.type === 'form' ? 'rgba(191, 10, 48, 0.1)' : item.type === 'sop' ? 'rgba(0, 86, 135, 0.1)' : 'rgba(240, 179, 35, 0.2)',
-                            color: item.type === 'form' ? 'var(--zander-red)' : item.type === 'sop' ? 'var(--zander-blue)' : '#b8860b',
-                            padding: '0.1rem 0.4rem',
-                            borderRadius: '4px',
-                            fontSize: '0.65rem',
-                            fontWeight: '600',
-                            textTransform: 'uppercase'
-                          }}>
-                            {item.type}
-                          </span>
+                          {item.type === 'form' && formSubmissionStatuses[item.treasuryItemId] && (
+                            <span style={{
+                              background: formSubmissionStatuses[item.treasuryItemId].status === 'completed' 
+                                ? 'rgba(40, 167, 69, 0.15)' 
+                                : 'rgba(255, 193, 7, 0.2)',
+                              color: formSubmissionStatuses[item.treasuryItemId].status === 'completed'
+                                ? '#28a745'
+                                : '#856404',
+                              padding: '0.1rem 0.4rem',
+                              borderRadius: '4px',
+                              fontSize: '0.65rem',
+                              fontWeight: '600'
+                            }}>
+                              {formSubmissionStatuses[item.treasuryItemId].status === 'completed' 
+                                ? '✅ v' + formSubmissionStatuses[item.treasuryItemId].version
+                                : '📝 Draft'}
+                            </span>
+                          )}
+                          {item.type === 'form' && !formSubmissionStatuses[item.treasuryItemId] && (
+                            <span style={{
+                              background: 'rgba(108, 117, 125, 0.15)',
+                              color: '#6c757d',
+                              padding: '0.1rem 0.4rem',
+                              borderRadius: '4px',
+                              fontSize: '0.65rem',
+                              fontWeight: '600'
+                            }}>
+                              ⬜ Not Started
+                            </span>
+                          )}
+                          {item.type !== 'form' && (
+                            <span style={{
+                              background: item.type === 'sop' ? 'rgba(0, 86, 135, 0.1)' : 'rgba(240, 179, 35, 0.2)',
+                              color: item.type === 'sop' ? 'var(--zander-blue)' : '#b8860b',
+                              padding: '0.1rem 0.4rem',
+                              borderRadius: '4px',
+                              fontSize: '0.65rem',
+                              fontWeight: '600',
+                              textTransform: 'uppercase'
+                            }}>
+                              {item.type}
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
