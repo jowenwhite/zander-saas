@@ -74,6 +74,7 @@ export class FormsController {
     return this.formsService.getOrCreateEventSubmission(
       formId,
       body.calendarEventId,
+      req.tenantId,
       body.contactId,
       req.user?.id
     );

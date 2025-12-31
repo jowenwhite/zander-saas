@@ -145,14 +145,37 @@ export class FormsService {
   async getOrCreateEventSubmission(
     formId: string,
     calendarEventId: string,
+    tenantId: string,
     contactId?: string,
     userId?: string
   ) {
-    const form = await this.prisma.form.findUnique({
+    // First try to find form in forms table
+    let form = await this.prisma.form.findUnique({
       where: { id: formId },
     });
+
+    // If not found, check Treasury items (forms attached from Treasury)
     if (!form) {
-      throw new NotFoundException('Form not found');
+      const treasuryForm = await this.prisma.treasuryItem.findFirst({
+        where: { id: formId, type: 'form' },
+      });
+      if (!treasuryForm) {
+        throw new NotFoundException('Form not found');
+      }
+      // Create form record from Treasury item for submissions to reference
+      const treasuryContent = treasuryForm.content as any;
+      form = await this.prisma.form.create({
+        data: {
+          id: treasuryForm.id,
+          tenantId: tenantId,
+          name: treasuryForm.name,
+          description: treasuryForm.description || '',
+          formType: 'form',
+          fields: treasuryContent?.fields || [],
+          settings: {},
+          status: 'active',
+        },
+      });
     }
 
     // Check for existing submission for this event
