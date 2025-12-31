@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import Sidebar from '../components/Sidebar';
 import AuthGuard from '../components/AuthGuard';
+import FormCompletionModal from '../components/FormCompletionModal';
 
 interface CalendarEvent {
   id: string;
@@ -87,6 +88,9 @@ export default function SchedulePage() {
   }>({ category: '', executive: '', industry: '' });
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [saving, setSaving] = useState(false);
+  // Form completion modal state
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [selectedFormForCompletion, setSelectedFormForCompletion] = useState<{ formId: string; formName: string; calendarEventId: string; contactId?: string } | null>(null);
 
   // New event form state
   const [newEvent, setNewEvent] = useState({
@@ -116,6 +120,20 @@ export default function SchedulePage() {
       'Content-Type': 'application/json'
     };
   };
+
+  // Handle opening form completion modal
+  const handleOpenFormCompletion = (item: { treasuryItemId: string; type: string; name: string }) => {
+    if (item.type === 'form' && selectedEvent) {
+      setSelectedFormForCompletion({
+        formId: item.treasuryItemId,
+        formName: item.name,
+        calendarEventId: selectedEvent.id,
+        contactId: selectedEvent.contactId
+      });
+      setShowFormModal(true);
+    }
+  };
+
   // Fetch Treasury Items for Assemblies
   const fetchTreasuryItems = async () => {
     setTreasuryLoading(true);
@@ -1400,16 +1418,19 @@ export default function SchedulePage() {
                       {selectedEvent.attachedItems.map((item: any, index: number) => (
                         <div
                           key={index}
+                          onClick={() => handleOpenFormCompletion(item)}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.5rem',
                             padding: '0.5rem 0.75rem',
-                            background: 'var(--zander-off-white)',
+                            background: item.type === 'form' ? 'rgba(191, 10, 48, 0.05)' : 'var(--zander-off-white)',
                             borderRadius: '6px',
-                            border: '1px solid var(--zander-border-gray)',
-                            cursor: 'pointer'
+                            border: item.type === 'form' ? '2px solid var(--zander-red)' : '1px solid var(--zander-border-gray)',
+                            cursor: item.type === 'form' ? 'pointer' : 'default',
+                            transition: 'all 0.2s ease'
                           }}
+                          title={item.type === 'form' ? 'Click to open form' : ''}
                         >
                           <span>{getTreasuryTypeIcon(item.type)}</span>
                           <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{item.name}</span>
@@ -1770,6 +1791,24 @@ export default function SchedulePage() {
           </div>
         )}
       </div>
+
+        {/* Form Completion Modal */}
+        {showFormModal && selectedFormForCompletion && (
+          <FormCompletionModal
+            isOpen={showFormModal}
+            onClose={() => {
+              setShowFormModal(false);
+              setSelectedFormForCompletion(null);
+            }}
+            formId={selectedFormForCompletion.formId}
+            formName={selectedFormForCompletion.formName}
+            calendarEventId={selectedFormForCompletion.calendarEventId}
+            contactId={selectedFormForCompletion.contactId}
+            onSubmissionUpdate={(submission) => {
+              console.log('Form submission updated:', submission);
+            }}
+          />
+        )}
     </AuthGuard>
   );
 }
