@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request } from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { Public } from '../auth/public.decorator';
 
@@ -59,5 +59,72 @@ export class FormsController {
   @Post(':id/submit')
   async submitForm(@Param('id') id: string, @Body() data: any) {
     return this.formsService.createSubmission(id, data);
+  }
+
+  // Get or create submission for an attached form (calendar event)
+  @Post(':id/event-submission')
+  async getOrCreateEventSubmission(
+    @Param('id') formId: string,
+    @Request() req,
+    @Body() body: {
+      calendarEventId: string;
+      contactId?: string;
+    }
+  ) {
+    return this.formsService.getOrCreateEventSubmission(
+      formId,
+      body.calendarEventId,
+      body.contactId,
+      req.user?.id
+    );
+  }
+
+  // Get a specific submission
+  @Get('submissions/:submissionId')
+  async getSubmission(@Param('submissionId') submissionId: string) {
+    return this.formsService.getSubmission(submissionId);
+  }
+
+  // Auto-save draft
+  @Patch('submissions/:submissionId/draft')
+  async saveSubmissionDraft(
+    @Param('submissionId') submissionId: string,
+    @Request() req,
+    @Body() body: { data: any }
+  ) {
+    return this.formsService.saveSubmissionDraft(
+      submissionId,
+      body.data,
+      req.user?.id
+    );
+  }
+
+  // Submit/complete a submission
+  @Patch('submissions/:submissionId/submit')
+  async submitSubmission(
+    @Param('submissionId') submissionId: string,
+    @Request() req,
+    @Body() body: { data: any }
+  ) {
+    return this.formsService.submitSubmission(
+      submissionId,
+      body.data,
+      req.user?.id
+    );
+  }
+
+  // Get submission by calendar event
+  @Get(':id/event/:eventId')
+  async getSubmissionByEventId(
+    @Param('id') formId: string,
+    @Param('eventId') eventId: string
+  ) {
+    return this.formsService.getSubmissionByEventId(formId, eventId);
+  }
+
+  // Get all submissions for a calendar event
+  @Get('event/:eventId/submissions')
+  async getSubmissionsByEventId(@Param('eventId') eventId: string) {
+    return this.formsService.getSubmissionsByEventId(eventId);
   }
 }

@@ -22,11 +22,9 @@ export class FormsService {
         _count: { select: { submissions: true } }
       },
     });
-
     if (!form) {
       throw new NotFoundException('Form not found');
     }
-
     return form;
   }
 
@@ -60,11 +58,9 @@ export class FormsService {
     const form = await this.prisma.form.findFirst({
       where: { id, tenantId },
     });
-
     if (!form) {
       throw new NotFoundException('Form not found');
     }
-
     return this.prisma.form.update({
       where: { id },
       data,
@@ -75,20 +71,16 @@ export class FormsService {
     const form = await this.prisma.form.findFirst({
       where: { id, tenantId },
     });
-
     if (!form) {
       throw new NotFoundException('Form not found');
     }
-
     // Delete submissions first
     await this.prisma.formSubmission.deleteMany({
       where: { formId: id },
     });
-
     await this.prisma.form.delete({
       where: { id },
     });
-
     return { success: true, message: 'Form deleted successfully' };
   }
 
@@ -97,14 +89,12 @@ export class FormsService {
     const form = await this.prisma.form.findFirst({
       where: { id: formId, tenantId },
     });
-
     if (!form) {
       throw new NotFoundException('Form not found');
     }
-
     return this.prisma.formSubmission.findMany({
       where: { formId },
-      include: { contact: true },
+      include: { contact: true, form: true, updatedBy: true },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -113,18 +103,15 @@ export class FormsService {
     const form = await this.prisma.form.findUnique({
       where: { id: formId },
     });
-
     if (!form) {
       throw new NotFoundException('Form not found');
     }
-
     // Optionally create a contact from submission
     let contactId: string | undefined;
     if (data.email && form.tenantId) {
       const existingContact = await this.prisma.contact.findFirst({
         where: { email: data.email, tenantId: form.tenantId },
       });
-
       if (existingContact) {
         contactId = existingContact.id;
       } else if (data.firstName || data.lastName) {
@@ -142,13 +129,151 @@ export class FormsService {
         contactId = newContact.id;
       }
     }
-
     return this.prisma.formSubmission.create({
       data: {
         formId,
         data,
         contactId,
+        status: 'draft',
+        version: 1,
+        changeLog: [],
       },
+    });
+  }
+
+  // Get or create submission for a calendar event (attached form)
+  async getOrCreateEventSubmission(
+    formId: string,
+    calendarEventId: string,
+    contactId?: string,
+    userId?: string
+  ) {
+    const form = await this.prisma.form.findUnique({
+      where: { id: formId },
+    });
+    if (!form) {
+      throw new NotFoundException('Form not found');
+    }
+
+    // Check for existing submission for this event
+    let submission = await this.prisma.formSubmission.findFirst({
+      where: { formId, calendarEventId },
+      include: { form: true, contact: true, updatedBy: true },
+    });
+
+    if (!submission) {
+      // Create new submission linked to event
+      submission = await this.prisma.formSubmission.create({
+        data: {
+          formId,
+          calendarEventId,
+          contactId,
+          data: {},
+          status: 'draft',
+          version: 1,
+          changeLog: [],
+          updatedById: userId,
+        },
+        include: { form: true, contact: true, updatedBy: true },
+      });
+    }
+
+    return submission;
+  }
+
+  // Get submission by ID
+  async getSubmission(submissionId: string) {
+    const submission = await this.prisma.formSubmission.findUnique({
+      where: { id: submissionId },
+      include: { form: true, contact: true, updatedBy: true },
+    });
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+    return submission;
+  }
+
+  // Auto-save submission (draft save)
+  async saveSubmissionDraft(
+    submissionId: string,
+    data: any,
+    userId?: string
+  ) {
+    const submission = await this.prisma.formSubmission.findUnique({
+      where: { id: submissionId },
+    });
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    return this.prisma.formSubmission.update({
+      where: { id: submissionId },
+      data: {
+        data,
+        updatedById: userId,
+        // Keep status as draft during auto-save
+      },
+      include: { form: true, contact: true, updatedBy: true },
+    });
+  }
+
+  // Submit/complete a submission
+  async submitSubmission(
+    submissionId: string,
+    data: any,
+    userId?: string
+  ) {
+    const submission = await this.prisma.formSubmission.findUnique({
+      where: { id: submissionId },
+    });
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    const wasCompleted = submission.status === 'completed';
+    const currentChangeLog = (submission.changeLog as any[]) || [];
+
+    // If already completed, increment version and add to changelog
+    const newVersion = wasCompleted ? submission.version + 1 : 1;
+    const newChangeLog = wasCompleted
+      ? [
+          ...currentChangeLog,
+          {
+            version: newVersion,
+            updatedAt: new Date().toISOString(),
+            updatedById: userId,
+            previousData: submission.data,
+          },
+        ]
+      : currentChangeLog;
+
+    return this.prisma.formSubmission.update({
+      where: { id: submissionId },
+      data: {
+        data,
+        status: 'completed',
+        version: newVersion,
+        changeLog: newChangeLog,
+        updatedById: userId,
+      },
+      include: { form: true, contact: true, updatedBy: true },
+    });
+  }
+
+  // Get submission by calendar event ID
+  async getSubmissionByEventId(formId: string, calendarEventId: string) {
+    return this.prisma.formSubmission.findFirst({
+      where: { formId, calendarEventId },
+      include: { form: true, contact: true, updatedBy: true },
+    });
+  }
+
+  // Get all submissions for a calendar event
+  async getSubmissionsByEventId(calendarEventId: string) {
+    return this.prisma.formSubmission.findMany({
+      where: { calendarEventId },
+      include: { form: true, contact: true, updatedBy: true },
+      orderBy: { createdAt: 'desc' },
     });
   }
 }
