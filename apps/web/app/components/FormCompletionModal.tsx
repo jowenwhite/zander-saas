@@ -89,9 +89,30 @@ export default function FormCompletionModal({
         const initialData = { ...data.data };
         // Progressive fields: pre-populate from contact if available
         if (data.contact && Object.keys(initialData).length === 0) {
-          if (data.contact.firstName) initialData['Full Name'] = `${data.contact.firstName} ${data.contact.lastName || ''}`.trim();
-          if (data.contact.email) initialData['Email Address'] = data.contact.email;
-          if (data.contact.phone) initialData['Phone Number'] = data.contact.phone;
+          const c = data.contact;
+          // Name fields
+          if (c.firstName) {
+            initialData['Full Name'] = `${c.firstName} ${c.lastName || ''}`.trim();
+            initialData['Name'] = `${c.firstName} ${c.lastName || ''}`.trim();
+            initialData['Client Name'] = `${c.firstName} ${c.lastName || ''}`.trim();
+            initialData['First Name'] = c.firstName;
+          }
+          if (c.lastName) initialData['Last Name'] = c.lastName;
+          // Contact fields
+          if (c.email) {
+            initialData['Email Address'] = c.email;
+            initialData['Email'] = c.email;
+          }
+          if (c.phone) {
+            initialData['Phone Number'] = c.phone;
+            initialData['Phone'] = c.phone;
+            initialData['Primary Phone'] = c.phone;
+          }
+          // Company fields
+          if (c.company) {
+            initialData['Company Name'] = c.company;
+            initialData['Company'] = c.company;
+          }
         }
         setFormData(initialData);
         setLastSaved(new Date(data.updatedAt));
