@@ -1452,6 +1452,197 @@ export default function ProductionPage() {
           </div>
         </div>
       )}
+
+      {/* Widget Settings Modal */}
+      {showWidgetSettings && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowWidgetSettings(false)}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            width: '600px',
+            maxHeight: '80vh',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.25)'
+          }} onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+              color: 'white',
+              padding: '1.5rem 2rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>⚙️ Customize Dashboard</h2>
+                <p style={{ margin: '0.25rem 0 0 0', opacity: 0.8, fontSize: '0.9rem' }}>Select which KPIs appear in your dashboard widgets</p>
+              </div>
+              <button
+                onClick={() => setShowWidgetSettings(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  border: 'none',
+                  color: 'white',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  fontSize: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >×</button>
+            </div>
+            
+            {/* Modal Body */}
+            <div style={{ padding: '2rem', maxHeight: '60vh', overflowY: 'auto' }}>
+              <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                Choose 4 KPIs to display in your dashboard. Click a slot to change its metric.
+              </p>
+              
+              {/* Current Widget Slots */}
+              <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
+                  📊 Your Dashboard Widgets
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                  {[0, 1, 2, 3].map((slotIndex) => {
+                    const currentKpiId = widgetConfig[slotIndex];
+                    return (
+                      <div key={slotIndex} style={{
+                        border: '2px solid var(--zander-border-gray)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        background: 'var(--zander-off-white)'
+                      }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Widget {slotIndex + 1}
+                        </div>
+                        <select
+                          value={currentKpiId}
+                          onChange={(e) => {
+                            const newConfig = [...widgetConfig];
+                            newConfig[slotIndex] = e.target.value;
+                            saveWidgetConfig(newConfig);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem',
+                            border: '2px solid var(--zander-border-gray)',
+                            borderRadius: '8px',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            color: 'var(--zander-navy)',
+                            background: 'white',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {kpiLibrary.map((kpi) => (
+                            <option key={kpi.id} value={kpi.id}>
+                              {kpi.icon} {kpi.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Available KPIs Reference */}
+              <div>
+                <h3 style={{ color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
+                  📋 Available KPIs
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+                  {kpiLibrary.map((kpi) => {
+                    const isSelected = widgetConfig.includes(kpi.id);
+                    return (
+                      <div key={kpi.id} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem',
+                        borderRadius: '8px',
+                        background: isSelected ? 'rgba(191, 10, 48, 0.1)' : 'transparent',
+                        border: isSelected ? '2px solid var(--zander-red)' : '2px solid transparent'
+                      }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          background: kpi.gradient,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.9rem'
+                        }}>{kpi.icon}</div>
+                        <div>
+                          <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.875rem' }}>{kpi.name}</div>
+                          {isSelected && <div style={{ fontSize: '0.7rem', color: 'var(--zander-red)' }}>In use</div>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div style={{
+              padding: '1rem 2rem',
+              borderTop: '1px solid var(--zander-border-gray)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'var(--zander-off-white)'
+            }}>
+              <button
+                onClick={() => {
+                  saveWidgetConfig(['won_revenue', 'pipeline_value', 'closing_soon', 'win_rate']);
+                }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  border: '2px solid var(--zander-border-gray)',
+                  borderRadius: '8px',
+                  background: 'white',
+                  color: 'var(--zander-gray)',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Reset to Default
+              </button>
+              <button
+                onClick={() => setShowWidgetSettings(false)}
+                style={{
+                  padding: '0.75rem 2rem',
+                  border: 'none',
+                  borderRadius: '8px',
+                  background: 'var(--zander-red)',
+                  color: 'white',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </AuthGuard>
 
