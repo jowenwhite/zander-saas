@@ -255,7 +255,7 @@ export default function AdminTreasuryPage() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--zander-off-white)' }}>
       <Sidebar />
-      <main style={{ flex: 1, padding: '2rem' }}>
+      <main style={{ flex: 1, padding: '2rem', marginLeft: '240px' }}>
         {/* Header */}
         <div style={{ 
           background: 'linear-gradient(135deg, var(--zander-red) 0%, #a00a28 100%)',
