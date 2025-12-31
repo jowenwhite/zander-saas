@@ -64,6 +64,70 @@ export default function ProductionPage() {
   const [showNewDealModal, setShowNewDealModal] = useState(false);
   const [showNewContactModal, setShowNewContactModal] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showWidgetSettings, setShowWidgetSettings] = useState(false);
+  
+  // Widget configuration - which KPIs to show in each slot
+  const [widgetConfig, setWidgetConfig] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('zander_widget_config');
+      return saved ? JSON.parse(saved) : ['won_revenue', 'pipeline_value', 'closing_soon', 'win_rate'];
+    }
+    return ['won_revenue', 'pipeline_value', 'closing_soon', 'win_rate'];
+  });
+  
+  // KPI Library - all available metrics
+  const kpiLibrary = [
+    { id: 'won_revenue', name: 'Won This Month', icon: '💰', color: '#E74C3C', gradient: 'linear-gradient(135deg, #E74C3C 0%, #d93426 100%)' },
+    { id: 'pipeline_value', name: 'Pipeline Value', icon: '📊', color: '#27AE60', gradient: 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' },
+    { id: 'closing_soon', name: 'Closing This Week', icon: '🤝', color: '#3498DB', gradient: 'linear-gradient(135deg, #3498DB 0%, #2471a3 100%)' },
+    { id: 'win_rate', name: 'Win Rate', icon: '📈', color: '#9B59B6', gradient: 'linear-gradient(135deg, #9B59B6 0%, #7d3c98 100%)' },
+    { id: 'avg_deal_size', name: 'Avg Deal Size', icon: '💎', color: '#F39C12', gradient: 'linear-gradient(135deg, #F39C12 0%, #d68910 100%)' },
+    { id: 'total_deals', name: 'Total Deals', icon: '📋', color: '#1ABC9C', gradient: 'linear-gradient(135deg, #1ABC9C 0%, #16a085 100%)' },
+    { id: 'weighted_pipeline', name: 'Weighted Pipeline', icon: '🎯', color: '#E67E22', gradient: 'linear-gradient(135deg, #E67E22 0%, #d35400 100%)' },
+    { id: 'leads_count', name: 'New Leads', icon: '🌱', color: '#2ECC71', gradient: 'linear-gradient(135deg, #2ECC71 0%, #27ae60 100%)' },
+    { id: 'proposals_out', name: 'Proposals Out', icon: '📄', color: '#9B59B6', gradient: 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)' },
+    { id: 'lost_deals', name: 'Lost This Month', icon: '📉', color: '#95A5A6', gradient: 'linear-gradient(135deg, #95A5A6 0%, #7f8c8d 100%)' },
+  ];
+  
+  // Calculate KPI values
+  const getKpiValue = (kpiId: string) => {
+    switch (kpiId) {
+      case 'won_revenue':
+        return { value: formatCurrency(wonValue), detail: `${wonDeals.length} deals closed`, trend: '+12%', trendUp: true };
+      case 'pipeline_value':
+        return { value: formatCurrency(pipelineValue), detail: `${activeDeals.length} active deals`, trend: '+8%', trendUp: true };
+      case 'closing_soon':
+        const closingDeals = deals.filter(d => d.stage === 'NEGOTIATION');
+        return { value: String(closingDeals.length), detail: `Expected: ${formatCurrency(closingDeals.reduce((sum, d) => sum + d.dealValue, 0))}`, trend: '+5', trendUp: true };
+      case 'win_rate':
+        return { value: `${winRate}%`, detail: 'Last 30 days', trend: '+3%', trendUp: true };
+      case 'avg_deal_size':
+        const avgSize = wonDeals.length > 0 ? wonValue / wonDeals.length : 0;
+        return { value: formatCurrency(avgSize), detail: `From ${wonDeals.length} deals`, trend: '+5%', trendUp: true };
+      case 'total_deals':
+        return { value: String(deals.length), detail: 'All time', trend: '+' + activeDeals.length, trendUp: true };
+      case 'weighted_pipeline':
+        const weighted = activeDeals.reduce((sum, d) => sum + (d.dealValue * d.probability / 100), 0);
+        return { value: formatCurrency(weighted), detail: 'Risk-adjusted', trend: '+6%', trendUp: true };
+      case 'leads_count':
+        const leads = deals.filter(d => d.stage === 'LEAD' || d.stage === 'PROSPECT');
+        return { value: String(leads.length), detail: 'In early stages', trend: '+3', trendUp: true };
+      case 'proposals_out':
+        const proposals = deals.filter(d => d.stage === 'PROPOSAL');
+        return { value: String(proposals.length), detail: formatCurrency(proposals.reduce((sum, d) => sum + d.dealValue, 0)), trend: '+2', trendUp: true };
+      case 'lost_deals':
+        const lost = deals.filter(d => d.stage === 'CLOSED_LOST');
+        return { value: String(lost.length), detail: formatCurrency(lost.reduce((sum, d) => sum + d.dealValue, 0)), trend: '-2', trendUp: false };
+      default:
+        return { value: '0', detail: '', trend: '', trendUp: true };
+    }
+  };
+  
+  // Save widget config to localStorage
+  const saveWidgetConfig = (newConfig: string[]) => {
+    setWidgetConfig(newConfig);
+    localStorage.setItem('zander_widget_config', JSON.stringify(newConfig));
+  };
 
   // Form states
   const [contactForm, setContactForm] = useState({
@@ -332,179 +396,92 @@ export default function ProductionPage() {
             >
               + New Person
             </button>
+            <button
+              onClick={() => setShowWidgetSettings(true)}
+              style={{
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                border: '2px solid var(--zander-border-gray)',
+                background: 'white',
+                color: 'var(--zander-gray)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              ⚙️ Customize
+            </button>
           </div>
         </div>
 
-        {/* Metrics Grid */}
+        {/* Metrics Grid - Dynamic Widgets */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '1.5rem',
           marginBottom: '2rem'
         }}>
-          {/* Won This Month */}
-          <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
-            borderRadius: '12px',
-            padding: '1.5rem',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
+          {widgetConfig.map((kpiId, index) => {
+            const kpi = kpiLibrary.find(k => k.id === kpiId);
+            if (!kpi) return null;
+            const kpiData = getKpiValue(kpiId);
+            return (
+              <div key={kpiId} style={{
+                background: 'white',
+                border: '2px solid var(--zander-border-gray)',
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #E74C3C 0%, #d93426 100%)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem'
-              }}>💰</div>
-              <span style={{
-                padding: '0.25rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                background: 'rgba(40, 167, 69, 0.1)',
-                color: '#28a745'
-              }}>↑ 12%</span>
-            </div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
-              {formatCurrency(wonValue)}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
-              Won This Month
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
-              {wonDeals.length} deals closed
-            </div>
-          </div>
-
-          {/* Projects Value */}
-          <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
-            borderRadius: '12px',
-            padding: '1.5rem',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem'
-              }}>📊</div>
-              <span style={{
-                padding: '0.25rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                background: 'rgba(40, 167, 69, 0.1)',
-                color: '#28a745'
-              }}>↑ 8%</span>
-            </div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
-              {formatCurrency(pipelineValue)}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
-              Projects Value
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
-              {activeDeals.length} active deals
-            </div>
-          </div>
-
-          {/* Closing This Week */}
-          <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
-            borderRadius: '12px',
-            padding: '1.5rem',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #3498DB 0%, #2471a3 100%)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem'
-              }}>🤝</div>
-              <span style={{
-                padding: '0.25rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                background: 'rgba(40, 167, 69, 0.1)',
-                color: '#28a745'
-              }}>+5</span>
-            </div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
-              {deals.filter(d => d.stage === 'NEGOTIATION').length}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
-              Closing This Week
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
-              Expected: {formatCurrency(deals.filter(d => d.stage === 'NEGOTIATION').reduce((sum, d) => sum + d.dealValue, 0))}
-            </div>
-          </div>
-
-          {/* Win Rate */}
-          <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
-            borderRadius: '12px',
-            padding: '1.5rem',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #9B59B6 0%, #7d3c98 100%)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem'
-              }}>📈</div>
-              <span style={{
-                padding: '0.25rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                background: 'rgba(40, 167, 69, 0.1)',
-                color: '#28a745'
-              }}>↑ 3%</span>
-            </div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
-              {winRate}%
-            </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
-              Win Rate
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
-              Last 30 days
-            </div>
-          </div>
+                padding: '1.5rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = kpi.color;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    background: kpi.gradient,
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.25rem'
+                  }}>{kpi.icon}</div>
+                  {kpiData.trend && (
+                    <span style={{
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      background: kpiData.trendUp ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)',
+                      color: kpiData.trendUp ? '#28a745' : '#dc3545'
+                    }}>{kpiData.trendUp ? '↑' : '↓'} {kpiData.trend.replace(/[+-]/g, '')}</span>
+                  )}
+                </div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                  {kpiData.value}
+                </div>
+                <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
+                  {kpi.name}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                  {kpiData.detail}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Projects Overview - Full Width */}
