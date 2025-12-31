@@ -111,6 +111,7 @@ model User {
   googleToken      GoogleToken?
   microsoftToken   MicrosoftToken?
   tenantAccess     UserTenantAccess[]
+  formSubmissionUpdates FormSubmission[]
 
   @@map("users")
 }
@@ -296,14 +297,20 @@ model Form {
 }
 
 model FormSubmission {
-  id        String   @id @default(cuid())
-  formId    String
-  data      Json
+  id              String   @id @default(cuid())
+  formId          String
+  data            Json
   contactId       String?
   calendarEventId String?
-  createdAt DateTime @default(now())
-  form      Form     @relation(fields: [formId], references: [id])
-  contact   Contact? @relation(fields: [contactId], references: [id])
+  status          String   @default("draft") // "draft" | "completed"
+  version         Int      @default(1)
+  changeLog       Json     @default("[]") // Array of { version, updatedAt, updatedById, changes }
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  updatedById     String?
+  form            Form     @relation(fields: [formId], references: [id])
+  contact         Contact? @relation(fields: [contactId], references: [id])
+  updatedBy       User?    @relation(fields: [updatedById], references: [id])
 
   @@map("form_submissions")
 }
