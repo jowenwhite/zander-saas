@@ -298,56 +298,105 @@ export default function AIAssistantPage() {
 
           {/* Chat Area - with margin for sidebar */}
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--zander-off-white)', marginLeft: '240px' }}>
-            {/* Executive Header */}
+            {/* Page Header - Matching Forms/Schedule/Communication */}
             <div style={{
-              background: `linear-gradient(135deg, ${selectedExecutive.color} 0%, ${selectedExecutive.color}dd 100%)`,
-              padding: '1.5rem 2rem',
-              color: 'white'
+              background: 'linear-gradient(135deg, var(--zander-red) 0%, #a00828 100%)',
+              borderRadius: '12px',
+              padding: '2rem',
+              color: 'white',
+              margin: '2rem',
+              marginBottom: '0'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.75rem'
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h1 style={{ fontSize: '2rem', fontWeight: '700', margin: '0 0 0.5rem 0' }}>
+                    Meet {selectedExecutive.name}
+                  </h1>
+                  <p style={{ margin: 0, opacity: 0.9 }}>
+                    Your {selectedExecutive.fullTitle} • {selectedExecutive.reference}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button
+                    onClick={() => alert('Treasury Prompts coming soon!')}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: 'rgba(255,255,255,0.2)',
+                      color: 'white',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    🏛️ The Treasury
+                  </button>
+                  <button
+                    onClick={() => alert('New Prompt feature coming soon!')}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: 'var(--zander-gold)',
+                      color: 'var(--zander-navy)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    + New Prompt
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Jordan Overview Box */}
+            <div style={{
+              background: 'white',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              margin: '2rem',
+              marginTop: '1.5rem',
+              marginBottom: '0'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ 
+                    margin: 0, 
+                    fontSize: '1.1rem', 
+                    lineHeight: 1.7, 
+                    color: 'var(--zander-navy)',
+                    maxWidth: '800px'
                   }}>
-                    {selectedExecutive.avatar}
-                  </div>
-                  <div>
-                    <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>
-                      Meet {selectedExecutive.name}
-                    </h1>
-                    <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9, fontSize: '0.9rem' }}>
-                      Your {selectedExecutive.fullTitle} • {selectedExecutive.reference}
-                    </p>
-                  </div>
+                    {selectedExecutive.personality}
+                  </p>
                 </div>
                 {messages.length > 0 && (
                   <button
                     onClick={handleClearChat}
                     style={{
                       padding: '0.5rem 1rem',
-                      background: 'rgba(255,255,255,0.2)',
-                      color: 'white',
-                      border: 'none',
+                      background: 'var(--zander-off-white)',
+                      color: 'var(--zander-gray)',
+                      border: '2px solid var(--zander-border-gray)',
                       borderRadius: '6px',
                       fontSize: '0.8rem',
                       cursor: 'pointer',
-                      fontWeight: '500'
+                      fontWeight: '500',
+                      marginLeft: '1rem',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     🗑 Clear Chat
                   </button>
                 )}
               </div>
-              <p style={{ margin: '1rem 0 0 0', opacity: 0.95, fontSize: '0.9rem', lineHeight: 1.6, maxWidth: '700px' }}>
-                {selectedExecutive.personality}
-              </p>
             </div>
 
             {/* Messages Area */}
