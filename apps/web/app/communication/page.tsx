@@ -874,7 +874,7 @@ export default function CommunicationsPage() {
                         marginLeft: '0.5rem'
                       }}
                     >
-                      🎥 Schedule Meeting
+                      🎥 Schedule Assembly
                     </button>
                   )}
                 </div>
@@ -1733,7 +1733,7 @@ export default function CommunicationsPage() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: 'white', borderRadius: '12px', width: '500px', maxHeight: '85vh', overflow: 'auto' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px 12px 0 0' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'white' }}>🎥 Schedule Meeting</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'white' }}>🎥 Schedule Assembly</h2>
               <button onClick={() => setShowScheduleMeeting(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'white' }}>×</button>
             </div>
             <form onSubmit={handleScheduleMeeting} style={{ padding: '1.5rem' }}>
@@ -1798,7 +1798,7 @@ export default function CommunicationsPage() {
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowScheduleMeeting(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={savingMeeting} style={{ padding: '0.75rem 1.5rem', background: savingMeeting ? 'var(--zander-gray)' : 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingMeeting ? 'not-allowed' : 'pointer' }}>
-                  {savingMeeting ? 'Scheduling...' : '🎥 Schedule Meeting'}
+                  {savingMeeting ? 'Scheduling...' : '🎥 Schedule Assembly'}
                 </button>
               </div>
             </form>

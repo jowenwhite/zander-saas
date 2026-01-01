@@ -558,7 +558,7 @@ export default function SchedulePage() {
                   📅 Schedule
                 </h1>
                 <p style={{ margin: 0, opacity: 0.9 }}>
-                  {formatDateFull(today.toISOString())} • {todayEvents.length} event{todayEvents.length !== 1 ? 's' : ''} today • {upcomingCount} upcoming
+                  {formatDateFull(today.toISOString())} • {todayEvents.length} assembl{todayEvents.length !== 1 ? 'ies' : 'y'} today • {upcomingCount} upcoming
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
