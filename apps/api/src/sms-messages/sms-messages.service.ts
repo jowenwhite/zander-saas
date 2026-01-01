@@ -164,4 +164,10 @@ export class SmsMessagesService {
 
     return { success: true, updated: updated.count };
   }
+
+  async delete(id: string, tenantId: string) {
+    return this.prisma.smsMessage.deleteMany({
+      where: { id, tenantId },
+    });
+  }
 }

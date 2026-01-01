@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   Query,
@@ -66,5 +67,12 @@ export class SmsMessagesController {
   @Post('status-webhook')
   async handleStatus(@Body() body: any) {
     return this.smsMessagesService.handleStatusWebhook(body);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  async delete(@Request() req, @Param('id') id: string) {
+    await this.smsMessagesService.delete(id, req.user.tenantId);
+    return { success: true };
   }
 }

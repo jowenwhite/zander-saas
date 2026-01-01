@@ -949,9 +949,27 @@ export default function CommunicationsPage() {
                               <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: sms.direction === 'inbound' ? '#e8f5e9' : '#fff3e0', color: sms.direction === 'inbound' ? '#2e7d32' : '#f57c00' }}>
                                 {sms.direction === 'inbound' ? '📥' : '📤'}
                               </span>
-                              <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                                 {sms.body.substring(0, 50)}{sms.body.length > 50 ? '...' : ''}
                               </span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm('Delete this SMS?')) {
+                                    fetch(process.env.NEXT_PUBLIC_API_URL + '/sms-messages/' + sms.id, {
+                                      method: 'DELETE',
+                                      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('zander_token') }
+                                    }).then(() => {
+                                      setSmsMessages(prev => prev.filter(s => s.id !== sms.id));
+                                    }).catch(err => console.error('Delete SMS error:', err));
+                                  }
+                                }}
+                                style={{ padding: '0.25rem 0.5rem', background: 'transparent', color: 'var(--zander-red)', border: '1px solid var(--zander-red)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', opacity: 0.7 }}
+                                onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
+                                onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
+                              >
+                                🗑️
+                              </button>
                             </div>
                           </div>
                         ))
@@ -1999,7 +2017,24 @@ export default function CommunicationsPage() {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
+              <button
+                onClick={() => {
+                  if (confirm('Delete this call log?')) {
+                    fetch(process.env.NEXT_PUBLIC_API_URL + '/call-logs/' + selectedCall.id, {
+                      method: 'DELETE',
+                      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('zander_token') }
+                    }).then(() => {
+                      setCallLogs(prev => prev.filter(c => c.id !== selectedCall.id));
+                      setShowCallDetails(false);
+                      setSelectedCall(null);
+                    }).catch(err => console.error('Delete call error:', err));
+                  }
+                }}
+                style={{ padding: '0.5rem 1.5rem', background: 'transparent', color: 'var(--zander-red)', border: '1px solid var(--zander-red)', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}
+              >
+                🗑️ Delete
+              </button>
               <button onClick={() => setShowCallDetails(false)} style={{ padding: '0.5rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}>Close</button>
             </div>
           </div>
