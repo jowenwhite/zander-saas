@@ -19,8 +19,8 @@ const DEFAULT_CHECKLIST: ChecklistItem[] = [
   { id: 'pillars', label: 'Understand the Five Pillars', time: '', completed: true },
   { id: 'email', label: 'Connect your email', time: '5 min', completed: false, link: '/settings' },
   { id: 'contact', label: 'Add your first contact', time: '2 min', completed: false, link: '/people' },
-  { id: 'deal', label: 'Create your first deal', time: '3 min', completed: false, link: '/deals' },
-  { id: 'treasury', label: 'Explore The Treasury', time: '5 min', completed: false, link: '/treasury' },
+  { id: 'deal', label: 'Create your first deal', time: '3 min', completed: false, link: '/projects' },
+  { id: 'treasury', label: 'Explore The Treasury', time: '5 min', completed: false, link: '/forms' },
   { id: 'dashboard', label: 'Customize your dashboard', time: '3 min', completed: false, link: '/production' },
 ];
 
