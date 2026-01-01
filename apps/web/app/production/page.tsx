@@ -570,7 +570,8 @@ export default function ProductionPage() {
             {/* Stage Columns */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
+              gridTemplateColumns: 'repeat(6, minmax(180px, 1fr))',
+              overflowX: 'auto',
               gap: '1rem'
             }}>
               {STAGES.map((stage) => {
