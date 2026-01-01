@@ -240,7 +240,7 @@ export default function ContactDetailPage() {
         <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ textAlign: 'center' }}>
             <p style={{ color: 'var(--zander-red)', marginBottom: '1rem' }}>{error || 'Contact not found'}</p>
-            <button onClick={() => router.push('/contacts')} style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
+            <button onClick={() => router.push('/people')} style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
               Back to Contacts
             </button>
           </div>
@@ -259,7 +259,7 @@ export default function ContactDetailPage() {
         <main style={{ marginTop: '64px', padding: '2rem', maxWidth: '1200px', margin: '64px auto 0' }}>
           {/* Back Button */}
           <button
-            onClick={() => router.push('/contacts')}
+            onClick={() => router.push('/people')}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -285,7 +285,7 @@ export default function ContactDetailPage() {
             position: 'relative'
           }}>
             <button
-              onClick={() => router.push('/contacts')}
+              onClick={() => router.push('/people')}
               style={{
                 position: 'absolute',
                 top: '1rem',

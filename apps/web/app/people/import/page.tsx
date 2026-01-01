@@ -94,7 +94,7 @@ export default function ImportContactsPage() {
       <main style={{ marginTop: '64px', padding: '2rem', maxWidth: '1000px', margin: '64px auto 0' }}>
         {/* Back Button */}
         <button 
-          onClick={() => router.push('/contacts')}
+          onClick={() => router.push('/people')}
           style={{
             display: 'flex',
             alignItems: 'center',
