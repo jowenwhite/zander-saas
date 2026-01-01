@@ -211,6 +211,8 @@ export class EmailMessagesService {
       where: {
         tenantId,
         direction: 'inbound',
+        isDeleted: false,
+        isArchived: false,
         isRead: false,
       },
     });
