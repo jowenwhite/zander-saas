@@ -714,7 +714,7 @@ export default function SchedulePage() {
             ) : events.length === 0 ? (
               <div style={{ padding: '3rem', textAlign: 'center' }}>
                 <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📅</div>
-                <h3 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>No Events Scheduled</h3>
+                <h3 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>No Assemblies Scheduled</h3>
                 <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>
                   {view === 'today' ? "Your day is clear! Schedule something or enjoy the free time." : "No events found for this period."}
                 </p>
@@ -730,7 +730,7 @@ export default function SchedulePage() {
                     cursor: 'pointer'
                   }}
                 >
-                  + Schedule Event
+                  + Schedule Assembly
                 </button>
               </div>
             ) : (
