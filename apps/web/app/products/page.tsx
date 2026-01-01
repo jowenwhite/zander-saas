@@ -218,23 +218,26 @@ export default function ProductsPage() {
                   Manage your products and services catalog
                 </p>
               </div>
-              <button
-                onClick={() => setShowNewProductModal(true)}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  background: 'var(--zander-red)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <span style={{ fontSize: '1.2rem' }}>+</span> New Product
-              </button>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <a href="/products/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+                <button
+                  onClick={() => setShowNewProductModal(true)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'var(--zander-red)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  + New Product
+                </button>
+              </div>
             </div>
 
             {/* Filters */}
