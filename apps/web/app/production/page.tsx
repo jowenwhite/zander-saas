@@ -1515,7 +1515,9 @@ export default function ProductionPage() {
             background: 'white',
             borderRadius: '16px',
             width: '600px',
-            maxHeight: '80vh',
+            maxHeight: '85vh',
+            display: 'flex',
+            flexDirection: 'column',
             overflow: 'hidden',
             boxShadow: '0 25px 50px rgba(0,0,0,0.25)'
           }} onClick={(e) => e.stopPropagation()}>
@@ -1551,7 +1553,7 @@ export default function ProductionPage() {
             </div>
             
             {/* Modal Body */}
-            <div style={{ padding: '2rem', maxHeight: '60vh', overflowY: 'auto' }}>
+            <div style={{ padding: '2rem', flex: 1, overflowY: 'auto' }}>
               <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                 Choose 4 KPIs to display in your dashboard. Click a slot to change its metric.
               </p>
