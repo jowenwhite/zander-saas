@@ -133,6 +133,35 @@ interface ScheduledComm {
 }
 
 
+
+interface AccessibleTenant {
+  id: string;
+  companyName: string;
+  subdomain: string;
+  tenantType: string;
+}
+
+// Tenant colors for multi-tenant view
+const TENANT_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
+  'mcf': { bg: '#BF0A30', text: 'white', icon: '🏭' },
+  '64w': { bg: '#0C2340', text: 'white', icon: '🏢' },
+  'zander': { bg: '#F0B323', text: '#0C2340', icon: '🚀' },
+  'default': { bg: '#6c757d', text: 'white', icon: '🏪' }
+};
+
+const getTenantColor = (subdomain: string) => {
+  if (subdomain?.toLowerCase().includes('mcf') || subdomain?.toLowerCase().includes('cabinet')) {
+    return TENANT_COLORS.mcf;
+  }
+  if (subdomain?.toLowerCase().includes('64w') || subdomain?.toLowerCase().includes('west')) {
+    return TENANT_COLORS['64w'];
+  }
+  if (subdomain?.toLowerCase().includes('zander')) {
+    return TENANT_COLORS.zander;
+  }
+  return TENANT_COLORS.default;
+};
+
 export default function CommunicationsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'inbox' | 'campaigns' | 'scheduled'>('inbox');
@@ -202,6 +231,13 @@ export default function CommunicationsPage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
 
+  // Multi-tenant state (SuperAdmin only)
+  const [accessibleTenants, setAccessibleTenants] = useState<AccessibleTenant[]>([]);
+  const [selectedTenantIds, setSelectedTenantIds] = useState<string[]>([]);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [viewMode, setViewMode] = useState<'single' | 'all'>('single');
+  const [currentTenantId, setCurrentTenantId] = useState<string>('');
+
   const API_URL = 'https://api.zanderos.com';
 
   const getAuthHeaders = () => {
@@ -211,6 +247,34 @@ export default function CommunicationsPage() {
       'Authorization': `Bearer ${token}`
     };
   };
+
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      try {
+        const token = localStorage.getItem('zander_token');
+        const userStr = localStorage.getItem('zander_user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          setIsSuperAdmin(user.isSuperAdmin || false);
+          setCurrentTenantId(user.tenantId || '');
+          
+          if (user.isSuperAdmin) {
+            const res = await fetch(`${API_URL}/tenants/accessible`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const tenants = await res.json();
+              setAccessibleTenants(tenants);
+              setSelectedTenantIds([user.tenantId]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error checking SuperAdmin status:', err);
+      }
+    };
+    checkSuperAdmin();
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -690,6 +754,100 @@ export default function CommunicationsPage() {
             </div>
           </div>
         </div>
+
+
+        {/* SuperAdmin Tenant Toggle - Only visible for SuperAdmin */}
+        {isSuperAdmin && accessibleTenants.length > 1 && (
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            border: '2px solid var(--zander-gold)',
+            marginBottom: '1rem',
+            padding: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <span style={{ 
+              fontWeight: '600', 
+              color: 'var(--zander-navy)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              ⭐ Personal View:
+            </span>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => {
+                  setViewMode('single');
+                  setSelectedTenantIds([currentTenantId]);
+                }}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: viewMode === 'single' ? 'var(--zander-navy)' : 'transparent',
+                  color: viewMode === 'single' ? 'white' : 'var(--zander-navy)',
+                  border: viewMode === 'single' ? 'none' : '1px solid var(--zander-border-gray)',
+                  borderRadius: '6px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                Current Tenant
+              </button>
+              {accessibleTenants.map((tenant) => {
+                const colors = getTenantColor(tenant.subdomain);
+                const isSelected = viewMode === 'all' && selectedTenantIds.includes(tenant.id) && selectedTenantIds.length === 1;
+                return (
+                  <button
+                    key={tenant.id}
+                    onClick={() => {
+                      setViewMode('all');
+                      setSelectedTenantIds([tenant.id]);
+                    }}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: isSelected ? colors.bg : 'transparent',
+                      color: isSelected ? colors.text : 'var(--zander-navy)',
+                      border: isSelected ? 'none' : '1px solid var(--zander-border-gray)',
+                      borderRadius: '6px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    {colors.icon} {tenant.companyName}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => {
+                  setViewMode('all');
+                  setSelectedTenantIds(accessibleTenants.map(t => t.id));
+                }}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-gold)' : 'transparent',
+                  color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-navy)' : 'var(--zander-navy)',
+                  border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid var(--zander-border-gray)',
+                  borderRadius: '6px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                ⭐ All My Companies
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div style={{
