@@ -68,6 +68,34 @@ interface TreasuryItem {
   duration?: string;
 }
 
+interface AccessibleTenant {
+  id: string;
+  companyName: string;
+  subdomain: string;
+  tenantType: string;
+}
+
+// Tenant colors for multi-tenant view
+const TENANT_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
+  'mcf': { bg: '#BF0A30', text: 'white', icon: '🏭' },
+  '64w': { bg: '#0C2340', text: 'white', icon: '🏢' },
+  'zander': { bg: '#F0B323', text: '#0C2340', icon: '🚀' },
+  'default': { bg: '#6c757d', text: 'white', icon: '🏪' }
+};
+
+const getTenantColor = (subdomain: string) => {
+  if (subdomain?.toLowerCase().includes('mcf') || subdomain?.toLowerCase().includes('cabinet')) {
+    return TENANT_COLORS.mcf;
+  }
+  if (subdomain?.toLowerCase().includes('64w') || subdomain?.toLowerCase().includes('west')) {
+    return TENANT_COLORS['64w'];
+  }
+  if (subdomain?.toLowerCase().includes('zander')) {
+    return TENANT_COLORS.zander;
+  }
+  return TENANT_COLORS.default;
+};
+
 export default function SchedulePage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -92,6 +120,13 @@ export default function SchedulePage() {
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedFormForCompletion, setSelectedFormForCompletion] = useState<{ formId: string; formName: string; calendarEventId: string; contactId?: string } | null>(null);
   const [formSubmissionStatuses, setFormSubmissionStatuses] = useState<Record<string, { status: string; version: number; updatedAt: string }>>({});
+
+  // Multi-tenant state (SuperAdmin only)
+  const [accessibleTenants, setAccessibleTenants] = useState<AccessibleTenant[]>([]);
+  const [selectedTenantIds, setSelectedTenantIds] = useState<string[]>([]);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [viewMode, setViewMode] = useState<'single' | 'all'>('single');
+  const [currentTenantId, setCurrentTenantId] = useState<string>('');
 
   // New event form state
   const [newEvent, setNewEvent] = useState({
@@ -306,10 +341,41 @@ export default function SchedulePage() {
 
 
 
+  // Fetch accessible tenants for SuperAdmin
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      try {
+        const token = localStorage.getItem('zander_token');
+        const userStr = localStorage.getItem('zander_user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          setIsSuperAdmin(user.isSuperAdmin || false);
+          setCurrentTenantId(user.tenantId || '');
+          
+          if (user.isSuperAdmin) {
+            // Fetch accessible tenants
+            const res = await fetch(`${API_URL}/tenants/accessible`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const tenants = await res.json();
+              setAccessibleTenants(tenants);
+              // Default to current tenant only
+              setSelectedTenantIds([user.tenantId]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error checking SuperAdmin status:', err);
+      }
+    };
+    checkSuperAdmin();
+  }, []);
+
   useEffect(() => {
     fetchEvents();
     fetchContacts();
-  }, [view, selectedDate]);
+  }, [view, selectedDate, viewMode, selectedTenantIds]);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -767,6 +833,22 @@ export default function SchedulePage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                             <span>{getEventTypeIcon(event.eventType)}</span>
                             <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{event.title}</span>
+                            {/* Tenant badge for multi-tenant view */}
+                            {viewMode === 'all' && (event as any).tenant && (
+                              <span style={{
+                                background: getTenantColor((event as any).tenant.subdomain).bg,
+                                color: getTenantColor((event as any).tenant.subdomain).text,
+                                padding: '0.125rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.65rem',
+                                fontWeight: '700',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.25rem'
+                              }}>
+                                {getTenantColor((event as any).tenant.subdomain).icon} {(event as any).tenant.companyName}
+                              </span>
+                            )}
                             {event.willBeRecorded && (
                               <span style={{
                                 background: '#BF0A30',
@@ -857,6 +939,22 @@ export default function SchedulePage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                             <span>{getEventTypeIcon(event.eventType)}</span>
                             <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{event.title}</span>
+                            {/* Tenant badge for multi-tenant view */}
+                            {viewMode === 'all' && (event as any).tenant && (
+                              <span style={{
+                                background: getTenantColor((event as any).tenant.subdomain).bg,
+                                color: getTenantColor((event as any).tenant.subdomain).text,
+                                padding: '0.125rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.65rem',
+                                fontWeight: '700',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.25rem'
+                              }}>
+                                {getTenantColor((event as any).tenant.subdomain).icon} {(event as any).tenant.companyName}
+                              </span>
+                            )}
                             {event.willBeRecorded && (
                               <span style={{
                                 background: '#BF0A30',

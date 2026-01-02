@@ -351,4 +351,67 @@ export class CalendarEventsService {
       },
     });
   }
+
+  // Multi-tenant calendar for SuperAdmin
+  async findAllTenantsToday(tenantIds: string[]) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return this.prisma.calendarEvent.findMany({
+      where: {
+        tenantId: { in: tenantIds },
+        startTime: { gte: today, lt: tomorrow },
+        status: { not: 'cancelled' },
+      },
+      include: {
+        contact: true,
+        createdBy: true,
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true,
+          },
+        },
+        attendees: {
+          include: {
+            user: true,
+            contact: true,
+          },
+        },
+      },
+      orderBy: { startTime: 'asc' },
+    });
+  }
+
+  async findAllTenantsRange(tenantIds: string[], startDate: Date, endDate: Date) {
+    return this.prisma.calendarEvent.findMany({
+      where: {
+        tenantId: { in: tenantIds },
+        startTime: { gte: startDate, lt: endDate },
+        status: { not: 'cancelled' },
+      },
+      include: {
+        contact: true,
+        createdBy: true,
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+            subdomain: true,
+          },
+        },
+        attendees: {
+          include: {
+            user: true,
+            contact: true,
+          },
+        },
+      },
+      orderBy: { startTime: 'asc' },
+    });
+  }
+
 }

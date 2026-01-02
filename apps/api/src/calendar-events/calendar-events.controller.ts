@@ -186,4 +186,40 @@ export class CalendarEventsController {
     await this.calendarEventsService.updateRecordingConsent(req.user.tenantId, eventId, body.status);
     return { success: true };
   }
+
+  // SuperAdmin multi-tenant endpoints
+  @Get('multi-tenant/today')
+  async findAllTenantsToday(@Request() req) {
+    if (!req.user.isSuperAdmin) {
+      return { error: 'Unauthorized - SuperAdmin only', events: [] };
+    }
+    // Get all tenant IDs the SuperAdmin wants to view
+    const tenantIds = req.query.tenantIds ? req.query.tenantIds.split(',') : [];
+    if (tenantIds.length === 0) {
+      return [];
+    }
+    return this.calendarEventsService.findAllTenantsToday(tenantIds);
+  }
+
+  @Get('multi-tenant/range')
+  async findAllTenantsRange(
+    @Request() req,
+    @Query('tenantIds') tenantIds: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    if (!req.user.isSuperAdmin) {
+      return { error: 'Unauthorized - SuperAdmin only', events: [] };
+    }
+    const ids = tenantIds ? tenantIds.split(',') : [];
+    if (ids.length === 0) {
+      return [];
+    }
+    return this.calendarEventsService.findAllTenantsRange(
+      ids,
+      new Date(startDate),
+      new Date(endDate)
+    );
+  }
+
 }
