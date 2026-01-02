@@ -87,6 +87,31 @@ export class SmsMessagesService {
     });
   }
 
+  async findAllMultiTenant(tenantIds: string[], filters?: {
+    contactId?: string;
+    direction?: string;
+    limit?: number;
+  }) {
+    const { contactId, direction, limit = 100 } = filters || {};
+    return this.prisma.smsMessage.findMany({
+      where: {
+        tenantId: { in: tenantIds },
+        ...(contactId && { contactId }),
+        ...(direction && { direction }),
+      },
+      include: {
+        contact: {
+          select: { id: true, firstName: true, lastName: true, phone: true },
+        },
+        tenant: {
+          select: { id: true, companyName: true, subdomain: true },
+        },
+      },
+      orderBy: { sentAt: "desc" },
+      take: limit,
+    });
+  }
+
   async findOne(id: string, tenantId: string) {
     return this.prisma.smsMessage.findFirst({
       where: { id, tenantId },

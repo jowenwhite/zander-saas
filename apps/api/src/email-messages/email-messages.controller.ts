@@ -44,7 +44,17 @@ export class EmailMessagesController {
     @Query('contactId') contactId?: string,
     @Query('dealId') dealId?: string,
     @Query('limit') limit?: string,
+    @Query('tenantIds') tenantIds?: string,
   ) {
+    // SuperAdmin can query multiple tenants
+    if (req.user.isSuperAdmin && tenantIds) {
+      const tenantIdArray = tenantIds.split(',');
+      return this.emailMessagesService.findAllMultiTenant(tenantIdArray, {
+        contactId,
+        dealId,
+        limit: limit ? parseInt(limit, 10) : undefined,
+      });
+    }
     const tenantId = req.user.tenantId;
     return this.emailMessagesService.findAll(tenantId, {
       contactId,

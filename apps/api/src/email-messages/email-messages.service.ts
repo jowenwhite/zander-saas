@@ -118,6 +118,28 @@ export class EmailMessagesService {
     });
   }
 
+  async findAllMultiTenant(tenantIds: string[], options?: { contactId?: string; dealId?: string; limit?: number }) {
+    return this.prisma.emailMessage.findMany({
+      where: {
+        tenantId: { in: tenantIds },
+        isDeleted: false,
+        isArchived: false,
+        ...(options?.contactId && { contactId: options.contactId }),
+        ...(options?.dealId && { dealId: options.dealId }),
+      },
+      orderBy: { sentAt: "desc" },
+      take: options?.limit || 100,
+      include: {
+        contact: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        tenant: {
+          select: { id: true, companyName: true, subdomain: true },
+        },
+      },
+    });
+  }
+
   async findByThread(tenantId: string, threadId: string) {
     return this.prisma.emailMessage.findMany({
       where: { tenantId, threadId },

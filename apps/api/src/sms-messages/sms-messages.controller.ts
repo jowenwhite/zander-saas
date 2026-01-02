@@ -38,7 +38,17 @@ export class SmsMessagesController {
     @Query('contactId') contactId?: string,
     @Query('direction') direction?: string,
     @Query('limit') limit?: string,
+    @Query('tenantIds') tenantIds?: string,
   ) {
+    // SuperAdmin can query multiple tenants
+    if (req.user.isSuperAdmin && tenantIds) {
+      const tenantIdArray = tenantIds.split(',');
+      return this.smsMessagesService.findAllMultiTenant(tenantIdArray, {
+        contactId,
+        direction,
+        limit: limit ? parseInt(limit, 10) : undefined,
+      });
+    }
     return this.smsMessagesService.findAll(req.user.tenantId, {
       contactId,
       direction,

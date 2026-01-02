@@ -61,6 +61,31 @@ export class CallLogsService {
     });
   }
 
+  async findAllMultiTenant(tenantIds: string[], filters?: {
+    type?: string;
+    direction?: string;
+    contactId?: string;
+    status?: string;
+  }) {
+    const where: any = { tenantId: { in: tenantIds } };
+    if (filters?.type) where.type = filters.type;
+    if (filters?.direction) where.direction = filters.direction;
+    if (filters?.contactId) where.contactId = filters.contactId;
+    if (filters?.status) where.status = filters.status;
+
+    return this.prisma.callLog.findMany({
+      where,
+      include: {
+        contact: true,
+        tenant: {
+          select: { id: true, companyName: true, subdomain: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    });
+  }
+
   async findOne(tenantId: string, id: string) {
     return this.prisma.callLog.findFirst({
       where: { id, tenantId },

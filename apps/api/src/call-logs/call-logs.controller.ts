@@ -48,7 +48,18 @@ export class CallLogsController {
     @Query('direction') direction?: string,
     @Query('contactId') contactId?: string,
     @Query('status') status?: string,
+    @Query('tenantIds') tenantIds?: string,
   ) {
+    // SuperAdmin can query multiple tenants
+    if (req.user.isSuperAdmin && tenantIds) {
+      const tenantIdArray = tenantIds.split(',');
+      return this.callLogsService.findAllMultiTenant(tenantIdArray, {
+        type,
+        direction,
+        contactId,
+        status,
+      });
+    }
     return this.callLogsService.findAll(req.user.tenantId, {
       type,
       direction,

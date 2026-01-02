@@ -278,19 +278,24 @@ export default function CommunicationsPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [viewMode, selectedTenantIds]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
+      // Build tenant query param for multi-tenant mode
+      const tenantQuery = viewMode === 'all' && selectedTenantIds.length > 0 
+        ? `?tenantIds=${selectedTenantIds.join(',')}`
+        : '';
+      
       const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes, unreadCountRes, campaignsRes] = await Promise.all([
         fetch(`${API_URL}/templates`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sequences`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/scheduled-communications`, { headers: getAuthHeaders() }),
-        fetch(`${API_URL}/email-messages`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/email-messages${tenantQuery}`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() }),
-        fetch(`${API_URL}/sms-messages`, { headers: getAuthHeaders() }),
-        fetch(`${API_URL}/call-logs`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/sms-messages${tenantQuery}`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/call-logs${tenantQuery}`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/email-messages/unread-count`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/campaigns`, { headers: getAuthHeaders() }),
       ]);
