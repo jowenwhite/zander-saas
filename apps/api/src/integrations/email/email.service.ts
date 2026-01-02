@@ -29,7 +29,7 @@ export class EmailService {
     if (!apiKey) {
       this.logger.warn('RESEND_API_KEY not configured - emails will not be sent');
     }
-    this.resend = new Resend(apiKey);
+    if (apiKey) { this.resend = new Resend(apiKey); }
     // Default from address - update this to your verified domain
     this.defaultFrom = 'Zander <noreply@mcfapp.com>';
   }
