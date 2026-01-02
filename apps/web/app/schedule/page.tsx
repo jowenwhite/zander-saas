@@ -666,6 +666,100 @@ export default function SchedulePage() {
             </div>
           </div>
 
+
+          {/* SuperAdmin Tenant Toggle - Only visible for SuperAdmin */}
+          {isSuperAdmin && accessibleTenants.length > 1 && (
+            <div style={{
+              background: 'white',
+              borderRadius: '12px',
+              border: '2px solid var(--zander-gold)',
+              marginBottom: '1rem',
+              padding: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
+              <span style={{ 
+                fontWeight: '600', 
+                color: 'var(--zander-navy)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                ⭐ Personal View:
+              </span>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => {
+                    setViewMode('single');
+                    setSelectedTenantIds([currentTenantId]);
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: viewMode === 'single' ? 'var(--zander-navy)' : 'transparent',
+                    color: viewMode === 'single' ? 'white' : 'var(--zander-navy)',
+                    border: viewMode === 'single' ? 'none' : '1px solid var(--zander-border-gray)',
+                    borderRadius: '6px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  Current Tenant
+                </button>
+                {accessibleTenants.map((tenant) => {
+                  const colors = getTenantColor(tenant.subdomain);
+                  const isSelected = viewMode === 'all' && selectedTenantIds.includes(tenant.id) && selectedTenantIds.length === 1;
+                  return (
+                    <button
+                      key={tenant.id}
+                      onClick={() => {
+                        setViewMode('all');
+                        setSelectedTenantIds([tenant.id]);
+                      }}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        background: isSelected ? colors.bg : 'transparent',
+                        color: isSelected ? colors.text : 'var(--zander-navy)',
+                        border: isSelected ? 'none' : '1px solid var(--zander-border-gray)',
+                        borderRadius: '6px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      {colors.icon} {tenant.companyName}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => {
+                    setViewMode('all');
+                    setSelectedTenantIds(accessibleTenants.map(t => t.id));
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-gold)' : 'transparent',
+                    color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-navy)' : 'var(--zander-navy)',
+                    border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid var(--zander-border-gray)',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  ⭐ All My Companies
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* View Tabs & Navigation */}
           <div style={{
             background: 'white',
