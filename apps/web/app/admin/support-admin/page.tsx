@@ -139,6 +139,7 @@ export default function SupportAdminPage() {
   const [zanderExpanded, setZanderExpanded] = useState(false);
   const [zanderMessages, setZanderMessages] = useState<ZanderMessage[]>([INITIAL_ZANDER_MESSAGE]);
   const [zanderInput, setZanderInput] = useState('');
+  const [zanderLoading, setZanderLoading] = useState(false);
   
   // Search/Filter state
   const [tenantSearch, setTenantSearch] = useState('');
@@ -345,34 +346,65 @@ export default function SupportAdminPage() {
     }
   };
 
-  const handleZanderSend = () => {
-    if (!zanderInput.trim()) return;
+  const handleZanderSend = async () => {
+    if (!zanderInput.trim() || zanderLoading) return;
     
     const userMessage: ZanderMessage = {
       role: 'user',
       content: zanderInput,
       timestamp: new Date().toISOString()
     };
-    
     setZanderMessages(prev => [...prev, userMessage]);
     const currentInput = zanderInput;
     setZanderInput('');
+    setZanderLoading(true);
     
-    // Mock AI response
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      // Build conversation history for context
+      const conversationHistory = zanderMessages.map(msg => ({
+        role: msg.role === 'zander' ? 'assistant' : msg.role,
+        content: msg.content
+      }));
+      
+      const response = await fetch(`${API_URL}/ai/zander/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: currentInput,
+          conversationHistory
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get response from Zander');
+      }
+      
+      const data = await response.json();
+      
       const aiResponse: ZanderMessage = {
         role: 'zander',
-        content: `I understand you're asking about "${currentInput}". Let me look into that for you.
-
-Based on the current system state: All systems are operational, no related issues found in recent tickets. Would you like me to search for more specific information?`,
+        content: data.content,
         timestamp: new Date().toISOString()
       };
-      
       setZanderMessages(prev => [...prev, aiResponse]);
-    }, 1000);
+    } catch (error) {
+      console.error('Zander chat error:', error);
+      const errorResponse: ZanderMessage = {
+        role: 'zander',
+        content: 'I encountered an error processing your request. Please try again.',
+        timestamp: new Date().toISOString()
+      };
+      setZanderMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setZanderLoading(false);
+    }
   };
 
-  const handleZanderAction = (action: string) => {
+    const handleZanderAction = (action: string) => {
     const actionResponses: Record<string, string> = {
       'link_headwind': "✅ Done! I've linked TICK-003 to Headwind #1 (Gmail sync issue). Bob Wilson will be notified when this is resolved.",
       'view_ticket': "Opening ticket TICK-003 from Bob Wilson...\n\n**Subject:** Cannot connect Gmail account\n**Details:** User reports OAuth error when attempting to connect Gmail. Error code: TOKEN_REFRESH_FAILED\n\nThis matches the pattern we're seeing in Headwind #1.",
@@ -1123,18 +1155,20 @@ Based on the current system state: All systems are operational, no related issue
                 />
                 <button
                   onClick={handleZanderSend}
+                  disabled={zanderLoading || !zanderInput.trim()}
                   style={{
-                    background: 'var(--zander-navy)',
+                    background: zanderLoading ? '#999' : 'var(--zander-navy)',
                     color: 'white',
                     border: 'none',
                     padding: '0.6rem 1.25rem',
                     borderRadius: '6px',
-                    cursor: 'pointer',
+                    cursor: zanderLoading ? 'not-allowed' : 'pointer',
                     fontWeight: '600',
-                    fontSize: '0.9rem'
+                    fontSize: '0.9rem',
+                    opacity: (!zanderInput.trim() || zanderLoading) ? 0.6 : 1
                   }}
                 >
-                  Send
+                  {zanderLoading ? '...' : 'Send'}
                 </button>
                 <span style={{ fontSize: '0.75rem', color: '#999', marginLeft: '0.5rem' }}>Powered by Claude</span>
               </div>
