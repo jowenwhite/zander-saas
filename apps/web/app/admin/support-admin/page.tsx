@@ -66,6 +66,24 @@ interface SupportTicket {
   resolvedAt?: string;
 }
 
+
+interface KnowledgeArticle {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  summary?: string;
+  category: 'PLATFORM_GUIDE' | 'FAQ' | 'TROUBLESHOOTING' | 'RELEASE_NOTES' | 'API_DOCS';
+  tags: string[];
+  searchTerms?: string;
+  isPublished: boolean;
+  sortOrder: number;
+  viewCount: number;
+  createdBy?: { id: string; firstName: string; lastName: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface ZanderMessage {
   role: 'zander' | 'user';
   content: string;
@@ -104,13 +122,17 @@ export default function SupportAdminPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'headwinds' | 'tenants' | 'tickets'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'headwinds' | 'tenants' | 'tickets' | 'knowledge'>('overview');
   
   // Data state
   const [health, setHealth] = useState<SystemHealth>(MOCK_HEALTH);
   const [headwinds, setHeadwinds] = useState<Headwind[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [knowledgeArticles, setKnowledgeArticles] = useState<KnowledgeArticle[]>([]);
+  const [showKnowledgeModal, setShowKnowledgeModal] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<KnowledgeArticle | null>(null);
+  const [articleForm, setArticleForm] = useState({ title: '', slug: '', content: '', summary: '', category: 'PLATFORM_GUIDE', tags: '', searchTerms: '', isPublished: true });
   
   // Zander AI state
   const [zanderOpen, setZanderOpen] = useState(true);
@@ -195,6 +217,69 @@ export default function SupportAdminPage() {
       }
     } catch (error) {
       console.error('Failed to fetch tenants:', error);
+    }
+  };
+
+  
+  const fetchKnowledge = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/knowledge`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setKnowledgeArticles(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch knowledge articles:', error);
+    }
+  };
+
+  const saveArticle = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('zander_token');
+      const url = editingArticle 
+        ? `${API_URL}/knowledge/${editingArticle.id}`
+        : `${API_URL}/knowledge`;
+      const method = editingArticle ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...articleForm,
+          tags: articleForm.tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+        })
+      });
+      
+      if (response.ok) {
+        setShowKnowledgeModal(false);
+        setEditingArticle(null);
+        setArticleForm({ title: '', slug: '', content: '', summary: '', category: 'PLATFORM_GUIDE', tags: '', searchTerms: '', isPublished: true });
+        fetchKnowledge();
+      }
+    } catch (error) {
+      console.error('Failed to save article:', error);
+    }
+    setSaving(false);
+  };
+
+  const deleteArticle = async (id: string) => {
+    if (!confirm('Delete this article?')) return;
+    try {
+      const token = localStorage.getItem('zander_token');
+      await fetch(`${API_URL}/knowledge/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchKnowledge();
+    } catch (error) {
+      console.error('Failed to delete article:', error);
     }
   };
 
@@ -446,7 +531,7 @@ Based on the current system state: All systems are operational, no related issue
             borderRadius: '8px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
-            {(['overview', 'headwinds', 'tenants', 'tickets'] as const).map(tab => (
+            {(['overview', 'headwinds', 'tenants', 'tickets', 'knowledge'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -461,7 +546,7 @@ Based on the current system state: All systems are operational, no related issue
                   transition: 'all 0.2s ease'
                 }}
               >
-                {tab === 'overview' && '📊'} {tab === 'headwinds' && '🔴'} {tab === 'tenants' && '🏢'} {tab === 'tickets' && '🎫'}
+                {tab === 'overview' && '📊'} {tab === 'headwinds' && '🔴'} {tab === 'tenants' && '🏢'} {tab === 'tickets' && '🎫'} {tab === 'knowledge' && '📚'}
                 {' '}{tab.charAt(0).toUpperCase() + tab.slice(1)}
                 {tab === 'headwinds' && ` (${headwinds.filter(h => h.status !== 'CLOSED' && h.status !== 'DEPLOYED').length})`}
                 {tab === 'tickets' && ` (${tickets.filter(t => !['RESOLVED', 'CLOSED', 'AI_RESOLVED'].includes(t.status)).length})`}
@@ -631,6 +716,115 @@ Based on the current system state: All systems are operational, no related issue
             </div>
           )}
 
+          
+          {activeTab === 'knowledge' && (
+            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>📚 Knowledge Base ({knowledgeArticles.length} articles)</h3>
+                <button
+                  onClick={() => {
+                    setEditingArticle(null);
+                    setArticleForm({ title: '', slug: '', content: '', summary: '', category: 'PLATFORM_GUIDE', tags: '', searchTerms: '', isPublished: true });
+                    setShowKnowledgeModal(true);
+                  }}
+                  style={{ background: 'var(--zander-gold)', color: 'var(--zander-navy)', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  + New Article
+                </button>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#f8f9fa' }}>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Title</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Category</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Tags</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Status</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Views</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {knowledgeArticles.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+                        <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>No articles yet</div>
+                        <div>Create your first knowledge base article to help AI executives assist users.</div>
+                      </td>
+                    </tr>
+                  ) : knowledgeArticles.map(article => (
+                    <tr key={article.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                      <td style={{ padding: '1rem' }}>
+                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{article.title}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{article.slug}</div>
+                      </td>
+                      <td style={{ padding: '1rem' }}>
+                        <span style={{
+                          background: article.category === 'PLATFORM_GUIDE' ? '#e3f2fd' : article.category === 'FAQ' ? '#f3e5f5' : article.category === 'TROUBLESHOOTING' ? '#fff3e0' : '#e8f5e9',
+                          color: article.category === 'PLATFORM_GUIDE' ? '#1565c0' : article.category === 'FAQ' ? '#7b1fa2' : article.category === 'TROUBLESHOOTING' ? '#ef6c00' : '#2e7d32',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600'
+                        }}>
+                          {article.category.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                          {article.tags.slice(0, 3).map(tag => (
+                            <span key={tag} style={{ background: '#f5f5f5', padding: '0.15rem 0.4rem', borderRadius: '3px', fontSize: '0.7rem', color: '#666' }}>{tag}</span>
+                          ))}
+                          {article.tags.length > 3 && <span style={{ fontSize: '0.7rem', color: '#999' }}>+{article.tags.length - 3}</span>}
+                        </div>
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'center' }}>
+                        <span style={{
+                          background: article.isPublished ? '#c8e6c9' : '#ffecb3',
+                          color: article.isPublished ? '#2e7d32' : '#f57f17',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600'
+                        }}>
+                          {article.isPublished ? 'Published' : 'Draft'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'center', color: '#666' }}>{article.viewCount}</td>
+                      <td style={{ padding: '1rem', textAlign: 'center' }}>
+                        <button
+                          onClick={() => {
+                            setEditingArticle(article);
+                            setArticleForm({
+                              title: article.title,
+                              slug: article.slug,
+                              content: article.content,
+                              summary: article.summary || '',
+                              category: article.category,
+                              tags: article.tags.join(', '),
+                              searchTerms: article.searchTerms || '',
+                              isPublished: article.isPublished
+                            });
+                            setShowKnowledgeModal(true);
+                          }}
+                          style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.4rem 0.6rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', marginRight: '0.5rem' }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteArticle(article.id)}
+                          style={{ background: '#f44336', color: 'white', border: 'none', padding: '0.4rem 0.6rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
           {activeTab === 'tickets' && (
             <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -669,6 +863,132 @@ Based on the current system state: All systems are operational, no related issue
             </div>
           )}
         </main>
+
+        
+        {/* Knowledge Article Modal */}
+        {showKnowledgeModal && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ background: 'white', borderRadius: '12px', width: '700px', maxHeight: '90vh', overflow: 'auto' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee' }}>
+                <h2 style={{ margin: 0, color: 'var(--zander-navy)' }}>{editingArticle ? 'Edit Article' : 'New Knowledge Article'}</h2>
+              </div>
+              <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Title *</label>
+                  <input
+                    type="text"
+                    value={articleForm.title}
+                    onChange={(e) => {
+                      setArticleForm({ ...articleForm, title: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') });
+                    }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    placeholder="How to add a new pipeline stage"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Slug</label>
+                  <input
+                    type="text"
+                    value={articleForm.slug}
+                    onChange={(e) => setArticleForm({ ...articleForm, slug: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', color: '#666' }}
+                    placeholder="how-to-add-pipeline-stage"
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Category</label>
+                    <select
+                      value={articleForm.category}
+                      onChange={(e) => setArticleForm({ ...articleForm, category: e.target.value })}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    >
+                      <option value="PLATFORM_GUIDE">Platform Guide</option>
+                      <option value="FAQ">FAQ</option>
+                      <option value="TROUBLESHOOTING">Troubleshooting</option>
+                      <option value="RELEASE_NOTES">Release Notes</option>
+                      <option value="API_DOCS">API Docs</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Status</label>
+                    <select
+                      value={articleForm.isPublished ? 'published' : 'draft'}
+                      onChange={(e) => setArticleForm({ ...articleForm, isPublished: e.target.value === 'published' })}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    >
+                      <option value="published">Published</option>
+                      <option value="draft">Draft</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Summary</label>
+                  <input
+                    type="text"
+                    value={articleForm.summary}
+                    onChange={(e) => setArticleForm({ ...articleForm, summary: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    placeholder="Brief description for article lists"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Content *</label>
+                  <textarea
+                    value={articleForm.content}
+                    onChange={(e) => setArticleForm({ ...articleForm, content: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', minHeight: '200px', fontFamily: 'inherit' }}
+                    placeholder="Full article content. Markdown supported."
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Tags (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={articleForm.tags}
+                    onChange={(e) => setArticleForm({ ...articleForm, tags: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    placeholder="pipeline, crm, deals, stages"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>AI Search Terms</label>
+                  <input
+                    type="text"
+                    value={articleForm.searchTerms}
+                    onChange={(e) => setArticleForm({ ...articleForm, searchTerms: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    placeholder="Keywords AI executives should match: add stage, create pipeline, new column"
+                  />
+                </div>
+              </div>
+              <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                <button
+                  onClick={() => { setShowKnowledgeModal(false); setEditingArticle(null); }}
+                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', cursor: 'pointer', background: 'white' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveArticle}
+                  disabled={saving || !articleForm.title || !articleForm.content}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    background: 'var(--zander-gold)',
+                    color: 'var(--zander-navy)',
+                    fontWeight: '600',
+                    opacity: saving || !articleForm.title || !articleForm.content ? 0.5 : 1
+                  }}
+                >
+                  {saving ? 'Saving...' : editingArticle ? 'Update Article' : 'Create Article'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Zander AI Bottom Panel */}
         <div style={{
