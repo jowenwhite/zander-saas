@@ -161,6 +161,12 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
                   {!collapsed && <span>Treasury Admin</span>}
                 </a>
               </li>
+              <li style={{ marginBottom: '0.25rem' }}>
+                <a href="/admin/support-admin" style={linkStyle(isActive('/admin/support-admin'))}>
+                  <span style={{ fontSize: '1.1rem' }}>🛡️</span>
+                  {!collapsed && <span>Support Admin</span>}
+                </a>
+              </li>
             </ul>
           </div>
         )}
