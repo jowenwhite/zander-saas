@@ -670,6 +670,116 @@ export default function AIAssistantPage() {
 
 
 
+        {/* Support Ticket Modal */}
+        {showTicketModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{
+              background: 'white',
+              borderRadius: '12px',
+              width: '500px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: 'var(--zander-navy)', borderRadius: '12px 12px 0 0' }}>
+                <h2 style={{ margin: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  🎫 Create Support Ticket
+                </h2>
+                <p style={{ margin: '0.5rem 0 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
+                  Escalate this conversation to human support
+                </p>
+              </div>
+              <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Subject</label>
+                  <input
+                    type="text"
+                    value={ticketForm.subject}
+                    onChange={(e) => setTicketForm({ ...ticketForm, subject: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Category</label>
+                    <select
+                      value={ticketForm.category}
+                      onChange={(e) => setTicketForm({ ...ticketForm, category: e.target.value })}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    >
+                      <option value="HOW_TO">How To</option>
+                      <option value="BUG">Bug Report</option>
+                      <option value="FEATURE_REQUEST">Feature Request</option>
+                      <option value="PLATFORM">Platform Issue</option>
+                      <option value="BILLING">Billing</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Priority</label>
+                    <select
+                      value={ticketForm.priority}
+                      onChange={(e) => setTicketForm({ ...ticketForm, priority: e.target.value })}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    >
+                      <option value="P3">Low</option>
+                      <option value="P2">Medium</option>
+                      <option value="P1">High</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Description</label>
+                  <textarea
+                    value={ticketForm.description}
+                    onChange={(e) => setTicketForm({ ...ticketForm, description: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', minHeight: '150px', fontFamily: 'inherit' }}
+                    placeholder="Describe your issue or question in detail..."
+                  />
+                </div>
+                <div style={{ background: '#f8f9fa', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#666' }}>
+                  <strong>💡 Tip:</strong> Include specific details about what you were trying to do and any error messages you encountered.
+                </div>
+              </div>
+              <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                <button
+                  onClick={() => { setShowTicketModal(false); setTicketContext(null); }}
+                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', cursor: 'pointer', background: 'white' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitTicket}
+                  disabled={savingTicket || !ticketForm.subject || !ticketForm.description}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    background: 'var(--zander-red)',
+                    color: 'white',
+                    fontWeight: '600',
+                    opacity: savingTicket || !ticketForm.subject || !ticketForm.description ? 0.5 : 1
+                  }}
+                >
+                  {savingTicket ? 'Creating...' : 'Create Ticket'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* AI Team Modal */}
         {showTeamModal && (
           <div
