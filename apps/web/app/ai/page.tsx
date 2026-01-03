@@ -176,6 +176,10 @@ export default function AIAssistantPage() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showTeamModal, setShowTeamModal] = useState(false);
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [ticketContext, setTicketContext] = useState<{ message: string; executive: string } | null>(null);
+  const [ticketForm, setTicketForm] = useState({ subject: '', description: '', category: 'HOW_TO', priority: 'P3' });
+  const [savingTicket, setSavingTicket] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -269,6 +273,48 @@ export default function AIAssistantPage() {
   const handleClearChat = () => {
     setMessages([]);
   };
+
+  const openTicketModal = (assistantMessage: string) => {
+    setTicketContext({ message: assistantMessage, executive: selectedExecutive.name });
+    setTicketForm({
+      subject: `Question for ${selectedExecutive.name} (${selectedExecutive.role})`,
+      description: `Original question: ${messages[messages.length - 2]?.content || 'N/A'}\n\nAI Response: ${assistantMessage}\n\nReason for escalation: `,
+      category: 'HOW_TO',
+      priority: 'P3'
+    });
+    setShowTicketModal(true);
+  };
+
+  const submitTicket = async () => {
+    setSavingTicket(true);
+    try {
+      const response = await fetch(`${API_URL}/support-tickets`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          subject: ticketForm.subject,
+          description: ticketForm.description,
+          category: ticketForm.category,
+          priority: ticketForm.priority,
+          createdVia: selectedExecutive.name.toUpperCase()
+        })
+      });
+      
+      if (response.ok) {
+        const ticket = await response.json();
+        alert(`Support ticket #${ticket.ticketNumber} created successfully! Our team will review it shortly.`);
+        setShowTicketModal(false);
+        setTicketContext(null);
+      } else {
+        throw new Error('Failed to create ticket');
+      }
+    } catch (error) {
+      console.error('Failed to create ticket:', error);
+      alert('Failed to create support ticket. Please try again.');
+    }
+    setSavingTicket(false);
+  };
+
 
   // Standard sidebar items
   const salesRevenueItems = [
@@ -486,6 +532,28 @@ export default function AIAssistantPage() {
                         lineHeight: 1.6
                       }}>
                         {message.content}
+                        {message.role === 'assistant' && (
+                          <button
+                            onClick={() => openTicketModal(message.content)}
+                            style={{
+                              marginTop: '0.75rem',
+                              padding: '0.5rem 0.75rem',
+                              background: 'transparent',
+                              border: '1px solid #ddd',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              color: '#666',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = '#f5f5f5'; e.currentTarget.style.borderColor = 'var(--zander-red)'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#ddd'; }}
+                          >
+                            🎫 Need more help? Create Support Ticket
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
