@@ -84,11 +84,19 @@ interface KnowledgeArticle {
   updatedAt: string;
 }
 
+interface ZanderAction {
+  label: string;
+  action: string;
+  ticketId?: string;
+  headwindId?: string;
+  ticketNumber?: string;
+}
+
 interface ZanderMessage {
   role: 'zander' | 'user';
   content: string;
   timestamp: string;
-  actions?: { label: string; action: string }[];
+  actions?: ZanderAction[];
 }
 
 // Mock Data
@@ -408,19 +416,164 @@ export default function SupportAdminPage() {
     }
   };
 
-    const handleZanderAction = (action: string) => {
-    const actionResponses: Record<string, string> = {
-      'link_headwind': "✅ Done! I've linked TICK-003 to Headwind #1 (Gmail sync issue). Bob Wilson will be notified when this is resolved.",
-      'view_ticket': "Opening ticket TICK-003 from Bob Wilson...\n\n**Subject:** Cannot connect Gmail account\n**Details:** User reports OAuth error when attempting to connect Gmail. Error code: TOKEN_REFRESH_FAILED\n\nThis matches the pattern we're seeing in Headwind #1.",
-      'dismiss': 'Got it. Let me know if you need anything else!'
-    };
+  const handleZanderAction = async (actionData: ZanderAction) => {
+    const { action, ticketId, headwindId, ticketNumber } = actionData;
     
+    if (action === 'dismiss') {
+      const response: ZanderMessage = {
+        role: 'zander',
+        content: 'Got it. Let me know if you need anything else!',
+        timestamp: new Date().toISOString()
+      };
+      setZanderMessages(prev => [...prev, response]);
+      return;
+    }
+    
+    if (action === 'link_headwind' && ticketId && headwindId) {
+      try {
+        const token = localStorage.getItem('zander_token');
+        const response = await fetch(`${API_URL}/support-tickets/${ticketId}/link-headwind/${headwindId}`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const zanderResponse: ZanderMessage = {
+            role: 'zander',
+            content: `Done! I've linked ${ticketNumber || 'the ticket'} to the headwind. The ticket will be tracked with this issue.`,
+            timestamp: new Date().toISOString()
+          };
+          setZanderMessages(prev => [...prev, zanderResponse]);
+          fetchTickets();
+          fetchHeadwinds();
+        } else {
+          throw new Error('Failed to link');
+        }
+      } catch (error) {
+        const errorResponse: ZanderMessage = {
+          role: 'zander',
+          content: 'Sorry, I could not link the ticket to the headwind. Please try manually from the Tickets tab.',
+          timestamp: new Date().toISOString()
+        };
+        setZanderMessages(prev => [...prev, errorResponse]);
+      }
+      return;
+    }
+    
+    if (action === 'view_ticket' && ticketId) {
+      try {
+        const token = localStorage.getItem('zander_token');
+        const response = await fetch(`${API_URL}/support-tickets/${ticketId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const ticket = await response.json();
+          const zanderResponse: ZanderMessage = {
+            role: 'zander',
+            content: `**${ticket.ticketNumber}: ${ticket.subject}**
+
+**Status:** ${ticket.status}  |  **Priority:** ${ticket.priority}  |  **Via:** ${ticket.createdVia}
+**From:** ${ticket.user?.firstName || 'Unknown'} ${ticket.user?.lastName || ''} (${ticket.tenant?.companyName || 'Unknown'})
+**Created:** ${new Date(ticket.createdAt).toLocaleString()}
+
+**Description:**
+${ticket.description}
+
+${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' (' + ticket.linkedHeadwind.status + ')' : '**Not linked to any headwind**'}`,
+            timestamp: new Date().toISOString(),
+            actions: ticket.linkedHeadwind ? undefined : [
+              { label: 'Link to a Headwind', action: 'suggest_link', ticketId: ticket.id, ticketNumber: ticket.ticketNumber },
+              { label: 'Mark as Resolved', action: 'resolve_ticket', ticketId: ticket.id, ticketNumber: ticket.ticketNumber },
+              { label: 'Close', action: 'dismiss' }
+            ]
+          };
+          setZanderMessages(prev => [...prev, zanderResponse]);
+        } else {
+          throw new Error('Failed to fetch ticket');
+        }
+      } catch (error) {
+        const errorResponse: ZanderMessage = {
+          role: 'zander',
+          content: 'Sorry, I could not fetch the ticket details. Please check the Tickets tab.',
+          timestamp: new Date().toISOString()
+        };
+        setZanderMessages(prev => [...prev, errorResponse]);
+      }
+      return;
+    }
+    
+    if (action === 'resolve_ticket' && ticketId) {
+      try {
+        const token = localStorage.getItem('zander_token');
+        const response = await fetch(`${API_URL}/support-tickets/${ticketId}`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}` 
+          },
+          body: JSON.stringify({ status: 'RESOLVED' })
+        });
+        
+        if (response.ok) {
+          const zanderResponse: ZanderMessage = {
+            role: 'zander',
+            content: `${ticketNumber || 'Ticket'} has been marked as resolved.`,
+            timestamp: new Date().toISOString()
+          };
+          setZanderMessages(prev => [...prev, zanderResponse]);
+          fetchTickets();
+        } else {
+          throw new Error('Failed to resolve');
+        }
+      } catch (error) {
+        const errorResponse: ZanderMessage = {
+          role: 'zander',
+          content: 'Sorry, I could not resolve the ticket. Please try from the Tickets tab.',
+          timestamp: new Date().toISOString()
+        };
+        setZanderMessages(prev => [...prev, errorResponse]);
+      }
+      return;
+    }
+    
+    if (action === 'suggest_link' && ticketId) {
+      const activeHeadwinds = headwinds.filter(h => h.status !== 'CLOSED');
+      if (activeHeadwinds.length === 0) {
+        const zanderResponse: ZanderMessage = {
+          role: 'zander',
+          content: 'There are no active headwinds to link this ticket to. Create a new headwind from the Headwinds tab if needed.',
+          timestamp: new Date().toISOString()
+        };
+        setZanderMessages(prev => [...prev, zanderResponse]);
+        return;
+      }
+      
+      const zanderResponse: ZanderMessage = {
+        role: 'zander',
+        content: `Which headwind should I link ${ticketNumber} to?`,
+        timestamp: new Date().toISOString(),
+        actions: [
+          ...activeHeadwinds.slice(0, 3).map(h => ({
+            label: `[${h.priority}] ${h.title}`,
+            action: 'link_headwind',
+            ticketId: ticketId,
+            headwindId: h.id,
+            ticketNumber: ticketNumber
+          })),
+          { label: 'Cancel', action: 'dismiss' }
+        ]
+      };
+      setZanderMessages(prev => [...prev, zanderResponse]);
+      return;
+    }
+    
+    // Default
     const response: ZanderMessage = {
       role: 'zander',
-      content: actionResponses[action] || 'Action completed.',
+      content: 'Action completed.',
       timestamp: new Date().toISOString()
     };
-    
     setZanderMessages(prev => [...prev, response]);
   };
 
@@ -1119,7 +1272,7 @@ export default function SupportAdminPage() {
                         {msg.actions.map((action, actionIdx) => (
                           <button
                             key={actionIdx}
-                            onClick={() => handleZanderAction(action.action)}
+                            onClick={() => handleZanderAction(action)}
                             style={{
                               background: action.action === 'dismiss' ? '#f5f5f5' : 'var(--zander-gold)',
                               color: action.action === 'dismiss' ? '#666' : 'var(--zander-navy)',
