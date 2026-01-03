@@ -145,7 +145,7 @@ export default function SupportAdminPage() {
   // Zander AI state
   const [zanderOpen, setZanderOpen] = useState(true);
   const [zanderExpanded, setZanderExpanded] = useState(false);
-  const [zanderMessages, setZanderMessages] = useState<ZanderMessage[]>([INITIAL_ZANDER_MESSAGE]);
+  const [zanderMessages, setZanderMessages] = useState<ZanderMessage[]>([]);
   const [zanderInput, setZanderInput] = useState('');
   const [zanderLoading, setZanderLoading] = useState(false);
   
@@ -183,12 +183,50 @@ export default function SupportAdminPage() {
     fetchTenants();
     fetchTickets();
     fetchKnowledge();
+    fetchZanderGreeting();
   }, [router]);
 
   useEffect(() => {
     // Scroll to bottom of messages when new message added
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [zanderMessages]);
+
+
+  const fetchZanderGreeting = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/ai/zander/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: 'Give me a brief operational status update.',
+          conversationHistory: []
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const greeting: ZanderMessage = {
+          role: 'zander',
+          content: data.content,
+          timestamp: new Date().toISOString()
+        };
+        setZanderMessages([greeting]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Zander greeting:', error);
+      // Fallback to a simple greeting
+      const fallback: ZanderMessage = {
+        role: 'zander',
+        content: 'Hello Jonathan. I\'m ready to help you manage platform operations. What would you like to know?',
+        timestamp: new Date().toISOString()
+      };
+      setZanderMessages([fallback]);
+    }
+  };
 
   const checkSystemHealth = async () => {
     try {
