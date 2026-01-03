@@ -212,7 +212,8 @@ export default function SupportAdminPage() {
         const greeting: ZanderMessage = {
           role: 'zander',
           content: data.content,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          actions: data.actions
         };
         setZanderMessages([greeting]);
       }
@@ -438,7 +439,8 @@ export default function SupportAdminPage() {
       const aiResponse: ZanderMessage = {
         role: 'zander',
         content: data.content,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        actions: data.actions
       };
       setZanderMessages(prev => [...prev, aiResponse]);
     } catch (error) {

@@ -543,6 +543,41 @@ COMMUNICATION STYLE:
       }
 
       const data = await response.json();
+      
+      // Generate suggested actions based on current state
+      const actions: any[] = [];
+      
+      // If there are open tickets, suggest viewing them
+      const newTickets = tickets.filter(t => t.status === 'NEW');
+      if (newTickets.length > 0) {
+        const firstTicket = newTickets[0];
+        actions.push({
+          label: `View ${firstTicket.ticketNumber}`,
+          action: 'view_ticket',
+          ticketId: firstTicket.id,
+          ticketNumber: firstTicket.ticketNumber
+        });
+      }
+      
+      // If there are unlinked tickets and active headwinds, suggest linking
+      const unlinkedTickets = tickets.filter(t => !t.linkedHeadwindId && t.status !== 'CLOSED' && t.status !== 'RESOLVED');
+      const activeHW = headwinds.filter(h => h.status !== 'CLOSED');
+      if (unlinkedTickets.length > 0 && activeHW.length > 0) {
+        const ticket = unlinkedTickets[0];
+        const headwind = activeHW[0];
+        actions.push({
+          label: `Link ${ticket.ticketNumber} to Headwind`,
+          action: 'suggest_link',
+          ticketId: ticket.id,
+          ticketNumber: ticket.ticketNumber
+        });
+      }
+      
+      // Always add a dismiss option if there are actions
+      if (actions.length > 0) {
+        actions.push({ label: 'Dismiss', action: 'dismiss' });
+      }
+      
       return {
         content: data.content[0].text,
         context: {
@@ -552,6 +587,7 @@ COMMUNICATION STYLE:
           totalTenants: tenants.length,
           totalUsers: users,
         },
+        actions: actions.length > 0 ? actions : undefined,
       };
     } catch (error) {
       console.error('Error calling Claude API:', error);
