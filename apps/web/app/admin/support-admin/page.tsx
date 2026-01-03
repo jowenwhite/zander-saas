@@ -16,34 +16,54 @@ interface SystemHealth {
 interface Headwind {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   priority: 'P1' | 'P2' | 'P3';
   category: 'BUG' | 'REBUILD' | 'NEW_BUILD' | 'ENHANCEMENT';
   status: 'OPEN' | 'IN_PROGRESS' | 'TESTING' | 'DEPLOYED' | 'CLOSED';
+  tenantId?: string;
+  tenant?: { id: string; companyName: string };
+  createdBy?: { id: string; firstName: string; lastName: string; email: string };
+  assignedTo?: { id: string; firstName: string; lastName: string; email: string };
+  gitCommit?: string;
+  gitBranch?: string;
+  resolution?: string;
   createdAt: string;
   updatedAt: string;
+  resolvedAt?: string;
 }
 
 interface Tenant {
   id: string;
-  name: string;
-  userCount: number;
-  plan: string;
-  lastActive: string;
-  status: 'active' | 'trial' | 'suspended';
+  companyName: string;
+  subdomain: string;
+  tenantType: string;
+  subscriptionStatus?: string;
+  subscriptionTier?: string;
+  users?: { id: string }[];
+  _count?: { users: number };
 }
 
 interface SupportTicket {
   id: string;
   ticketNumber: string;
   subject: string;
+  description: string;
   userId: string;
-  userName: string;
-  tenantName: string;
+  user?: { id: string; firstName: string; lastName: string; email: string };
+  tenantId: string;
+  tenant?: { id: string; companyName: string };
   status: 'NEW' | 'AI_RESOLVED' | 'PENDING_REVIEW' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
-  priority: 'P1' | 'P2' | 'P3' | 'AUTO';
+  priority: 'P1' | 'P2' | 'P3';
+  category: 'PLATFORM' | 'BILLING' | 'BUG' | 'FEATURE_REQUEST' | 'HOW_TO' | 'OTHER';
   createdVia: string;
+  aiSummary?: string;
+  aiResponse?: string;
+  linkedHeadwindId?: string;
+  linkedHeadwind?: { id: string; title: string; status: string; priority: string };
+  resolution?: string;
   createdAt: string;
+  updatedAt: string;
+  resolvedAt?: string;
 }
 
 interface ZanderMessage {
@@ -61,25 +81,8 @@ const MOCK_HEALTH: SystemHealth = {
   lastChecked: new Date().toISOString()
 };
 
-const MOCK_HEADWINDS: Headwind[] = [
-  { id: '1', title: 'Gmail sync failing for some users', description: 'OAuth token refresh issue', priority: 'P1', category: 'BUG', status: 'IN_PROGRESS', createdAt: '2026-01-02T10:00:00Z', updatedAt: '2026-01-02T14:00:00Z' },
-  { id: '2', title: 'Dashboard slow on mobile', description: 'Performance optimization needed', priority: 'P2', category: 'ENHANCEMENT', status: 'OPEN', createdAt: '2026-01-01T08:00:00Z', updatedAt: '2026-01-01T08:00:00Z' },
-  { id: '3', title: 'Add bulk contact import', description: 'Users requesting CSV import', priority: 'P3', category: 'NEW_BUILD', status: 'OPEN', createdAt: '2025-12-28T12:00:00Z', updatedAt: '2025-12-28T12:00:00Z' },
-];
 
-const MOCK_TENANTS: Tenant[] = [
-  { id: '1', name: 'My Cabinet Factory', userCount: 24, plan: 'Enterprise', lastActive: '2 min ago', status: 'active' },
-  { id: '2', name: '64 West Holdings LLC', userCount: 3, plan: 'Pro', lastActive: '5 min ago', status: 'active' },
-  { id: '3', name: '64 West Consulting', userCount: 2, plan: 'Pro', lastActive: '1 hour ago', status: 'active' },
-  { id: '4', name: '64 West Finance', userCount: 1, plan: 'Starter', lastActive: '2 hours ago', status: 'active' },
-  { id: '5', name: 'Zander Inc', userCount: 5, plan: 'Enterprise', lastActive: '10 min ago', status: 'active' },
-];
 
-const MOCK_TICKETS: SupportTicket[] = [
-  { id: '1', ticketNumber: 'TICK-001', subject: 'How do I add a new contact?', userId: 'u1', userName: 'John Smith', tenantName: 'Acme Corp', status: 'AI_RESOLVED', priority: 'AUTO', createdVia: 'JORDAN', createdAt: '2026-01-02T15:00:00Z' },
-  { id: '2', ticketNumber: 'TICK-002', subject: 'My import failed with error', userId: 'u2', userName: 'Jane Doe', tenantName: 'Beta LLC', status: 'PENDING_REVIEW', priority: 'P2', createdVia: 'MIRANDA', createdAt: '2026-01-02T14:30:00Z' },
-  { id: '3', ticketNumber: 'TICK-003', subject: 'Cannot connect Gmail account', userId: 'u3', userName: 'Bob Wilson', tenantName: 'Test Inc', status: 'NEW', priority: 'P1', createdVia: 'MANUAL', createdAt: '2026-01-02T14:00:00Z' },
-];
 
 const INITIAL_ZANDER_MESSAGE: ZanderMessage = {
   role: 'zander',
@@ -105,9 +108,9 @@ export default function SupportAdminPage() {
   
   // Data state
   const [health, setHealth] = useState<SystemHealth>(MOCK_HEALTH);
-  const [headwinds, setHeadwinds] = useState<Headwind[]>(MOCK_HEADWINDS);
-  const [tenants, setTenants] = useState<Tenant[]>(MOCK_TENANTS);
-  const [tickets, setTickets] = useState<SupportTicket[]>(MOCK_TICKETS);
+  const [headwinds, setHeadwinds] = useState<Headwind[]>([]);
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   
   // Zander AI state
   const [zanderOpen, setZanderOpen] = useState(true);
@@ -122,6 +125,8 @@ export default function SupportAdminPage() {
   // Modal state
   const [showHeadwindModal, setShowHeadwindModal] = useState(false);
   const [editingHeadwind, setEditingHeadwind] = useState<Headwind | null>(null);
+  const [headwindForm, setHeadwindForm] = useState({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '' });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('zander_token');
@@ -160,6 +165,98 @@ export default function SupportAdminPage() {
       }
     } catch {
       setHealth(prev => ({ ...prev, api: 'down', lastChecked: new Date().toISOString() }));
+    }
+  };
+
+  const fetchHeadwinds = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/headwinds`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setHeadwinds(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch headwinds:', error);
+    }
+  };
+
+  const fetchTenants = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/tenants/accessible`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTenants(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tenants:', error);
+    }
+  };
+
+  const fetchTickets = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/support-tickets`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTickets(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tickets:', error);
+    }
+  };
+
+  const saveHeadwind = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('zander_token');
+      const url = editingHeadwind 
+        ? `${API_URL}/headwinds/${editingHeadwind.id}`
+        : `${API_URL}/headwinds`;
+      const method = editingHeadwind ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(headwindForm)
+      });
+      
+      if (response.ok) {
+        await fetchHeadwinds();
+        setShowHeadwindModal(false);
+        setEditingHeadwind(null);
+        setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '' });
+      }
+    } catch (error) {
+      console.error('Failed to save headwind:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteHeadwind = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this headwind?')) return;
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/headwinds/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        await fetchHeadwinds();
+      }
+    } catch (error) {
+      console.error('Failed to delete headwind:', error);
     }
   };
 
@@ -237,8 +334,8 @@ Based on the current system state: All systems are operational, no related issue
     return `${diffDays}d ago`;
   };
 
-  const filteredTenants = tenants.filter(t => 
-    t.name.toLowerCase().includes(tenantSearch.toLowerCase())
+  const filteredTenants = tenants.filter(t =>
+    (t.companyName || '').toLowerCase().includes(tenantSearch.toLowerCase())
   );
 
   const filteredHeadwinds = headwinds.filter(h => 
@@ -406,7 +503,7 @@ Based on the current system state: All systems are operational, no related issue
                       <span style={{ fontSize: '1.25rem' }}>{t.status === 'AI_RESOLVED' ? '🤖' : t.status === 'NEW' ? '🆕' : '👤'}</span>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{t.subject}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{t.userName} • {t.tenantName} • {formatTimeAgo(t.createdAt)}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown'} • {t.tenant?.companyName || 'Unknown'} • {formatTimeAgo(t.createdAt)}</div>
                       </div>
                       <span style={{ background: getStatusColor(t.status), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>{t.status.replace('_', ' ')}</span>
                     </div>
@@ -434,7 +531,7 @@ Based on the current system state: All systems are operational, no related issue
                     </button>
                   ))}
                 </div>
-                <button onClick={() => { setEditingHeadwind(null); setShowHeadwindModal(true); }} style={{
+                <button onClick={() => { setEditingHeadwind(null); setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '' }); setShowHeadwindModal(true); }} style={{
                   background: 'var(--zander-gold)',
                   color: 'var(--zander-navy)',
                   border: 'none',
@@ -473,7 +570,8 @@ Based on the current system state: All systems are operational, no related issue
                       </td>
                       <td style={{ padding: '1rem', color: '#666' }}>{formatTimeAgo(h.updatedAt)}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <button onClick={() => { setEditingHeadwind(h); setShowHeadwindModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>✏️</button>
+                        <button onClick={() => { setEditingHeadwind(h); setHeadwindForm({ title: h.title, description: h.description || '', priority: h.priority, category: h.category, status: h.status, gitBranch: h.gitBranch || '' }); setShowHeadwindModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>✏️</button>
+                        <button onClick={() => deleteHeadwind(h.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginLeft: '0.5rem' }}>🗑️</button>
                       </td>
                     </tr>
                   ))}
@@ -513,14 +611,14 @@ Based on the current system state: All systems are operational, no related issue
                 <tbody>
                   {filteredTenants.map(t => (
                     <tr key={t.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                      <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{t.name}</td>
-                      <td style={{ padding: '1rem', textAlign: 'center' }}>{t.userCount}</td>
+                      <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{t.companyName}</td>
+                      <td style={{ padding: '1rem', textAlign: 'center' }}>{t._count?.users || t.users?.length || 0}</td>
                       <td style={{ padding: '1rem' }}>
-                        <span style={{ background: t.plan === 'Enterprise' ? 'var(--zander-gold)' : t.plan === 'Pro' ? 'var(--zander-navy)' : '#6c757d', color: t.plan === 'Enterprise' ? 'var(--zander-navy)' : 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>{t.plan}</span>
+                        <span style={{ background: t.subscriptionTier === 'enterprise' ? 'var(--zander-gold)' : t.subscriptionTier === 'pro' ? 'var(--zander-navy)' : '#6c757d', color: t.subscriptionTier === 'enterprise' ? 'var(--zander-navy)' : 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>{t.subscriptionTier || 'starter'}</span>
                       </td>
-                      <td style={{ padding: '1rem', color: '#666' }}>{t.lastActive}</td>
+                      <td style={{ padding: '1rem', color: '#666' }}>{t.tenantType}</td>
                       <td style={{ padding: '1rem' }}>
-                        <span style={{ background: getStatusColor(t.status), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{t.status}</span>
+                        <span style={{ background: getStatusColor(t.subscriptionStatus || 'active'), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{t.subscriptionStatus || 'active'}</span>
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
                         <button style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem', fontSize: '0.8rem' }}>View As</button>
@@ -553,8 +651,8 @@ Based on the current system state: All systems are operational, no related issue
                       <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{t.ticketNumber}</td>
                       <td style={{ padding: '1rem' }}>{t.subject}</td>
                       <td style={{ padding: '1rem' }}>
-                        <div style={{ fontWeight: '500' }}>{t.userName}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{t.tenantName}</div>
+                        <div style={{ fontWeight: '500' }}>{t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown'}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{t.tenant?.companyName || 'Unknown'}</div>
                       </td>
                       <td style={{ padding: '1rem', color: '#666' }}>{t.createdVia}</td>
                       <td style={{ padding: '1rem' }}>
@@ -752,16 +850,16 @@ Based on the current system state: All systems are operational, no related issue
             </h2>
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Title</label>
-              <input type="text" defaultValue={editingHeadwind?.title || ''} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }} />
+              <input type="text" value={headwindForm.title} onChange={(e) => setHeadwindForm(prev => ({ ...prev, title: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }} />
             </div>
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Description</label>
-              <textarea defaultValue={editingHeadwind?.description || ''} rows={3} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px', resize: 'vertical' }} />
+              <textarea value={headwindForm.description} onChange={(e) => setHeadwindForm(prev => ({ ...prev, description: e.target.value }))} rows={3} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px', resize: 'vertical' }} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Priority</label>
-                <select defaultValue={editingHeadwind?.priority || 'P2'} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
+                <select value={headwindForm.priority} onChange={(e) => setHeadwindForm(prev => ({ ...prev, priority: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
                   <option value="P1">P1 - Critical</option>
                   <option value="P2">P2 - Important</option>
                   <option value="P3">P3 - Nice to Have</option>
@@ -769,7 +867,7 @@ Based on the current system state: All systems are operational, no related issue
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Category</label>
-                <select defaultValue={editingHeadwind?.category || 'BUG'} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
+                <select value={headwindForm.category} onChange={(e) => setHeadwindForm(prev => ({ ...prev, category: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
                   <option value="BUG">Bug</option>
                   <option value="REBUILD">Rebuild</option>
                   <option value="NEW_BUILD">New Build</option>
@@ -779,7 +877,7 @@ Based on the current system state: All systems are operational, no related issue
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Status</label>
-              <select defaultValue={editingHeadwind?.status || 'OPEN'} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
+              <select value={headwindForm.status} onChange={(e) => setHeadwindForm(prev => ({ ...prev, status: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
                 <option value="OPEN">Open</option>
                 <option value="IN_PROGRESS">In Progress</option>
                 <option value="TESTING">Testing</option>
@@ -789,7 +887,7 @@ Based on the current system state: All systems are operational, no related issue
             </div>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button onClick={() => setShowHeadwindModal(false)} style={{ background: '#f5f5f5', color: '#666', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
-              <button onClick={() => setShowHeadwindModal(false)} style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Save</button>
+              <button onClick={saveHeadwind} disabled={saving} style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', opacity: saving ? 0.7 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
         </div>
