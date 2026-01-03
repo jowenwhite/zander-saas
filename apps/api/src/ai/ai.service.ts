@@ -205,6 +205,32 @@ When responding:
 export class AiService {
   constructor(private prisma: PrismaService) {}
 
+  async queryKnowledge(query: string, limit: number = 5) {
+    // Search knowledge base for relevant articles
+    const articles = await this.prisma.knowledgeArticle.findMany({
+      where: {
+        isPublished: true,
+        OR: [
+          { searchTerms: { contains: query, mode: 'insensitive' } },
+          { title: { contains: query, mode: 'insensitive' } },
+          { tags: { hasSome: query.toLowerCase().split(' ').filter(w => w.length > 2) } },
+          { content: { contains: query, mode: 'insensitive' } },
+        ],
+      },
+      select: {
+        title: true,
+        summary: true,
+        content: true,
+        category: true,
+        tags: true,
+      },
+      take: limit,
+      orderBy: { viewCount: 'desc' },
+    });
+    return articles;
+  }
+
+
   async chat(tenantId: string, executiveId: string, message: string, conversationHistory: any[] = []) {
     const executive = executives[executiveId];
     if (!executive) {
@@ -243,12 +269,31 @@ DEAL SUMMARY:
 ${deals.slice(0, 5).map(d => `- ${d.dealName}: $${d.dealValue?.toLocaleString() || 0} (${d.stage}) - Contact: ${d.contact?.firstName} ${d.contact?.lastName}`).join('\n')}
 `;
 
+    
+    // Query knowledge base for platform help
+    const knowledgeArticles = await this.queryKnowledge(message);
+    const knowledgeContext = knowledgeArticles.length > 0 
+      ? `
+PLATFORM KNOWLEDGE BASE (Use this to answer questions about how Zander works):
+${knowledgeArticles.map(a => `
+--- Article: ${a.title} ---
+Category: ${a.category}
+${a.summary ? 'Summary: ' + a.summary : ''}
+Content: ${a.content}
+---
+`).join('\n')}
+`
+      : '';
+
     // Build messages for Claude
     const systemPrompt = `${executive.personality}
 
 ${businessContext}
+${knowledgeContext}
 
-Remember: You are ${executive.name}, the ${executive.fullTitle}. Stay in character and provide helpful, actionable advice based on your expertise. Reference the business context when relevant to personalize your advice.`;
+Remember: You are ${executive.name}, the ${executive.fullTitle}. Stay in character and provide helpful, actionable advice based on your expertise. Reference the business context when relevant to personalize your advice.
+
+IMPORTANT: If the user asks about how to use Zander, platform features, or needs help with the software, refer to the PLATFORM KNOWLEDGE BASE section above. Provide accurate information based on the knowledge articles. If you don't have relevant knowledge articles, let the user know you'll escalate to support.`;
 
     const messages = [
       ...conversationHistory.map((msg: any) => ({
