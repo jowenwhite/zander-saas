@@ -41,7 +41,7 @@ export class SupportTicketsController {
         priority,
         category,
         createdVia,
-        userId: myTickets === 'true' ? req.user.id : undefined,
+        userId: myTickets === 'true' ? req.user.userId : undefined,
       });
     }
 
@@ -52,7 +52,7 @@ export class SupportTicketsController {
       priority,
       category,
       createdVia,
-      userId: myTickets === 'true' ? req.user.id : undefined,
+      userId: myTickets === 'true' ? req.user.userId : undefined,
     });
   }
 
@@ -111,7 +111,7 @@ export class SupportTicketsController {
       priority: data.priority,
       createdVia: data.createdVia || 'MANUAL',
       tenantId: req.user.isSuperAdmin && data.tenantId ? data.tenantId : req.user.tenantId,
-      userId: req.user.isSuperAdmin && data.userId ? data.userId : req.user.id,
+      userId: req.user.isSuperAdmin && data.userId ? data.userId : req.user.userId,
     };
 
     return this.supportTicketsService.create(ticketData);

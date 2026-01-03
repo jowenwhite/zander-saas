@@ -89,7 +89,7 @@ export class HeadwindsController {
 
     return this.headwindsService.create({
       ...data,
-      createdById: req.user.id,
+      createdById: req.user.userId,
     });
   }
 
