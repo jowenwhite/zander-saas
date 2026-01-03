@@ -28,6 +28,8 @@ import { ProductsModule } from './products/products.module';
 import { BillingModule } from './billing/billing.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { TreasuryModule } from './treasury/treasury.module';
+import { HeadwindsModule } from './headwinds/headwinds.module';
+import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -54,6 +56,8 @@ import { TreasuryModule } from './treasury/treasury.module';
     BillingModule,
     CampaignsModule,
     TreasuryModule,
+    HeadwindsModule,
+    SupportTicketsModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

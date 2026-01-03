@@ -86,6 +86,8 @@ model Tenant {
   subscriptionCohort      String?
   trialEndsAt             DateTime?
   rateLockExpiresAt       DateTime?
+  headwinds               Headwind[]
+  supportTickets          SupportTicket[]
 
   @@map("tenants")
 }
@@ -119,6 +121,10 @@ model User {
   onboardingFocusArea  String?
   onboardingChecklist  Json?
   firstLoginAt         DateTime?
+  // Support Admin
+  headwindsCreated     Headwind[]        @relation("HeadwindCreatedBy")
+  headwindsAssigned    Headwind[]        @relation("HeadwindAssignedTo")
+  supportTickets       SupportTicket[]
 
   @@map("users")
 }
@@ -743,4 +749,114 @@ model TreasuryItem {
   @@index([executive])
   @@index([industry])
   @@map("treasury_items")
+}
+
+// ============================================
+// SUPPORT ADMIN (Platform Operations)
+// ============================================
+
+enum HeadwindPriority {
+  P1
+  P2
+  P3
+}
+
+enum HeadwindCategory {
+  BUG
+  REBUILD
+  NEW_BUILD
+  ENHANCEMENT
+}
+
+enum HeadwindStatus {
+  OPEN
+  IN_PROGRESS
+  TESTING
+  DEPLOYED
+  CLOSED
+}
+
+enum TicketSource {
+  JORDAN
+  BEN
+  MIRANDA
+  DON
+  TED
+  NEO
+  PAM
+  MANUAL
+  ZANDER
+}
+
+enum TicketCategory {
+  PLATFORM
+  BILLING
+  BUG
+  FEATURE_REQUEST
+  HOW_TO
+  OTHER
+}
+
+enum TicketStatus {
+  NEW
+  AI_RESOLVED
+  PENDING_REVIEW
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Headwind {
+  id            String            @id @default(cuid())
+  title         String
+  description   String?
+  priority      HeadwindPriority  @default(P2)
+  category      HeadwindCategory  @default(BUG)
+  status        HeadwindStatus    @default(OPEN)
+  tenantId      String?           // null = system-wide issue
+  assignedToId  String?
+  gitCommit     String?
+  gitBranch     String?
+  resolution    String?
+  createdById   String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  resolvedAt    DateTime?
+  tenant        Tenant?           @relation(fields: [tenantId], references: [id])
+  createdBy     User              @relation("HeadwindCreatedBy", fields: [createdById], references: [id])
+  assignedTo    User?             @relation("HeadwindAssignedTo", fields: [assignedToId], references: [id])
+  tickets       SupportTicket[]
+  @@index([priority])
+  @@index([status])
+  @@index([tenantId])
+  @@map("headwinds")
+}
+
+model SupportTicket {
+  id              String          @id @default(cuid())
+  ticketNumber    String          @unique
+  tenantId        String
+  userId          String
+  createdVia      TicketSource    @default(MANUAL)
+  subject         String
+  description     String
+  category        TicketCategory  @default(OTHER)
+  priority        HeadwindPriority @default(P3)
+  status          TicketStatus    @default(NEW)
+  aiSummary       String?
+  aiResponse      String?
+  linkedHeadwindId String?
+  resolution      String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  resolvedAt      DateTime?
+  tenant          Tenant          @relation(fields: [tenantId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
+  linkedHeadwind  Headwind?       @relation(fields: [linkedHeadwindId], references: [id])
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([ticketNumber])
+  @@map("support_tickets")
 }
