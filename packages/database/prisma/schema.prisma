@@ -124,6 +124,7 @@ model User {
   // Support Admin
   headwindsCreated     Headwind[]        @relation("HeadwindCreatedBy")
   headwindsAssigned    Headwind[]        @relation("HeadwindAssignedTo")
+  knowledgeArticles    KnowledgeArticle[] @relation("KnowledgeCreatedBy")
   supportTickets       SupportTicket[]
 
   @@map("users")
@@ -859,4 +860,40 @@ model SupportTicket {
   @@index([priority])
   @@index([ticketNumber])
   @@map("support_tickets")
+}
+
+// ============================================
+// KNOWLEDGE BASE (Platform Documentation)
+// ============================================
+
+enum KnowledgeCategory {
+  PLATFORM_GUIDE
+  FAQ
+  TROUBLESHOOTING
+  RELEASE_NOTES
+  API_DOCS
+}
+
+model KnowledgeArticle {
+  id            String            @id @default(cuid())
+  title         String
+  slug          String            @unique
+  content       String            @db.Text
+  summary       String?           // Short description for lists
+  category      KnowledgeCategory @default(PLATFORM_GUIDE)
+  tags          String[]          @default([])
+  searchTerms   String?           @db.Text  // AI-friendly keywords
+  isPublished   Boolean           @default(true)
+  sortOrder     Int               @default(0)
+  viewCount     Int               @default(0)
+  
+  createdById   String
+  createdBy     User              @relation("KnowledgeCreatedBy", fields: [createdById], references: [id])
+  
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  @@index([category])
+  @@index([isPublished])
+  @@map("knowledge_articles")
 }
