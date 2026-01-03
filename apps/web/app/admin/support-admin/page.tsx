@@ -171,6 +171,10 @@ export default function SupportAdminPage() {
     
     // TODO: Fetch real data from API
     checkSystemHealth();
+    fetchHeadwinds();
+    fetchTenants();
+    fetchTickets();
+    fetchKnowledge();
   }, [router]);
 
   useEffect(() => {
