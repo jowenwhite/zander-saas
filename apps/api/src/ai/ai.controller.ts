@@ -19,4 +19,22 @@ export class AiController {
       body.conversationHistory || []
     );
   }
+
+
+  @Post('zander/chat')
+  async zanderChat(
+    @Req() req: any,
+    @Body() body: { message: string; conversationHistory?: any[] }
+  ) {
+    // Only SuperAdmin can access Zander
+    if (!req.user?.isSuperAdmin) {
+      throw new Error('Unauthorized: Zander is only accessible to SuperAdmin');
+    }
+    return this.aiService.zanderChat(
+      req.user.userId,
+      body.message,
+      body.conversationHistory || []
+    );
+  }
+
 }

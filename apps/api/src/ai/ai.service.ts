@@ -421,4 +421,159 @@ Could you tell me more specifically what you'd like help with? I'm ready to dive
       },
     };
   }
+
+
+  async zanderChat(userId: string, message: string, conversationHistory: any[] = []) {
+    // Zander is the master AI - Jonathan only, full platform visibility
+    
+    // Get platform-wide context
+    const [tickets, headwinds, tenants, knowledgeArticles, users] = await Promise.all([
+      // All support tickets across platform
+      this.prisma.supportTicket.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+        include: {
+          user: { select: { firstName: true, lastName: true, email: true } },
+          tenant: { select: { companyName: true } },
+        },
+      }),
+      // All headwinds
+      this.prisma.headwind.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+      }),
+      // All tenants with user counts
+      this.prisma.tenant.findMany({
+        include: {
+          _count: { select: { users: true } },
+        },
+      }),
+      // Knowledge base
+      this.prisma.knowledgeArticle.findMany({
+        where: { isPublished: true },
+        select: { title: true, category: true, summary: true },
+        take: 20,
+      }),
+      // Total user count
+      this.prisma.user.count(),
+    ]);
+
+    // Calculate platform stats
+    const openTickets = tickets.filter(t => t.status === 'NEW' || t.status === 'IN_PROGRESS').length;
+    const p1Headwinds = headwinds.filter(h => h.priority === 'P1' && h.status !== 'CLOSED').length;
+    const activeHeadwinds = headwinds.filter(h => h.status !== 'CLOSED').length;
+
+    // Build comprehensive platform context
+    const platformContext = `
+ZANDER PLATFORM OPERATIONS CONTEXT
+==================================
+You are Zander, the master operations AI for the Zander SaaS platform. You report directly to Jonathan White, the founder and CEO. Your role is to help Jonathan manage platform operations, analyze support patterns, and maintain system health.
+
+CURRENT PLATFORM STATUS:
+- Total Tenants: ${tenants.length}
+- Total Users: ${users}
+- Open Support Tickets: ${openTickets}
+- Active Headwinds: ${activeHeadwinds} (${p1Headwinds} P1 critical)
+- Knowledge Articles: ${knowledgeArticles.length}
+
+TENANT BREAKDOWN:
+${tenants.map(t => `- ${t.companyName}: ${t._count.users} users (${t.subscriptionTier || 'TRIAL'})`).join('\n')}
+
+RECENT SUPPORT TICKETS:
+${tickets.slice(0, 10).map(t => `- [${t.ticketNumber}] ${t.status} - ${t.subject} (from ${t.user?.firstName || 'Unknown'} at ${t.tenant?.companyName || 'Unknown'})`).join('\n')}
+
+ACTIVE HEADWINDS (Internal Issues):
+${headwinds.filter(h => h.status !== 'CLOSED').map(h => `- [${h.priority}] ${h.title} - ${h.status}`).join('\n') || 'None active'}
+
+KNOWLEDGE BASE CATEGORIES:
+${[...new Set(knowledgeArticles.map(a => a.category))].join(', ') || 'Empty'}
+
+YOUR CAPABILITIES:
+1. Analyze ticket patterns and suggest resolutions
+2. Identify which headwinds are causing user issues
+3. Recommend knowledge base articles to create
+4. Provide platform health assessments
+5. Help draft responses to support tickets
+6. Suggest operational improvements
+
+COMMUNICATION STYLE:
+- Be direct and professional - Jonathan is busy
+- Lead with the most important information
+- Use data to support recommendations
+- Proactively identify patterns and issues
+- Suggest specific actions when relevant
+`;
+
+    const systemPrompt = platformContext;
+
+    const messages = [
+      ...conversationHistory.map((msg: any) => ({
+        role: msg.role === 'zander' ? 'assistant' : msg.role,
+        content: msg.content,
+      })),
+      { role: 'user', content: message },
+    ];
+
+    // Call Claude API
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return this.getZanderMockResponse(message, { openTickets, activeHeadwinds, p1Headwinds });
+    }
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2048,
+          system: systemPrompt,
+          messages: messages,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('Claude API error:', error);
+        return this.getZanderMockResponse(message, { openTickets, activeHeadwinds, p1Headwinds });
+      }
+
+      const data = await response.json();
+      return {
+        content: data.content[0].text,
+        context: {
+          openTickets,
+          activeHeadwinds,
+          p1Headwinds,
+          totalTenants: tenants.length,
+          totalUsers: users,
+        },
+      };
+    } catch (error) {
+      console.error('Error calling Claude API:', error);
+      return this.getZanderMockResponse(message, { openTickets, activeHeadwinds, p1Headwinds });
+    }
+  }
+
+  private getZanderMockResponse(message: string, stats: any): any {
+    return {
+      content: `**Platform Status Summary**
+
+Based on current data:
+- **${stats.openTickets}** open support tickets
+- **${stats.activeHeadwinds}** active headwinds (${stats.p1Headwinds} P1)
+
+Regarding your question about "${message.substring(0, 50)}...":
+
+I'm ready to help analyze this. The full AI integration will provide deeper insights, but I can tell you the system is operational and I'm tracking all incoming issues.
+
+What specific aspect would you like me to focus on?`,
+      context: stats,
+    };
+  }
+
 }
