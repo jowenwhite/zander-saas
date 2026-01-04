@@ -235,4 +235,26 @@ export class AuthService {
     return { message: 'Password reset successful' };
   }
 
+
+  // Generate token with specific tenantId for tenant switching
+  generateTokenForTenant(user: {
+    id: string;
+    email: string;
+    isSuperAdmin?: boolean;
+  }, tenantId: string) {
+    const jwtSecret = this.configService.get<string>('JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined');
+    }
+    return jwt.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        tenantId: tenantId,
+        isSuperAdmin: user.isSuperAdmin || false
+      },
+      jwtSecret,
+      { expiresIn: '1d' }
+    );
+  }
 }

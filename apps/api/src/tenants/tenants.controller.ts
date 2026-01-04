@@ -1,11 +1,15 @@
 import { Controller, Get, Patch, Post, Body, Request, Param, UseGuards } from '@nestjs/common';
 import { TenantsService } from './tenants.service';
+import { AuthService } from '../auth/auth.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('tenants')
 @UseGuards(JwtAuthGuard)
 export class TenantsController {
-  constructor(private readonly tenantsService: TenantsService) {}
+  constructor(
+    private readonly tenantsService: TenantsService,
+    private readonly authService: AuthService
+  ) {}
 
   @Get('me')
   async getMyTenant(@Request() req) {
@@ -35,9 +39,15 @@ export class TenantsController {
       tenantId,
       req.user.isSuperAdmin || false
     );
-    return { 
-      success: true, 
+    // Generate new token with updated tenantId
+    const token = this.authService.generateTokenForTenant(
+      { id: req.user.sub, email: req.user.email, isSuperAdmin: req.user.isSuperAdmin },
+      tenantId
+    );
+    return {
+      success: true,
       tenant,
+      token,
       message: 'Switched to ' + tenant.companyName
     };
   }
