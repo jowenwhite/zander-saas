@@ -18,7 +18,7 @@ interface Headwind {
   title: string;
   description?: string;
   priority: 'P1' | 'P2' | 'P3';
-  category: 'BUG' | 'REBUILD' | 'NEW_BUILD' | 'ENHANCEMENT';
+  category: 'BUG' | 'REBUILD' | 'NEW_BUILD' | 'ENHANCEMENT' | 'TASK';
   status: 'OPEN' | 'IN_PROGRESS' | 'TESTING' | 'DEPLOYED' | 'CLOSED';
   tenantId?: string;
   tenant?: { id: string; companyName: string };
@@ -27,6 +27,8 @@ interface Headwind {
   gitCommit?: string;
   gitBranch?: string;
   resolution?: string;
+  estimatedHours?: number;
+  dueDate?: string;
   createdAt: string;
   updatedAt: string;
   resolvedAt?: string;
@@ -156,7 +158,7 @@ export default function SupportAdminPage() {
   // Modal state
   const [showHeadwindModal, setShowHeadwindModal] = useState(false);
   const [editingHeadwind, setEditingHeadwind] = useState<Headwind | null>(null);
-  const [headwindForm, setHeadwindForm] = useState({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '' });
+  const [headwindForm, setHeadwindForm] = useState({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '', estimatedHours: '', dueDate: '' });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -365,14 +367,18 @@ export default function SupportAdminPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(headwindForm)
+        body: JSON.stringify({
+          ...headwindForm,
+          estimatedHours: headwindForm.estimatedHours ? parseFloat(headwindForm.estimatedHours) : null,
+          dueDate: headwindForm.dueDate || null
+        })
       });
       
       if (response.ok) {
         await fetchHeadwinds();
         setShowHeadwindModal(false);
         setEditingHeadwind(null);
-        setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '' });
+        setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '', estimatedHours: '', dueDate: '' });
       }
     } catch (error) {
       console.error('Failed to save headwind:', error);
@@ -845,7 +851,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                     </button>
                   ))}
                 </div>
-                <button onClick={() => { setEditingHeadwind(null); setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '' }); setShowHeadwindModal(true); }} style={{
+                <button onClick={() => { setEditingHeadwind(null); setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '', estimatedHours: '', dueDate: '' }); setShowHeadwindModal(true); }} style={{
                   background: 'var(--zander-gold)',
                   color: 'var(--zander-navy)',
                   border: 'none',
@@ -864,6 +870,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Title</th>
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Category</th>
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Status</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Est. Hrs</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Due Date</th>
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Updated</th>
                     <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Actions</th>
                   </tr>
@@ -882,9 +890,11 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                       <td style={{ padding: '1rem' }}>
                         <span style={{ background: getStatusColor(h.status), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{h.status.replace('_', ' ')}</span>
                       </td>
+                      <td style={{ padding: '1rem', textAlign: 'center', color: '#666' }}>{h.estimatedHours ? h.estimatedHours + 'h' : '-'}</td>
+                      <td style={{ padding: '1rem', color: h.dueDate && new Date(h.dueDate) < new Date() ? '#dc2626' : '#666' }}>{h.dueDate ? new Date(h.dueDate).toLocaleDateString() : '-'}</td>
                       <td style={{ padding: '1rem', color: '#666' }}>{formatTimeAgo(h.updatedAt)}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <button onClick={() => { setEditingHeadwind(h); setHeadwindForm({ title: h.title, description: h.description || '', priority: h.priority, category: h.category, status: h.status, gitBranch: h.gitBranch || '' }); setShowHeadwindModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>✏️</button>
+                        <button onClick={() => { setEditingHeadwind(h); setHeadwindForm({ title: h.title, description: h.description || '', priority: h.priority, category: h.category, status: h.status, gitBranch: h.gitBranch || '', estimatedHours: h.estimatedHours ? String(h.estimatedHours) : '', dueDate: h.dueDate ? h.dueDate.split('T')[0] : '' }); setShowHeadwindModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>✏️</button>
                         <button onClick={() => deleteHeadwind(h.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginLeft: '0.5rem' }}>🗑️</button>
                       </td>
                     </tr>
@@ -1423,7 +1433,18 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   <option value="REBUILD">Rebuild</option>
                   <option value="NEW_BUILD">New Build</option>
                   <option value="ENHANCEMENT">Enhancement</option>
+                  <option value="TASK">Task</option>
                 </select>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Est. Hours</label>
+                <input type="number" step="0.5" min="0" value={headwindForm.estimatedHours} onChange={(e) => setHeadwindForm(prev => ({ ...prev, estimatedHours: e.target.value }))} placeholder="e.g. 4" style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Due Date</label>
+                <input type="date" value={headwindForm.dueDate} onChange={(e) => setHeadwindForm(prev => ({ ...prev, dueDate: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }} />
               </div>
             </div>
             <div style={{ marginBottom: '1.5rem' }}>

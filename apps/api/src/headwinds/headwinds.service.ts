@@ -75,6 +75,8 @@ export class HeadwindsService {
     assignedToId?: string;
     gitBranch?: string;
     createdById: string;
+    estimatedHours?: number;
+    dueDate?: Date;
   }) {
     return this.prisma.headwind.create({
       data: {
@@ -87,6 +89,8 @@ export class HeadwindsService {
         assignedToId: data.assignedToId || null,
         gitBranch: data.gitBranch,
         createdById: data.createdById,
+        estimatedHours: data.estimatedHours,
+        dueDate: data.dueDate,
       },
       include: {
         tenant: { select: { id: true, companyName: true } },
@@ -106,6 +110,8 @@ export class HeadwindsService {
     gitCommit?: string;
     gitBranch?: string;
     resolution?: string;
+    estimatedHours?: number;
+    dueDate?: Date;
   }) {
     const updateData: any = { ...data };
     
