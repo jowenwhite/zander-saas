@@ -39,7 +39,14 @@ interface Activity {
   dealId?: string;
 }
 
-const STAGES = ['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'];
+
+interface PipelineStage {
+  id: string;
+  name: string;
+  order: number;
+  probability: number;
+  color: string;
+}
 
 // Helper to format stage names for display
 const formatStage = (stage: string) => {
@@ -59,6 +66,7 @@ export default function ProductionPage() {
   const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeModule, setActiveModule] = useState('cro');
@@ -189,14 +197,18 @@ export default function ProductionPage() {
 
   async function fetchData() {
     try {
-      const [contactsRes, dealsRes] = await Promise.all([
+      const [contactsRes, dealsRes, stagesRes] = await Promise.all([
         fetch('https://api.zanderos.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
         fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch('https://api.zanderos.com/pipeline-stages', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
       ]);
       
-      if (contactsRes.ok && dealsRes.ok) {
+      if (contactsRes.ok && dealsRes.ok && stagesRes.ok) {
         const contactsData = await contactsRes.json();
         const dealsData = await dealsRes.json();
+        const stagesData = await stagesRes.json();
+        const sortedStages = (stagesData || []).sort((a: PipelineStage, b: PipelineStage) => a.order - b.order);
+        setStages(sortedStages);
         setContacts(contactsData.data || []);
         const allDeals = [...(dealsData.pipeline.PROSPECT || []), ...(dealsData.pipeline.QUALIFIED || []), ...(dealsData.pipeline.PROPOSAL || []), ...(dealsData.pipeline.NEGOTIATION || []), ...(dealsData.pipeline.CLOSED_WON || []), ...(dealsData.pipeline.CLOSED_LOST || [])]; setDeals(allDeals);
       }
@@ -257,7 +269,29 @@ export default function ProductionPage() {
   const winRate = deals.length > 0 ? Math.round((wonDeals.length / deals.length) * 100) : 0;
 
   // Get deals by stage for pipeline
-  const getDealsByStage = (stage: string) => deals.filter(d => d.stage === stage);
+  const getDealsByStage = (stageName: string) => {
+    // Map new stage names to old enum values for backward compatibility
+    const stageNameToEnum: Record<string, string> = {
+      'Lead': 'LEAD',
+      'Discovery': 'PROSPECT', 
+      'Estimating': 'QUALIFIED',
+      'Proposal': 'PROPOSAL',
+      'Negotiation': 'NEGOTIATION',
+      'Contract': 'CLOSED_WON',
+      'Production': 'CLOSED_WON',
+      'Complete': 'CLOSED_WON',
+      // Also support direct enum matches
+      'LEAD': 'LEAD',
+      'PROSPECT': 'PROSPECT',
+      'QUALIFIED': 'QUALIFIED',
+      'PROPOSAL': 'PROPOSAL',
+      'NEGOTIATION': 'NEGOTIATION',
+      'CLOSED_WON': 'CLOSED_WON',
+      'CLOSED_LOST': 'CLOSED_LOST'
+    };
+    const enumValue = stageNameToEnum[stageName] || stageName;
+    return deals.filter(d => d.stage === enumValue || d.stage === stageName);
+  };
 
   // Get greeting based on time
   const getGreeting = () => {
@@ -570,15 +604,15 @@ export default function ProductionPage() {
             {/* Stage Columns */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(6, minmax(180px, 1fr))',
+              gridTemplateColumns: `repeat(${stages.length || 6}, minmax(180px, 1fr))`,
               overflowX: 'auto',
               gap: '1rem'
             }}>
-              {STAGES.map((stage) => {
-                const stageDeals = getDealsByStage(stage);
+              {stages.map((stageObj) => {
+                const stageDeals = getDealsByStage(stageObj.name);
                 return (
 
-                  <div key={stage} style={{
+                  <div key={stageObj.id} style={{
                     background: 'var(--zander-off-white)',
                     borderRadius: '8px',
                     padding: '1rem',
@@ -596,7 +630,7 @@ export default function ProductionPage() {
                         fontWeight: '600', 
                         color: 'var(--zander-navy)', 
                         fontSize: '0.875rem' 
-                      }}>{formatStage(stage)}</span>
+                      }}>{stageObj.name}</span>
                       <span style={{
                         padding: '0.25rem 0.5rem',
                         background: 'var(--zander-red)',
@@ -1287,8 +1321,8 @@ export default function ProductionPage() {
                     fontSize: '1rem'
                   }}
                 >
-                  {STAGES.map(stage => (
-                    <option key={stage} value={stage}>{formatStage(stage)}</option>
+                  {stages.map(stageObj => (
+                    <option key={stageObj.id} value={stageObj.name}>{stageObj.name}</option>
                   ))}
                 </select>
               </div>
