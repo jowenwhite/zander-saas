@@ -184,7 +184,7 @@ model Deal {
   contactId         String?
   dealValue         Float
   probability       Int               @default(50)
-  stage             DealStage         @default(LEAD)
+  stage             String            @default("Lead")
   priority          DealPriority      @default(MEDIUM)
   status            String            @default("open")
   expectedCloseDate DateTime?

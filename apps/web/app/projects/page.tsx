@@ -181,25 +181,7 @@ export default function ProjectsPage() {
   });
 
   const getDealsByStage = (stageName: string) => {
-    const stageNameToEnum: Record<string, string> = {
-      'Lead': 'LEAD',
-      'Discovery': 'PROSPECT',
-      'Estimating': 'QUALIFIED',
-      'Proposal': 'PROPOSAL',
-      'Negotiation': 'NEGOTIATION',
-      'Contract': 'CONTRACT',
-      'Production': 'PRODUCTION',
-      'Complete': 'CLOSED_WON',
-      'LEAD': 'LEAD',
-      'PROSPECT': 'PROSPECT',
-      'QUALIFIED': 'QUALIFIED',
-      'PROPOSAL': 'PROPOSAL',
-      'NEGOTIATION': 'NEGOTIATION',
-      'CLOSED_WON': 'CLOSED_WON',
-      'CLOSED_LOST': 'CLOSED_LOST'
-    };
-    const enumValue = stageNameToEnum[stageName] || stageName;
-    return filteredDeals.filter(d => d.stage === enumValue || d.stage === stageName);
+    return filteredDeals.filter(d => d.stage === stageName);
   };
   
   const getStageValue = (stage: string) => {

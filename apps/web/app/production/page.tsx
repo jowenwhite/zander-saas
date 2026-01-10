@@ -270,27 +270,7 @@ export default function ProductionPage() {
 
   // Get deals by stage for pipeline
   const getDealsByStage = (stageName: string) => {
-    // Map new stage names to old enum values for backward compatibility
-    const stageNameToEnum: Record<string, string> = {
-      'Lead': 'LEAD',
-      'Discovery': 'PROSPECT', 
-      'Estimating': 'QUALIFIED',
-      'Proposal': 'PROPOSAL',
-      'Negotiation': 'NEGOTIATION',
-      'Contract': 'CONTRACT',
-      'Production': 'PRODUCTION',
-      'Complete': 'CLOSED_WON',
-      // Also support direct enum matches
-      'LEAD': 'LEAD',
-      'PROSPECT': 'PROSPECT',
-      'QUALIFIED': 'QUALIFIED',
-      'PROPOSAL': 'PROPOSAL',
-      'NEGOTIATION': 'NEGOTIATION',
-      'CLOSED_WON': 'CLOSED_WON',
-      'CLOSED_LOST': 'CLOSED_LOST'
-    };
-    const enumValue = stageNameToEnum[stageName] || stageName;
-    return deals.filter(d => d.stage === enumValue || d.stage === stageName);
+    return deals.filter(d => d.stage === stageName);
   };
 
   // Get greeting based on time
