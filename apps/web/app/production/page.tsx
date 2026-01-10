@@ -210,7 +210,7 @@ export default function ProductionPage() {
         const sortedStages = (stagesData || []).sort((a: PipelineStage, b: PipelineStage) => a.order - b.order);
         setStages(sortedStages);
         setContacts(contactsData.data || []);
-        const allDeals = Object.values(dealsData.pipeline || {}).flat(); setDeals(allDeals);
+        const allDeals = Object.values(dealsData.pipeline || {}).flat() as Deal[]; setDeals(allDeals);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
