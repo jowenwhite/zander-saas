@@ -11,6 +11,36 @@ export class AuthService {
     private configService: ConfigService
   ) {}
 
+  // Default pipeline stages for new tenants
+  private readonly DEFAULT_PIPELINE_STAGES = [
+    { name: 'Lead', order: 1, probability: 10, color: '#6C757D' },
+    { name: 'Qualified', order: 2, probability: 25, color: '#17A2B8' },
+    { name: 'Proposal', order: 3, probability: 50, color: '#007BFF' },
+    { name: 'Negotiation', order: 4, probability: 75, color: '#6F42C1' },
+    { name: 'Closed Won', order: 5, probability: 100, color: '#28A745' },
+    { name: 'Closed Lost', order: 6, probability: 0, color: '#DC3545' },
+  ];
+
+  // Helper method to seed default pipeline stages for a tenant
+  private async seedDefaultPipelineStages(tenantId: string): Promise<void> {
+    const existingStages = await this.prisma.pipelineStage.findMany({
+      where: { tenantId }
+    });
+
+    // Only seed if tenant has no stages
+    if (existingStages.length === 0) {
+      await this.prisma.pipelineStage.createMany({
+        data: this.DEFAULT_PIPELINE_STAGES.map(stage => ({
+          tenantId,
+          name: stage.name,
+          order: stage.order,
+          probability: stage.probability,
+          color: stage.color,
+        }))
+      });
+    }
+  }
+
   async register(data: {
     email: string;
     firstName: string;
@@ -33,9 +63,11 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // If no tenantId is provided, create a default tenant
-    let tenant = tenantId ? 
-      await this.prisma.tenant.findUnique({ where: { id: tenantId } }) : 
+    let tenant = tenantId ?
+      await this.prisma.tenant.findUnique({ where: { id: tenantId } }) :
       await this.prisma.tenant.findFirst();
+
+    let isNewTenant = false;
 
     if (!tenant) {
       tenant = await this.prisma.tenant.create({
@@ -44,6 +76,12 @@ export class AuthService {
           subdomain: 'default'
         }
       });
+      isNewTenant = true;
+    }
+
+    // Seed default pipeline stages for new tenants
+    if (isNewTenant) {
+      await this.seedDefaultPipelineStages(tenant.id);
     }
 
     const user = await this.prisma.user.create({
@@ -90,7 +128,6 @@ export class AuthService {
       token
     };
   }
-
 
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -147,6 +184,7 @@ export class AuthService {
 
     return user;
   }
+
   private generateToken(user: {
     isSuperAdmin?: boolean;
     id: string;
@@ -157,21 +195,21 @@ export class AuthService {
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined');
     }
-
     return jwt.sign(
-      { 
-        sub: user.id, 
+      {
+        sub: user.id,
         email: user.email,
         tenantId: user.tenantId,
-        isSuperAdmin: user.isSuperAdmin || false 
-      }, 
-      jwtSecret, 
+        isSuperAdmin: user.isSuperAdmin || false
+      },
+      jwtSecret,
       { expiresIn: '1d' }
     );
   }
+
   async forgotPassword(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    
+
     // Always return success to prevent email enumeration
     if (!user) {
       return { message: 'If an account exists, a reset email has been sent' };
@@ -191,6 +229,7 @@ export class AuthService {
     const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
     if (resendApiKey) {
       const resetUrl = `https://app.zanderos.com/reset-password?token=${resetToken}`;
+
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -234,7 +273,6 @@ export class AuthService {
 
     return { message: 'Password reset successful' };
   }
-
 
   // Generate token with specific tenantId for tenant switching
   generateTokenForTenant(user: {
