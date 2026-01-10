@@ -128,6 +128,13 @@ export class DealsService {
 
   // Get pipeline view (deals grouped by stage)
   async getPipeline(tenantId: string) {
+    // Fetch tenant-specific pipeline stages
+    const stages = await this.prisma.pipelineStage.findMany({
+      where: { tenantId },
+      orderBy: { order: 'asc' }
+    });
+
+    // Fetch all deals for tenant
     const deals = await this.prisma.deal.findMany({
       where: { tenantId },
       include: {
@@ -136,29 +143,69 @@ export class DealsService {
       orderBy: { createdAt: 'desc' }
     });
 
-    // Group deals by stage
-    const pipeline = {
-      PROSPECT: deals.filter(d => d.stage === 'PROSPECT'),
-      QUALIFIED: deals.filter(d => d.stage === 'QUALIFIED'),
-      PROPOSAL: deals.filter(d => d.stage === 'PROPOSAL'),
-      NEGOTIATION: deals.filter(d => d.stage === 'NEGOTIATION'),
-      CLOSED_WON: deals.filter(d => d.stage === 'CLOSED_WON'),
-      CLOSED_LOST: deals.filter(d => d.stage === 'CLOSED_LOST')
+    // If no custom stages configured, use default stage names
+    const defaultStages = [
+      { name: 'PROSPECT', order: 1, probability: 10 },
+      { name: 'QUALIFIED', order: 2, probability: 25 },
+      { name: 'PROPOSAL', order: 3, probability: 50 },
+      { name: 'NEGOTIATION', order: 4, probability: 75 },
+      { name: 'CLOSED_WON', order: 5, probability: 100 },
+      { name: 'CLOSED_LOST', order: 6, probability: 0 }
+    ];
+
+    const activeStages = stages.length > 0 ? stages : defaultStages;
+
+    // Create mapping from old enum values to new stage names for backward compatibility
+    const stageMapping: Record<string, string> = {
+      'PROSPECT': 'Lead',
+      'LEAD': 'Lead',
+      'QUALIFIED': 'Discovery',
+      'DISCOVERY': 'Discovery',
+      'ESTIMATING': 'Estimating',
+      'PROPOSAL': 'Proposal',
+      'NEGOTIATION': 'Negotiation',
+      'CONTRACT': 'Contract',
+      'PRODUCTION': 'Production',
+      'CLOSED_WON': 'Complete',
+      'COMPLETE': 'Complete',
+      'CLOSED_LOST': 'Closed Lost'
     };
 
-    // Calculate stage values
-    const stageValues = {
-      PROSPECT: pipeline.PROSPECT.reduce((sum, d) => sum + d.dealValue, 0),
-      QUALIFIED: pipeline.QUALIFIED.reduce((sum, d) => sum + d.dealValue, 0),
-      PROPOSAL: pipeline.PROPOSAL.reduce((sum, d) => sum + d.dealValue, 0),
-      NEGOTIATION: pipeline.NEGOTIATION.reduce((sum, d) => sum + d.dealValue, 0),
-      CLOSED_WON: pipeline.CLOSED_WON.reduce((sum, d) => sum + d.dealValue, 0),
-      CLOSED_LOST: pipeline.CLOSED_LOST.reduce((sum, d) => sum + d.dealValue, 0)
-    };
+    // Group deals by stage dynamically
+    const pipeline: Record<string, any[]> = {};
+    const stageValues: Record<string, number> = {};
+
+    // Initialize all stages with empty arrays and zero values
+    for (const stage of activeStages) {
+      pipeline[stage.name] = [];
+      stageValues[stage.name] = 0;
+    }
+
+    // Assign deals to stages
+    for (const deal of deals) {
+      const dealStage = deal.stage;
+      
+      // Try direct match first
+      if (pipeline[dealStage] !== undefined) {
+        pipeline[dealStage].push(deal);
+        stageValues[dealStage] += deal.dealValue;
+      } 
+      // Try mapped stage name
+      else if (stageMapping[dealStage] && pipeline[stageMapping[dealStage]] !== undefined) {
+        pipeline[stageMapping[dealStage]].push(deal);
+        stageValues[stageMapping[dealStage]] += deal.dealValue;
+      }
+      // Fallback: assign to first stage
+      else if (activeStages.length > 0) {
+        pipeline[activeStages[0].name].push(deal);
+        stageValues[activeStages[0].name] += deal.dealValue;
+      }
+    }
 
     return {
       pipeline,
       stageValues,
+      stages: activeStages,
       totalValue: Object.values(stageValues).reduce((sum, val) => sum + val, 0),
       totalDeals: deals.length
     };
