@@ -180,7 +180,27 @@ export default function ProjectsPage() {
     return deal.dealName.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  const getDealsByStage = (stage: string) => filteredDeals.filter(d => d.stage === stage);
+  const getDealsByStage = (stageName: string) => {
+    const stageNameToEnum: Record<string, string> = {
+      'Lead': 'LEAD',
+      'Discovery': 'PROSPECT',
+      'Estimating': 'QUALIFIED',
+      'Proposal': 'PROPOSAL',
+      'Negotiation': 'NEGOTIATION',
+      'Contract': 'CONTRACT',
+      'Production': 'PRODUCTION',
+      'Complete': 'CLOSED_WON',
+      'LEAD': 'LEAD',
+      'PROSPECT': 'PROSPECT',
+      'QUALIFIED': 'QUALIFIED',
+      'PROPOSAL': 'PROPOSAL',
+      'NEGOTIATION': 'NEGOTIATION',
+      'CLOSED_WON': 'CLOSED_WON',
+      'CLOSED_LOST': 'CLOSED_LOST'
+    };
+    const enumValue = stageNameToEnum[stageName] || stageName;
+    return filteredDeals.filter(d => d.stage === enumValue || d.stage === stageName);
+  };
   
   const getStageValue = (stage: string) => {
     return getDealsByStage(stage).reduce((sum, deal) => sum + deal.dealValue, 0);

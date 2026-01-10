@@ -277,8 +277,8 @@ export default function ProductionPage() {
       'Estimating': 'QUALIFIED',
       'Proposal': 'PROPOSAL',
       'Negotiation': 'NEGOTIATION',
-      'Contract': 'CLOSED_WON',
-      'Production': 'CLOSED_WON',
+      'Contract': 'CONTRACT',
+      'Production': 'PRODUCTION',
       'Complete': 'CLOSED_WON',
       // Also support direct enum matches
       'LEAD': 'LEAD',
