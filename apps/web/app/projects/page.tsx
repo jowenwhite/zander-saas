@@ -27,7 +27,13 @@ interface Deal {
   updatedAt: string;
 }
 
-const STAGES = ['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'];
+interface PipelineStage {
+  id: string;
+  name: string;
+  order: number;
+  probability: number;
+  color: string;
+}
 
 const formatStage = (stage: string) => {
   const stageLabels: Record<string, string> = {
@@ -49,6 +55,7 @@ const formatCurrency = (value: number) => {
 export default function ProjectsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [draggedDeal, setDraggedDeal] = useState<Deal | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
@@ -71,21 +78,21 @@ export default function ProjectsPage() {
 
   async function fetchData() {
     try {
-      const [dealsRes, contactsRes] = await Promise.all([
+      const [dealsRes, stagesRes, contactsRes] = await Promise.all([
         fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch('https://api.zanderos.com/pipeline-stages', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
         fetch('https://api.zanderos.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
       ]);
       
       if (dealsRes.ok) {
         const pipelineData = await dealsRes.json();
-        const allDeals = [
-          ...pipelineData.pipeline.PROSPECT,
-          ...pipelineData.pipeline.QUALIFIED,
-          ...pipelineData.pipeline.PROPOSAL,
-          ...pipelineData.pipeline.NEGOTIATION,
-          ...pipelineData.pipeline.CLOSED_WON,
-          ...(pipelineData.pipeline.CLOSED_LOST || [])
-        ];
+        // Fetch and set stages
+        if (stagesRes.ok) {
+          const stagesData = await stagesRes.json();
+          const sortedStages = (stagesData || []).sort((a: PipelineStage, b: PipelineStage) => a.order - b.order);
+          setStages(sortedStages);
+        }
+        const allDeals = Object.values(pipelineData.pipeline || {}).flat() as Deal[];
         setDeals(allDeals);
       }
       if (contactsRes.ok) {
@@ -179,7 +186,7 @@ export default function ProjectsPage() {
     return getDealsByStage(stage).reduce((sum, deal) => sum + deal.dealValue, 0);
   };
 
-  const totalProjectsValue = STAGES.reduce((sum, stage) => sum + getStageValue(stage), 0);
+  const totalProjectsValue = stages.reduce((sum, stage) => sum + getStageValue(stage.name), 0);
 
   if (loading) {
     return (
@@ -278,8 +285,8 @@ export default function ProjectsPage() {
           gap: '1rem',
           marginBottom: '2rem'
         }}>
-          {STAGES.map((stage) => (
-            <div key={stage} style={{
+          {stages.map((stage) => (
+            <div key={stage.name} style={{
               background: 'white',
               border: '2px solid var(--zander-border-gray)',
               borderRadius: '8px',
@@ -289,13 +296,13 @@ export default function ProjectsPage() {
               transition: 'all 0.2s ease'
             }}>
               <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
-                {formatCurrency(getStageValue(stage))}
+                {formatCurrency(getStageValue(stage.name))}
               </div>
               <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
-                {formatStage(stage)}
+                {stage.name}
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
-                {getDealsByStage(stage).length} deals
+                {getDealsByStage(stage.name).length} deals
               </div>
             </div>
           ))}
@@ -309,17 +316,17 @@ export default function ProjectsPage() {
           paddingBottom: '2rem',
           minHeight: '500px'
         }}>
-          {STAGES.map((stage) => {
-            const stageDeals = getDealsByStage(stage);
-            const isOver = dragOverStage === stage;
+          {stages.map((stage) => {
+            const stageDeals = getDealsByStage(stage.name);
+            const isOver = dragOverStage === stage.name;
             
             return (
 
               <div
-                key={stage}
-                onDragOver={(e) => handleDragOver(e, stage)}
+                key={stage.name}
+                onDragOver={(e) => handleDragOver(e, stage.name)}
                 onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, stage)}
+                onDrop={(e) => handleDrop(e, stage.name)}
                 style={{
                   flex: '0 0 320px',
                   background: isOver ? 'rgba(191, 10, 48, 0.05)' : 'var(--zander-off-white)',
@@ -344,10 +351,10 @@ export default function ProjectsPage() {
                 }}>
                   <div>
                     <div style={{ fontWeight: '700', color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '0.25rem' }}>
-                      {formatStage(stage)}
+                      {stage.name}
                     </div>
                     <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
-                      <span>{formatCurrency(getStageValue(stage))}</span>
+                      <span>{formatCurrency(getStageValue(stage.name))}</span>
                       <span>•</span>
                       <span>{stageDeals.length} deals</span>
                     </div>
@@ -500,7 +507,7 @@ export default function ProjectsPage() {
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Stage</label>
                 <select value={dealForm.stage} onChange={(e) => setDealForm({...dealForm, stage: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}>
-                  {STAGES.map(stage => <option key={stage} value={stage}>{formatStage(stage)}</option>)}
+                  {stages.map(stage => <option key={stage.name} value={stage.name}>{stage.name}</option>)}
                 </select>
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
