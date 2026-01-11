@@ -217,7 +217,7 @@ export default function ProjectsPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0 }}>
-              Pipeline
+              Projects
             </h1>
             <div style={{
               padding: '0.5rem 1rem',
