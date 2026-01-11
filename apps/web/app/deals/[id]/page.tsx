@@ -157,7 +157,7 @@ export default function DealDetailPage() {
           setTimeline(timelineData.data || []);
         }
       } else {
-        router.push('/pipeline');
+        router.push('/projects');
       }
     } catch (error) {
       console.error('Error fetching deal:', error);
@@ -235,7 +235,7 @@ export default function DealDetailPage() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
           <div style={{ color: 'var(--zander-gray)' }}>Deal not found</div>
-          <button onClick={() => router.push('/pipeline')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+          <button onClick={() => router.push('/projects')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
             Back to Projects
           </button>
         </div>
@@ -257,7 +257,7 @@ export default function DealDetailPage() {
       <main style={{ marginTop: '64px', padding: '2rem', maxWidth: '1000px', margin: '64px auto 0' }}>
         {/* Back Button */}
         <button 
-          onClick={() => router.push('/pipeline')}
+          onClick={() => router.push('/projects')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -303,7 +303,7 @@ export default function DealDetailPage() {
               </div>
             </div>
             <button 
-              onClick={() => router.push('/pipeline')}
+              onClick={() => router.push('/projects')}
               style={{
                 background: 'transparent',
                 border: 'none',
