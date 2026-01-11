@@ -2,23 +2,29 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from the api directory
+COPY apps/api/package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy prisma schema from packages/database
-COPY ../../packages/database/prisma ./prisma
+# Install specific Prisma CLI version and stripe
+RUN npm install prisma@5.22.0 stripe
+
+# Copy prisma schema from packages/database (but not seed.ts)
+COPY packages/database/prisma/schema.prisma ./prisma/
 
 # Generate Prisma client
 RUN npx prisma generate
 
-# Copy source code
-COPY . .
+# Copy API source code and tsconfig
+COPY apps/api/ .
+
+# Compile TypeScript to JavaScript
+RUN npx tsc
 
 # Expose port
 EXPOSE 3001
 
-# Start with ts-node (for now - can optimize later with build step)
-CMD ["npx", "ts-node", "src/main.ts"]
+# Start with compiled JavaScript
+CMD ["node", "dist/main.js"]
