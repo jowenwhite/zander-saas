@@ -68,6 +68,7 @@ export default function ProductionPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
+  const [upcomingAssemblies, setUpcomingAssemblies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeModule, setActiveModule] = useState('cro');
   const [showNewDealModal, setShowNewDealModal] = useState(false);
@@ -197,10 +198,15 @@ export default function ProductionPage() {
 
   async function fetchData() {
     try {
-      const [contactsRes, dealsRes, stagesRes] = await Promise.all([
-        fetch('https://api.zanderos.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
-        fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
-        fetch('https://api.zanderos.com/pipeline-stages', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+      const token = localStorage.getItem('zander_token');
+      const headers = { 'Authorization': `Bearer ${token}` };
+      
+      const [contactsRes, dealsRes, stagesRes, activitiesRes, assembliesRes] = await Promise.all([
+        fetch('https://api.zanderos.com/contacts', { headers }),
+        fetch('https://api.zanderos.com/deals/pipeline', { headers }),
+        fetch('https://api.zanderos.com/pipeline-stages', { headers }),
+        fetch('https://api.zanderos.com/activities/timeline?limit=5', { headers }),
+        fetch('https://api.zanderos.com/calendar-events/upcoming?limit=5', { headers }),
       ]);
       
       if (contactsRes.ok && dealsRes.ok && stagesRes.ok) {
@@ -210,7 +216,18 @@ export default function ProductionPage() {
         const sortedStages = (stagesData || []).sort((a: PipelineStage, b: PipelineStage) => a.order - b.order);
         setStages(sortedStages);
         setContacts(contactsData.data || []);
-        const allDeals = Object.values(dealsData.pipeline || {}).flat() as Deal[]; setDeals(allDeals);
+        const allDeals = Object.values(dealsData.pipeline || {}).flat() as Deal[];
+        setDeals(allDeals);
+      }
+      
+      if (activitiesRes.ok) {
+        const activitiesData = await activitiesRes.json();
+        setActivities(activitiesData.data || activitiesData || []);
+      }
+      
+      if (assembliesRes.ok) {
+        const assembliesData = await assembliesRes.json();
+        setUpcomingAssemblies(assembliesData.data || assembliesData || []);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -310,36 +327,51 @@ export default function ProductionPage() {
       ];
 
   // Compute tasks from deals in PROPOSAL/NEGOTIATION stages
-  const todaysTasks = deals
-    .filter(d => d.stage === 'PROPOSAL' || d.stage === 'NEGOTIATION')
-    .slice(0, 3)
-    .map(d => ({
-      title: `Follow up with ${d.dealName.split(' - ')[1] || d.dealName}`,
-      detail: d.stage === 'PROPOSAL' ? 'Proposal pending review' : 'In negotiation',
-      priority: d.dealValue > 10000 ? 'high' : 'medium',
-      dealId: d.id
-    }));
-
-  // Compute follow-ups from deals with no recent activity (using deals not in CLOSED stages)
-  const followupsNeeded = deals
-    .filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST')
-    .filter(d => {
+  // Action Required: Deals needing attention (stage-agnostic)
+  const actionRequired = (() => {
+    if (stages.length === 0 || deals.length === 0) return [];
+    
+    const firstStageName = stages[0]?.name;
+    const lastStageName = stages[stages.length - 1]?.name;
+    
+    // Get deals that need attention: active deals (not new leads, not completed)
+    const activeDeals = deals.filter(d => 
+      d.stage !== firstStageName && 
+      d.stage !== lastStageName &&
+      d.stage?.toLowerCase() !== 'complete' &&
+      d.stage?.toLowerCase() !== 'closed won' &&
+      d.stage?.toLowerCase() !== 'closed lost'
+    );
+    
+    // Score each deal by urgency
+    const scoredDeals = activeDeals.map(d => {
       const lastUpdate = new Date(d.updatedAt);
       const daysSince = Math.floor((Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
-      return daysSince >= 3;
-    })
-    .slice(0, 3)
-    .map(d => {
-      const lastUpdate = new Date(d.updatedAt);
-      const daysSince = Math.floor((Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
+      const isStale = daysSince >= 3;
+      const isHighValue = d.dealValue > 10000;
+      const urgencyScore = (isStale ? 2 : 0) + (isHighValue ? 1 : 0) + (daysSince >= 7 ? 2 : 0);
+      
       return {
-        title: d.dealName.split(' - ')[1] || d.dealName,
-        detail: `No contact in ${daysSince} days`,
-        overdue: daysSince >= 7,
-        dealId: d.id
+        ...d,
+        daysSince,
+        isStale,
+        isHighValue,
+        urgencyScore
       };
     });
-
+    
+    // Sort by urgency and take top 5
+    return scoredDeals
+      .sort((a, b) => b.urgencyScore - a.urgencyScore)
+      .slice(0, 5)
+      .map(d => ({
+        title: d.dealName.split(' - ')[1] || d.dealName,
+        detail: d.isStale ? `No activity in ${d.daysSince} days` : `${d.stage} - $${d.dealValue.toLocaleString()}`,
+        priority: d.urgencyScore >= 3 ? 'high' : d.urgencyScore >= 1 ? 'medium' : 'low',
+        dealId: d.id,
+        stage: d.stage
+      }));
+  })();
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
   };
@@ -697,7 +729,7 @@ export default function ProductionPage() {
 
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {recentActivities.map((activity) => (
-                <li key={activity.id} onClick={() => router.push('/pipeline')} style={{
+                <li key={activity.id} onClick={() => router.push('/projects')} style={{
                   display: 'flex',
                   gap: '1rem',
                   padding: '1rem',
@@ -747,7 +779,7 @@ export default function ProductionPage() {
               ))}
             </ul>
           </div>
-          {/* Today's Tasks */}
+          {/* Action Required */}
           <div style={{
             background: 'white',
             border: '2px solid var(--zander-border-gray)',
@@ -760,14 +792,14 @@ export default function ProductionPage() {
               color: 'var(--zander-navy)', 
               margin: 0,
               marginBottom: '1.5rem'
-            }}>Today's Tasks</h3>
+            }}>Action Required</h3>
 
-            {(todaysTasks.length > 0 ? todaysTasks : [
+            {(actionRequired.length > 0 ? actionRequired : [
               { title: 'Follow up with Precision Metal Works', detail: 'Proposal sent 3 days ago', priority: 'high' },
               { title: 'Prepare demo for Elite HVAC', detail: 'Meeting tomorrow at 2pm', priority: 'high' },
               { title: 'Send quote to ProBuild Contractors', detail: 'Requested yesterday', priority: 'medium' }
             ]).map((task, i) => (
-              <div key={i} onClick={() => (task as any).dealId && router.push("/pipeline")} style={{
+              <div key={i} onClick={() => (task as any).dealId && router.push("/projects")} style={{
                 display: 'flex',
                 alignItems: 'start',
                 gap: '0.75rem',
@@ -813,41 +845,36 @@ export default function ProductionPage() {
             ))}
           </div>
 
-          {/* Follow-ups Needed */}
+          {/* Upcoming Assemblies */}
           <div style={{
             background: 'white',
             border: '2px solid var(--zander-border-gray)',
             borderRadius: '12px',
             padding: '1.5rem'
           }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
               marginBottom: '1.5rem'
             }}>
-              <h3 style={{ 
-                fontSize: '1.25rem', 
-                fontWeight: '700', 
-                color: 'var(--zander-navy)', 
-                margin: 0 
-              }}>Follow-ups Needed</h3>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                color: 'var(--zander-navy)',
+                margin: 0
+              }}>Upcoming Assemblies</h3>
               <span style={{
                 padding: '0.25rem 0.75rem',
-                background: 'rgba(220, 53, 69, 0.1)',
-                color: '#dc3545',
+                background: 'rgba(155, 89, 182, 0.1)',
+                color: '#9b59b6',
                 borderRadius: '50%',
                 fontWeight: '700',
                 fontSize: '0.875rem'
-              }}>{followupsNeeded.length || 3}</span>
+              }}>{upcomingAssemblies.length}</span>
             </div>
-
-            {(followupsNeeded.length > 0 ? followupsNeeded : [
-              { title: 'Georgia Furniture Co.', detail: 'No contact in 7 days', overdue: true },
-              { title: 'Summit Financial Advisors', detail: 'Proposal expires in 2 days', overdue: false },
-              { title: 'Atlanta Law Group', detail: 'Waiting for response (5 days)', overdue: true }
-            ]).map((task, i) => (
-              <div key={i} onClick={() => (task as any).dealId && router.push("/pipeline")} style={{
+            {upcomingAssemblies.length > 0 ? upcomingAssemblies.map((assembly: any, i: number) => (
+              <div key={assembly.id || i} onClick={() => router.push('/schedule')} style={{
                 display: 'flex',
                 alignItems: 'start',
                 gap: '0.75rem',
@@ -858,42 +885,50 @@ export default function ProductionPage() {
                 cursor: 'pointer'
               }}>
                 <div style={{
-                  width: '20px',
-                  height: '20px',
-                  border: '2px solid var(--zander-border-gray)',
-                  borderRadius: '4px',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  background: 'rgba(155, 89, 182, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   flexShrink: 0,
-                  marginTop: '0.25rem'
-                }}></div>
+                  fontSize: '1rem'
+                }}>📅</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    fontWeight: '600', 
+                  <div style={{
+                    fontWeight: '600',
                     color: 'var(--zander-navy)',
                     marginBottom: '0.25rem'
-                  }}>{task.title}</div>
-                  <div style={{ 
+                  }}>{assembly.title}</div>
+                  <div style={{
                     display: 'flex',
                     gap: '1rem',
                     fontSize: '0.75rem',
                     color: 'var(--zander-gray)'
                   }}>
-                    <span>⏰ {task.detail}</span>
-                    {task.overdue && (
+                    <span>🕐 {new Date(assembly.startTime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(assembly.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+                    {assembly.eventType && (
                       <span style={{
                         padding: '0.125rem 0.5rem',
-                        background: 'rgba(220, 53, 69, 0.1)',
-                        color: '#dc3545',
+                        background: 'rgba(155, 89, 182, 0.1)',
+                        color: '#9b59b6',
                         borderRadius: '4px',
-                        fontWeight: '600'
-                      }}>Overdue</span>
+                        fontWeight: '600',
+                        textTransform: 'capitalize'
+                      }}>{assembly.eventType}</span>
                     )}
                   </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
+                <div>No upcoming assemblies scheduled</div>
+              </div>
+            )}
           </div>
         </div>
-
         {/* Analytics Section */}
         <div style={{ marginTop: '3rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '1.5rem' }}>
