@@ -311,20 +311,13 @@ export default function ProductionPage() {
     return `${diffDays} days ago`;
   };
 
-  const recentActivities: Activity[] = activities.length > 0 
-    ? activities.slice(0, 5).map(a => ({
-        id: a.id,
-        type: a.type || 'note',
-        title: a.subject || 'Activity',
-        description: a.description || '',
-        date: formatTimeAgo(a.createdAt)
-      }))
-    : [
-        { id: '1', type: 'call', title: 'Called Precision Metal Works', description: 'Follow up on proposal', date: '2 hours ago' },
-        { id: '2', type: 'email', title: 'Sent quote to ProBuild', description: 'Kitchen cabinet quote', date: '4 hours ago' },
-        { id: '3', type: 'meeting', title: 'Demo with Elite HVAC', description: 'Product demonstration', date: 'Yesterday' },
-        { id: '4', type: 'note', title: 'Updated Georgia Furniture', description: 'Added requirements notes', date: 'Yesterday' },
-      ];
+  const recentActivities: Activity[] = activities.slice(0, 5).map(a => ({
+    id: a.id,
+    type: a.type || 'note',
+    title: a.subject || a.title || 'Activity',
+    description: a.description || a.notes || '',
+    date: formatTimeAgo(a.createdAt)
+  }));
 
   // Compute tasks from deals in PROPOSAL/NEGOTIATION stages
   // Action Required: Deals needing attention (stage-agnostic)
@@ -365,7 +358,7 @@ export default function ProductionPage() {
       .sort((a, b) => b.urgencyScore - a.urgencyScore)
       .slice(0, 5)
       .map(d => ({
-        title: d.dealName.split(' - ')[1] || d.dealName,
+        title: d.dealName,
         detail: d.isStale ? `No activity in ${d.daysSince} days` : `${d.stage} - $${d.dealValue.toLocaleString()}`,
         priority: d.urgencyScore >= 3 ? 'high' : d.urgencyScore >= 1 ? 'medium' : 'low',
         dealId: d.id,
@@ -727,6 +720,7 @@ export default function ProductionPage() {
               }}>Recent Activity</h3>
             </div>
 
+            {recentActivities.length > 0 ? (
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {recentActivities.map((activity) => (
                 <li key={activity.id} onClick={() => router.push('/projects')} style={{
@@ -778,6 +772,13 @@ export default function ProductionPage() {
                 </li>
               ))}
             </ul>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📋</div>
+                <div>No recent activity</div>
+                <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Activities will appear here as you work on deals</div>
+              </div>
+            )}
           </div>
           {/* Action Required */}
           <div style={{
@@ -794,11 +795,7 @@ export default function ProductionPage() {
               marginBottom: '1.5rem'
             }}>Action Required</h3>
 
-            {(actionRequired.length > 0 ? actionRequired : [
-              { title: 'Follow up with Precision Metal Works', detail: 'Proposal sent 3 days ago', priority: 'high' },
-              { title: 'Prepare demo for Elite HVAC', detail: 'Meeting tomorrow at 2pm', priority: 'high' },
-              { title: 'Send quote to ProBuild Contractors', detail: 'Requested yesterday', priority: 'medium' }
-            ]).map((task, i) => (
+            {actionRequired.length > 0 ? actionRequired.map((task, i) => (
               <div key={i} onClick={() => (task as any).dealId && router.push("/projects")} style={{
                 display: 'flex',
                 alignItems: 'start',
@@ -842,7 +839,13 @@ export default function ProductionPage() {
                   </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
+                <div>No action required</div>
+                <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>All deals are progressing smoothly</div>
+              </div>
+            )}
           </div>
 
           {/* Upcoming Assemblies */}
