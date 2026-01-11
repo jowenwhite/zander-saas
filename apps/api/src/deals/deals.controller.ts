@@ -40,7 +40,7 @@ export class DealsController {
   // PATCH /deals/:id/stage - Move deal to different stage
   @Patch(':id/stage')
   async updateStage(@Param('id') id: string, @Body() body: { stage: string }, @Request() req) {
-    return this.dealsService.updateStage(id, body.stage, req.tenantId);
+    return this.dealsService.updateStage(id, body.stage, req.tenantId, req.user?.userId || req.user?.sub);
   }
 
   // DELETE /deals/:id - Delete deal

@@ -32,7 +32,7 @@ interface Deal {
 
 interface Activity {
   id: string;
-  type: 'call' | 'email' | 'meeting' | 'note';
+  type: 'call' | 'email' | 'meeting' | 'note' | 'stage_change';
   title: string;
   description: string;
   date: string;
@@ -745,12 +745,12 @@ export default function ProductionPage() {
                     fontSize: '1rem',
                     background: activity.type === 'call' ? 'rgba(231, 76, 60, 0.1)' :
                               activity.type === 'email' ? 'rgba(52, 152, 219, 0.1)' :
-                              activity.type === 'meeting' ? 'rgba(155, 89, 182, 0.1)' :
+                              activity.type === 'meeting' ? 'rgba(155, 89, 182, 0.1)' : activity.type === 'stage_change' ? 'rgba(39, 174, 96, 0.1)' :
                               'rgba(39, 174, 96, 0.1)'
                   }}>
                     {activity.type === 'call' ? '📞' :
                      activity.type === 'email' ? '📧' :
-                     activity.type === 'meeting' ? '📅' : '📝'}
+                     activity.type === 'meeting' ? '📅' : activity.type === 'stage_change' ? '🔄' : '📝'}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ 

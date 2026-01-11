@@ -110,13 +110,15 @@ export class DealsService {
   }
 
   // Move deal to different stage
-  async updateStage(id: string, stage: string, tenantId: string) {
-    // Verify deal belongs to tenant
-    await this.findOne(id, tenantId);
-
-    return this.prisma.deal.update({
+  async updateStage(id: string, stage: string, tenantId: string, userId?: string) {
+    // Get current deal to capture old stage
+    const currentDeal = await this.findOne(id, tenantId);
+    const oldStage = currentDeal.stage;
+    
+    // Update the deal
+    const updatedDeal = await this.prisma.deal.update({
       where: { id },
-      data: { 
+      data: {
         stage: stage as any,
         updatedAt: new Date()
       },
@@ -124,6 +126,23 @@ export class DealsService {
         contact: true
       }
     });
+    
+    // Log activity for stage change (if stage actually changed)
+    if (oldStage !== stage && userId) {
+      await this.prisma.activity.create({
+        data: {
+          tenantId,
+          type: 'stage_change',
+          subject: `Moved to ${stage}`,
+          description: `Deal moved from ${oldStage} to ${stage}`,
+          dealId: id,
+          userId,
+          date: new Date()
+        }
+      });
+    }
+    
+    return updatedDeal;
   }
 
   // Get pipeline view (deals grouped by stage)
