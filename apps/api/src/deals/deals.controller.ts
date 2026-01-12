@@ -15,8 +15,8 @@ export class DealsController {
 
   // GET /deals/pipeline - Get pipeline view (deals grouped by stage)
   @Get('pipeline')
-  async getPipeline(@Request() req) {
-    return this.dealsService.getPipeline(req.tenantId);
+  async getPipeline(@Request() req, @Query() query) {
+    return this.dealsService.getPipeline(req.tenantId, query);
   }
 
   // GET /deals/:id - Get single deal

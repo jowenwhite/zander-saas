@@ -84,7 +84,7 @@ export default function ProjectsPage() {
   async function fetchData() {
     try {
       const [dealsRes, stagesRes, contactsRes] = await Promise.all([
-        fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch(`https://api.zanderos.com/deals/pipeline?includeArchived=true&includeLost=true`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
         fetch('https://api.zanderos.com/pipeline-stages', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
         fetch('https://api.zanderos.com/contacts', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
       ]);

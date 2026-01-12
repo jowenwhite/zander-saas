@@ -156,7 +156,7 @@ export class DealsService {
   }
 
   // Get pipeline view (deals grouped by stage)
-  async getPipeline(tenantId: string) {
+  async getPipeline(tenantId: string, query: any = {}) {
     // Fetch tenant-specific pipeline stages
     const stages = await this.prisma.pipelineStage.findMany({
       where: { tenantId },
@@ -165,7 +165,7 @@ export class DealsService {
 
     // Fetch all active deals for tenant (exclude archived and lost)
     const deals = await this.prisma.deal.findMany({
-      where: { tenantId, isArchived: false, isLost: false },
+      where: { tenantId, ...(query.includeArchived !== 'true' && { isArchived: false }), ...(query.includeLost !== 'true' && { isLost: false }) },
       include: {
         contact: true
       },
