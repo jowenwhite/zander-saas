@@ -266,7 +266,7 @@ export default function ProjectsPage() {
           gap: '1rem',
           alignItems: 'center'
         }}>
-          <div style={{ flex: 1, position: 'relative' }}>
+          <div style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
             <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--zander-gray)' }}>🔍</span>
             <input
               type="text"
@@ -282,6 +282,54 @@ export default function ProjectsPage() {
                 outline: 'none'
               }}
             />
+          </div>
+          {/* View Filter */}
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={() => setViewFilter('active')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: viewFilter === 'active' ? 'var(--zander-navy)' : 'white',
+                color: viewFilter === 'active' ? 'white' : 'var(--zander-navy)',
+                border: '2px solid var(--zander-navy)',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.875rem'
+              }}
+            >
+              Active
+            </button>
+            <button
+              onClick={() => setViewFilter('lost')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: viewFilter === 'lost' ? 'var(--zander-red)' : 'white',
+                color: viewFilter === 'lost' ? 'white' : 'var(--zander-red)',
+                border: '2px solid var(--zander-red)',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.875rem'
+              }}
+            >
+              Lost
+            </button>
+            <button
+              onClick={() => setViewFilter('archived')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: viewFilter === 'archived' ? '#666' : 'white',
+                color: viewFilter === 'archived' ? 'white' : '#666',
+                border: '2px solid #666',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.875rem'
+              }}
+            >
+              Archived
+            </button>
           </div>
         </div>
 
