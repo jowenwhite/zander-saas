@@ -110,7 +110,9 @@ export class DealsService {
   }
 
   // Move deal to different stage
+  // DEBUG: Log stage change attempts
   async updateStage(id: string, stage: string, tenantId: string, userId?: string) {
+    console.log(`[STAGE_CHANGE] id=${id}, newStage=${stage}, userId=${userId}`);
     // Get current deal to capture old stage
     const currentDeal = await this.findOne(id, tenantId);
     const oldStage = currentDeal.stage;
