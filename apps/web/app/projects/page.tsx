@@ -255,6 +255,7 @@ export default function ProjectsPage() {
             + New Project
           </button>
         </div>
+          </div>
         <div style={{
           background: 'white',
           border: '2px solid var(--zander-border-gray)',
@@ -537,7 +538,6 @@ export default function ProjectsPage() {
           })}
         </div>
       </main>
-    </div>
 
       {/* New Project Modal */}
       {showNewDealModal && (
