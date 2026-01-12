@@ -537,6 +537,7 @@ export default function ProjectsPage() {
           })}
         </div>
       </main>
+    </div>
 
       {/* New Project Modal */}
       {showNewDealModal && (
