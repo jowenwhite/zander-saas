@@ -284,7 +284,7 @@ export default function ProjectsPage() {
             />
           </div>
           {/* View Filter */}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
             <button
               onClick={() => setViewFilter('active')}
               style={{
@@ -488,7 +488,7 @@ export default function ProjectsPage() {
                         </div>
                         
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
                             <button onClick={() => deal.contact?.email && (window.location.href = '/communications?compose=true&to=' + encodeURIComponent(deal.contact.email) + '&subject=' + encodeURIComponent('Re: ' + deal.dealName))} title="Send Email" style={{
                               padding: '0.4rem 0.6rem',
                               background: 'var(--zander-navy)',
