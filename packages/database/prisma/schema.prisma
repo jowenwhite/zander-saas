@@ -199,7 +199,15 @@ model Deal {
   activities        Activity[]
   contact           Contact?          @relation(fields: [contactId], references: [id])
   lineItems         ProjectLineItem[]
-
+  // Archive & Loss tracking
+  isArchived        Boolean           @default(false)
+  archivedAt        DateTime?
+  archiveReason     String?
+  isLost            Boolean           @default(false)
+  lostAt            DateTime?
+  lossReason        String?
+  stageAtLoss       String?
+  
   @@map("deals")
 }
 

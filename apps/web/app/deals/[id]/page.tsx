@@ -112,6 +112,10 @@ export default function DealDetailPage() {
   const [activeModule, setActiveModule] = useState('cro');
   const [notes, setNotes] = useState('');
   const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [showLostModal, setShowLostModal] = useState(false);
+  const [lossReason, setLossReason] = useState('');
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [archiveReason, setArchiveReason] = useState('');
 
   // Mock documents - generalized for any business
   const [documents] = useState<DocumentItem[]>([
@@ -182,7 +186,46 @@ export default function DealDetailPage() {
       console.error('Error updating deal:', error);
     }
   }
-  async function saveNotes() {
+  
+
+  async function archiveDeal(reason?: string) {
+    try {
+      const response = await fetch(
+        `https://api.zanderos.com/deals/${dealId}/archive`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
+          body: JSON.stringify({ reason }),
+        }
+      );
+      if (response.ok) {
+        setShowArchiveModal(false);
+        router.push('/projects');
+      }
+    } catch (error) {
+      console.error('Error archiving deal:', error);
+    }
+  }
+
+  async function markDealLost(reason: string) {
+    try {
+      const response = await fetch(
+        `https://api.zanderos.com/deals/${dealId}/mark-lost`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
+          body: JSON.stringify({ reason }),
+        }
+      );
+      if (response.ok) {
+        setShowLostModal(false);
+        router.push('/projects');
+      }
+    } catch (error) {
+      console.error('Error marking deal as lost:', error);
+    }
+  }
+async function saveNotes() {
     try {
       const response = await fetch(
         `https://api.zanderos.com/deals/${dealId}`,
@@ -762,8 +805,8 @@ export default function DealDetailPage() {
               }}>
                 Enroll in Email Sequence
               </button>
-              <button 
-                onClick={() => updateDealStage('CLOSED_LOST')}
+              <button
+                onClick={() => setShowLostModal(true)}
                 style={{
                   padding: '0.75rem 1.25rem',
                   background: 'white',
@@ -775,13 +818,184 @@ export default function DealDetailPage() {
                   fontSize: '0.875rem'
                 }}
               >
-                Archive Deal
+                Mark as Lost
+              </button>
+              <button
+                onClick={() => setShowArchiveModal(true)}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  background: 'white',
+                  border: '1px solid #666',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  color: '#666',
+                  fontSize: '0.875rem'
+                }}
+              >
+                Archive
               </button>
             </div>
           </div>
         </div>
       </main>
     </div>
+
+      {/* Mark as Lost Modal */}
+      {showLostModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            width: '400px',
+            maxWidth: '90%'
+          }}>
+            <h3 style={{ marginBottom: '1rem', color: 'var(--zander-navy)' }}>Mark Project as Lost</h3>
+            <p style={{ marginBottom: '1rem', color: '#666', fontSize: '0.9rem' }}>
+              This will count towards your win/loss metrics. Select a reason:
+            </p>
+            <select
+              value={lossReason}
+              onChange={(e) => setLossReason(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: '1px solid var(--zander-border-gray)',
+                marginBottom: '1rem',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="">Select a reason...</option>
+              <option value="Price Too High">Price Too High</option>
+              <option value="Lost to Competitor">Lost to Competitor</option>
+              <option value="No Budget">No Budget</option>
+              <option value="Timing">Timing</option>
+              <option value="No Response">No Response</option>
+              <option value="Went Another Direction">Went Another Direction</option>
+            </select>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowLostModal(false); setLossReason(''); }}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  background: 'white',
+                  border: '1px solid var(--zander-border-gray)',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => lossReason && markDealLost(lossReason)}
+                disabled={!lossReason}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  background: lossReason ? 'var(--zander-red)' : '#ccc',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: lossReason ? 'pointer' : 'not-allowed',
+                  fontWeight: '600'
+                }}
+              >
+                Mark as Lost
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Archive Modal */}
+      {showArchiveModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            width: '400px',
+            maxWidth: '90%'
+          }}>
+            <h3 style={{ marginBottom: '1rem', color: 'var(--zander-navy)' }}>Archive Project</h3>
+            <p style={{ marginBottom: '1rem', color: '#666', fontSize: '0.9rem' }}>
+              Archived projects are excluded from win/loss metrics. Optional reason:
+            </p>
+            <select
+              value={archiveReason}
+              onChange={(e) => setArchiveReason(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: '1px solid var(--zander-border-gray)',
+                marginBottom: '1rem',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="">No reason specified</option>
+              <option value="Bad Fit">Bad Fit</option>
+              <option value="Duplicate">Duplicate</option>
+              <option value="Not Qualified">Not Qualified</option>
+              <option value="Test Data">Test Data</option>
+              <option value="Other">Other</option>
+            </select>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowArchiveModal(false); setArchiveReason(''); }}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  background: 'white',
+                  border: '1px solid var(--zander-border-gray)',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => archiveDeal(archiveReason || undefined)}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  background: '#666',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                Archive
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AuthGuard>
   );
 }

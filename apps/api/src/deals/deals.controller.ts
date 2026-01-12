@@ -77,4 +77,22 @@ export class DealsController {
 
     return { csv };
   }
+
+  // PATCH /deals/:id/archive - Archive a deal (excluded from metrics)
+  @Patch(':id/archive')
+  async archive(@Param('id') id: string, @Body() body: { reason?: string }, @Request() req) {
+    return this.dealsService.archive(id, req.tenantId, body.reason, req.user?.userId || req.user?.sub);
+  }
+
+  // PATCH /deals/:id/mark-lost - Mark deal as lost (counts in win/loss metrics)
+  @Patch(':id/mark-lost')
+  async markLost(@Param('id') id: string, @Body() body: { reason: string }, @Request() req) {
+    return this.dealsService.markLost(id, req.tenantId, body.reason, req.user?.userId || req.user?.sub);
+  }
+
+  // PATCH /deals/:id/restore - Restore an archived or lost deal
+  @Patch(':id/restore')
+  async restore(@Param('id') id: string, @Request() req) {
+    return this.dealsService.restore(id, req.tenantId, req.user?.userId || req.user?.sub);
+  }
 }

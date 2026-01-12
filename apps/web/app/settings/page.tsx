@@ -590,7 +590,7 @@ export default function SettingsPage() {
     { id: 'profile', label: 'Profile', icon: '👤' },
     { id: 'company', label: 'Company', icon: '🏢' },
     { id: 'team', label: 'Team', icon: '👥' },
-    { id: 'pipeline', label: 'Pipeline', icon: '📊' },
+    { id: 'pipeline', label: 'Projects', icon: '📊' },
     { id: 'integrations', label: 'Integrations', icon: '🔗' },
     { id: 'billing', label: 'Billing', icon: '💳' },
     { id: 'data', label: 'Data', icon: '🗄️' },
@@ -966,7 +966,7 @@ export default function SettingsPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Pipeline Stages</h3>
+            <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Project Stages</h3>
             <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.85rem' }} onClick={addStage}>+ Add Stage</button>
           </div>
           <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem' }}>Drag to reorder stages. Deals will follow this sequence.</p>
@@ -1011,11 +1011,11 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Deal Settings</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Project Settings</h3>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Stale Deal Threshold (days)</label>
-            <p style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-gray)', fontSize: '0.8rem' }}>Flag deals with no activity after this many days</p>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Stale Project Threshold (days)</label>
+            <p style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-gray)', fontSize: '0.8rem' }}>Flag projects with no activity after this many days</p>
             <input
               type="number"
               defaultValue={14}

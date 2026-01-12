@@ -7,9 +7,17 @@ export class DealsService {
 
   // Get all deals for a tenant (with search, filters, pagination)
   async findAll(tenantId: string, query: any) {
-    const { search, stage, priority, page = 1, limit = 50, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+    const { search, stage, priority, page = 1, limit = 50, sortBy = 'createdAt', sortOrder = 'desc', includeArchived, includeLost } = query;
 
     const where: any = { tenantId };
+
+    // By default, exclude archived and lost deals unless explicitly requested
+    if (includeArchived !== true && includeArchived !== "true") {
+      where.isArchived = false;
+    }
+    if (includeLost !== true && includeLost !== "true") {
+      where.isLost = false;
+    }
 
     // Search filter
     if (search) {
@@ -155,9 +163,9 @@ export class DealsService {
       orderBy: { order: 'asc' }
     });
 
-    // Fetch all deals for tenant
+    // Fetch all active deals for tenant (exclude archived and lost)
     const deals = await this.prisma.deal.findMany({
-      where: { tenantId },
+      where: { tenantId, isArchived: false, isLost: false },
       include: {
         contact: true
       },
@@ -248,4 +256,113 @@ export class DealsService {
 
     return { created, errors };
   }
+
+
+  // Archive a deal (excluded from win/loss metrics)
+  async archive(id: string, tenantId: string, reason?: string, userId?: string) {
+    const deal = await this.findOne(id, tenantId);
+    
+    const updatedDeal = await this.prisma.deal.update({
+      where: { id },
+      data: {
+        isArchived: true,
+        archivedAt: new Date(),
+        archiveReason: reason || null,
+        status: 'archived',
+        updatedAt: new Date()
+      },
+      include: { contact: true }
+    });
+
+    // Log activity
+    if (userId) {
+      await this.prisma.activity.create({
+        data: {
+          tenantId,
+          type: 'deal_archived',
+          subject: 'Deal Archived',
+          description: reason ? `Deal archived: ${reason}` : 'Deal archived',
+          dealId: id,
+          userId,
+          date: new Date()
+        }
+      });
+    }
+
+    return updatedDeal;
+  }
+
+  // Mark deal as lost (counts in win/loss metrics)
+  async markLost(id: string, tenantId: string, reason: string, userId?: string) {
+    const deal = await this.findOne(id, tenantId);
+    
+    const updatedDeal = await this.prisma.deal.update({
+      where: { id },
+      data: {
+        isLost: true,
+        lostAt: new Date(),
+        lossReason: reason,
+        stageAtLoss: deal.stage,
+        status: 'lost',
+        updatedAt: new Date()
+      },
+      include: { contact: true }
+    });
+
+    // Log activity
+    if (userId) {
+      await this.prisma.activity.create({
+        data: {
+          tenantId,
+          type: 'deal_lost',
+          subject: 'Deal Lost',
+          description: `Deal marked as lost: ${reason}`,
+          dealId: id,
+          userId,
+          date: new Date()
+        }
+      });
+    }
+
+    return updatedDeal;
+  }
+
+  // Restore an archived or lost deal
+  async restore(id: string, tenantId: string, userId?: string) {
+    const deal = await this.findOne(id, tenantId);
+    
+    const updatedDeal = await this.prisma.deal.update({
+      where: { id },
+      data: {
+        isArchived: false,
+        archivedAt: null,
+        archiveReason: null,
+        isLost: false,
+        lostAt: null,
+        lossReason: null,
+        stageAtLoss: null,
+        status: 'open',
+        updatedAt: new Date()
+      },
+      include: { contact: true }
+    });
+
+    // Log activity
+    if (userId) {
+      await this.prisma.activity.create({
+        data: {
+          tenantId,
+          type: 'deal_restored',
+          subject: 'Deal Restored',
+          description: 'Deal restored to active pipeline',
+          dealId: id,
+          userId,
+          date: new Date()
+        }
+      });
+    }
+
+    return updatedDeal;
+  }
+
 }

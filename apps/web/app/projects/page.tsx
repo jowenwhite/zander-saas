@@ -20,6 +20,10 @@ interface Deal {
   dealName: string;
   dealValue: number;
   stage: string;
+  isArchived?: boolean;
+  isLost?: boolean;
+  lossReason?: string;
+  archiveReason?: string;
   probability: number;
   expectedCloseDate?: string;
   contact: Contact | null;
@@ -61,6 +65,7 @@ export default function ProjectsPage() {
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [activeModule, setActiveModule] = useState('cro');
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewFilter, setViewFilter] = useState<'active' | 'lost' | 'archived'>('active');
   const [showNewDealModal, setShowNewDealModal] = useState(false);
   const [contacts, setContacts] = useState<Contact[]>([]);
 
@@ -74,7 +79,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [viewFilter]);
 
   async function fetchData() {
     try {
@@ -265,7 +270,7 @@ export default function ProjectsPage() {
             <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--zander-gray)' }}>🔍</span>
             <input
               type="text"
-              placeholder="Search deals..."
+              placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
