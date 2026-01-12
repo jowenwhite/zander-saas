@@ -181,6 +181,11 @@ export default function ProjectsPage() {
 
   // Filter deals
   const filteredDeals = deals.filter(deal => {
+    // Status filter
+    if (viewFilter === 'active' && (deal.isArchived || deal.isLost)) return false;
+    if (viewFilter === 'lost' && !deal.isLost) return false;
+    if (viewFilter === 'archived' && !deal.isArchived) return false;
+    // Search filter
     if (!searchTerm) return true;
     return deal.dealName.toLowerCase().includes(searchTerm.toLowerCase());
   });
