@@ -31,6 +31,8 @@ import { TreasuryModule } from './treasury/treasury.module';
 import { HeadwindsModule } from './headwinds/headwinds.module';
 import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
+import { CmoModule } from './cmo/cmo.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -60,6 +62,7 @@ import { KnowledgeModule } from './knowledge/knowledge.module';
     HeadwindsModule,
     SupportTicketsModule,
     KnowledgeModule,
+    CmoModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
