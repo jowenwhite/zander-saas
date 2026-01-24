@@ -15,6 +15,72 @@ import { CmoCalendarService } from './cmo-calendar.service';
 export class CmoCalendarController {
   constructor(private readonly cmoCalendarService: CmoCalendarService) {}
 
+  // Calendar Events
+  @Get('events')
+  async getEvents(
+    @Request() req,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('type') type?: string,
+  ) {
+    return this.cmoCalendarService.getEvents(req.tenantId, {
+      startDate,
+      endDate,
+      type,
+    });
+  }
+
+  @Get('events/:id')
+  async getEvent(@Param('id') id: string, @Request() req) {
+    return this.cmoCalendarService.getEvent(id, req.tenantId);
+  }
+
+  @Post('events')
+  async createEvent(
+    @Request() req,
+    @Body()
+    createData: {
+      title: string;
+      description?: string;
+      startTime: string;
+      endTime?: string;
+      allDay?: boolean;
+      eventType?: string;
+      color?: string;
+      monthlyThemeId?: string;
+    },
+  ) {
+    return this.cmoCalendarService.createEvent(
+      req.tenantId,
+      req.user.id,
+      createData,
+    );
+  }
+
+  @Patch('events/:id')
+  async updateEvent(
+    @Param('id') id: string,
+    @Request() req,
+    @Body()
+    updateData: {
+      title?: string;
+      description?: string;
+      startTime?: string;
+      endTime?: string;
+      allDay?: boolean;
+      eventType?: string;
+      color?: string;
+      monthlyThemeId?: string;
+    },
+  ) {
+    return this.cmoCalendarService.updateEvent(id, req.tenantId, updateData);
+  }
+
+  @Delete('events/:id')
+  async deleteEvent(@Param('id') id: string, @Request() req) {
+    return this.cmoCalendarService.deleteEvent(id, req.tenantId);
+  }
+
   // Weekly Schedule
   @Get('schedule')
   async getSchedule(@Request() req, @Query('week') week?: string) {

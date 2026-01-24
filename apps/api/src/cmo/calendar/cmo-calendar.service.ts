@@ -5,6 +5,195 @@ import { PrismaService } from '../../prisma.service';
 export class CmoCalendarService {
   constructor(private prisma: PrismaService) {}
 
+  // Calendar Events
+  async getEvents(
+    tenantId: string,
+    filters: { startDate?: string; endDate?: string; type?: string },
+  ) {
+    const where: any = { tenantId };
+
+    if (filters.startDate) {
+      where.startTime = { gte: new Date(filters.startDate) };
+    }
+    if (filters.endDate) {
+      where.startTime = {
+        ...where.startTime,
+        lte: new Date(filters.endDate + 'T23:59:59'),
+      };
+    }
+    if (filters.type) {
+      where.eventType = filters.type;
+    }
+
+    const events = await this.prisma.calendarEvent.findMany({
+      where,
+      orderBy: { startTime: 'asc' },
+    });
+
+    return {
+      events: events.map((e) => ({
+        id: e.id,
+        title: e.title,
+        description: e.description,
+        type: this.mapEventType(e.eventType),
+        status: this.mapEventStatus(e),
+        startDate: e.startTime.toISOString(),
+        endDate: e.endTime?.toISOString(),
+        allDay: e.allDay,
+        color: e.color,
+      })),
+      total: events.length,
+    };
+  }
+
+  async getEvent(id: string, tenantId: string) {
+    const event = await this.prisma.calendarEvent.findFirst({
+      where: { id, tenantId },
+    });
+    if (!event) {
+      throw new NotFoundException('Calendar event not found');
+    }
+    return {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      type: this.mapEventType(event.eventType),
+      status: this.mapEventStatus(event),
+      startDate: event.startTime.toISOString(),
+      endDate: event.endTime?.toISOString(),
+      allDay: event.allDay,
+      color: event.color,
+    };
+  }
+
+  async createEvent(
+    tenantId: string,
+    userId: string,
+    data: {
+      title: string;
+      description?: string;
+      startTime: string;
+      endTime?: string;
+      allDay?: boolean;
+      eventType?: string;
+      color?: string;
+      monthlyThemeId?: string;
+    },
+  ) {
+    const startTime = new Date(data.startTime);
+    const endTime = data.endTime
+      ? new Date(data.endTime)
+      : new Date(startTime.getTime() + 60 * 60 * 1000); // Default 1 hour
+
+    const event = await this.prisma.calendarEvent.create({
+      data: {
+        tenantId,
+        createdById: userId,
+        title: data.title,
+        description: data.description,
+        startTime,
+        endTime,
+        allDay: data.allDay || false,
+        eventType: this.reverseMapEventType(data.eventType || 'other'),
+        color: data.color,
+        monthlyThemeId: data.monthlyThemeId,
+      },
+    });
+
+    return {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      type: this.mapEventType(event.eventType),
+      status: this.mapEventStatus(event),
+      startDate: event.startTime.toISOString(),
+      endDate: event.endTime?.toISOString(),
+      allDay: event.allDay,
+      color: event.color,
+    };
+  }
+
+  async updateEvent(
+    id: string,
+    tenantId: string,
+    data: {
+      title?: string;
+      description?: string;
+      startTime?: string;
+      endTime?: string;
+      allDay?: boolean;
+      eventType?: string;
+      color?: string;
+      monthlyThemeId?: string;
+    },
+  ) {
+    const event = await this.prisma.calendarEvent.findFirst({
+      where: { id, tenantId },
+    });
+    if (!event) {
+      throw new NotFoundException('Calendar event not found');
+    }
+
+    const updateData: any = {
+      title: data.title,
+      description: data.description,
+      allDay: data.allDay,
+      color: data.color,
+      monthlyThemeId: data.monthlyThemeId,
+    };
+
+    if (data.startTime) {
+      updateData.startTime = new Date(data.startTime);
+    }
+    if (data.endTime) {
+      updateData.endTime = new Date(data.endTime);
+    }
+    if (data.eventType) {
+      updateData.eventType = this.reverseMapEventType(data.eventType);
+    }
+
+    const updated = await this.prisma.calendarEvent.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return {
+      id: updated.id,
+      title: updated.title,
+      description: updated.description,
+      type: this.mapEventType(updated.eventType),
+      status: this.mapEventStatus(updated),
+      startDate: updated.startTime.toISOString(),
+      endDate: updated.endTime?.toISOString(),
+      allDay: updated.allDay,
+      color: updated.color,
+    };
+  }
+
+  async deleteEvent(id: string, tenantId: string) {
+    const event = await this.prisma.calendarEvent.findFirst({
+      where: { id, tenantId },
+    });
+    if (!event) {
+      throw new NotFoundException('Calendar event not found');
+    }
+
+    await this.prisma.calendarEvent.delete({ where: { id } });
+    return { success: true, message: 'Calendar event deleted successfully' };
+  }
+
+  private reverseMapEventType(type: string): string {
+    const mapping: Record<string, string> = {
+      email: 'email',
+      social: 'social_post',
+      blog: 'blog_post',
+      campaign: 'campaign',
+      webinar: 'meeting',
+      other: 'task',
+    };
+    return mapping[type] || 'task';
+  }
+
   // Monthly Themes
   async getThemes(tenantId: string, year?: number) {
     const where: any = { tenantId };
