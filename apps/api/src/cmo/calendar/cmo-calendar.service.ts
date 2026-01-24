@@ -109,6 +109,97 @@ export class CmoCalendarService {
     return { success: true, message: 'Monthly theme deleted successfully' };
   }
 
+  // Weekly Schedule
+  async getSchedule(tenantId: string, week: string = 'current') {
+    const now = new Date();
+    let weekStart: Date;
+    let weekEnd: Date;
+
+    if (week === 'current') {
+      // Get start of current week (Monday)
+      const dayOfWeek = now.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      weekStart = new Date(now);
+      weekStart.setDate(now.getDate() + diff);
+      weekStart.setHours(0, 0, 0, 0);
+
+      // Get end of current week (Sunday)
+      weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+    } else {
+      // Parse ISO date for custom week
+      weekStart = new Date(week);
+      weekStart.setHours(0, 0, 0, 0);
+      weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+    }
+
+    // Get calendar events for the week
+    const events = await this.prisma.calendarEvent.findMany({
+      where: {
+        tenantId,
+        startTime: { gte: weekStart, lte: weekEnd },
+      },
+      orderBy: { startTime: 'asc' },
+    });
+
+    // Get current month's theme
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    const monthlyTheme = await this.prisma.monthlyTheme.findFirst({
+      where: {
+        tenantId,
+        year: currentYear,
+        month: currentMonth,
+        isActive: true,
+      },
+    });
+
+    // Transform events to schedule format
+    const scheduleEvents = events.map((event) => ({
+      id: event.id,
+      date: event.startTime.toISOString(),
+      title: event.title,
+      type: this.mapEventType(event.eventType),
+      status: this.mapEventStatus(event),
+    }));
+
+    return {
+      weekStart: weekStart.toISOString(),
+      weekEnd: weekEnd.toISOString(),
+      events: scheduleEvents,
+      monthlyTheme: monthlyTheme
+        ? {
+            id: monthlyTheme.id,
+            name: monthlyTheme.name,
+            description: monthlyTheme.description,
+          }
+        : undefined,
+    };
+  }
+
+  private mapEventType(eventType: string): 'email' | 'social' | 'blog' | 'campaign' {
+    const mapping: Record<string, 'email' | 'social' | 'blog' | 'campaign'> = {
+      email: 'email',
+      social_post: 'social',
+      blog_post: 'blog',
+      campaign: 'campaign',
+      meeting: 'campaign',
+      task: 'campaign',
+    };
+    return mapping[eventType] || 'campaign';
+  }
+
+  private mapEventStatus(event: any): 'scheduled' | 'published' | 'draft' {
+    const now = new Date();
+    if (event.startTime < now) {
+      return 'published';
+    }
+    return 'scheduled';
+  }
+
   // Idea Parking Lot
   async getIdeas(tenantId: string, status?: string) {
     const where: any = { tenantId };

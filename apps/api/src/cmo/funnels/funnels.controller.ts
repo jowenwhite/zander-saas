@@ -19,6 +19,11 @@ export class FunnelsController {
     return this.funnelsService.findAll(req.tenantId);
   }
 
+  @Get('overview')
+  async getOverview(@Request() req) {
+    return this.funnelsService.getOverview(req.tenantId);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
     return this.funnelsService.findOne(id, req.tenantId);
