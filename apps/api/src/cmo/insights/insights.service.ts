@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 
-type RecommendationType = 'insight' | 'action' | 'warning';
-type Priority = 'high' | 'medium' | 'low';
+export type RecommendationType = 'insight' | 'action' | 'warning';
+export type Priority = 'high' | 'medium' | 'low';
 
-interface Recommendation {
+export interface Recommendation {
   id: string;
   type: RecommendationType;
   icon: string;
