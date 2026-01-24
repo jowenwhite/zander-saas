@@ -5,6 +5,9 @@ import { PersonasModule } from './personas/personas.module';
 import { SegmentsModule } from './segments/segments.module';
 import { CmoCalendarModule } from './calendar/cmo-calendar.module';
 import { AssetsModule } from './assets/assets.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { InsightsModule } from './insights/insights.module';
 
 @Module({
   imports: [
@@ -14,6 +17,9 @@ import { AssetsModule } from './assets/assets.module';
     SegmentsModule,
     CmoCalendarModule,
     AssetsModule,
+    DashboardModule,
+    AnalyticsModule,
+    InsightsModule,
   ],
   exports: [
     WorkflowsModule,
@@ -22,6 +28,9 @@ import { AssetsModule } from './assets/assets.module';
     SegmentsModule,
     CmoCalendarModule,
     AssetsModule,
+    DashboardModule,
+    AnalyticsModule,
+    InsightsModule,
   ],
 })
 export class CmoModule {}

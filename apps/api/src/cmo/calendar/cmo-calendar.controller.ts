@@ -15,6 +15,12 @@ import { CmoCalendarService } from './cmo-calendar.service';
 export class CmoCalendarController {
   constructor(private readonly cmoCalendarService: CmoCalendarService) {}
 
+  // Weekly Schedule
+  @Get('schedule')
+  async getSchedule(@Request() req, @Query('week') week?: string) {
+    return this.cmoCalendarService.getSchedule(req.tenantId, week || 'current');
+  }
+
   // Monthly Themes
   @Get('themes')
   async getThemes(@Request() req, @Query('year') year?: string) {
