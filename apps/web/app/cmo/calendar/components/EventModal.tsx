@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CalendarEvent, CalendarEventType, CalendarEventStatus, EventFormData } from '../types';
 import { eventTypeColors, eventTypeIcons } from '../utils';
 
@@ -29,6 +29,23 @@ const eventStatuses: { value: CalendarEventStatus; label: string }[] = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
+// Helper to safely parse a date string
+function safeParseDate(dateStr: string | undefined): Date {
+  if (!dateStr) return new Date();
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
+// Helper to format date for input
+function formatDateForInput(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
+// Helper to format time for input
+function formatTimeForInput(date: Date): string {
+  return date.toTimeString().slice(0, 5);
+}
+
 export default function EventModal({
   isOpen,
   onClose,
@@ -51,74 +68,46 @@ export default function EventModal({
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Extract ALL primitive values to avoid object reference issues in useEffect
-  const eventId = event?.id;
-  const eventTitle = event?.title;
-  const eventDescription = event?.description;
-  const eventType = event?.type;
-  const eventStatus = event?.status;
-  const eventStartDate = event?.startDate;
-  const eventEndDate = event?.endDate;
-  const eventAllDay = event?.allDay;
-  const selectedDateStr = selectedDate?.toISOString();
+  // Track what we've initialized for to prevent re-initialization
+  const lastInitRef = useRef<string | null>(null);
 
+  // Initialize form data when modal opens - use ref to prevent loops
   useEffect(() => {
-    // Only initialize form when modal opens or event changes
-    if (!isOpen) return;
+    if (!isOpen) {
+      // Reset tracking when modal closes
+      lastInitRef.current = null;
+      return;
+    }
 
-    // Check if we have event data to populate (could be existing event or idea being scheduled)
-    // Use eventStartDate as indicator since it's always set for events
-    const hasEventData = eventId || eventTitle || eventStartDate;
-    if (hasEventData) {
-      try {
-        // Safely parse dates with fallback
-        const startDateObj = eventStartDate ? new Date(eventStartDate) : new Date();
-        const endDateObj = eventEndDate ? new Date(eventEndDate) : startDateObj;
+    // Create a key to track what we're initializing for
+    const initKey = event?.id || (selectedDate ? `new-${selectedDate.getTime()}` : 'empty');
 
-        // Validate dates are valid
-        const startDateStr = !isNaN(startDateObj.getTime())
-          ? startDateObj.toISOString().split('T')[0]
-          : new Date().toISOString().split('T')[0];
-        const startTimeStr = !isNaN(startDateObj.getTime())
-          ? startDateObj.toTimeString().slice(0, 5)
-          : '09:00';
-        const endDateStr = !isNaN(endDateObj.getTime())
-          ? endDateObj.toISOString().split('T')[0]
-          : startDateStr;
-        const endTimeStr = !isNaN(endDateObj.getTime())
-          ? endDateObj.toTimeString().slice(0, 5)
-          : '10:00';
+    // Skip if we've already initialized for this key
+    if (lastInitRef.current === initKey) {
+      return;
+    }
+    lastInitRef.current = initKey;
 
-        setFormData({
-          title: eventTitle || '',
-          description: eventDescription || '',
-          type: (eventType as CalendarEventType) || 'campaign',
-          status: (eventStatus as CalendarEventStatus) || 'draft',
-          startDate: startDateStr,
-          startTime: startTimeStr,
-          endDate: endDateStr,
-          endTime: endTimeStr,
-          allDay: eventAllDay ?? false,
-        });
-      } catch (err) {
-        console.error('Error parsing event data:', err);
-        // Fallback to defaults
-        const now = new Date();
-        setFormData({
-          title: eventTitle || '',
-          description: eventDescription || '',
-          type: 'campaign',
-          status: 'draft',
-          startDate: now.toISOString().split('T')[0],
-          startTime: '09:00',
-          endDate: now.toISOString().split('T')[0],
-          endTime: '10:00',
-          allDay: false,
-        });
-      }
+    // Initialize form based on event or selectedDate
+    if (event) {
+      const startDate = safeParseDate(event.startDate);
+      const endDate = event.endDate ? safeParseDate(event.endDate) : startDate;
+
+      setFormData({
+        title: event.title || '',
+        description: event.description || '',
+        type: (event.type as CalendarEventType) || 'campaign',
+        status: (event.status as CalendarEventStatus) || 'draft',
+        startDate: formatDateForInput(startDate),
+        startTime: formatTimeForInput(startDate),
+        endDate: formatDateForInput(endDate),
+        endTime: formatTimeForInput(endDate),
+        allDay: event.allDay ?? false,
+      });
     } else if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split('T')[0];
       const hour = selectedHour ?? 9;
+      const dateStr = formatDateForInput(selectedDate);
+
       setFormData({
         title: '',
         description: '',
@@ -131,9 +120,11 @@ export default function EventModal({
         allDay: false,
       });
     }
-    setShowDeleteConfirm(false);
-  }, [isOpen, eventId, eventTitle, eventDescription, eventType, eventStatus, eventStartDate, eventEndDate, eventAllDay, selectedDateStr, selectedHour]);
 
+    setShowDeleteConfirm(false);
+  }, [isOpen, event, selectedDate, selectedHour]);
+
+  // Handle body scroll lock
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
