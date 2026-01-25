@@ -15,6 +15,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
 
   const marketingItems = [
     { icon: '📊', label: 'Dashboard', href: '/cmo' },
+    { icon: '📝', label: 'Marketing Plan', href: '/cmo/plan' },
     { icon: '📁', label: 'Projects', href: '/cmo/projects' },
     { icon: '👥', label: 'People', href: '/cmo/people' },
     { icon: '📦', label: 'Products', href: '/cmo/products' },
@@ -36,6 +37,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
   const insightsItems = [
     { icon: '📈', label: 'Analytics', href: '/cmo/analytics' },
     { icon: '🎭', label: 'Personas', href: '/cmo/personas' },
+    { icon: '💰', label: 'Budget', href: '/cmo/budget' },
   ];
 
   const assetsItems = [
