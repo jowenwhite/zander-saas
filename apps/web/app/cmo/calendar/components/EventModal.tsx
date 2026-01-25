@@ -51,29 +51,71 @@ export default function EventModal({
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Use primitive values for dependencies to avoid infinite loops
+  // Extract ALL primitive values to avoid object reference issues in useEffect
   const eventId = event?.id;
+  const eventTitle = event?.title;
+  const eventDescription = event?.description;
+  const eventType = event?.type;
+  const eventStatus = event?.status;
   const eventStartDate = event?.startDate;
+  const eventEndDate = event?.endDate;
+  const eventAllDay = event?.allDay;
   const selectedDateStr = selectedDate?.toISOString();
 
   useEffect(() => {
     // Only initialize form when modal opens or event changes
     if (!isOpen) return;
 
-    if (event) {
-      const startDate = new Date(event.startDate);
-      const endDate = event.endDate ? new Date(event.endDate) : startDate;
-      setFormData({
-        title: event.title,
-        description: event.description || '',
-        type: event.type,
-        status: event.status,
-        startDate: startDate.toISOString().split('T')[0],
-        startTime: startDate.toTimeString().slice(0, 5),
-        endDate: endDate.toISOString().split('T')[0],
-        endTime: endDate.toTimeString().slice(0, 5),
-        allDay: event.allDay,
-      });
+    // Check if we have event data to populate (could be existing event or idea being scheduled)
+    // Use eventStartDate as indicator since it's always set for events
+    const hasEventData = eventId || eventTitle || eventStartDate;
+    if (hasEventData) {
+      try {
+        // Safely parse dates with fallback
+        const startDateObj = eventStartDate ? new Date(eventStartDate) : new Date();
+        const endDateObj = eventEndDate ? new Date(eventEndDate) : startDateObj;
+
+        // Validate dates are valid
+        const startDateStr = !isNaN(startDateObj.getTime())
+          ? startDateObj.toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0];
+        const startTimeStr = !isNaN(startDateObj.getTime())
+          ? startDateObj.toTimeString().slice(0, 5)
+          : '09:00';
+        const endDateStr = !isNaN(endDateObj.getTime())
+          ? endDateObj.toISOString().split('T')[0]
+          : startDateStr;
+        const endTimeStr = !isNaN(endDateObj.getTime())
+          ? endDateObj.toTimeString().slice(0, 5)
+          : '10:00';
+
+        setFormData({
+          title: eventTitle || '',
+          description: eventDescription || '',
+          type: (eventType as CalendarEventType) || 'campaign',
+          status: (eventStatus as CalendarEventStatus) || 'draft',
+          startDate: startDateStr,
+          startTime: startTimeStr,
+          endDate: endDateStr,
+          endTime: endTimeStr,
+          allDay: eventAllDay ?? false,
+        });
+      } catch (err) {
+        console.error('Error parsing event data:', err);
+        // Fallback to defaults
+        const now = new Date();
+        setFormData({
+          title: eventTitle || '',
+          description: eventDescription || '',
+          type: 'campaign',
+          status: 'draft',
+          startDate: now.toISOString().split('T')[0],
+          startTime: '09:00',
+          endDate: now.toISOString().split('T')[0],
+          endTime: '10:00',
+          allDay: false,
+        });
+      }
     } else if (selectedDate) {
       const dateStr = selectedDate.toISOString().split('T')[0];
       const hour = selectedHour ?? 9;
@@ -90,7 +132,7 @@ export default function EventModal({
       });
     }
     setShowDeleteConfirm(false);
-  }, [isOpen, eventId, eventStartDate, selectedDateStr, selectedHour]);
+  }, [isOpen, eventId, eventTitle, eventDescription, eventType, eventStatus, eventStartDate, eventEndDate, eventAllDay, selectedDateStr, selectedHour]);
 
   useEffect(() => {
     if (isOpen) {
