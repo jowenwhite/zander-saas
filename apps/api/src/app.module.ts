@@ -34,6 +34,7 @@ import { HeadwindsModule } from './headwinds/headwinds.module';
 import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { CmoModule } from './cmo/cmo.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { CmoModule } from './cmo/cmo.module';
     SupportTicketsModule,
     KnowledgeModule,
     CmoModule,
+    AdminModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

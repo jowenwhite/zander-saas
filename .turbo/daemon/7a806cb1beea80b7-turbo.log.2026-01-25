@@ -31,3 +31,15 @@
 2026-01-25T09:35:23.377785Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/tsconfig.tsbuildinfo")}
 2026-01-25T09:35:23.377801Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps/web") }}))
 2026-01-25T09:35:23.377900Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-01-25T10:19:40.298987Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/admin")}
+2026-01-25T10:19:40.299667Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-25T10:20:50.199160Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/admin/admin.service.ts.tmp.8900.1769336450125"), AnchoredSystemPathBuf("apps/api/src/admin/admin.service.ts")}
+2026-01-25T10:20:50.199185Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-25T10:21:09.498495Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/admin/admin.controller.ts"), AnchoredSystemPathBuf("apps/api/src/admin/admin.controller.ts.tmp.8900.1769336469450")}
+2026-01-25T10:21:09.498508Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-25T10:21:18.198727Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/admin/admin.module.ts"), AnchoredSystemPathBuf("apps/api/src/admin/admin.module.ts.tmp.8900.1769336478127")}
+2026-01-25T10:21:18.198740Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-25T10:21:28.497133Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/app.module.ts.tmp.8900.1769336488488"), AnchoredSystemPathBuf("apps/api/src/app.module.ts")}
+2026-01-25T10:21:28.497146Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2026-01-25T10:21:37.697692Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/app.module.ts.tmp.8900.1769336497681"), AnchoredSystemPathBuf("apps/api/src/app.module.ts")}
+2026-01-25T10:21:37.697705Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps/api") }}))
