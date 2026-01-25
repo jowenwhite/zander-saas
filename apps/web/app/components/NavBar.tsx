@@ -67,21 +67,21 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
       {/* Module Switcher */}
       <div style={{ display: 'flex', gap: '0.25rem' }}>
         {[
-          { code: 'CRO', label: 'Sales' },
-          { code: 'CFO', label: 'Finance' },
-          { code: 'COO', label: 'Operations' },
-          { code: 'CMO', label: 'Marketing' },
-          { code: 'CPO', label: 'Team' },
-          { code: 'CIO', label: 'Tech' },
-          { code: 'EA', label: 'Tasks' }
+          { code: 'CRO', label: 'Sales', href: '/cro' },
+          { code: 'CFO', label: 'Finance', href: '/cfo' },
+          { code: 'COO', label: 'Operations', href: '/coo' },
+          { code: 'CMO', label: 'Marketing', href: '/cmo' },
+          { code: 'CPO', label: 'Team', href: '/cpo' },
+          { code: 'CIO', label: 'Tech', href: '/cio' },
+          { code: 'EA', label: 'Tasks', href: '/ea' }
         ].map((module) => (
-          <button
+          <a
             key={module.code}
-            onClick={() => setCurrentModule(module.code.toLowerCase())}
+            href={module.href}
             style={{
               padding: '0.4rem 0.75rem 0.25rem',
               borderRadius: '6px',
-              border: 'none',
+              textDecoration: 'none',
               background: currentModule === module.code.toLowerCase() ? moduleColors[module.code.toLowerCase()] : 'transparent',
               color: currentModule === module.code.toLowerCase() ? 'white' : 'var(--zander-gray)',
               fontWeight: '600',
@@ -95,13 +95,13 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
             }}
           >
             <span>{module.code}</span>
-            <span style={{ 
-              fontSize: '0.65rem', 
+            <span style={{
+              fontSize: '0.65rem',
               fontWeight: '400',
               opacity: currentModule === module.code.toLowerCase() ? 0.9 : 0.7,
               letterSpacing: '0.3px'
             }}>{module.label}</span>
-          </button>
+          </a>
         ))}
       </div>
 
