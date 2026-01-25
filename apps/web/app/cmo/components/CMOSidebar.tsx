@@ -11,35 +11,36 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   // CMO 5 Pillars Navigation
+  // SHARED routes: /people, /projects, /products, /communication, /schedule, /forms
+  // CMO-SPECIFIC routes: /cmo, /cmo/calendar, /cmo/workflows, /cmo/funnels, /cmo/templates, /cmo/brand, /cmo/ai, /cmo/personas, /cmo/analytics
+
   const marketingItems = [
-    { icon: '📊', label: 'Production', href: '/cmo' },
-    { icon: '📁', label: 'Projects', href: '/cmo/projects' },
-    { icon: '👥', label: 'People', href: '/cmo/people' },
-    { icon: '📦', label: 'Products', href: '/cmo/products' },
+    { icon: '📊', label: 'Dashboard', href: '/cmo' },
+    { icon: '📁', label: 'Projects', href: '/projects' },
+    { icon: '👥', label: 'People', href: '/people' },
+    { icon: '📦', label: 'Products', href: '/products' },
   ];
 
   const processItems = [
-    { icon: '📧', label: 'Communication', href: '/cmo/communication' },
-    { icon: '📅', label: 'Schedule', href: '/cmo/calendar' },
-    { icon: '📋', label: 'Forms', href: '/cmo/forms' },
-    { icon: '🤖', label: 'Ask Don (CMO)', href: '/cmo/ai' },
+    { icon: '📧', label: 'Communication', href: '/communication' },
+    { icon: '📅', label: 'Schedule', href: '/schedule' },
+    { icon: '🗓️', label: 'Marketing Calendar', href: '/cmo/calendar' },
+    { icon: '📋', label: 'Forms', href: '/forms' },
+    { icon: '🤖', label: 'Ask Don', href: '/cmo/ai' },
   ];
 
   const automationItems = [
     { icon: '⚡', label: 'Workflows', href: '/cmo/workflows' },
     { icon: '🎯', label: 'Funnels', href: '/cmo/funnels' },
-    { icon: '📨', label: 'Sequences', href: '/cmo/sequences' },
   ];
 
   const insightsItems = [
     { icon: '📈', label: 'Analytics', href: '/cmo/analytics' },
-    { icon: '📑', label: 'Reports', href: '/cmo/reports' },
-    { icon: '🔗', label: 'Attribution', href: '/cmo/attribution' },
+    { icon: '🎭', label: 'Personas', href: '/cmo/personas' },
   ];
 
   const assetsItems = [
     { icon: '🎨', label: 'Brand Library', href: '/cmo/brand' },
-    { icon: '🖼️', label: 'Media', href: '/cmo/media' },
     { icon: '📄', label: 'Templates', href: '/cmo/templates' },
   ];
 
