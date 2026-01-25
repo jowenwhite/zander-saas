@@ -51,7 +51,15 @@ export default function EventModal({
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Use primitive values for dependencies to avoid infinite loops
+  const eventId = event?.id;
+  const eventStartDate = event?.startDate;
+  const selectedDateStr = selectedDate?.toISOString();
+
   useEffect(() => {
+    // Only initialize form when modal opens or event changes
+    if (!isOpen) return;
+
     if (event) {
       const startDate = new Date(event.startDate);
       const endDate = event.endDate ? new Date(event.endDate) : startDate;
@@ -68,7 +76,7 @@ export default function EventModal({
       });
     } else if (selectedDate) {
       const dateStr = selectedDate.toISOString().split('T')[0];
-      const hour = selectedHour || 9;
+      const hour = selectedHour ?? 9;
       setFormData({
         title: '',
         description: '',
@@ -81,7 +89,8 @@ export default function EventModal({
         allDay: false,
       });
     }
-  }, [event, selectedDate, selectedHour]);
+    setShowDeleteConfirm(false);
+  }, [isOpen, eventId, eventStartDate, selectedDateStr, selectedHour]);
 
   useEffect(() => {
     if (isOpen) {
