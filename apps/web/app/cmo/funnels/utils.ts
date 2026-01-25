@@ -62,9 +62,51 @@ export const stageTypeConfig: Record<FunnelStageType, StageTypeInfo> = {
   },
 };
 
-// Get stage type info
-export function getStageTypeInfo(type: FunnelStageType): StageTypeInfo {
-  return stageTypeConfig[type];
+// Default stage info for unknown types
+const defaultStageInfo: StageTypeInfo = {
+  type: 'landing_page', // fallback type
+  label: 'Stage',
+  icon: '📌',
+  color: '#6c757d',
+  description: 'Funnel stage',
+  configFields: [],
+};
+
+// Map common stage types to display info
+const genericStageTypeMap: Record<string, Partial<StageTypeInfo>> = {
+  awareness: { label: 'Awareness', icon: '👀', color: '#3498DB' },
+  interest: { label: 'Interest', icon: '💡', color: '#9B59B6' },
+  decision: { label: 'Decision', icon: '🤔', color: '#F39C12' },
+  action: { label: 'Action', icon: '✅', color: '#27AE60' },
+  consideration: { label: 'Consideration', icon: '⚖️', color: '#E67E22' },
+  conversion: { label: 'Conversion', icon: '🎯', color: '#2ECC71' },
+  retention: { label: 'Retention', icon: '🔄', color: '#1ABC9C' },
+  advocacy: { label: 'Advocacy', icon: '📢', color: '#E74C3C' },
+};
+
+// Get stage type info with fallback for unknown types
+export function getStageTypeInfo(type: FunnelStageType | string): StageTypeInfo {
+  // First check the main config
+  if (stageTypeConfig[type as FunnelStageType]) {
+    return stageTypeConfig[type as FunnelStageType];
+  }
+
+  // Check generic stage type map
+  const genericInfo = genericStageTypeMap[type];
+  if (genericInfo) {
+    return {
+      ...defaultStageInfo,
+      type: type as FunnelStageType,
+      ...genericInfo,
+    };
+  }
+
+  // Return default with formatted label from type
+  return {
+    ...defaultStageInfo,
+    type: type as FunnelStageType,
+    label: type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' '),
+  };
 }
 
 // Get all stage types as array

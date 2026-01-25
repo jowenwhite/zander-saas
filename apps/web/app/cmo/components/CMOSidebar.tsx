@@ -11,21 +11,20 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   // CMO 5 Pillars Navigation
-  // SHARED routes: /people, /projects, /products, /communication, /schedule, /forms
-  // CMO-SPECIFIC routes: /cmo, /cmo/calendar, /cmo/workflows, /cmo/funnels, /cmo/templates, /cmo/brand, /cmo/ai, /cmo/personas, /cmo/analytics
+  // All routes use /cmo prefix to stay within CMO context
 
   const marketingItems = [
     { icon: '📊', label: 'Dashboard', href: '/cmo' },
-    { icon: '📁', label: 'Projects', href: '/projects' },
-    { icon: '👥', label: 'People', href: '/people' },
-    { icon: '📦', label: 'Products', href: '/products' },
+    { icon: '📁', label: 'Projects', href: '/cmo/projects' },
+    { icon: '👥', label: 'People', href: '/cmo/people' },
+    { icon: '📦', label: 'Products', href: '/cmo/products' },
   ];
 
   const processItems = [
-    { icon: '📧', label: 'Communication', href: '/communication' },
-    { icon: '📅', label: 'Schedule', href: '/schedule' },
+    { icon: '📧', label: 'Communication', href: '/cmo/communication' },
+    { icon: '📅', label: 'Schedule', href: '/cmo/schedule' },
     { icon: '🗓️', label: 'Marketing Calendar', href: '/cmo/calendar' },
-    { icon: '📋', label: 'Forms', href: '/forms' },
+    { icon: '📋', label: 'Forms', href: '/cmo/forms' },
     { icon: '🤖', label: 'Ask Don', href: '/cmo/ai' },
   ];
 
