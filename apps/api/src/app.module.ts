@@ -8,6 +8,8 @@ import { PrismaService } from './prisma.service';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { PublicGuard } from './auth/public.guard';
+import { S3Module } from './common/s3/s3.module';
+import { StorageModule } from './common/storage/storage.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { DealsModule } from './deals/deals.module';
 import { ActivitiesModule } from './activities/activities.module';
@@ -39,6 +41,8 @@ import { CmoModule } from './cmo/cmo.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    S3Module,
+    StorageModule,
     ContactsModule,
     DealsModule,
     ActivitiesModule,
