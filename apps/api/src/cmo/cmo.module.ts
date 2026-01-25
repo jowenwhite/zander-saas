@@ -8,6 +8,7 @@ import { AssetsModule } from './assets/assets.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { InsightsModule } from './insights/insights.module';
+import { DonModule } from './don/don.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { InsightsModule } from './insights/insights.module';
     DashboardModule,
     AnalyticsModule,
     InsightsModule,
+    DonModule,
   ],
   exports: [
     WorkflowsModule,
@@ -31,6 +33,7 @@ import { InsightsModule } from './insights/insights.module';
     DashboardModule,
     AnalyticsModule,
     InsightsModule,
+    DonModule,
   ],
 })
 export class CmoModule {}
