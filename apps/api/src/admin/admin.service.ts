@@ -366,6 +366,200 @@ export class AdminService {
     }
     details.push(`Calendar events: ${eventsCreated} created, ${calendarEvents.length - eventsCreated} already existed`);
 
+    // Seed workflows
+    let workflowsCreated = 0;
+
+    // Workflow 1: New Lead Welcome Sequence
+    const welcomeWorkflowName = 'New Lead Welcome Sequence';
+    const existingWelcomeWorkflow = await this.prisma.workflow.findFirst({
+      where: { tenantId: tenant.id, name: welcomeWorkflowName },
+    });
+
+    if (!existingWelcomeWorkflow) {
+      const welcomeWorkflow = await this.prisma.workflow.create({
+        data: {
+          tenantId: tenant.id,
+          name: welcomeWorkflowName,
+          description: 'Automatically welcome new contacts with an email sequence',
+          status: 'active',
+          triggerType: 'contact_created',
+          triggerConfig: {},
+          entryCount: 47,
+          completionCount: 32,
+        },
+      });
+
+      const welcomeEmailNode = await this.prisma.workflowNode.create({
+        data: {
+          workflowId: welcomeWorkflow.id,
+          nodeType: 'send_email',
+          name: 'Send Welcome Email',
+          config: { subject: 'Welcome to 64 West Holdings!', fromName: '64 West Team' },
+          positionX: 0,
+          positionY: 0,
+          sortOrder: 1,
+        },
+      });
+
+      const waitNode = await this.prisma.workflowNode.create({
+        data: {
+          workflowId: welcomeWorkflow.id,
+          nodeType: 'wait',
+          name: 'Wait 2 Days',
+          config: { duration: 2, unit: 'days' },
+          positionX: 0,
+          positionY: 100,
+          sortOrder: 2,
+        },
+      });
+
+      const followUpNode = await this.prisma.workflowNode.create({
+        data: {
+          workflowId: welcomeWorkflow.id,
+          nodeType: 'send_email',
+          name: 'Send Follow-up Email',
+          config: { subject: 'How can we help you today?', fromName: '64 West Team' },
+          positionX: 0,
+          positionY: 200,
+          sortOrder: 3,
+        },
+      });
+
+      const endNode = await this.prisma.workflowNode.create({
+        data: {
+          workflowId: welcomeWorkflow.id,
+          nodeType: 'end',
+          name: 'End Workflow',
+          config: {},
+          positionX: 0,
+          positionY: 300,
+          sortOrder: 4,
+        },
+      });
+
+      await this.prisma.workflowNode.update({ where: { id: welcomeEmailNode.id }, data: { nextNodeId: waitNode.id } });
+      await this.prisma.workflowNode.update({ where: { id: waitNode.id }, data: { nextNodeId: followUpNode.id } });
+      await this.prisma.workflowNode.update({ where: { id: followUpNode.id }, data: { nextNodeId: endNode.id } });
+
+      workflowsCreated++;
+    }
+
+    // Workflow 2: Webinar Follow-up
+    const webinarWorkflowName = 'Webinar Follow-up';
+    const existingWebinarWorkflow = await this.prisma.workflow.findFirst({
+      where: { tenantId: tenant.id, name: webinarWorkflowName },
+    });
+
+    if (!existingWebinarWorkflow) {
+      const webinarWorkflow = await this.prisma.workflow.create({
+        data: {
+          tenantId: tenant.id,
+          name: webinarWorkflowName,
+          description: 'Follow up with contacts who attended a webinar',
+          status: 'active',
+          triggerType: 'tag_added',
+          triggerConfig: { tagName: 'webinar_attended' },
+          entryCount: 23,
+          completionCount: 21,
+        },
+      });
+
+      const thankYouNode = await this.prisma.workflowNode.create({
+        data: {
+          workflowId: webinarWorkflow.id,
+          nodeType: 'send_email',
+          name: 'Send Thank You Email',
+          config: { subject: 'Thank you for attending our webinar!', fromName: '64 West Holdings' },
+          positionX: 0,
+          positionY: 0,
+          sortOrder: 1,
+        },
+      });
+
+      const addTagNode = await this.prisma.workflowNode.create({
+        data: {
+          workflowId: webinarWorkflow.id,
+          nodeType: 'add_tag',
+          name: 'Add to Nurture Segment',
+          config: { tagName: 'nurture_segment' },
+          positionX: 0,
+          positionY: 100,
+          sortOrder: 2,
+        },
+      });
+
+      const webinarEndNode = await this.prisma.workflowNode.create({
+        data: {
+          workflowId: webinarWorkflow.id,
+          nodeType: 'end',
+          name: 'End Workflow',
+          config: {},
+          positionX: 0,
+          positionY: 200,
+          sortOrder: 3,
+        },
+      });
+
+      await this.prisma.workflowNode.update({ where: { id: thankYouNode.id }, data: { nextNodeId: addTagNode.id } });
+      await this.prisma.workflowNode.update({ where: { id: addTagNode.id }, data: { nextNodeId: webinarEndNode.id } });
+
+      workflowsCreated++;
+    }
+
+    // Workflow 3: Lead Nurture Drip Campaign
+    const nurtureWorkflowName = 'Lead Nurture Drip Campaign';
+    const existingNurtureWorkflow = await this.prisma.workflow.findFirst({
+      where: { tenantId: tenant.id, name: nurtureWorkflowName },
+    });
+
+    if (!existingNurtureWorkflow) {
+      const nurtureWorkflow = await this.prisma.workflow.create({
+        data: {
+          tenantId: tenant.id,
+          name: nurtureWorkflowName,
+          description: 'Multi-touch email drip campaign for leads who download content',
+          status: 'draft',
+          triggerType: 'form_submission',
+          triggerConfig: { formId: 'lead_magnet_download' },
+          entryCount: 0,
+          completionCount: 0,
+        },
+      });
+
+      const deliverNode = await this.prisma.workflowNode.create({
+        data: { workflowId: nurtureWorkflow.id, nodeType: 'send_email', name: 'Deliver Content', config: { subject: 'Your download is ready!' }, positionX: 0, positionY: 0, sortOrder: 1 },
+      });
+      const wait3Node = await this.prisma.workflowNode.create({
+        data: { workflowId: nurtureWorkflow.id, nodeType: 'wait', name: 'Wait 3 Days', config: { duration: 3, unit: 'days' }, positionX: 0, positionY: 100, sortOrder: 2 },
+      });
+      const eduNode = await this.prisma.workflowNode.create({
+        data: { workflowId: nurtureWorkflow.id, nodeType: 'send_email', name: 'Send Educational Content', config: { subject: '3 ways to grow your business' }, positionX: 0, positionY: 200, sortOrder: 3 },
+      });
+      const wait5Node = await this.prisma.workflowNode.create({
+        data: { workflowId: nurtureWorkflow.id, nodeType: 'wait', name: 'Wait 5 Days', config: { duration: 5, unit: 'days' }, positionX: 0, positionY: 300, sortOrder: 4 },
+      });
+      const ctaNode = await this.prisma.workflowNode.create({
+        data: { workflowId: nurtureWorkflow.id, nodeType: 'send_email', name: 'Send CTA Email', config: { subject: 'Ready to take the next step?' }, positionX: 0, positionY: 400, sortOrder: 5 },
+      });
+      const notifyNode = await this.prisma.workflowNode.create({
+        data: { workflowId: nurtureWorkflow.id, nodeType: 'notify_user', name: 'Notify Sales Team', config: { message: 'Lead completed nurture sequence' }, positionX: 0, positionY: 500, sortOrder: 6 },
+      });
+      const nurtureEndNode = await this.prisma.workflowNode.create({
+        data: { workflowId: nurtureWorkflow.id, nodeType: 'end', name: 'End Workflow', config: {}, positionX: 0, positionY: 600, sortOrder: 7 },
+      });
+
+      await this.prisma.workflowNode.update({ where: { id: deliverNode.id }, data: { nextNodeId: wait3Node.id } });
+      await this.prisma.workflowNode.update({ where: { id: wait3Node.id }, data: { nextNodeId: eduNode.id } });
+      await this.prisma.workflowNode.update({ where: { id: eduNode.id }, data: { nextNodeId: wait5Node.id } });
+      await this.prisma.workflowNode.update({ where: { id: wait5Node.id }, data: { nextNodeId: ctaNode.id } });
+      await this.prisma.workflowNode.update({ where: { id: ctaNode.id }, data: { nextNodeId: notifyNode.id } });
+      await this.prisma.workflowNode.update({ where: { id: notifyNode.id }, data: { nextNodeId: nurtureEndNode.id } });
+
+      workflowsCreated++;
+    }
+
+    details.push(`Workflows: ${workflowsCreated} created, ${3 - workflowsCreated} already existed`);
+
     return {
       success: true,
       message: 'Marketing seed completed successfully',
