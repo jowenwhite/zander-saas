@@ -403,8 +403,9 @@ export default function CMOCalendarPage() {
         )}
       </div>
 
-      {/* Event Modal */}
+      {/* Event Modal - key forces remount to avoid stale state issues */}
       <EventModal
+        key={selectedEvent?.id || 'new'}
         isOpen={showEventModal}
         onClose={() => {
           setShowEventModal(false);
