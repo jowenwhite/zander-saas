@@ -78,4 +78,27 @@ export class PersonasController {
   async remove(@Param('id') id: string, @Request() req) {
     return this.personasService.remove(id, req.tenantId);
   }
+
+  @Post('test')
+  async testContent(
+    @Request() req,
+    @Body()
+    body: {
+      personaId: string;
+      content: string;
+      contentType: 'email' | 'ad' | 'social' | 'landing_page';
+    },
+  ) {
+    return this.personasService.testContent(
+      req.tenantId,
+      body.personaId,
+      body.content,
+      body.contentType,
+    );
+  }
+
+  @Post('seed-default')
+  async seedDefault(@Request() req) {
+    return this.personasService.seedDefaultPersona(req.tenantId);
+  }
 }
