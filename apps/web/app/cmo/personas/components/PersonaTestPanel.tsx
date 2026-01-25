@@ -138,7 +138,7 @@ export default function PersonaTestPanel({
         variant="primary"
         onClick={handleTest}
         disabled={loading || !selectedPersonaId || !content.trim()}
-        style={{ width: '100%' }}
+        fullWidth
       >
         {loading ? 'Analyzing...' : 'Test Against Persona'}
       </Button>

@@ -708,6 +708,7 @@ model Campaign {
   triggerType    String? // "manual" | "stage_change" | "form_submission"
   triggerConfig  Json     @default("{}")
   isFromTreasury Boolean  @default(false)
+  businessUnit   String?  // 'zander' | 'finance' | 'consulting' | 'all'
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
