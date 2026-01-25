@@ -1,8 +1,8 @@
 # CLAUDE.md - Zander Development Guide
 
-> **Owner:** Jonathan White  
-> **Company:** 64 West Holdings LLC  
-> **Last Updated:** January 24, 2026
+> **Owner:** Jonathan White
+> **Company:** 64 West Holdings LLC
+> **Last Updated:** January 25, 2026
 
 ---
 
@@ -28,7 +28,7 @@ Create unified business operating systems that help small business owners reclai
 ### Frontend
 - **Framework:** Next.js 15.x (App Router)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS
+- **Styling:** Tailwind CSS + Inline CSS (CMO module)
 - **Icons:** Lucide React
 - **State:** React hooks, localStorage for client state
 - **Deployment:** Vercel → app.zanderos.com
@@ -41,12 +41,13 @@ Create unified business operating systems that help small business owners reclai
 - **Deployment:** AWS ECS → api.zanderos.com
 
 ### Infrastructure
-- **Cloud:** AWS (ECS, RDS, ECR, Route53)
+- **Cloud:** AWS (ECS, RDS, ECR, S3, Route53)
+- **S3 Bucket:** zander-assets
 - **DNS:** Cloudflare
 - **Email:** Resend API
 - **SMS:** Twilio
 - **Payments:** Stripe
-- **AI:** Anthropic Claude API
+- **AI:** Anthropic Claude API (claude-sonnet-4-20250514)
 
 ### Repository Structure
 ```
@@ -56,24 +57,92 @@ zander-saas/
 │   │   ├── app/                # App router pages
 │   │   │   ├── (auth)/         # Auth pages
 │   │   │   ├── (dashboard)/    # Main app pages
-│   │   │   ├── cmo/            # CMO module (building)
+│   │   │   ├── cmo/            # CMO module (COMPLETE)
 │   │   │   ├── cro/            # CRO module (complete)
 │   │   │   └── api/            # API routes
 │   │   ├── components/         # React components
 │   │   └── lib/                # Utilities
 │   └── api/                    # NestJS backend
-│       ├── src/
-│       │   ├── auth/           # Authentication
-│       │   ├── billing/        # Stripe integration
-│       │   ├── cmo/            # CMO module (building)
-│       │   ├── cro/            # CRO module
-│       │   ├── email/          # Resend integration
-│       │   └── prisma/         # Database service
+│       └── src/
+│           ├── admin/          # Admin endpoints (seed, etc.)
+│           ├── auth/           # Authentication
+│           ├── billing/        # Stripe integration
+│           ├── cmo/            # CMO module (COMPLETE)
+│           ├── cro/            # CRO module
+│           ├── email/          # Resend integration
+│           └── prisma/         # Database service
+├── packages/
+│   └── database/               # Shared Prisma schema
 │       └── prisma/
-│           └── schema.prisma   # Database schema
-├── packages/                   # Shared packages
+│           ├── schema.prisma   # Database schema
+│           └── seed-marketing.ts # Marketing seed script
 └── CLAUDE.md                   # This file
 ```
+
+---
+
+## Production URLs
+
+| Service | URL |
+|---------|-----|
+| Frontend | https://app.zanderos.com |
+| API | https://api.zanderos.com |
+| CMO Module | https://app.zanderos.com/cmo |
+
+---
+
+## Module Status
+
+| Module | Status | Notes |
+|--------|--------|-------|
+| **CRO** | 97% Complete | Sales pipeline, contacts, deals, automation templates |
+| **CMO** | **100% Complete** | All 12 phases done, deployed to production |
+| **CFO** | Not Started | — |
+| **COO** | Not Started | — |
+| **CPO** | Not Started | — |
+| **CIO** | Not Started | — |
+| **EA** | Not Started | — |
+
+### CRO Module (Reference)
+- Location: `apps/web/app/cro/`
+- Features: Pipeline kanban, contact management, deal tracking, The Treasury (templates), Schedule calendar
+- Use as pattern for other modules
+
+### CMO Module (COMPLETE - Deployed to Production)
+- Frontend: `apps/web/app/cmo/`
+- Backend: `apps/api/src/cmo/`
+- Spec: `/docs/Zander_CMO_Specification_v1.md`
+
+**CMO 5 Pillars Structure:**
+1. MARKETING: Dashboard, Projects, People, Products
+2. PROCESS: Communication, Schedule, Marketing Calendar, Forms, Ask Don
+3. AUTOMATION: Workflows, Funnels
+4. INSIGHTS: Analytics, Personas
+5. ASSETS: Brand Library, Templates
+
+**CMO Build Phases (ALL COMPLETE):**
+- [x] Phase 1: Foundation & Database
+- [x] Phase 2: Frontend Foundation (Layout, Sidebar, Components)
+- [x] Phase 3: Dashboard Page
+- [x] Phase 4: Marketing Calendar
+- [x] Phase 5: Funnels Module
+- [x] Phase 6: Workflows Module
+- [x] Phase 7: Ask Don AI (Claude API integration)
+- [x] Phase 8: Brand Assets
+- [x] Phase 9: Email Template Builder (drag-drop editor)
+- [x] Phase 10: Persona Testing (Claude API for content evaluation)
+- [x] Phase 11: Sidebar Navigation Fixes
+- [x] Phase 12: Seed Marketing Data (64 West Holdings)
+
+**CMO API Endpoints:**
+- `/cmo/dashboard` - Dashboard stats
+- `/cmo/calendar` - Marketing calendar events
+- `/cmo/funnels` - Funnel management with stages
+- `/cmo/workflows` - Workflow automation
+- `/cmo/personas` - Customer personas + testing
+- `/cmo/brand` - Brand profile management
+- `/cmo/templates` - Email template CRUD
+- `/cmo/ai/ask-don` - Claude AI integration
 
 ---
 
@@ -136,6 +205,10 @@ cd apps/web && npm run build 2>&1 | grep -E "error|Error" | head -20
 # Backend
 cd apps/api && npm run build 2>&1 | grep -E "error|Error" | head -20
 
+# Type check without building
+cd apps/api && npx tsc --noEmit
+cd apps/web && npx tsc --noEmit
+
 # Run dev servers
 cd apps/web && npm run dev  # Port 3002
 cd apps/api && npm run start:dev  # Port 8080
@@ -144,13 +217,19 @@ cd apps/api && npm run start:dev  # Port 8080
 **Database:**
 ```bash
 # Generate Prisma client after schema changes
-cd apps/api && npx prisma generate
+cd packages/database && npx prisma generate
+
+# Push schema changes (dev)
+cd packages/database && npx prisma db push
 
 # Create migration
-cd apps/api && npx prisma migrate dev --name migration_name
+cd packages/database && npx prisma migrate dev --name migration_name
 
 # View database
-cd apps/api && npx prisma studio
+cd packages/database && npx prisma studio
+
+# Run marketing seed (local)
+cd packages/database && npm run seed:marketing
 
 # Backup (always before major changes)
 pg_dump -U zander_app -h localhost zander_dev > ~/Desktop/zander_backup_$(date +%Y%m%d_%H%M%S).sql
@@ -158,42 +237,56 @@ pg_dump -U zander_app -h localhost zander_dev > ~/Desktop/zander_backup_$(date +
 
 ---
 
-## Module Status
+## Deployment
 
-| Module | Status | Notes |
-|--------|--------|-------|
-| **CRO** | 97% Complete | Sales pipeline, contacts, deals, automation templates |
-| **CMO** | Phase 1 Complete | Database schema done, starting Phase 2 |
-| **CFO** | Not Started | — |
-| **COO** | Not Started | — |
-| **CPO** | Not Started | — |
-| **CIO** | Not Started | — |
-| **EA** | Not Started | — |
+### Frontend (Vercel - Automatic)
+Push to main branch → Vercel auto-deploys to app.zanderos.com
 
-### CRO Module (Reference)
-- Location: `apps/web/app/cro/`
-- Features: Pipeline kanban, contact management, deal tracking, The Treasury (templates), Schedule calendar
-- Use as pattern for other modules
+### Backend (AWS ECS - Manual)
 
-### CMO Module (Active Development)
-- Location: `apps/web/app/cmo/` (frontend), `apps/api/src/cmo/` (backend)
-- Spec: `/docs/Zander_CMO_Specification_v1.md`
-- Build Plan: `/docs/Zander_CMO_Build_Plan.md`
+**Full deployment process:**
+```bash
+# 1. Login to ECR
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 288720721534.dkr.ecr.us-east-1.amazonaws.com
 
-**CMO 5 Pillars Structure:**
-1. MARKETING: Production, Projects, People, Products
-2. PROCESS: Communication, Schedule, Forms, Ask Don
-3. AUTOMATION: Workflows, Funnels, Sequences
-4. INSIGHTS: Analytics, Reports, Attribution
-5. ASSETS: Brand Library, Media, Templates
+# 2. Build Docker image (from repo root)
+cd /Users/jonathanwhite/dev/zander-saas
+docker build -f Dockerfile.api -t zander-api:latest .
 
-**CMO Build Phases:**
-- [x] Phase 1: Foundation & Database (16-20 hrs) — COMPLETE
-- [ ] Phase 2: Frontend Foundation (18-22 hrs) — STARTING
-- [ ] Phase 3: Dashboard Page (14-18 hrs)
-- [ ] Phase 4: Core Feature Pages (32-40 hrs)
-- [ ] Phase 5: Automation & AI (24-30 hrs)
-- [ ] Phase 6: Analytics, Polish & Launch (16-20 hrs)
+# 3. Tag and push to ECR
+docker tag zander-api:latest 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v6
+docker push 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v6
+
+# 4. Update ECS task definition (if env vars changed)
+# - Get current: aws ecs describe-task-definition --task-definition zander-api
+# - Modify JSON, register new revision
+# - aws ecs register-task-definition --cli-input-json file://task-def.json
+
+# 5. Update ECS service
+aws ecs update-service \
+  --cluster zander-cluster \
+  --service zander-api-service \
+  --task-definition zander-api:17 \
+  --force-new-deployment
+
+# 6. Monitor deployment
+aws ecs describe-services --cluster zander-cluster --services zander-api-service \
+  --query 'services[0].deployments' --output table
+```
+
+**Run marketing seed on production:**
+```bash
+curl -X POST https://api.zanderos.com/admin/seed-marketing \
+  -H "x-admin-secret: 1a10d78ea77ff45e4cc49d415fd506a62bc6613597f9e1722848777f34982021"
+```
+
+### AWS Resources
+- **Account:** 288720721534
+- **ECS Cluster:** zander-cluster
+- **ECS Service:** zander-api-service
+- **ECR:** 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api
+- **RDS:** zander-prod-db.cavkq4gew6zt.us-east-1.rds.amazonaws.com
+- **S3:** zander-assets
 
 ---
 
@@ -212,6 +305,7 @@ All 7 executives follow identical layout:
 --zander-navy: #0C2340;
 --zander-gold: #F0B323;
 --zander-blue: #005687;
+--zander-orange: #F57C00;  /* CMO accent color */
 
 /* Typography */
 font-family: 'Inter', sans-serif;
@@ -227,8 +321,8 @@ font-family: 'Inter', sans-serif;
 
 ### Component Patterns
 - Use Lucide React for icons
-- Cards with consistent border-radius (8px)
-- Buttons: Primary (red), Secondary (navy), Ghost (transparent)
+- Cards with consistent border-radius (8px or 12px)
+- Buttons: Primary (orange for CMO), Secondary (navy), Ghost (transparent)
 - Forms: Label above input, error states in red
 - Tables: Sticky headers, hover states, pagination
 
@@ -238,10 +332,11 @@ font-family: 'Inter', sans-serif;
 
 ### Endpoint Structure
 ```
-/api/v1/{module}/{resource}
-/api/v1/cmo/campaigns
-/api/v1/cmo/campaigns/:id
-/api/v1/cmo/calendar/events
+/{module}/{resource}
+/cmo/campaigns
+/cmo/campaigns/:id
+/cmo/calendar/events
+/admin/seed-marketing
 ```
 
 ### Response Format
@@ -264,6 +359,29 @@ font-family: 'Inter', sans-serif;
 - JWT tokens in Authorization header
 - TenantId extracted from token
 - UserId extracted from token
+- Admin endpoints use `x-admin-secret` header
+
+---
+
+## Environment Variables
+
+### Frontend (.env.local)
+```
+NEXT_PUBLIC_API_URL=http://localhost:8080  # or https://api.zanderos.com
+NEXT_PUBLIC_APP_URL=http://localhost:3002
+```
+
+### Backend (.env)
+```
+DATABASE_URL=postgresql://...
+JWT_SECRET=...
+RESEND_API_KEY=...
+STRIPE_SECRET_KEY=...
+STRIPE_WEBHOOK_SECRET=...
+ANTHROPIC_API_KEY=...
+S3_BUCKET_NAME=zander-assets
+ADMIN_SECRET_KEY=1a10d78ea77ff45e4cc49d415fd506a62bc6613597f9e1722848777f34982021
+```
 
 ---
 
@@ -279,16 +397,22 @@ font-family: 'Inter', sans-serif;
 - **Always run `prisma generate`** after schema changes
 - **Use transactions** for multi-table operations
 - **Include relations explicitly** — They don't auto-load
+- **Schema location:** `packages/database/prisma/schema.prisma`
 
 ### Next.js
 - **'use client'** directive required for hooks, event handlers
 - **API routes** go in `app/api/` with `route.ts` files
 - **Dynamic routes** use `[param]` folder naming
 
+### CMO Module Patterns
+- Uses inline CSS with `CSSProperties` type (not Tailwind)
+- Claude API: raw fetch to `api.anthropic.com`, model `claude-sonnet-4-20250514`
+- Button component uses `fullWidth` prop, not `style={{ width: '100%' }}`
+
 ### Deployment
 - **Frontend:** Push to main → Vercel auto-deploys
 - **Backend:** Build Docker image → Push to ECR → Update ECS task
-- **Database:** Run migrations manually on production RDS
+- **Database:** Schema changes auto-apply via `prisma db push` in Dockerfile CMD
 
 ---
 
@@ -316,32 +440,12 @@ font-family: 'Inter', sans-serif;
 
 ---
 
-## Environment Variables
-
-### Frontend (.env.local)
-```
-NEXT_PUBLIC_API_URL=http://localhost:8080  # or https://api.zanderos.com
-NEXT_PUBLIC_APP_URL=http://localhost:3002
-```
-
-### Backend (.env)
-```
-DATABASE_URL=postgresql://...
-JWT_SECRET=...
-RESEND_API_KEY=...
-STRIPE_SECRET_KEY=...
-STRIPE_WEBHOOK_SECRET=...
-ANTHROPIC_API_KEY=...
-```
-
----
-
 ## Key Contacts & Resources
 
 - **Production Frontend:** https://app.zanderos.com
 - **Production API:** https://api.zanderos.com
 - **GitHub:** github.com/jowenwhite/zander-saas
-- **AWS Console:** (Jonathan's account)
+- **AWS Console:** (Jonathan's account - 288720721534)
 - **Stripe Dashboard:** dashboard.stripe.com
 - **Resend Dashboard:** resend.com/emails
 
@@ -349,18 +453,31 @@ ANTHROPIC_API_KEY=...
 
 ## Current Priority
 
-**CMO Module Phase 2: Frontend Foundation**
+**Testing CMO Module & Bug Fixes**
 
-Next steps:
-1. Create design system (CSS variables, tokens)
-2. Build shared layout components (TopHeader, Sidebar, CMOLayout)
-3. Build core UI components (Button, Card, KPICard, etc.)
-4. Set up route structure (/cmo, /cmo/calendar, etc.)
+The CMO module is deployed to production. Current focus:
+1. Test all CMO features on production (app.zanderos.com/cmo)
+2. Fix any bugs discovered during testing
+3. Gather user feedback
 
-Estimated time: 18-22 hours
+**Next Major Task: Client → Projects Data Model for MCFOS**
+
+After CMO stabilization, the next priority is updating the data model to support:
+- Client entities (companies/organizations)
+- Projects linked to clients
+- Better organization for My Cabinet Factory operations
+
+---
+
+## Seeded Data (64 West Holdings)
+
+The production database includes seeded marketing data for 64 West Holdings:
+- **6 Campaigns** (2 each for zander, finance, consulting business units)
+- **3 Funnels** with stages (Zander SaaS, Finance Loan, Consulting Engagement)
+- **4 Personas** (Sam Martinez, Regional Developer, Growing Founder, Multi-Service Prospect)
+- **Monthly Theme** for current month
+- **8 Calendar Events** (marketing tasks and meetings)
 
 ---
 
 *This file is checked into git. Update it whenever Claude does something incorrectly so it learns for next time.*
-
-
