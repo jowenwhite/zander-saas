@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CalendarEvent, CalendarEventType, CalendarEventStatus, EventFormData } from '../types';
 import { eventTypeColors, eventTypeIcons } from '../utils';
 
@@ -46,59 +46,6 @@ function formatTimeForInput(date: Date): string {
   return date.toTimeString().slice(0, 5);
 }
 
-// Initialize form data from props - called ONCE via useState lazy initializer
-function getInitialFormData(
-  event: CalendarEvent | null,
-  selectedDate: Date | null,
-  selectedHour: number | null
-): EventFormData {
-  if (event) {
-    const startDate = safeParseDate(event.startDate);
-    const endDate = event.endDate ? safeParseDate(event.endDate) : startDate;
-    return {
-      title: event.title || '',
-      description: event.description || '',
-      type: (event.type as CalendarEventType) || 'campaign',
-      status: (event.status as CalendarEventStatus) || 'draft',
-      startDate: formatDateForInput(startDate),
-      startTime: formatTimeForInput(startDate),
-      endDate: formatDateForInput(endDate),
-      endTime: formatTimeForInput(endDate),
-      allDay: event.allDay ?? false,
-    };
-  }
-
-  if (selectedDate) {
-    const hour = selectedHour ?? 9;
-    const dateStr = formatDateForInput(selectedDate);
-    return {
-      title: '',
-      description: '',
-      type: 'campaign',
-      status: 'draft',
-      startDate: dateStr,
-      startTime: `${hour.toString().padStart(2, '0')}:00`,
-      endDate: dateStr,
-      endTime: `${(hour + 1).toString().padStart(2, '0')}:00`,
-      allDay: false,
-    };
-  }
-
-  // Default fallback
-  const today = formatDateForInput(new Date());
-  return {
-    title: '',
-    description: '',
-    type: 'campaign',
-    status: 'draft',
-    startDate: today,
-    startTime: '09:00',
-    endDate: today,
-    endTime: '10:00',
-    allDay: false,
-  };
-}
-
 export default function EventModal({
   isOpen,
   onClose,
@@ -108,14 +55,85 @@ export default function EventModal({
   onSave,
   onDelete,
 }: EventModalProps) {
-  // Initialize state ONCE from props - no useEffect needed
-  // The key prop on the parent forces remount when event changes
-  const [formData, setFormData] = useState<EventFormData>(() =>
-    getInitialFormData(event, selectedDate, selectedHour)
-  );
+  const [formData, setFormData] = useState<EventFormData>({
+    title: '',
+    description: '',
+    type: 'campaign',
+    status: 'draft',
+    startDate: '',
+    startTime: '09:00',
+    endDate: '',
+    endTime: '10:00',
+    allDay: false,
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Early return if not open
+  // Track what we've initialized for to prevent re-initialization
+  const lastInitRef = useRef<string | null>(null);
+
+  // Initialize form data when modal opens - use ref to prevent loops
+  useEffect(() => {
+    if (!isOpen) {
+      // Reset tracking when modal closes
+      lastInitRef.current = null;
+      return;
+    }
+
+    // Create a key to track what we're initializing for
+    const initKey = event?.id || (selectedDate ? `new-${selectedDate.getTime()}` : 'empty');
+
+    // Skip if we've already initialized for this key
+    if (lastInitRef.current === initKey) {
+      return;
+    }
+    lastInitRef.current = initKey;
+
+    // Initialize form based on event or selectedDate
+    if (event) {
+      const startDate = safeParseDate(event.startDate);
+      const endDate = event.endDate ? safeParseDate(event.endDate) : startDate;
+
+      setFormData({
+        title: event.title || '',
+        description: event.description || '',
+        type: (event.type as CalendarEventType) || 'campaign',
+        status: (event.status as CalendarEventStatus) || 'draft',
+        startDate: formatDateForInput(startDate),
+        startTime: formatTimeForInput(startDate),
+        endDate: formatDateForInput(endDate),
+        endTime: formatTimeForInput(endDate),
+        allDay: event.allDay ?? false,
+      });
+    } else if (selectedDate) {
+      const hour = selectedHour ?? 9;
+      const dateStr = formatDateForInput(selectedDate);
+
+      setFormData({
+        title: '',
+        description: '',
+        type: 'campaign',
+        status: 'draft',
+        startDate: dateStr,
+        startTime: `${hour.toString().padStart(2, '0')}:00`,
+        endDate: dateStr,
+        endTime: `${(hour + 1).toString().padStart(2, '0')}:00`,
+        allDay: false,
+      });
+    }
+
+    setShowDeleteConfirm(false);
+  }, [isOpen, event, selectedDate, selectedHour]);
+
+  // Handle body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -131,7 +149,7 @@ export default function EventModal({
     }
   };
 
-  const inputStyle: React.CSSProperties = {
+  const inputStyle = {
     width: '100%',
     padding: '0.75rem',
     border: '2px solid var(--zander-border-gray)',
@@ -141,7 +159,7 @@ export default function EventModal({
     transition: 'border-color 0.2s ease',
   };
 
-  const labelStyle: React.CSSProperties = {
+  const labelStyle = {
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
