@@ -15,6 +15,7 @@ export class AuthController {
     lastName: string;
     password: string;
     tenantId?: string;
+    companyName?: string;
   }) {
     return this.authService.register(createUserDto);
   }
