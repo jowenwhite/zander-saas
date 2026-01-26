@@ -248,6 +248,13 @@ export class EmailMessagesService {
     });
   }
 
+  async markAsUnread(tenantId: string, id: string) {
+    return this.prisma.emailMessage.update({
+      where: { id },
+      data: { isRead: false },
+    });
+  }
+
   async archiveEmail(tenantId: string, id: string) {
     return this.prisma.emailMessage.update({
       where: { id, tenantId },

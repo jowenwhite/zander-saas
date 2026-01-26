@@ -92,7 +92,13 @@ export class EmailMessagesController {
     return this.emailMessagesService.markAsRead(tenantId, id);
   }
 
-  
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/unread')
+  async markAsUnread(@Request() req, @Param('id') id: string) {
+    const tenantId = req.user.tenantId;
+    return this.emailMessagesService.markAsUnread(tenantId, id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Patch(':id/archive')
   async archiveEmail(@Request() req, @Param('id') id: string) {
