@@ -46,9 +46,10 @@ export class AuthService {
     firstName: string;
     lastName: string;
     tenantId?: string;
+    companyName?: string;
     password: string;
   }) {
-    const { email, firstName, lastName, password, tenantId } = data;
+    const { email, firstName, lastName, password, tenantId, companyName } = data;
 
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
@@ -62,18 +63,24 @@ export class AuthService {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // If no tenantId is provided, create a default tenant
+    // If no tenantId is provided, create a new tenant for this user
     let tenant = tenantId ?
       await this.prisma.tenant.findUnique({ where: { id: tenantId } }) :
-      await this.prisma.tenant.findFirst();
+      null;
 
     let isNewTenant = false;
 
     if (!tenant) {
+      // Generate a subdomain from company name or email
+      const baseSubdomain = companyName
+        ? companyName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 30)
+        : email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const subdomain = `${baseSubdomain}-${Date.now().toString(36)}`;
+
       tenant = await this.prisma.tenant.create({
         data: {
-          companyName: 'Default Tenant',
-          subdomain: 'default'
+          companyName: companyName || 'My Company',
+          subdomain
         }
       });
       isNewTenant = true;
