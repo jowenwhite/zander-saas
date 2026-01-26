@@ -207,6 +207,9 @@ export default function SettingsPage() {
   const [upgradeLoading, setUpgradeLoading] = useState(false);
   const [selectedInterval, setSelectedInterval] = useState<'month' | 'year'>('month');
 
+  // Data Retention State
+  const [dataRetention, setDataRetention] = useState('90');
+
   // Fetch billing data and prices
   useEffect(() => {
     const fetchBillingData = async () => {
@@ -1439,7 +1442,11 @@ export default function SettingsPage() {
           
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Keep deleted items for</label>
-            <select style={{ width: '200px', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem', background: 'white' }}>
+            <select
+              value={dataRetention}
+              onChange={(e) => setDataRetention(e.target.value)}
+              style={{ width: '200px', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem', background: 'white' }}
+            >
               <option value="30">30 days</option>
               <option value="60">60 days</option>
               <option value="90">90 days</option>
