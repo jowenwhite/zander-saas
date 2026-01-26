@@ -141,6 +141,19 @@ export class AuthService {
 
     const token = this.generateToken(user);
 
+    // Check terms acceptance status
+    const currentTerms = await this.prisma.termsVersion.findFirst({
+      where: { effectiveDate: { lte: new Date() } },
+      orderBy: { effectiveDate: 'desc' },
+      select: { version: true }
+    });
+
+    const needsTermsAcceptance = currentTerms && (
+      !user.termsAcceptedAt ||
+      !user.termsVersion ||
+      this.compareVersions(user.termsVersion, currentTerms.version) < 0
+    );
+
     return {
       user: {
         id: user.id,
@@ -149,8 +162,29 @@ export class AuthService {
         lastName: user.lastName,
         isSuperAdmin: user.isSuperAdmin || false
       },
-      token
+      token,
+      termsStatus: {
+        needsAcceptance: needsTermsAcceptance || false,
+        currentVersion: currentTerms?.version || null,
+        userVersion: user.termsVersion || null,
+      }
     };
+  }
+
+  /**
+   * Compare two version strings
+   */
+  private compareVersions(v1: string, v2: string): number {
+    const parts1 = v1.split('.').map(Number);
+    const parts2 = v2.split('.').map(Number);
+    const maxLength = Math.max(parts1.length, parts2.length);
+    for (let i = 0; i < maxLength; i++) {
+      const p1 = parts1[i] || 0;
+      const p2 = parts2[i] || 0;
+      if (p1 < p2) return -1;
+      if (p1 > p2) return 1;
+    }
+    return 0;
   }
 
   async getProfile(userId: string) {
@@ -169,6 +203,8 @@ export class AuthService {
         assemblyReminders: true,
         weeklyDigest: true,
         twoFactorEnabled: true,
+        termsAcceptedAt: true,
+        termsVersion: true,
         tenantId: true,
         createdAt: true,
         updatedAt: true,

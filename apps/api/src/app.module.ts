@@ -37,6 +37,7 @@ import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { CmoModule } from './cmo/cmo.module';
 import { AdminModule } from './admin/admin.module';
+import { LegalModule } from './legal/legal.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { AdminModule } from './admin/admin.module';
     KnowledgeModule,
     CmoModule,
     AdminModule,
+    LegalModule,
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [
