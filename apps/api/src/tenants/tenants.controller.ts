@@ -19,7 +19,21 @@ export class TenantsController {
   @Patch('me')
   async updateMyTenant(
     @Request() req,
-    @Body() updateData: { companyName?: string; subdomain?: string }
+    @Body() updateData: {
+      companyName?: string;
+      subdomain?: string;
+      website?: string;
+      email?: string;
+      phone?: string;
+      address?: string;
+      city?: string;
+      state?: string;
+      zip?: string;
+      industry?: string;
+      fiscalYearStart?: number;
+      currency?: string;
+      taxRate?: number;
+    }
   ) {
     return this.tenantsService.update(req.user.tenantId, updateData);
   }

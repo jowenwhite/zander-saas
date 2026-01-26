@@ -138,6 +138,12 @@ export class AuthService {
         firstName: true,
         lastName: true,
         phone: true,
+        timezone: true,
+        emailNotifications: true,
+        dealAlerts: true,
+        taskReminders: true,
+        assemblyReminders: true,
+        weeklyDigest: true,
         tenantId: true,
         createdAt: true,
         updatedAt: true,
@@ -162,6 +168,12 @@ export class AuthService {
     firstName?: string;
     lastName?: string;
     phone?: string;
+    timezone?: string;
+    emailNotifications?: boolean;
+    dealAlerts?: boolean;
+    taskReminders?: boolean;
+    assemblyReminders?: boolean;
+    weeklyDigest?: boolean;
   }) {
     const user = await this.prisma.user.update({
       where: { id: userId },
@@ -169,6 +181,12 @@ export class AuthService {
         firstName: data.firstName,
         lastName: data.lastName,
         phone: data.phone,
+        timezone: data.timezone,
+        emailNotifications: data.emailNotifications,
+        dealAlerts: data.dealAlerts,
+        taskReminders: data.taskReminders,
+        assemblyReminders: data.assemblyReminders,
+        weeklyDigest: data.weeklyDigest,
       },
       select: {
         id: true,
@@ -176,6 +194,12 @@ export class AuthService {
         firstName: true,
         lastName: true,
         phone: true,
+        timezone: true,
+        emailNotifications: true,
+        dealAlerts: true,
+        taskReminders: true,
+        assemblyReminders: true,
+        weeklyDigest: true,
         tenantId: true,
         createdAt: true,
         updatedAt: true,
