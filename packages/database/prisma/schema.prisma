@@ -86,6 +86,18 @@ model Tenant {
   subscriptionCohort      String?
   trialEndsAt             DateTime?
   rateLockExpiresAt       DateTime?
+  // Company settings
+  website                 String?
+  email                   String?
+  phone                   String?
+  address                 String?
+  city                    String?
+  state                   String?
+  zip                     String?
+  industry                String?
+  fiscalYearStart         Int?                     @default(1)
+  currency                String?                  @default("USD")
+  taxRate                 Float?                   @default(0)
   headwinds               Headwind[]
   supportTickets          SupportTicket[]
   // CMO Module relations
@@ -113,6 +125,13 @@ model User {
   isSuperAdmin          Boolean            @default(false)
   resetToken            String?
   resetTokenExpiry      DateTime?
+  // User preferences
+  timezone              String?            @default("America/New_York")
+  emailNotifications    Boolean            @default(true)
+  dealAlerts            Boolean            @default(true)
+  taskReminders         Boolean            @default(true)
+  assemblyReminders     Boolean            @default(true)
+  weeklyDigest          Boolean            @default(true)
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
   tenant                Tenant             @relation(fields: [tenantId], references: [id])
