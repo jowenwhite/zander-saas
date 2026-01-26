@@ -29,4 +29,4 @@ RUN npx tsc --outDir dist
 EXPOSE 3001
 
 # Run migration and start the app
-CMD npx prisma db push --schema=/app/packages/database/prisma/schema.prisma --skip-generate && node dist/main.js
+CMD npx prisma db push --schema=/app/packages/database/prisma/schema.prisma --skip-generate --accept-data-loss && node dist/main.js
