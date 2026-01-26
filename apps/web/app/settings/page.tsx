@@ -7,6 +7,11 @@ import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { logout } from '../utils/auth';
 
+// Helper functions for month conversion
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const getMonthName = (monthNum: number): string => MONTHS[monthNum - 1] || 'January';
+const getMonthNumber = (monthName: string): number => MONTHS.indexOf(monthName) + 1 || 1;
+
 export default function SettingsPage() {
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -337,6 +342,12 @@ export default function SettingsPage() {
             lastName: profileData.lastName || '',
             email: profileData.email || '',
             phone: profileData.phone || '',
+            timezone: profileData.timezone || 'America/New_York',
+            emailNotifications: profileData.emailNotifications ?? true,
+            dealAlerts: profileData.dealAlerts ?? true,
+            taskReminders: profileData.taskReminders ?? true,
+            assemblyReminders: profileData.assemblyReminders ?? true,
+            weeklyDigest: profileData.weeklyDigest ?? true,
           }));
         }
 
@@ -349,6 +360,17 @@ export default function SettingsPage() {
           setCompany(prev => ({
             ...prev,
             name: tenantData.companyName || '',
+            website: tenantData.website || '',
+            email: tenantData.email || '',
+            phone: tenantData.phone || '',
+            address: tenantData.address || '',
+            city: tenantData.city || '',
+            state: tenantData.state || '',
+            zip: tenantData.zip || '',
+            industry: tenantData.industry || 'Business Consulting',
+            fiscalYearStart: tenantData.fiscalYearStart ? getMonthName(tenantData.fiscalYearStart) : 'January',
+            currency: tenantData.currency || 'USD',
+            taxRate: tenantData.taxRate?.toString() || '0',
           }));
         }
         // Fetch team members
@@ -408,6 +430,12 @@ export default function SettingsPage() {
           firstName: profile.firstName,
           lastName: profile.lastName,
           phone: profile.phone,
+          timezone: profile.timezone,
+          emailNotifications: profile.emailNotifications,
+          dealAlerts: profile.dealAlerts,
+          taskReminders: profile.taskReminders,
+          assemblyReminders: profile.assemblyReminders,
+          weeklyDigest: profile.weeklyDigest,
         })
       });
       if (res.ok) {
@@ -436,6 +464,17 @@ export default function SettingsPage() {
         },
         body: JSON.stringify({
           companyName: company.name,
+          website: company.website,
+          email: company.email,
+          phone: company.phone,
+          address: company.address,
+          city: company.city,
+          state: company.state,
+          zip: company.zip,
+          industry: company.industry,
+          fiscalYearStart: getMonthNumber(company.fiscalYearStart),
+          currency: company.currency,
+          taxRate: parseFloat(company.taxRate) || 0,
         })
       });
       if (res.ok) {
