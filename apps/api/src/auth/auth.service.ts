@@ -97,8 +97,8 @@ export class AuthService {
     return user;
   }
 
-  async login(loginData: { email: string; password: string }) {
-    const { email, password } = loginData;
+  async login(loginData: { email: string; password: string; twoFactorCode?: string }) {
+    const { email, password, twoFactorCode } = loginData;
 
     const user = await this.prisma.user.findUnique({
       where: { email }
@@ -113,6 +113,30 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if 2FA is enabled
+    if (user.twoFactorEnabled && user.twoFactorSecret) {
+      // If no 2FA code provided, return requiring2FA response
+      if (!twoFactorCode) {
+        return {
+          requires2FA: true,
+          userId: user.id,
+          message: 'Please enter your two-factor authentication code'
+        };
+      }
+
+      // Verify the 2FA code
+      const otplib = await import('otplib');
+      const result = await otplib.verify({
+        token: twoFactorCode,
+        secret: user.twoFactorSecret
+      });
+      const isValidCode = result.valid;
+
+      if (!isValidCode) {
+        throw new UnauthorizedException('Invalid two-factor authentication code');
+      }
     }
 
     const token = this.generateToken(user);
@@ -144,6 +168,7 @@ export class AuthService {
         taskReminders: true,
         assemblyReminders: true,
         weeklyDigest: true,
+        twoFactorEnabled: true,
         tenantId: true,
         createdAt: true,
         updatedAt: true,
@@ -200,6 +225,7 @@ export class AuthService {
         taskReminders: true,
         assemblyReminders: true,
         weeklyDigest: true,
+        twoFactorEnabled: true,
         tenantId: true,
         createdAt: true,
         updatedAt: true,

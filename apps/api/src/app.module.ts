@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { PrismaService } from './prisma.service';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
+import { TwoFactorService } from './auth/two-factor.service';
+import { TwoFactorController } from './auth/two-factor.controller';
 import { PublicGuard } from './auth/public.guard';
 import { S3Module } from './common/s3/s3.module';
 import { StorageModule } from './common/storage/storage.module';
@@ -70,11 +72,12 @@ import { AdminModule } from './admin/admin.module';
     CmoModule,
     AdminModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController, AuthController, TwoFactorController],
   providers: [
     AppService,
     PrismaService,
     AuthService,
+    TwoFactorService,
     {
       provide: APP_GUARD,
       useClass: PublicGuard,
