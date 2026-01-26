@@ -21,7 +21,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  async login(@Body() loginUserDto: { email: string; password: string }) {
+  async login(@Body() loginUserDto: { email: string; password: string; twoFactorCode?: string }) {
     return this.authService.login(loginUserDto);
   }
 
