@@ -923,6 +923,12 @@ model SupportTicket {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   resolvedAt       DateTime?
+
+  // SLA Tracking Fields
+  firstResponseAt  DateTime?        // When first response was made
+  firstResponseSLA Int?             @default(24) // Target hours for first response
+  resolutionSLA    Int?             @default(72) // Target hours for resolution
+
   tenant           Tenant           @relation(fields: [tenantId], references: [id])
   user             User             @relation(fields: [userId], references: [id])
   linkedHeadwind   Headwind?        @relation(fields: [linkedHeadwindId], references: [id])
