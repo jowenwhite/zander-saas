@@ -1,10 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { TicketNotificationService } from './ticket-notification.service';
 import { TicketSource, TicketCategory, TicketStatus, HeadwindPriority } from '@prisma/client';
 
 @Injectable()
 export class SupportTicketsService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(SupportTicketsService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: TicketNotificationService,
+  ) {}
 
   private async generateTicketNumber(): Promise<string> {
     const count = await this.prisma.supportTicket.count();
@@ -101,8 +107,8 @@ export class SupportTicketsService {
     createdVia?: TicketSource;
   }) {
     const ticketNumber = await this.generateTicketNumber();
-    
-    return this.prisma.supportTicket.create({
+
+    const ticket = await this.prisma.supportTicket.create({
       data: {
         ticketNumber,
         tenantId: data.tenantId,
@@ -119,6 +125,20 @@ export class SupportTicketsService {
         user: { select: { id: true, firstName: true, lastName: true, email: true } },
       },
     });
+
+    // Send email notification (async, don't block response)
+    this.notificationService.sendTicketCreatedNotification({
+      ticketNumber: ticket.ticketNumber,
+      subject: ticket.subject,
+      description: ticket.description,
+      status: ticket.status,
+      priority: ticket.priority,
+      category: ticket.category,
+      user: ticket.user,
+      tenant: ticket.tenant,
+    }).catch(err => this.logger.error(`Failed to send ticket created notification: ${err.message}`));
+
+    return ticket;
   }
 
   async update(id: string, data: {
@@ -132,13 +152,20 @@ export class SupportTicketsService {
     linkedHeadwindId?: string;
     resolution?: string;
   }) {
+    // Get current ticket to check for status change
+    const currentTicket = await this.prisma.supportTicket.findUnique({
+      where: { id },
+      select: { status: true },
+    });
+
+    const previousStatus = currentTicket?.status;
     const updateData: any = { ...data };
-    
+
     if (data.status === 'RESOLVED' || data.status === 'CLOSED') {
       updateData.resolvedAt = new Date();
     }
-    
-    return this.prisma.supportTicket.update({
+
+    const ticket = await this.prisma.supportTicket.update({
       where: { id },
       data: updateData,
       include: {
@@ -147,6 +174,26 @@ export class SupportTicketsService {
         linkedHeadwind: { select: { id: true, title: true, status: true, priority: true } },
       },
     });
+
+    // Send email notification if status changed (async, don't block response)
+    if (data.status && previousStatus && data.status !== previousStatus) {
+      this.notificationService.sendTicketUpdatedNotification(
+        {
+          ticketNumber: ticket.ticketNumber,
+          subject: ticket.subject,
+          description: ticket.description,
+          status: ticket.status,
+          priority: ticket.priority,
+          category: ticket.category,
+          resolution: ticket.resolution || undefined,
+          user: ticket.user,
+          tenant: ticket.tenant,
+        },
+        previousStatus
+      ).catch(err => this.logger.error(`Failed to send ticket updated notification: ${err.message}`));
+    }
+
+    return ticket;
   }
 
   async delete(id: string) {
