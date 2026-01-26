@@ -79,7 +79,11 @@ interface EmailMessage {
   status: string;
   sentAt: string;
   threadId?: string;
+  isRead: boolean;
+  isArchived: boolean;
+  isDeleted: boolean;
   contact?: { id: string; firstName: string; lastName: string; email: string; };
+  tenant?: { id: string; companyName: string; subdomain: string; };
 }
 
 interface SmsMessage {
@@ -206,6 +210,9 @@ export default function CommunicationsPage() {
   const [smsForm, setSmsForm] = useState({ to: '', body: '', contactId: '' });
   const [sendingSms, setSendingSms] = useState(false);
   const [inboxFilter, setInboxFilter] = useState<'all' | 'inbound' | 'outbound'>('all');
+  const [inboxView, setInboxView] = useState<'list' | 'threads'>('list');
+  const [selectedThread, setSelectedThread] = useState<string | null>(null);
+  const [threadEmails, setThreadEmails] = useState<EmailMessage[]>([]);
   const [callsFilter, setCallsFilter] = useState<'all' | 'scheduled' | 'completed'>('all');
   const [composeForm, setComposeForm] = useState({ to: '', contactId: '', subject: '', body: '' });
   const [sending, setSending] = useState(false);
@@ -246,6 +253,122 @@ export default function CommunicationsPage() {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     };
+  };
+
+  // Email action handlers
+  const handleMarkAsRead = async (emailId: string) => {
+    try {
+      await fetch(`${API_URL}/email-messages/${emailId}/read`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      setEmails(prev => prev.map(e => e.id === emailId ? { ...e, isRead: true } : e));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Mark as read error:', err);
+    }
+  };
+
+  const handleMarkAsUnread = async (emailId: string) => {
+    try {
+      await fetch(`${API_URL}/email-messages/${emailId}/unread`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      setEmails(prev => prev.map(e => e.id === emailId ? { ...e, isRead: false } : e));
+      setUnreadCount(prev => prev + 1);
+    } catch (err) {
+      console.error('Mark as unread error:', err);
+    }
+  };
+
+  const handleArchiveEmail = async (emailId: string) => {
+    try {
+      await fetch(`${API_URL}/email-messages/${emailId}/archive`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      setEmails(prev => prev.filter(e => e.id !== emailId));
+      if (selectedEmail?.id === emailId) setSelectedEmail(null);
+    } catch (err) {
+      console.error('Archive email error:', err);
+    }
+  };
+
+  const handleDeleteEmail = async (emailId: string) => {
+    if (!confirm('Delete this email?')) return;
+    try {
+      await fetch(`${API_URL}/email-messages/${emailId}/delete`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      setEmails(prev => prev.filter(e => e.id !== emailId));
+      if (selectedEmail?.id === emailId) setSelectedEmail(null);
+    } catch (err) {
+      console.error('Delete email error:', err);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await fetch(`${API_URL}/email-messages/mark-all-read`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      setEmails(prev => prev.map(e => ({ ...e, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Mark all as read error:', err);
+    }
+  };
+
+  const loadThread = async (threadId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/email-messages/thread/${threadId}`, {
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        const thread = await res.json();
+        setThreadEmails(thread);
+        setSelectedThread(threadId);
+      }
+    } catch (err) {
+      console.error('Load thread error:', err);
+    }
+  };
+
+  // Group emails by thread for thread view
+  const groupEmailsByThread = (emailList: EmailMessage[]) => {
+    const threads: Map<string, EmailMessage[]> = new Map();
+    const standalone: EmailMessage[] = [];
+
+    emailList.forEach(email => {
+      if (email.threadId) {
+        const existing = threads.get(email.threadId) || [];
+        existing.push(email);
+        threads.set(email.threadId, existing);
+      } else {
+        standalone.push(email);
+      }
+    });
+
+    // Convert to array of thread summaries
+    const threadSummaries: { threadId: string; emails: EmailMessage[]; latestEmail: EmailMessage; unreadCount: number }[] = [];
+
+    threads.forEach((emails, threadId) => {
+      const sorted = emails.sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime());
+      threadSummaries.push({
+        threadId,
+        emails: sorted,
+        latestEmail: sorted[0],
+        unreadCount: emails.filter(e => !e.isRead && e.direction === 'inbound').length
+      });
+    });
+
+    // Sort threads by latest email date
+    threadSummaries.sort((a, b) => new Date(b.latestEmail.sentAt).getTime() - new Date(a.latestEmail.sentAt).getTime());
+
+    return { threads: threadSummaries, standalone };
   };
 
   useEffect(() => {
@@ -1041,7 +1164,64 @@ export default function CommunicationsPage() {
                     </button>
                   )}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: selectedEmail ? '350px 1fr' : '1fr', gap: '1rem' }}>
+                {/* View toggle and Mark All Read for email */}
+                {messageType === 'email' && emails.length > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', gap: '0.25rem', background: '#f0f0f0', borderRadius: '6px', padding: '0.25rem' }}>
+                      <button
+                        onClick={() => { setInboxView('list'); setSelectedThread(null); }}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          background: inboxView === 'list' ? 'white' : 'transparent',
+                          color: inboxView === 'list' ? 'var(--zander-navy)' : '#666',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          fontWeight: inboxView === 'list' ? '600' : '400',
+                          boxShadow: inboxView === 'list' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                        }}
+                      >
+                        📋 List
+                      </button>
+                      <button
+                        onClick={() => setInboxView('threads')}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          background: inboxView === 'threads' ? 'white' : 'transparent',
+                          color: inboxView === 'threads' ? 'var(--zander-navy)' : '#666',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          fontWeight: inboxView === 'threads' ? '600' : '400',
+                          boxShadow: inboxView === 'threads' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                        }}
+                      >
+                        🧵 Threads
+                      </button>
+                    </div>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={handleMarkAllAsRead}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          background: 'transparent',
+                          color: 'var(--zander-navy)',
+                          border: '1px solid var(--zander-border-gray)',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          fontWeight: '500'
+                        }}
+                      >
+                        ✓ Mark All Read
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ display: 'grid', gridTemplateColumns: selectedEmail || selectedThread ? 'minmax(280px, 350px) 1fr' : '1fr', gap: '1rem' }}>
                   <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', maxHeight: '500px', overflowY: 'auto' }}>
                     {messageType === 'email' ? (
                       emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).length === 0 ? (
@@ -1049,21 +1229,110 @@ export default function CommunicationsPage() {
                           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📭</div>
                           <p>No emails yet</p>
                         </div>
+                      ) : inboxView === 'threads' ? (
+                        /* Thread View */
+                        (() => {
+                          const { threads, standalone } = groupEmailsByThread(emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter));
+                          return (
+                            <>
+                              {threads.map(thread => (
+                                <div
+                                  key={thread.threadId}
+                                  onClick={() => loadThread(thread.threadId)}
+                                  style={{
+                                    padding: '0.75rem 1rem',
+                                    borderBottom: '1px solid var(--zander-border-gray)',
+                                    cursor: 'pointer',
+                                    background: selectedThread === thread.threadId ? 'rgba(191, 10, 48, 0.05)' : thread.unreadCount > 0 ? 'rgba(25, 118, 210, 0.03)' : 'transparent',
+                                    borderLeft: selectedThread === thread.threadId ? '3px solid var(--zander-red)' : thread.unreadCount > 0 ? '3px solid #1976d2' : '3px solid transparent'
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                                    <span style={{ fontWeight: thread.unreadCount > 0 ? '700' : '500', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                                      🧵 {thread.latestEmail.subject}
+                                    </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                      {thread.unreadCount > 0 && (
+                                        <span style={{ background: '#1976d2', color: 'white', borderRadius: '10px', padding: '0.1rem 0.4rem', fontSize: '0.65rem', fontWeight: '600' }}>
+                                          {thread.unreadCount}
+                                        </span>
+                                      )}
+                                      <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                        {new Date(thread.latestEmail.sentAt).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                      {thread.emails.length} messages
+                                    </span>
+                                    <span style={{ fontSize: '0.75rem', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                      {thread.latestEmail.body.substring(0, 50)}...
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                              {standalone.map(email => (
+                                <div
+                                  key={email.id}
+                                  onClick={() => { setSelectedEmail(email); setSelectedThread(null); if (!email.isRead && email.direction === 'inbound') handleMarkAsRead(email.id); }}
+                                  style={{
+                                    padding: '0.75rem 1rem',
+                                    borderBottom: '1px solid var(--zander-border-gray)',
+                                    cursor: 'pointer',
+                                    background: selectedEmail?.id === email.id ? 'rgba(191, 10, 48, 0.05)' : !email.isRead && email.direction === 'inbound' ? 'rgba(25, 118, 210, 0.03)' : 'transparent',
+                                    borderLeft: selectedEmail?.id === email.id ? '3px solid var(--zander-red)' : !email.isRead && email.direction === 'inbound' ? '3px solid #1976d2' : '3px solid transparent'
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                    <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                                      {email.direction === 'inbound' ? email.fromAddress : email.toAddress}
+                                    </span>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                      {new Date(email.sentAt).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
+                                      {email.direction === 'inbound' ? '📥' : '📤'}
+                                    </span>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: !email.isRead && email.direction === 'inbound' ? '600' : '400', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                      {email.subject}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </>
+                          );
+                        })()
                       ) : (
+                        /* List View */
                         emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).map(email => (
                         <div
                           key={email.id}
-                          onClick={() => setSelectedEmail(email)}
+                          onClick={() => { setSelectedEmail(email); setSelectedThread(null); if (!email.isRead && email.direction === 'inbound') handleMarkAsRead(email.id); }}
+                          onMouseEnter={(e) => {
+                            const actions = e.currentTarget.querySelector('.email-actions') as HTMLElement;
+                            if (actions) actions.style.opacity = '1';
+                          }}
+                          onMouseLeave={(e) => {
+                            const actions = e.currentTarget.querySelector('.email-actions') as HTMLElement;
+                            if (actions) actions.style.opacity = '0';
+                          }}
                           style={{
                             padding: '0.75rem 1rem',
                             borderBottom: '1px solid var(--zander-border-gray)',
                             cursor: 'pointer',
-                            background: selectedEmail?.id === email.id ? 'rgba(191, 10, 48, 0.05)' : 'transparent',
-                            borderLeft: selectedEmail?.id === email.id ? '3px solid var(--zander-red)' : '3px solid transparent'
+                            background: selectedEmail?.id === email.id ? 'rgba(191, 10, 48, 0.05)' : !email.isRead && email.direction === 'inbound' ? 'rgba(25, 118, 210, 0.03)' : 'transparent',
+                            borderLeft: selectedEmail?.id === email.id ? '3px solid var(--zander-red)' : !email.isRead && email.direction === 'inbound' ? '3px solid #1976d2' : '3px solid transparent',
+                            position: 'relative'
                           }}
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                            <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                            <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.85rem', color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                              {!email.isRead && email.direction === 'inbound' && (
+                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1976d2', display: 'inline-block' }}></span>
+                              )}
                               {email.direction === 'inbound' ? email.fromAddress : email.toAddress}
                             </span>
                             <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
@@ -1074,9 +1343,63 @@ export default function CommunicationsPage() {
                             <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
                               {email.direction === 'inbound' ? '📥' : '📤'}
                             </span>
-                            <span style={{ fontSize: '0.8rem', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <span style={{ fontSize: '0.8rem', fontWeight: !email.isRead && email.direction === 'inbound' ? '600' : '400', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                               {email.subject}
                             </span>
+                            {email.threadId && (
+                              <span style={{ fontSize: '0.6rem', color: '#666', background: '#f0f0f0', padding: '0.1rem 0.3rem', borderRadius: '3px' }}>🧵</span>
+                            )}
+                          </div>
+                          {/* Quick Actions */}
+                          <div
+                            className="email-actions"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              position: 'absolute',
+                              right: '0.5rem',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              display: 'flex',
+                              gap: '0.25rem',
+                              opacity: 0,
+                              transition: 'opacity 0.2s',
+                              background: 'white',
+                              padding: '0.25rem',
+                              borderRadius: '4px',
+                              boxShadow: '0 1px 4px rgba(0,0,0,0.15)'
+                            }}
+                          >
+                            {email.isRead ? (
+                              <button
+                                onClick={() => handleMarkAsUnread(email.id)}
+                                title="Mark as unread"
+                                style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                              >
+                                ○
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleMarkAsRead(email.id)}
+                                title="Mark as read"
+                                style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                              >
+                                ●
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleArchiveEmail(email.id)}
+                              title="Archive"
+                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                            >
+                              📦
+                            </button>
+                            <button
+                              onClick={() => handleDeleteEmail(email.id)}
+                              title="Delete"
+                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: 'var(--zander-red)' }}
+                            >
+                              🗑️
+                            </button>
                           </div>
                         </div>
                       ))
@@ -1210,16 +1533,85 @@ export default function CommunicationsPage() {
                       )
                     )}
                   </div>
+                  {/* Thread View */}
+                  {selectedThread && threadEmails.length > 0 && !selectedEmail && (
+                    <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', overflow: 'hidden' }}>
+                      <div style={{ padding: '1rem', background: 'var(--zander-off-white)', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--zander-navy)', margin: 0 }}>
+                          🧵 {threadEmails[0]?.subject} ({threadEmails.length} messages)
+                        </h3>
+                        <button onClick={() => { setSelectedThread(null); setThreadEmails([]); }} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
+                      </div>
+                      <div style={{ maxHeight: '450px', overflowY: 'auto' }}>
+                        {threadEmails.map((email, idx) => (
+                          <div key={email.id} style={{ padding: '1rem', borderBottom: idx < threadEmails.length - 1 ? '1px solid var(--zander-border-gray)' : 'none', background: !email.isRead && email.direction === 'inbound' ? 'rgba(25, 118, 210, 0.03)' : 'white' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                              <div>
+                                <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.9rem', color: 'var(--zander-navy)' }}>
+                                  {email.direction === 'inbound' ? email.fromAddress : `To: ${email.toAddress}`}
+                                </span>
+                                <span style={{ marginLeft: '0.5rem', fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
+                                  {email.direction === 'inbound' ? '📥' : '📤'}
+                                </span>
+                              </div>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{new Date(email.sentAt).toLocaleString()}</span>
+                            </div>
+                            <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap', fontSize: '0.9rem', color: '#333' }}>{email.body}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ padding: '1rem', background: 'var(--zander-off-white)', borderTop: '1px solid var(--zander-border-gray)' }}>
+                        <button
+                          onClick={() => {
+                            const lastEmail = threadEmails[threadEmails.length - 1];
+                            setComposeForm({
+                              to: lastEmail.direction === "inbound" ? lastEmail.fromAddress : lastEmail.toAddress,
+                              contactId: lastEmail.contact?.id || "",
+                              subject: "Re: " + lastEmail.subject.replace(/^Re: /, ""),
+                              body: "\n\n---\nOn " + new Date(lastEmail.sentAt).toLocaleString() + ", " + lastEmail.fromAddress + " wrote:\n> " + lastEmail.body.split("\n").join("\n> ")
+                            });
+                            setShowComposeModal(true);
+                          }}
+                          style={{ padding: "0.5rem 1rem", background: "var(--zander-navy)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
+                        >
+                          ↩️ Reply to Thread
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Single Email View */}
                   {selectedEmail && (
                     <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', padding: '1rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                         <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{selectedEmail.subject}</h3>
-                        <button onClick={() => setSelectedEmail(null)} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          {selectedEmail.direction === 'inbound' && (
+                            <button
+                              onClick={() => selectedEmail.isRead ? handleMarkAsUnread(selectedEmail.id) : handleMarkAsRead(selectedEmail.id)}
+                              style={{ padding: '0.35rem 0.6rem', background: 'transparent', border: '1px solid var(--zander-border-gray)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                              title={selectedEmail.isRead ? 'Mark as unread' : 'Mark as read'}
+                            >
+                              {selectedEmail.isRead ? '○ Unread' : '● Read'}
+                            </button>
+                          )}
+                          <button onClick={() => setSelectedEmail(null)} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
+                        </div>
                       </div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)', marginBottom: '1rem' }}>
                         <p><strong>From:</strong> {selectedEmail.fromAddress}</p>
                         <p><strong>To:</strong> {selectedEmail.toAddress}</p>
                         <p><strong>Date:</strong> {new Date(selectedEmail.sentAt).toLocaleString()}</p>
+                        {selectedEmail.threadId && (
+                          <p style={{ marginTop: '0.5rem' }}>
+                            <button
+                              onClick={() => { loadThread(selectedEmail.threadId!); setSelectedEmail(null); }}
+                              style={{ padding: '0.25rem 0.5rem', background: '#f0f0f0', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', color: '#666' }}
+                            >
+                              🧵 View full thread
+                            </button>
+                          </p>
+                        )}
                       </div>
                       <hr style={{ border: 'none', borderTop: '1px solid var(--zander-border-gray)', margin: '1rem 0' }} />
                       <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{selectedEmail.body}</div>
@@ -1241,20 +1633,6 @@ export default function CommunicationsPage() {
                         <button
                           onClick={() => {
                             setComposeForm({
-                              to: selectedEmail.direction === "inbound" ? selectedEmail.fromAddress : selectedEmail.toAddress,
-                              contactId: selectedEmail.contact?.id || "",
-                              subject: "Re: " + selectedEmail.subject.replace(/^Re: /, ""),
-                              body: "\n\n---\nOn " + new Date(selectedEmail.sentAt).toLocaleString() + ", " + selectedEmail.fromAddress + " wrote:\n> " + selectedEmail.body.split("\n").join("\n> ")
-                            });
-                            setShowComposeModal(true);
-                          }}
-                          style={{ padding: "0.5rem 1rem", background: "var(--zander-navy)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
-                        >
-                          ↩️↩️ Reply All
-                        </button>
-                        <button
-                          onClick={() => {
-                            setComposeForm({
                               to: "",
                               contactId: "",
                               subject: "Fwd: " + selectedEmail.subject.replace(/^Fwd: /, ""),
@@ -1267,13 +1645,13 @@ export default function CommunicationsPage() {
                           ➡️ Forward
                         </button>
                         <button
-                          onClick={async () => { try { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/email-messages/${selectedEmail.id}/archive`, { method: "PATCH", headers: { "Authorization": `Bearer ${localStorage.getItem("zander_token")}` } }); setSelectedEmail(null); fetchData(); } catch (e) { console.error(e); } }}
+                          onClick={() => handleArchiveEmail(selectedEmail.id)}
                           style={{ padding: "0.5rem 1rem", background: "var(--zander-gold)", color: "var(--zander-navy)", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
-                          📥 Archive
+                          📦 Archive
                         </button>
                         <button
-                          onClick={async () => { if(confirm("Delete this email?")) { try { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/email-messages/${selectedEmail.id}/delete`, { method: "PATCH", headers: { "Authorization": `Bearer ${localStorage.getItem("zander_token")}` } }); setSelectedEmail(null); fetchData(); } catch (e) { console.error(e); } } }}
+                          onClick={() => handleDeleteEmail(selectedEmail.id)}
                           style={{ padding: "0.5rem 1rem", background: "transparent", color: "var(--zander-red)", border: "1px solid var(--zander-red)", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           🗑️ Delete
