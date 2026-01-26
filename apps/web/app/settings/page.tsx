@@ -223,6 +223,24 @@ export default function SettingsPage() {
   const [showDisable2FAModal, setShowDisable2FAModal] = useState(false);
   const [disable2FAPassword, setDisable2FAPassword] = useState('');
 
+  // Terms & Conditions State
+  const [termsData, setTermsData] = useState<{
+    userVersion: string | null;
+    userAcceptedAt: string | null;
+    currentVersion: string | null;
+    currentContent: string | null;
+    currentEffectiveDate: string | null;
+    needsAcceptance: boolean;
+  }>({
+    userVersion: null,
+    userAcceptedAt: null,
+    currentVersion: null,
+    currentContent: null,
+    currentEffectiveDate: null,
+    needsAcceptance: false
+  });
+  const [termsLoading, setTermsLoading] = useState(true);
+
   // Fetch billing data and prices
   useEffect(() => {
     const fetchBillingData = async () => {
@@ -358,7 +376,32 @@ export default function SettingsPage() {
             weeklyDigest: profileData.weeklyDigest ?? true,
           }));
           setTwoFactorEnabled(profileData.twoFactorEnabled ?? false);
+
+          // Set terms data from profile
+          setTermsData(prev => ({
+            ...prev,
+            userVersion: profileData.termsVersion || null,
+            userAcceptedAt: profileData.termsAcceptedAt || null,
+          }));
         }
+
+        // Fetch current terms version
+        try {
+          const termsRes = await fetch('https://api.zanderos.com/legal/terms');
+          if (termsRes.ok) {
+            const termsVersionData = await termsRes.json();
+            setTermsData(prev => ({
+              ...prev,
+              currentVersion: termsVersionData.version || null,
+              currentContent: termsVersionData.content || null,
+              currentEffectiveDate: termsVersionData.effectiveDate || null,
+              needsAcceptance: termsVersionData.version && (!prev.userVersion || prev.userVersion !== termsVersionData.version)
+            }));
+          }
+        } catch (termsError) {
+          console.error('Failed to fetch terms:', termsError);
+        }
+        setTermsLoading(false);
 
         // Fetch tenant/company data
         const tenantRes = await fetch('https://api.zanderos.com/tenants/me', {
@@ -738,6 +781,7 @@ export default function SettingsPage() {
     { id: 'pipeline', label: 'Projects', icon: '📊' },
     { id: 'integrations', label: 'Integrations', icon: '🔗' },
     { id: 'security', label: 'Security', icon: '🔐' },
+    { id: 'legal', label: 'Legal', icon: '📜' },
     { id: 'billing', label: 'Billing', icon: '💳' },
     { id: 'data', label: 'Data', icon: '🗄️' },
   ];
@@ -1734,6 +1778,187 @@ export default function SettingsPage() {
     </div>
   );
 
+  const renderLegalTab = () => {
+    const formatDate = (dateString: string | null) => {
+      if (!dateString) return 'N/A';
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+
+    const handleAcceptTerms = async () => {
+      if (!termsData.currentVersion) return;
+
+      const token = localStorage.getItem('zander_token');
+      try {
+        const res = await fetch('https://api.zanderos.com/legal/terms/accept', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ version: termsData.currentVersion })
+        });
+
+        if (res.ok) {
+          setTermsData(prev => ({
+            ...prev,
+            userVersion: prev.currentVersion,
+            userAcceptedAt: new Date().toISOString(),
+            needsAcceptance: false
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to accept terms:', error);
+      }
+    };
+
+    return (
+      <div>
+        <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Terms of Service</h3>
+
+        {termsLoading ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+            Loading...
+          </div>
+        ) : (
+          <>
+            <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: termsData.needsAcceptance ? 'rgba(240, 179, 35, 0.1)' : 'rgba(40, 167, 69, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem',
+                  flexShrink: 0
+                }}>
+                  {termsData.needsAcceptance ? '⚠️' : '✓'}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '0.5rem' }}>
+                    {termsData.userVersion
+                      ? termsData.needsAcceptance
+                        ? 'Updated Terms Available'
+                        : 'Terms Accepted'
+                      : 'Terms Not Yet Accepted'}
+                  </div>
+                  <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                    {termsData.userVersion && (
+                      <div>
+                        <span style={{ fontWeight: '500' }}>Your accepted version:</span> {termsData.userVersion}
+                        <br />
+                        <span style={{ fontWeight: '500' }}>Accepted on:</span> {formatDate(termsData.userAcceptedAt)}
+                      </div>
+                    )}
+                    {termsData.currentVersion && (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <span style={{ fontWeight: '500' }}>Current version:</span> {termsData.currentVersion}
+                        {termsData.currentEffectiveDate && (
+                          <>
+                            <br />
+                            <span style={{ fontWeight: '500' }}>Effective:</span> {formatDate(termsData.currentEffectiveDate)}
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {!termsData.currentVersion && (
+                      <div>No terms have been published yet.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {termsData.needsAcceptance && termsData.currentVersion && (
+              <div style={{
+                background: 'rgba(240, 179, 35, 0.1)',
+                border: '2px solid rgba(240, 179, 35, 0.3)',
+                borderRadius: '10px',
+                padding: '1.5rem',
+                marginBottom: '1.5rem'
+              }}>
+                <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
+                  Action Required
+                </div>
+                <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+                  Please review and accept the updated Terms of Service to continue using Zander.
+                </p>
+                <button
+                  onClick={handleAcceptTerms}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'var(--zander-navy)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Accept Terms of Service
+                </button>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <a
+                href="/legal/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'white',
+                  color: 'var(--zander-navy)',
+                  border: '2px solid var(--zander-border-gray)',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  display: 'inline-block'
+                }}
+              >
+                View Full Terms
+              </a>
+            </div>
+          </>
+        )}
+
+        <h3 style={{ margin: '2rem 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Privacy Policy</h3>
+        <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem' }}>
+          <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+            Learn about how we collect, use, and protect your data.
+          </p>
+          <a
+            href="/legal/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'white',
+              color: 'var(--zander-navy)',
+              border: '2px solid var(--zander-border-gray)',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              textDecoration: 'none',
+              display: 'inline-block'
+            }}
+          >
+            View Privacy Policy
+          </a>
+        </div>
+      </div>
+    );
+  };
+
   const renderDataTab = () => (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
@@ -1862,6 +2087,7 @@ export default function SettingsPage() {
               {activeTab === 'pipeline' && renderPipelineTab()}
               {activeTab === 'integrations' && renderIntegrationsTab()}
               {activeTab === 'security' && renderSecurityTab()}
+              {activeTab === 'legal' && renderLegalTab()}
               {activeTab === 'billing' && renderBillingTab()}
               {activeTab === 'data' && renderDataTab()}
             </div>

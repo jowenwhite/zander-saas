@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import TermsModal from '../components/TermsModal';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +14,10 @@ export default function LoginPage() {
   // 2FA state
   const [requires2FA, setRequires2FA] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
+
+  // Terms acceptance state
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsVersion, setTermsVersion] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +49,14 @@ export default function LoginPage() {
         localStorage.setItem('zander_token', data.token);
         localStorage.setItem('zander_user', JSON.stringify(data.user));
 
+        // Check if terms acceptance is required
+        if (data.termsStatus?.needsAcceptance) {
+          setTermsVersion(data.termsStatus.currentVersion);
+          setShowTermsModal(true);
+          setLoading(false);
+          return;
+        }
+
         // Redirect to dashboard
         router.push('/');
       } else {
@@ -65,6 +78,12 @@ export default function LoginPage() {
     setRequires2FA(false);
     setTwoFactorCode('');
     setError('');
+  };
+
+  // Handle terms acceptance
+  const handleTermsAccepted = () => {
+    setShowTermsModal(false);
+    router.push('/');
   };
 
   return (
@@ -354,6 +373,13 @@ export default function LoginPage() {
 
         </div>
       </div>
+
+      {/* Terms Acceptance Modal */}
+      <TermsModal
+        isOpen={showTermsModal}
+        currentVersion={termsVersion}
+        onAccept={handleTermsAccepted}
+      />
     </div>
   );
 }
