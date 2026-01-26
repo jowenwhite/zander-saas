@@ -312,10 +312,10 @@ export class AuthService {
     });
 
     // Send email via Resend
+    const resetUrl = `https://app.zanderos.com/reset-password?token=${resetToken}`;
     const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
-    if (resendApiKey) {
-      const resetUrl = `https://app.zanderos.com/reset-password?token=${resetToken}`;
 
+    if (resendApiKey) {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -329,6 +329,9 @@ export class AuthService {
           html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 1 hour.</p>`
         })
       });
+    } else {
+      // Log reset URL for development/testing when email isn't configured
+      console.log(`[Password Reset] Email: ${email}, Reset URL: ${resetUrl}`);
     }
 
     return { message: 'If an account exists, a reset email has been sent' };
