@@ -64,6 +64,58 @@ export class SupportTicketsController {
     return this.supportTicketsService.getStats(req.user.tenantId);
   }
 
+  // ==================== SLA ENDPOINTS ====================
+
+  @Get('sla/stats')
+  async getSLAStats(@Request() req, @Query('tenantId') tenantId?: string) {
+    if (req.user.isSuperAdmin) {
+      return this.supportTicketsService.getSLAStats(tenantId);
+    }
+    return this.supportTicketsService.getSLAStats(req.user.tenantId);
+  }
+
+  @Get('sla/at-risk')
+  async getAtRiskTickets(@Request() req, @Query('tenantId') tenantId?: string) {
+    if (req.user.isSuperAdmin) {
+      return this.supportTicketsService.getAtRiskTickets(tenantId);
+    }
+    return this.supportTicketsService.getAtRiskTickets(req.user.tenantId);
+  }
+
+  @Get('with-sla')
+  async findAllWithSLA(
+    @Request() req,
+    @Query('tenantId') tenantId?: string,
+    @Query('tenantIds') tenantIds?: string,
+    @Query('status') status?: TicketStatus,
+    @Query('priority') priority?: HeadwindPriority,
+    @Query('category') category?: TicketCategory,
+    @Query('createdVia') createdVia?: TicketSource,
+    @Query('myTickets') myTickets?: string,
+  ) {
+    if (req.user.isSuperAdmin) {
+      const parsedTenantIds = tenantIds ? tenantIds.split(',') : undefined;
+      return this.supportTicketsService.findAllWithSLA({
+        tenantId,
+        tenantIds: parsedTenantIds,
+        status,
+        priority,
+        category,
+        createdVia,
+        userId: myTickets === 'true' ? req.user.userId : undefined,
+      });
+    }
+
+    return this.supportTicketsService.findAllWithSLA({
+      tenantId: req.user.tenantId,
+      status,
+      priority,
+      category,
+      createdVia,
+      userId: myTickets === 'true' ? req.user.userId : undefined,
+    });
+  }
+
   @Get('number/:ticketNumber')
   async findByTicketNumber(
     @Request() req,
@@ -161,6 +213,32 @@ export class SupportTicketsController {
     }
 
     return this.supportTicketsService.linkToHeadwind(id, headwindId);
+  }
+
+  @Put(':id/first-response')
+  async recordFirstResponse(
+    @Request() req,
+    @Param('id') id: string,
+  ) {
+    const ticket = await this.supportTicketsService.findOne(id);
+
+    // Only SuperAdmin can record first response
+    if (!req.user.isSuperAdmin) {
+      throw new ForbiddenException('Only SuperAdmin can record first response');
+    }
+
+    return this.supportTicketsService.recordFirstResponse(id);
+  }
+
+  @Get(':id/with-sla')
+  async findOneWithSLA(@Request() req, @Param('id') id: string) {
+    const ticket = await this.supportTicketsService.findOneWithSLA(id);
+
+    if (!req.user.isSuperAdmin && ticket.tenantId !== req.user.tenantId) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    return ticket;
   }
 
   @Delete(':id')

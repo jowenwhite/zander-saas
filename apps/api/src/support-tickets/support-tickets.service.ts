@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { TicketNotificationService } from './ticket-notification.service';
+import { TicketSLAService, SLAInfo } from './ticket-sla.service';
 import { TicketSource, TicketCategory, TicketStatus, HeadwindPriority } from '@prisma/client';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class SupportTicketsService {
   constructor(
     private prisma: PrismaService,
     private notificationService: TicketNotificationService,
+    private slaService: TicketSLAService,
   ) {}
 
   private async generateTicketNumber(): Promise<string> {
@@ -107,6 +109,10 @@ export class SupportTicketsService {
     createdVia?: TicketSource;
   }) {
     const ticketNumber = await this.generateTicketNumber();
+    const priority = data.priority || 'P3';
+
+    // Get default SLA targets based on priority
+    const defaultSLA = this.slaService.getDefaultSLA(priority);
 
     const ticket = await this.prisma.supportTicket.create({
       data: {
@@ -116,9 +122,11 @@ export class SupportTicketsService {
         subject: data.subject,
         description: data.description,
         category: data.category || 'OTHER',
-        priority: data.priority || 'P3',
+        priority,
         createdVia: data.createdVia || 'MANUAL',
         status: 'NEW',
+        firstResponseSLA: defaultSLA.firstResponse,
+        resolutionSLA: defaultSLA.resolution,
       },
       include: {
         tenant: { select: { id: true, companyName: true } },
@@ -258,5 +266,91 @@ export class SupportTicketsService {
         return acc;
       }, {} as Record<string, number>),
     };
+  }
+
+  /**
+   * Get all tickets with SLA info attached
+   */
+  async findAllWithSLA(filters?: {
+    tenantId?: string;
+    tenantIds?: string[];
+    userId?: string;
+    status?: TicketStatus;
+    priority?: HeadwindPriority;
+    category?: TicketCategory;
+    createdVia?: TicketSource;
+  }) {
+    const where: any = {};
+
+    if (filters?.tenantIds && filters.tenantIds.length > 0) {
+      where.tenantId = { in: filters.tenantIds };
+    } else if (filters?.tenantId) {
+      where.tenantId = filters.tenantId;
+    }
+    if (filters?.userId) where.userId = filters.userId;
+    if (filters?.status) where.status = filters.status;
+    if (filters?.priority) where.priority = filters.priority;
+    if (filters?.category) where.category = filters.category;
+    if (filters?.createdVia) where.createdVia = filters.createdVia;
+
+    const tickets = await this.prisma.supportTicket.findMany({
+      where,
+      include: {
+        tenant: { select: { id: true, companyName: true } },
+        user: { select: { id: true, firstName: true, lastName: true, email: true } },
+        linkedHeadwind: { select: { id: true, title: true, status: true, priority: true } },
+      },
+      orderBy: [
+        { priority: 'asc' },
+        { createdAt: 'desc' },
+      ],
+    });
+
+    // Attach SLA info to each ticket
+    return tickets.map(ticket => ({
+      ...ticket,
+      slaInfo: this.slaService.calculateSLAInfo(ticket),
+    }));
+  }
+
+  /**
+   * Get a single ticket with SLA info
+   */
+  async findOneWithSLA(id: string) {
+    const ticket = await this.findOne(id);
+    return {
+      ...ticket,
+      slaInfo: this.slaService.calculateSLAInfo({
+        createdAt: ticket.createdAt,
+        firstResponseAt: ticket.firstResponseAt,
+        firstResponseSLA: ticket.firstResponseSLA,
+        resolvedAt: ticket.resolvedAt,
+        resolutionSLA: ticket.resolutionSLA,
+        priority: ticket.priority,
+        status: ticket.status,
+      }),
+    };
+  }
+
+  /**
+   * Record first response on a ticket
+   */
+  async recordFirstResponse(id: string) {
+    await this.slaService.recordFirstResponse(id);
+    return this.findOne(id);
+  }
+
+  /**
+   * Get SLA statistics
+   */
+  async getSLAStats(tenantId?: string) {
+    return this.slaService.getSLAStats(tenantId);
+  }
+
+  /**
+   * Get tickets at risk or breached
+   */
+  async getAtRiskTickets(tenantId?: string) {
+    return this.slaService.getAtRiskTickets(tenantId);
   }
 }
