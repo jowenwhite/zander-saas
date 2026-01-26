@@ -31,11 +31,12 @@ interface TreasuryItem {
   sortOrder: number;
 }
 
-const ITEM_TYPES = ['form', 'sop', 'campaign', 'assembly'];
-const CATEGORIES = ['sales', 'operations', 'finance', 'hr', 'marketing'];
+const ITEM_TYPES = ['form', 'sop', 'campaign', 'assembly', 'prompt'];
+const CATEGORIES = ['sales', 'operations', 'finance', 'hr', 'marketing', 'support', 'general'];
 const EXECUTIVES = ['CRO', 'COO', 'CFO', 'CMO', 'CPO', 'CIO', 'EA'];
 const INDUSTRIES = ['cabinet_millwork', 'home_services', 'professional_services', 'general'];
 const FIELD_TYPES = ['text', 'email', 'tel', 'number', 'textarea', 'select', 'date', 'checkbox'];
+const PROMPT_TAGS = ['email', 'chat', 'analysis', 'summary', 'generation', 'extraction', 'classification', 'custom'];
 
 export default function AdminTreasuryPage() {
   const router = useRouter();
@@ -49,17 +50,36 @@ export default function AdminTreasuryPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    type: string;
+    name: string;
+    description: string;
+    category: string;
+    executive: string;
+    industry: string;
+    channels: string[];
+    duration: string;
+    stepCount: number;
+    content: {
+      fields?: FormField[];
+      prompt?: string;
+      variables?: string[];
+      tags?: string[];
+      exampleOutput?: string;
+      steps?: any[];
+      [key: string]: any;
+    };
+  }>({
     type: 'form',
     name: '',
     description: '',
     category: 'sales',
     executive: 'CRO',
     industry: 'general',
-    channels: [] as string[],
+    channels: [],
     duration: '',
     stepCount: 0,
-    content: { fields: [] as FormField[] }
+    content: { fields: [] }
   });
 
   useEffect(() => {
@@ -314,7 +334,7 @@ export default function AdminTreasuryPage() {
                 transition: 'all 0.2s ease'
               }}
             >
-              {type === 'form' && '📋'} {type === 'sop' && '📝'} {type === 'campaign' && '📧'} {type === 'assembly' && '👥'}
+              {type === 'form' && '📋'} {type === 'sop' && '📝'} {type === 'campaign' && '📧'} {type === 'assembly' && '👥'} {type === 'prompt' && '🤖'}
               {' '}{type.charAt(0).toUpperCase() + type.slice(1)}s ({items.filter(i => i.type === type).length})
             </button>
           ))}
@@ -342,7 +362,7 @@ export default function AdminTreasuryPage() {
                   <th style={{ padding: '1rem', textAlign: 'left' }}>Executive</th>
                   <th style={{ padding: '1rem', textAlign: 'left' }}>Industry</th>
                   <th style={{ padding: '1rem', textAlign: 'center' }}>
-                    {activeTab === 'form' ? 'Fields' : activeTab === 'campaign' ? 'Steps' : 'Items'}
+                    {activeTab === 'form' ? 'Fields' : activeTab === 'campaign' ? 'Steps' : activeTab === 'prompt' ? 'Variables' : 'Items'}
                   </th>
                   <th style={{ padding: '1rem', textAlign: 'center' }}>Actions</th>
                 </tr>
@@ -354,6 +374,27 @@ export default function AdminTreasuryPage() {
                       <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{item.name}</div>
                       {item.description && (
                         <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.25rem' }}>{item.description}</div>
+                      )}
+                      {item.type === 'prompt' && item.content?.tags && item.content.tags.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.35rem' }}>
+                          {item.content.tags.slice(0, 3).map((tag: string) => (
+                            <span
+                              key={tag}
+                              style={{
+                                background: 'rgba(12, 35, 64, 0.1)',
+                                color: 'var(--zander-navy)',
+                                padding: '0.1rem 0.4rem',
+                                borderRadius: '3px',
+                                fontSize: '0.7rem'
+                              }}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                          {item.content.tags.length > 3 && (
+                            <span style={{ fontSize: '0.7rem', color: '#666' }}>+{item.content.tags.length - 3}</span>
+                          )}
+                        </div>
                       )}
                     </td>
                     <td style={{ padding: '1rem' }}>
@@ -390,8 +431,10 @@ export default function AdminTreasuryPage() {
                         fontWeight: '600',
                         fontSize: '0.85rem'
                       }}>
-                        {item.type === 'form' 
+                        {item.type === 'form'
                           ? (item.content?.fields?.length || 0)
+                          : item.type === 'prompt'
+                          ? (item.content?.variables?.length || 0)
                           : (item.content?.steps?.length || item.stepCount || 0)}
                       </span>
                     </td>
@@ -692,12 +735,12 @@ export default function AdminTreasuryPage() {
                               </button>
                               <button
                                 onClick={() => moveField(index, 'down')}
-                                disabled={index === formData.content.fields.length - 1}
+                                disabled={index === (formData.content.fields?.length || 0) - 1}
                                 style={{
                                   background: 'none',
                                   border: 'none',
-                                  cursor: index === formData.content.fields.length - 1 ? 'default' : 'pointer',
-                                  opacity: index === formData.content.fields.length - 1 ? 0.3 : 1,
+                                  cursor: index === (formData.content.fields?.length || 0) - 1 ? 'default' : 'pointer',
+                                  opacity: index === (formData.content.fields?.length || 0) - 1 ? 0.3 : 1,
                                   fontSize: '0.8rem'
                                 }}
                               >
@@ -791,6 +834,172 @@ export default function AdminTreasuryPage() {
                         )}
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Prompt Builder */}
+                {formData.type === 'prompt' && (
+                  <div style={{
+                    border: '2px solid var(--zander-navy)',
+                    borderRadius: '8px',
+                    padding: '1rem',
+                    marginBottom: '1.5rem'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '1rem'
+                    }}>
+                      <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>
+                        🤖 AI Prompt Content
+                      </h3>
+                    </div>
+
+                    {/* Prompt Tags */}
+                    <div style={{ marginBottom: '1rem' }}>
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                        Tags
+                      </label>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {PROMPT_TAGS.map(tag => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => {
+                              const currentTags = formData.content.tags || [];
+                              const newTags = currentTags.includes(tag)
+                                ? currentTags.filter((t: string) => t !== tag)
+                                : [...currentTags, tag];
+                              setFormData({
+                                ...formData,
+                                content: { ...formData.content, tags: newTags }
+                              });
+                            }}
+                            style={{
+                              padding: '0.35rem 0.75rem',
+                              border: '1px solid',
+                              borderColor: (formData.content.tags || []).includes(tag) ? 'var(--zander-red)' : '#ddd',
+                              background: (formData.content.tags || []).includes(tag) ? 'rgba(191, 10, 48, 0.1)' : 'white',
+                              color: (formData.content.tags || []).includes(tag) ? 'var(--zander-red)' : '#666',
+                              borderRadius: '16px',
+                              fontSize: '0.8rem',
+                              cursor: 'pointer',
+                              fontWeight: (formData.content.tags || []).includes(tag) ? '600' : '400'
+                            }}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Prompt Content */}
+                    <div style={{ marginBottom: '1rem' }}>
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                        Prompt Content *
+                      </label>
+                      <p style={{ fontSize: '0.8rem', color: '#666', margin: '0 0 0.5rem' }}>
+                        Use {'{{variable_name}}'} syntax for placeholders (e.g., {'{{company_name}}'}, {'{{customer_email}}'})
+                      </p>
+                      <textarea
+                        value={formData.content.prompt || ''}
+                        onChange={(e) => {
+                          // Extract variables from prompt
+                          const matches = e.target.value.match(/\{\{([^}]+)\}\}/g) || [];
+                          const variables = [...new Set(matches.map(m => m.replace(/\{\{|\}\}/g, '').trim()))];
+                          setFormData({
+                            ...formData,
+                            content: {
+                              ...formData.content,
+                              prompt: e.target.value,
+                              variables
+                            }
+                          });
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          border: '2px solid #ddd',
+                          borderRadius: '6px',
+                          fontSize: '0.95rem',
+                          minHeight: '200px',
+                          resize: 'vertical',
+                          fontFamily: 'monospace',
+                          lineHeight: '1.5'
+                        }}
+                        placeholder={`You are an expert sales assistant for {{company_name}}.
+
+When responding to customer inquiries from {{customer_email}}, you should:
+1. Be professional and friendly
+2. Address their specific needs
+3. Highlight relevant products or services
+
+Context about the customer:
+{{customer_context}}
+
+Generate a personalized response that...`}
+                      />
+                    </div>
+
+                    {/* Extracted Variables */}
+                    {(formData.content.variables || []).length > 0 && (
+                      <div style={{
+                        background: 'rgba(240, 179, 35, 0.1)',
+                        border: '1px solid var(--zander-gold)',
+                        borderRadius: '6px',
+                        padding: '1rem'
+                      }}>
+                        <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                          📌 Detected Variables ({formData.content.variables?.length || 0})
+                        </h4>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {(formData.content.variables || []).map((variable: string) => (
+                            <span
+                              key={variable}
+                              style={{
+                                background: 'var(--zander-gold)',
+                                color: 'var(--zander-navy)',
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '4px',
+                                fontSize: '0.85rem',
+                                fontFamily: 'monospace',
+                                fontWeight: '600'
+                              }}
+                            >
+                              {`{{${variable}}}`}
+                            </span>
+                          ))}
+                        </div>
+                        <p style={{ fontSize: '0.8rem', color: '#666', margin: '0.5rem 0 0' }}>
+                          These variables will need to be filled in when using this prompt.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Example Output (Optional) */}
+                    <div style={{ marginTop: '1rem' }}>
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                        Example Output (Optional)
+                      </label>
+                      <textarea
+                        value={formData.content.exampleOutput || ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          content: { ...formData.content, exampleOutput: e.target.value }
+                        })}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          border: '2px solid #ddd',
+                          borderRadius: '6px',
+                          fontSize: '0.9rem',
+                          minHeight: '100px',
+                          resize: 'vertical'
+                        }}
+                        placeholder="Show an example of what good output from this prompt looks like..."
+                      />
+                    </div>
                   </div>
                 )}
 
