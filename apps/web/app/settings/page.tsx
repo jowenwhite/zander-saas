@@ -215,6 +215,14 @@ export default function SettingsPage() {
   // Data Retention State
   const [dataRetention, setDataRetention] = useState('90');
 
+  // 2FA State
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [twoFactorSetupData, setTwoFactorSetupData] = useState<{ secret: string; qrCodeUrl: string } | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [twoFactorLoading, setTwoFactorLoading] = useState(false);
+  const [showDisable2FAModal, setShowDisable2FAModal] = useState(false);
+  const [disable2FAPassword, setDisable2FAPassword] = useState('');
+
   // Fetch billing data and prices
   useEffect(() => {
     const fetchBillingData = async () => {
@@ -349,6 +357,7 @@ export default function SettingsPage() {
             assemblyReminders: profileData.assemblyReminders ?? true,
             weeklyDigest: profileData.weeklyDigest ?? true,
           }));
+          setTwoFactorEnabled(profileData.twoFactorEnabled ?? false);
         }
 
         // Fetch tenant/company data
@@ -490,6 +499,100 @@ export default function SettingsPage() {
     }
   };
 
+  // 2FA Setup - Start
+  const setup2FA = async () => {
+    setTwoFactorLoading(true);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('https://api.zanderos.com/auth/2fa/setup', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTwoFactorSetupData({ secret: data.secret, qrCodeUrl: data.qrCodeUrl });
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Error setting up 2FA');
+      }
+    } catch (error) {
+      console.error('Error setting up 2FA:', error);
+      alert('Error setting up 2FA');
+    } finally {
+      setTwoFactorLoading(false);
+    }
+  };
+
+  // 2FA Verify and Enable
+  const verify2FA = async () => {
+    if (!twoFactorCode || twoFactorCode.length !== 6) {
+      alert('Please enter a 6-digit code');
+      return;
+    }
+    setTwoFactorLoading(true);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('https://api.zanderos.com/auth/2fa/verify', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code: twoFactorCode })
+      });
+      if (res.ok) {
+        setTwoFactorEnabled(true);
+        setTwoFactorSetupData(null);
+        setTwoFactorCode('');
+        alert('Two-factor authentication has been enabled!');
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Invalid verification code');
+      }
+    } catch (error) {
+      console.error('Error verifying 2FA:', error);
+      alert('Error verifying 2FA');
+    } finally {
+      setTwoFactorLoading(false);
+    }
+  };
+
+  // 2FA Disable
+  const disable2FA = async () => {
+    if (!disable2FAPassword) {
+      alert('Please enter your password');
+      return;
+    }
+    setTwoFactorLoading(true);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('https://api.zanderos.com/auth/2fa/disable', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: disable2FAPassword })
+      });
+      if (res.ok) {
+        setTwoFactorEnabled(false);
+        setShowDisable2FAModal(false);
+        setDisable2FAPassword('');
+        alert('Two-factor authentication has been disabled');
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Error disabling 2FA');
+      }
+    } catch (error) {
+      console.error('Error disabling 2FA:', error);
+      alert('Error disabling 2FA');
+    } finally {
+      setTwoFactorLoading(false);
+    }
+  };
 
   // Invite new team member
   const inviteUser = async () => {
@@ -634,6 +737,7 @@ export default function SettingsPage() {
     { id: 'team', label: 'Team', icon: '👥' },
     { id: 'pipeline', label: 'Projects', icon: '📊' },
     { id: 'integrations', label: 'Integrations', icon: '🔗' },
+    { id: 'security', label: 'Security', icon: '🔐' },
     { id: 'billing', label: 'Billing', icon: '💳' },
     { id: 'data', label: 'Data', icon: '🗄️' },
   ];
@@ -1463,6 +1567,173 @@ export default function SettingsPage() {
     }
   };
 
+  const renderSecurityTab = () => (
+    <div>
+      <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Two-Factor Authentication</h3>
+
+      <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            background: twoFactorEnabled ? 'rgba(40, 167, 69, 0.1)' : 'rgba(108, 117, 125, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.5rem'
+          }}>
+            {twoFactorEnabled ? '🔒' : '🔓'}
+          </div>
+          <div>
+            <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem' }}>
+              {twoFactorEnabled ? '2FA is Enabled' : '2FA is Disabled'}
+            </div>
+            <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>
+              {twoFactorEnabled
+                ? 'Your account is protected with two-factor authentication'
+                : 'Add an extra layer of security to your account'}
+            </div>
+          </div>
+        </div>
+
+        {!twoFactorEnabled && !twoFactorSetupData && (
+          <button
+            onClick={setup2FA}
+            disabled={twoFactorLoading}
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'var(--zander-navy)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: twoFactorLoading ? 'wait' : 'pointer',
+              opacity: twoFactorLoading ? 0.7 : 1
+            }}
+          >
+            {twoFactorLoading ? 'Setting up...' : 'Enable Two-Factor Authentication'}
+          </button>
+        )}
+
+        {twoFactorSetupData && (
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ background: 'white', borderRadius: '8px', padding: '1.5rem', marginBottom: '1rem' }}>
+              <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontWeight: '600' }}>
+                Step 1: Scan this QR code with your authenticator app
+              </p>
+              <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.875rem' }}>
+                Use Google Authenticator, Authy, or any TOTP-compatible app
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                <img src={twoFactorSetupData.qrCodeUrl} alt="2FA QR Code" style={{ width: '200px', height: '200px' }} />
+              </div>
+              <div style={{ background: 'var(--zander-off-white)', borderRadius: '6px', padding: '0.75rem', textAlign: 'center' }}>
+                <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                  Or enter this code manually:
+                </p>
+                <code style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--zander-navy)', letterSpacing: '2px' }}>
+                  {twoFactorSetupData.secret}
+                </code>
+              </div>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: '8px', padding: '1.5rem' }}>
+              <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontWeight: '600' }}>
+                Step 2: Enter the 6-digit code from your app
+              </p>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  maxLength={6}
+                  style={{
+                    width: '150px',
+                    padding: '0.75rem',
+                    border: '2px solid var(--zander-border-gray)',
+                    borderRadius: '8px',
+                    fontSize: '1.25rem',
+                    textAlign: 'center',
+                    letterSpacing: '8px',
+                    fontWeight: '600'
+                  }}
+                />
+                <button
+                  onClick={verify2FA}
+                  disabled={twoFactorLoading || twoFactorCode.length !== 6}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: twoFactorCode.length === 6 ? '#28A745' : 'var(--zander-border-gray)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: twoFactorCode.length === 6 ? 'pointer' : 'not-allowed'
+                  }}
+                >
+                  {twoFactorLoading ? 'Verifying...' : 'Verify & Enable'}
+                </button>
+                <button
+                  onClick={() => { setTwoFactorSetupData(null); setTwoFactorCode(''); }}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'transparent',
+                    color: 'var(--zander-gray)',
+                    border: '2px solid var(--zander-border-gray)',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {twoFactorEnabled && (
+          <button
+            onClick={() => setShowDisable2FAModal(true)}
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'transparent',
+              color: 'var(--zander-red)',
+              border: '2px solid var(--zander-red)',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            Disable Two-Factor Authentication
+          </button>
+        )}
+      </div>
+
+      <h3 style={{ margin: '2rem 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Password</h3>
+      <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem' }}>
+        <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+          Keep your account secure by using a strong, unique password.
+        </p>
+        <button
+          style={{
+            padding: '0.75rem 1.5rem',
+            background: 'white',
+            color: 'var(--zander-navy)',
+            border: '2px solid var(--zander-border-gray)',
+            borderRadius: '8px',
+            fontWeight: '600',
+            cursor: 'pointer'
+          }}
+        >
+          Change Password
+        </button>
+      </div>
+    </div>
+  );
+
   const renderDataTab = () => (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
@@ -1590,6 +1861,7 @@ export default function SettingsPage() {
               {activeTab === 'team' && renderTeamTab()}
               {activeTab === 'pipeline' && renderPipelineTab()}
               {activeTab === 'integrations' && renderIntegrationsTab()}
+              {activeTab === 'security' && renderSecurityTab()}
               {activeTab === 'billing' && renderBillingTab()}
               {activeTab === 'data' && renderDataTab()}
             </div>
@@ -1625,6 +1897,43 @@ export default function SettingsPage() {
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button onClick={() => setShowInviteModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
               <button onClick={inviteUser} disabled={saving} style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>{saving ? 'Sending...' : 'Send Invite'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Disable 2FA Modal */}
+      {showDisable2FAModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '400px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.3rem' }}>Disable Two-Factor Authentication</h3>
+            <p style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+              This will make your account less secure. Enter your password to confirm.
+            </p>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Password</label>
+              <input
+                type="password"
+                value={disable2FAPassword}
+                onChange={(e) => setDisable2FAPassword(e.target.value)}
+                placeholder="Enter your password"
+                style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowDisable2FAModal(false); setDisable2FAPassword(''); }}
+                style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={disable2FA}
+                disabled={twoFactorLoading || !disable2FAPassword}
+                style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', opacity: (!disable2FAPassword || twoFactorLoading) ? 0.7 : 1 }}
+              >
+                {twoFactorLoading ? 'Disabling...' : 'Disable 2FA'}
+              </button>
             </div>
           </div>
         </div>
