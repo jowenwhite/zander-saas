@@ -135,6 +135,9 @@ model User {
   // Two-Factor Authentication
   twoFactorEnabled      Boolean            @default(false)
   twoFactorSecret       String?
+  // Terms & Conditions
+  termsAcceptedAt       DateTime?
+  termsVersion          String?
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
   tenant                Tenant             @relation(fields: [tenantId], references: [id])
@@ -1239,4 +1242,18 @@ model BrandProfile {
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@map("cmo_brand_profiles")
+}
+
+// ============================================
+// LEGAL - TERMS & CONDITIONS
+// ============================================
+
+model TermsVersion {
+  id            String   @id @default(cuid())
+  version       String   @unique
+  content       String   @db.Text
+  effectiveDate DateTime
+  createdAt     DateTime @default(now())
+
+  @@map("terms_versions")
 }
