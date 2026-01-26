@@ -33,7 +33,17 @@ export class AuthController {
   @Patch('me')
   async updateProfile(
     @Request() req,
-    @Body() updateData: { firstName?: string; lastName?: string; phone?: string }
+    @Body() updateData: {
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      timezone?: string;
+      emailNotifications?: boolean;
+      dealAlerts?: boolean;
+      taskReminders?: boolean;
+      assemblyReminders?: boolean;
+      weeklyDigest?: boolean;
+    }
   ) {
     return this.authService.updateProfile(req.user.sub, updateData);
   }

@@ -12,6 +12,17 @@ export class TenantsService {
         id: true,
         companyName: true,
         subdomain: true,
+        website: true,
+        email: true,
+        phone: true,
+        address: true,
+        city: true,
+        state: true,
+        zip: true,
+        industry: true,
+        fiscalYearStart: true,
+        currency: true,
+        taxRate: true,
         createdAt: true,
         updatedAt: true,
       }
@@ -25,17 +36,50 @@ export class TenantsService {
   async update(tenantId: string, data: {
     companyName?: string;
     subdomain?: string;
+    website?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    industry?: string;
+    fiscalYearStart?: number;
+    currency?: string;
+    taxRate?: number;
   }) {
     const tenant = await this.prisma.tenant.update({
       where: { id: tenantId },
       data: {
         companyName: data.companyName,
         subdomain: data.subdomain,
+        website: data.website,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        zip: data.zip,
+        industry: data.industry,
+        fiscalYearStart: data.fiscalYearStart,
+        currency: data.currency,
+        taxRate: data.taxRate,
       },
       select: {
         id: true,
         companyName: true,
         subdomain: true,
+        website: true,
+        email: true,
+        phone: true,
+        address: true,
+        city: true,
+        state: true,
+        zip: true,
+        industry: true,
+        fiscalYearStart: true,
+        currency: true,
+        taxRate: true,
         createdAt: true,
         updatedAt: true,
       }
