@@ -8,21 +8,27 @@ export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
 
   // GET /contacts - List all contacts with filters
+  // HIGH-3: Pass userId and role for ownership-based filtering
   @Get()
   async findAll(@Request() req, @Query() query: any) {
-    return this.contactsService.findAll(req.tenantId, query);
+    const { tenantId, user } = req;
+    return this.contactsService.findAll(tenantId, query, user?.userId, user?.role);
   }
 
   // GET /contacts/:id - Get single contact
+  // HIGH-3: Pass userId and role for ownership-based access control
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
-    return this.contactsService.findOne(id, req.tenantId);
+    const { tenantId, user } = req;
+    return this.contactsService.findOne(id, tenantId, user?.userId, user?.role);
   }
-  // POST /contacts - Create new contact
 
+  // POST /contacts - Create new contact
+  // HIGH-3: Pass userId to set owner on creation
   @Post()
   async create(@Body() data: any, @Request() req) {
-    return this.contactsService.create(data, req.tenantId);
+    const { tenantId, user } = req;
+    return this.contactsService.create(data, tenantId, user?.userId);
   }
 
   // PATCH /contacts/:id - Update contact
@@ -44,9 +50,11 @@ export class ContactsController {
   }
 
   // GET /contacts/export - Export contacts (returns CSV data)
+  // HIGH-3: Pass userId and role for ownership-based filtering
   @Get('export')
   async export(@Request() req) {
-    const { data } = await this.contactsService.findAll(req.tenantId, { limit: 10000 });
+    const { tenantId, user } = req;
+    const { data } = await this.contactsService.findAll(tenantId, { limit: 10000 }, user?.userId, user?.role);
     
     // Convert to CSV format
     const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Source'];

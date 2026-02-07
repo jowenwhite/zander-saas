@@ -1,15 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { getOwnershipFilter, canAccessRecord, mergeFilters } from '../common/utils/ownership-filter.util';
 
 @Injectable()
 export class DealsService {
   constructor(private prisma: PrismaService) {}
 
   // Get all deals for a tenant (with search, filters, pagination)
-  async findAll(tenantId: string, query: any) {
+  // HIGH-3: Added userId and userRole for ownership-based filtering
+  async findAll(tenantId: string, query: any, userId?: string, userRole?: string) {
     const { search, stage, priority, page = 1, limit = 50, sortBy = 'createdAt', sortOrder = 'desc', includeArchived, includeLost } = query;
 
-    const where: any = { tenantId };
+    // HIGH-3: Build ownership filter based on user role
+    const ownershipWhere = userId && userRole
+      ? getOwnershipFilter(
+          { tenantId, userId, userRole },
+          { ownerField: 'ownerId', assignedField: 'assignedToId' }
+        )
+      : { tenantId };
+
+    const where: any = { ...ownershipWhere };
 
     // By default, exclude archived and lost deals unless explicitly requested
     if (includeArchived !== true && includeArchived !== "true") {
@@ -64,12 +74,29 @@ export class DealsService {
     };
   }
 
-  // Get single deal by ID (with tenant check)
-  async findOne(id: string, tenantId: string) {
+  // Get single deal by ID (with tenant and ownership check)
+  // HIGH-3: Added userId and userRole for ownership-based access control
+  async findOne(id: string, tenantId: string, userId?: string, userRole?: string) {
     const deal = await this.prisma.deal.findFirst({
       where: { id, tenantId },
       include: {
-        contact: true
+        contact: true,
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        assignedTo: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
       }
     });
 
@@ -77,18 +104,50 @@ export class DealsService {
       throw new NotFoundException('Deal not found');
     }
 
+    // HIGH-3: Check if user can access this deal
+    if (userId && userRole) {
+      const hasAccess = canAccessRecord(
+        deal,
+        { tenantId, userId, userRole },
+        { ownerField: 'ownerId', assignedField: 'assignedToId' }
+      );
+      if (!hasAccess) {
+        throw new ForbiddenException('You do not have permission to access this deal');
+      }
+    }
+
     return deal;
   }
 
   // Create new deal
-  async create(data: any, tenantId: string) {
+  // HIGH-3: Added userId to set owner on creation
+  async create(data: any, tenantId: string, userId?: string) {
     return this.prisma.deal.create({
       data: {
         ...data,
-        tenantId
+        tenantId,
+        // HIGH-3: Set owner and assignee to creator by default
+        ownerId: data.ownerId || userId,
+        assignedToId: data.assignedToId || userId,
       },
       include: {
-        contact: true
+        contact: true,
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        assignedTo: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
       }
     });
   }
@@ -156,16 +215,29 @@ export class DealsService {
   }
 
   // Get pipeline view (deals grouped by stage)
-  async getPipeline(tenantId: string, query: any = {}) {
+  // HIGH-3: Added userId and userRole for ownership-based filtering
+  async getPipeline(tenantId: string, query: any = {}, userId?: string, userRole?: string) {
     // Fetch tenant-specific pipeline stages
     const stages = await this.prisma.pipelineStage.findMany({
       where: { tenantId },
       orderBy: { order: 'asc' }
     });
 
+    // HIGH-3: Build ownership filter based on user role
+    const ownershipWhere = userId && userRole
+      ? getOwnershipFilter(
+          { tenantId, userId, userRole },
+          { ownerField: 'ownerId', assignedField: 'assignedToId' }
+        )
+      : { tenantId };
+
     // Fetch all active deals for tenant (exclude archived and lost)
     const deals = await this.prisma.deal.findMany({
-      where: { tenantId, ...(query.includeArchived !== 'true' && { isArchived: false }), ...(query.includeLost !== 'true' && { isLost: false }) },
+      where: {
+        ...ownershipWhere,
+        ...(query.includeArchived !== 'true' && { isArchived: false }),
+        ...(query.includeLost !== 'true' && { isLost: false })
+      },
       include: {
         contact: true
       },
