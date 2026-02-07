@@ -2,7 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as express from 'express';
-import { PayloadTooLargeExceptionFilter, EntityTooLargeFilter } from './common/filters/payload-too-large.filter';
+import {
+  GlobalExceptionFilter,
+  ValidationExceptionFilter,
+  PayloadTooLargeExceptionFilter,
+  ThrottleExceptionFilter,
+} from './common/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -70,10 +75,14 @@ async function bootstrap() {
     }
   }));
 
-  // MEDIUM-2: Global exception filters for payload size errors
+  // MEDIUM-2 & MEDIUM-3: Global exception filters
+  // Order matters: GlobalExceptionFilter catches unhandled exceptions last (fallback)
+  // Specific filters (Validation, PayloadTooLarge, Throttle) catch their types first
   app.useGlobalFilters(
-    new PayloadTooLargeExceptionFilter(),
-    new EntityTooLargeFilter(),
+    new GlobalExceptionFilter(),      // Catch-all fallback (registered first = catches last)
+    new ValidationExceptionFilter(),  // 400 validation errors
+    new PayloadTooLargeExceptionFilter(), // 413 payload errors
+    new ThrottleExceptionFilter(),    // 429 rate limit errors
   );
 
   // Enable CORS for frontend (local and Cloudflare)
