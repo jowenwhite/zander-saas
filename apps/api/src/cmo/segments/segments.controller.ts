@@ -7,7 +7,10 @@ import {
   Body,
   Param,
   Request,
+  UseGuards,
 } from '@nestjs/common';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { SegmentsService } from './segments.service';
 
 @Controller('cmo/segments')
@@ -53,6 +56,9 @@ export class SegmentsController {
     return this.segmentsService.update(id, req.tenantId, updateData);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.segmentsService.remove(id, req.tenantId);
@@ -72,6 +78,9 @@ export class SegmentsController {
     return this.segmentsService.addMember(id, req.tenantId, data.contactId);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id/members/:contactId')
   async removeMember(
     @Param('id') id: string,

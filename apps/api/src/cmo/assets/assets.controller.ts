@@ -9,10 +9,13 @@ import {
   Query,
   Request,
   UseInterceptors,
+  UseGuards,
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { AssetsService } from './assets.service';
 
 @Controller('cmo/assets')
@@ -125,6 +128,9 @@ export class AssetsController {
   }
 
   // Delete asset (removes from S3 and database)
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.assetsService.deleteAsset(id, req.tenantId);

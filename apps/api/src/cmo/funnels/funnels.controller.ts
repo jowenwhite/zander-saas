@@ -7,7 +7,10 @@ import {
   Body,
   Param,
   Request,
+  UseGuards,
 } from '@nestjs/common';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { FunnelsService } from './funnels.service';
 
 @Controller('cmo/funnels')
@@ -70,6 +73,9 @@ export class FunnelsController {
     return this.funnelsService.update(id, req.tenantId, updateData);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.funnelsService.remove(id, req.tenantId);
