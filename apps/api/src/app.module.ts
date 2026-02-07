@@ -40,6 +40,8 @@ import { KnowledgeModule } from './knowledge/knowledge.module';
 import { CmoModule } from './cmo/cmo.module';
 import { AdminModule } from './admin/admin.module';
 import { LegalModule } from './legal/legal.module';
+import { AuditLogModule } from './common/audit-log.module';
+import { AuditLogFeatureModule } from './audit-log/audit-log.module';
 
 @Module({
   imports: [
@@ -79,6 +81,8 @@ import { LegalModule } from './legal/legal.module';
     CmoModule,
     AdminModule,
     LegalModule,
+    AuditLogModule,        // MEDIUM-4: Global audit logging service
+    AuditLogFeatureModule, // MEDIUM-4: Audit log API endpoints
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [

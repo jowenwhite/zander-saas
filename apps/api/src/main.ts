@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as express from 'express';
@@ -8,6 +8,8 @@ import {
   PayloadTooLargeExceptionFilter,
   ThrottleExceptionFilter,
 } from './common/filters';
+import { AuditLogInterceptor } from './common/interceptors';
+import { AuditLogService } from './common/services/audit-log.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -84,6 +86,12 @@ async function bootstrap() {
     new PayloadTooLargeExceptionFilter(), // 413 payload errors
     new ThrottleExceptionFilter(),    // 429 rate limit errors
   );
+
+  // MEDIUM-4: Global audit log interceptor
+  // Logs all mutating operations (POST, PUT, PATCH, DELETE) automatically
+  const auditLogService = app.get(AuditLogService);
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new AuditLogInterceptor(auditLogService, reflector));
 
   // Enable CORS for frontend (local and Cloudflare)
   app.enableCors({
