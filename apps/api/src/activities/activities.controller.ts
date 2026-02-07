@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ActivitiesService } from './activities.service';
+import { CreateActivityDto, UpdateActivityDto } from './dto';
 
 @Controller('activities')
 @UseGuards(JwtAuthGuard)
@@ -29,13 +30,15 @@ export class ActivitiesController {
     return this.activitiesService.findOne(id, req.tenantId);
   }
 
+  // MEDIUM-1: Input validation via CreateActivityDto
   @Post()
-  async create(@Body() data: any, @Request() req) {
+  async create(@Body() data: CreateActivityDto, @Request() req) {
     return this.activitiesService.create(data, req.tenantId, req.user.userId);
   }
 
+  // MEDIUM-1: Input validation via UpdateActivityDto
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() data: any, @Request() req) {
+  async update(@Param('id') id: string, @Body() data: UpdateActivityDto, @Request() req) {
     return this.activitiesService.update(id, data, req.tenantId);
   }
 
