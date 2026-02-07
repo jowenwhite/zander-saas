@@ -1,7 +1,8 @@
-import { Controller, Get, Res, Query, Logger } from '@nestjs/common';
+import { Controller, Get, Res, Query, Request, Logger, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { MicrosoftAuthService } from './microsoft-auth.service';
 import { Public } from '../jwt-auth.decorator';
+import { JwtAuthGuard } from '../jwt-auth.guard';
 
 @Controller('auth/microsoft')
 export class MicrosoftAuthController {
@@ -9,6 +10,7 @@ export class MicrosoftAuthController {
 
   constructor(private readonly microsoftAuthService: MicrosoftAuthService) {}
 
+  // OAuth initiation - must be public for OAuth flow
   @Public()
   @Get()
   async microsoftAuth(@Query('state') state: string, @Res() res: Response) {
@@ -35,6 +37,7 @@ export class MicrosoftAuthController {
     return res.redirect(authUrl);
   }
 
+  // OAuth callback - must be public for Microsoft to redirect here
   @Public()
   @Get('callback')
   async microsoftAuthCallback(
@@ -76,12 +79,11 @@ export class MicrosoftAuthController {
     }
   }
 
-  @Public()
+  // SECURED: Requires authentication - users can only check their own status
+  @UseGuards(JwtAuthGuard)
   @Get('status')
-  async getStatus(@Query('userId') userId: string) {
-    if (!userId) {
-      return { connected: false };
-    }
+  async getStatus(@Request() req) {
+    const userId = req.user.sub;
     const token = await this.microsoftAuthService.getTokenByUserId(userId);
     return {
       connected: !!token,
@@ -89,12 +91,12 @@ export class MicrosoftAuthController {
     };
   }
 
-  @Public()
+  // SECURED: Requires authentication - users can only disconnect their own integration
+  @UseGuards(JwtAuthGuard)
   @Get('disconnect')
-  async disconnect(@Query('userId') userId: string, @Res() res: Response) {
-    if (userId) {
-      await this.microsoftAuthService.deleteTokens(userId);
-    }
+  async disconnect(@Request() req, @Res() res: Response) {
+    const userId = req.user.sub;
+    await this.microsoftAuthService.deleteTokens(userId);
     return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3002'}/settings?microsoft=disconnected`);
   }
 }
