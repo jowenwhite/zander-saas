@@ -1298,3 +1298,30 @@ model TermsVersion {
 
   @@map("terms_versions")
 }
+
+// ============================================
+// MEDIUM-4: AUDIT LOGGING
+// ============================================
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  tenantId     String
+  userId       String?
+  action       String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, FAILED_LOGIN, etc.
+  resource     String   // deals, contacts, users, etc.
+  resourceId   String?  // ID of affected resource
+  details      Json?    // Additional context (old values, new values, etc.)
+  ipAddress    String?
+  userAgent    String?
+  status       String   @default("success") // success, failure
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@index([tenantId, createdAt])
+  @@map("audit_logs")
+}
