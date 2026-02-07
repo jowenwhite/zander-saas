@@ -93,16 +93,41 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new AuditLogInterceptor(auditLogService, reflector));
 
-  // Enable CORS for frontend (local and Cloudflare)
-  app.enableCors({
-    origin: [
+  // LOW-1: CORS Configuration with domain whitelist
+  // Production origins only - dev origins added conditionally below
+  const allowedOrigins = [
+    'https://app.zanderos.com',
+    'https://www.zanderos.com',
+    'https://zanderos.com',
+    'https://api.zanderos.com',
+    'https://zander.mcfapp.com',
+    'https://api.zander.mcfapp.com',
+  ];
+
+  // Add development origins only in non-production environments
+  if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.push(
       'http://localhost:3002',
-      'https://zander.mcfapp.com',
-      'https://api.zander.mcfapp.com',
-      'https://app.zanderos.com',
-      'https://api.zanderos.com'
+      'http://localhost:3000',
+      'http://127.0.0.1:3002',
+      'http://127.0.0.1:3000',
+    );
+  }
+
+  app.enableCors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+      'X-CSRF-Token',
     ],
+    exposedHeaders: ['X-Total-Count', 'X-Page', 'X-Per-Page'],
     credentials: true,
+    maxAge: 86400, // 24 hours - cache preflight requests
   });
 
   await app.listen(3001);
