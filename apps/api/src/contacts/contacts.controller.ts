@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ContactsService } from './contacts.service';
+import { CreateContactDto, UpdateContactDto, ImportContactsDto } from './dto';
 
 @Controller('contacts')
 @UseGuards(JwtAuthGuard) // All routes require authentication
@@ -27,15 +28,17 @@ export class ContactsController {
 
   // POST /contacts - Create new contact
   // HIGH-3: Pass userId to set owner on creation
+  // MEDIUM-1: Input validation via CreateContactDto
   @Post()
-  async create(@Body() data: any, @Request() req) {
+  async create(@Body() data: CreateContactDto, @Request() req) {
     const { tenantId, user } = req;
     return this.contactsService.create(data, tenantId, user?.userId);
   }
 
   // PATCH /contacts/:id - Update contact
+  // MEDIUM-1: Input validation via UpdateContactDto
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() data: any, @Request() req) {
+  async update(@Param('id') id: string, @Body() data: UpdateContactDto, @Request() req) {
     return this.contactsService.update(id, data, req.tenantId);
   }
 
@@ -50,10 +53,11 @@ export class ContactsController {
 
   // POST /contacts/import - Bulk import
   // HIGH-4: Admin/Owner only - bulk operations are privileged
+  // MEDIUM-1: Input validation via ImportContactsDto (validates each contact)
   @UseGuards(RolesGuard)
   @Roles('admin', 'owner')
   @Post('import')
-  async bulkImport(@Body() data: { contacts: any[] }, @Request() req) {
+  async bulkImport(@Body() data: ImportContactsDto, @Request() req) {
     return this.contactsService.bulkImport(data.contacts, req.tenantId);
   }
 
