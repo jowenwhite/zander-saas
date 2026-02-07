@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as express from 'express';
+import helmet from 'helmet';
 import {
   GlobalExceptionFilter,
   ValidationExceptionFilter,
@@ -16,6 +17,23 @@ async function bootstrap() {
     // Disable body parsing - we'll handle it manually for webhooks
     bodyParser: false,
   });
+
+  // LOW-2: Security headers via Helmet
+  // API-focused configuration (no CSP needed for JSON-only responses)
+  app.use(helmet({
+    contentSecurityPolicy: false, // Not needed for JSON API
+    crossOriginEmbedderPolicy: false, // Can cause issues with some API clients
+    hsts: {
+      maxAge: 31536000, // 1 year in seconds
+      includeSubDomains: true,
+      preload: true,
+    },
+    frameguard: { action: 'deny' }, // Prevent clickjacking
+    hidePoweredBy: true, // Remove X-Powered-By header
+    noSniff: true, // Prevent MIME type sniffing
+    xssFilter: true, // XSS protection for legacy browsers
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  }));
 
   // MEDIUM-2: Request size limits to prevent DoS via large payloads
   const JSON_LIMIT = '1mb';
