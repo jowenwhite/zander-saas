@@ -161,6 +161,16 @@ model User {
   knowledgeArticles   KnowledgeArticle[] @relation("KnowledgeCreatedBy")
   supportTickets      SupportTicket[]
 
+  // HIGH-3: User-level data isolation relations
+  dealsOwned       Deal[]         @relation("DealOwner")
+  dealsAssigned    Deal[]         @relation("DealAssignedTo")
+  contactsOwned    Contact[]      @relation("ContactOwner")
+  contactsAssigned Contact[]      @relation("ContactAssignedTo")
+  emailsSent       EmailMessage[] @relation("UserEmails")
+  smsSent          SmsMessage[]   @relation("UserSms")
+  campaignsCreated Campaign[]     @relation("CampaignCreatedBy")
+  formsCreated     Form[]         @relation("FormCreatedBy")
+
   @@map("users")
 }
 
@@ -180,6 +190,8 @@ model UserTenantAccess {
 model Contact {
   id                      String                   @id @default(cuid())
   tenantId                String
+  ownerId                 String?
+  assignedToId            String?
   firstName               String
   lastName                String
   email                   String
@@ -196,6 +208,8 @@ model Contact {
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
   tenant                  Tenant                   @relation(fields: [tenantId], references: [id])
+  owner                   User?                    @relation("ContactOwner", fields: [ownerId], references: [id])
+  assignedTo              User?                    @relation("ContactAssignedTo", fields: [assignedToId], references: [id])
   activities              Activity[]
   deals                   Deal[]
   formSubmissions         FormSubmission[]
@@ -217,6 +231,8 @@ model Contact {
   segmentMemberships      ContactSegment[]
   workflowExecutions      WorkflowExecution[]
 
+  @@index([ownerId])
+  @@index([assignedToId])
   @@map("contacts")
 }
 
@@ -225,6 +241,8 @@ model Deal {
   tenantId          String
   dealName          String
   contactId         String?
+  ownerId           String?
+  assignedToId      String?
   dealValue         Float
   probability       Int               @default(50)
   stage             String            @default("Lead")
@@ -241,6 +259,8 @@ model Deal {
   tenant            Tenant            @relation(fields: [tenantId], references: [id])
   activities        Activity[]
   contact           Contact?          @relation(fields: [contactId], references: [id])
+  owner             User?     @relation("DealOwner", fields: [ownerId], references: [id])
+  assignedTo        User?     @relation("DealAssignedTo", fields: [assignedToId], references: [id])
   lineItems         ProjectLineItem[]
   // Archive & Loss tracking
   isArchived        Boolean           @default(false)
@@ -251,6 +271,9 @@ model Deal {
   lossReason        String?
   stageAtLoss       String?
 
+
+  @@index([ownerId])
+  @@index([assignedToId])
   @@map("deals")
 }
 
@@ -347,6 +370,7 @@ model PipelineStage {
 model Form {
   id          String           @id @default(cuid())
   tenantId    String
+  createdById String?
   name        String
   description String?
   fields      Json             @default("[]")
@@ -357,7 +381,9 @@ model Form {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   tenant      Tenant           @relation(fields: [tenantId], references: [id])
+  createdBy   User?            @relation("FormCreatedBy", fields: [createdById], references: [id])
 
+  @@index([createdById])
   @@map("forms")
 }
 
@@ -472,6 +498,7 @@ model EmailMessage {
   tenantId    String
   contactId   String?
   dealId      String?
+  userId      String?
   direction   String // 'inbound' | 'outbound'
   fromAddress String
   toAddress   String
@@ -491,9 +518,11 @@ model EmailMessage {
   updatedAt   DateTime  @updatedAt
   tenant      Tenant    @relation(fields: [tenantId], references: [id])
   contact     Contact?  @relation(fields: [contactId], references: [id])
+  user        User?     @relation("UserEmails", fields: [userId], references: [id])
 
   @@index([tenantId])
   @@index([contactId])
+  @@index([userId])
   @@index([threadId])
   @@index([messageId])
   @@map("email_messages")
@@ -504,6 +533,7 @@ model SmsMessage {
   tenantId    String
   contactId   String?
   dealId      String?
+  userId      String?
   direction   String // 'inbound' | 'outbound'
   fromNumber  String
   toNumber    String
@@ -516,9 +546,11 @@ model SmsMessage {
   updatedAt   DateTime  @updatedAt
   tenant      Tenant    @relation(fields: [tenantId], references: [id])
   contact     Contact?  @relation(fields: [contactId], references: [id])
+  user        User?     @relation("UserSms", fields: [userId], references: [id])
 
   @@index([tenantId])
   @@index([contactId])
+  @@index([userId])
   @@index([messageSid])
   @@map("sms_messages")
 }
@@ -725,6 +757,7 @@ model MicrosoftToken {
 model Campaign {
   id             String   @id @default(cuid())
   tenantId       String
+  createdById    String?
   name           String
   description    String?
   type           String   @default("multi") // "single" | "multi"
@@ -738,6 +771,7 @@ model Campaign {
   updatedAt      DateTime @updatedAt
 
   tenant          Tenant               @relation(fields: [tenantId], references: [id])
+  createdBy       User?                @relation("CampaignCreatedBy", fields: [createdById], references: [id])
   steps           CampaignStep[]
   enrollments     CampaignEnrollment[]
   // CMO Module fields
@@ -751,6 +785,7 @@ model Campaign {
   calendarEvents  CalendarEvent[]
 
   @@index([tenantId])
+  @@index([createdById])
   @@index([status])
   @@map("campaigns")
 }
