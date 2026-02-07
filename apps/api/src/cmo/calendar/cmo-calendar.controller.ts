@@ -8,7 +8,10 @@ import {
   Param,
   Query,
   Request,
+  UseGuards,
 } from '@nestjs/common';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { CmoCalendarService } from './cmo-calendar.service';
 
 @Controller('cmo/calendar')
@@ -76,6 +79,9 @@ export class CmoCalendarController {
     return this.cmoCalendarService.updateEvent(id, req.tenantId, updateData);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete('events/:id')
   async deleteEvent(@Param('id') id: string, @Request() req) {
     return this.cmoCalendarService.deleteEvent(id, req.tenantId);
@@ -147,6 +153,9 @@ export class CmoCalendarController {
     );
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete('themes/:year/:month')
   async deleteTheme(
     @Param('year') year: string,
@@ -204,6 +213,9 @@ export class CmoCalendarController {
     return this.cmoCalendarService.updateIdea(id, req.tenantId, updateData);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete('ideas/:id')
   async deleteIdea(@Param('id') id: string, @Request() req) {
     return this.cmoCalendarService.deleteIdea(id, req.tenantId);

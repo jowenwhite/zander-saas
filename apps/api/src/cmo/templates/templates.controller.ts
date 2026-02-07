@@ -8,7 +8,10 @@ import {
   Param,
   Query,
   Request,
+  UseGuards,
 } from '@nestjs/common';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { TemplatesService } from './templates.service';
 
 @Controller('cmo/templates')
@@ -87,6 +90,9 @@ export class TemplatesController {
   }
 
   // Delete template
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.templatesService.remove(id, req.tenantId);
