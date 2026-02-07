@@ -3,6 +3,7 @@ import { ProductsService, ProductImportRow } from './products.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CreateProductDto, UpdateProductDto } from './dto';
 
 @Controller('products')
 @UseGuards(JwtAuthGuard)
@@ -23,14 +24,16 @@ export class ProductsController {
     return { data: product };
   }
 
+  // MEDIUM-1: Input validation via CreateProductDto
   @Post()
-  async create(@Body() data: any, @Request() req) {
+  async create(@Body() data: CreateProductDto, @Request() req) {
     const product = await this.productsService.create(req.user.tenantId, data);
     return { data: product };
   }
 
+  // MEDIUM-1: Input validation via UpdateProductDto
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() data: any, @Request() req) {
+  async update(@Param('id') id: string, @Body() data: UpdateProductDto, @Request() req) {
     const product = await this.productsService.update(id, req.user.tenantId, data);
     return { data: product };
   }

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Request, UseGuards }
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CampaignsService } from './campaigns.service';
+import { CreateCampaignDto, UpdateCampaignDto, EnrollContactDto } from './dto';
 
 @Controller('campaigns')
 export class CampaignsController {
@@ -17,54 +18,15 @@ export class CampaignsController {
     return this.campaignsService.findOne(id, req.tenantId);
   }
 
+  // MEDIUM-1: Input validation via CreateCampaignDto
   @Post()
-  async create(
-    @Request() req,
-    @Body() createData: {
-      name: string;
-      description?: string;
-      type?: string;
-      channels?: string[];
-      status?: string;
-      triggerType?: string;
-      triggerConfig?: any;
-      isFromTreasury?: boolean;
-      steps?: {
-        order: number;
-        channel: string;
-        dayOffset: number;
-        hourOffset?: number;
-        subject?: string;
-        content: string;
-      }[];
-    }
-  ) {
+  async create(@Request() req, @Body() createData: CreateCampaignDto) {
     return this.campaignsService.create(req.tenantId, createData);
   }
 
+  // MEDIUM-1: Input validation via UpdateCampaignDto
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Request() req,
-    @Body() updateData: {
-      name?: string;
-      description?: string;
-      type?: string;
-      channels?: string[];
-      status?: string;
-      triggerType?: string;
-      triggerConfig?: any;
-      steps?: {
-        id?: string;
-        order: number;
-        channel: string;
-        dayOffset: number;
-        hourOffset?: number;
-        subject?: string;
-        content: string;
-      }[];
-    }
-  ) {
+  async update(@Param('id') id: string, @Request() req, @Body() updateData: UpdateCampaignDto) {
     return this.campaignsService.update(id, req.tenantId, updateData);
   }
 
@@ -76,12 +38,9 @@ export class CampaignsController {
     return this.campaignsService.remove(id, req.tenantId);
   }
 
+  // MEDIUM-1: Input validation via EnrollContactDto
   @Post(':id/enroll')
-  async enroll(
-    @Param('id') id: string,
-    @Request() req,
-    @Body() data: { contactId: string; dealId?: string }
-  ) {
+  async enroll(@Param('id') id: string, @Request() req, @Body() data: EnrollContactDto) {
     return this.campaignsService.enroll(id, req.tenantId, data.contactId, data.dealId);
   }
 
