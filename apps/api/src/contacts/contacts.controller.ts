@@ -1,5 +1,7 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { ContactsService } from './contacts.service';
 
 @Controller('contacts')
@@ -38,12 +40,18 @@ export class ContactsController {
   }
 
   // DELETE /contacts/:id - Delete contact
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async delete(@Param('id') id: string, @Request() req) {
     return this.contactsService.delete(id, req.tenantId);
   }
 
   // POST /contacts/import - Bulk import
+  // HIGH-4: Admin/Owner only - bulk operations are privileged
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Post('import')
   async bulkImport(@Body() data: { contacts: any[] }, @Request() req) {
     return this.contactsService.bulkImport(data.contacts, req.tenantId);
