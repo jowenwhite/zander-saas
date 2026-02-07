@@ -23,8 +23,13 @@ export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {}
 
   // File Upload
+  // MEDIUM-2: File upload size limit (10MB max)
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB max file size
+    },
+  }))
   async uploadAsset(
     @Request() req,
     @UploadedFile() file: Express.Multer.File,
