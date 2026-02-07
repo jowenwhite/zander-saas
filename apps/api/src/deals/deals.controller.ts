@@ -8,27 +8,35 @@ export class DealsController {
   constructor(private readonly dealsService: DealsService) {}
 
   // GET /deals - List all deals with filters
+  // HIGH-3: Pass userId and role for ownership-based filtering
   @Get()
   async findAll(@Request() req, @Query() query: any) {
-    return this.dealsService.findAll(req.tenantId, query);
+    const { tenantId, user } = req;
+    return this.dealsService.findAll(tenantId, query, user?.userId, user?.role);
   }
 
   // GET /deals/pipeline - Get pipeline view (deals grouped by stage)
+  // HIGH-3: Pass userId and role for ownership-based filtering
   @Get('pipeline')
   async getPipeline(@Request() req, @Query() query) {
-    return this.dealsService.getPipeline(req.tenantId, query);
+    const { tenantId, user } = req;
+    return this.dealsService.getPipeline(tenantId, query, user?.userId, user?.role);
   }
 
   // GET /deals/:id - Get single deal
+  // HIGH-3: Pass userId and role for ownership-based access control
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
-    return this.dealsService.findOne(id, req.tenantId);
+    const { tenantId, user } = req;
+    return this.dealsService.findOne(id, tenantId, user?.userId, user?.role);
   }
 
   // POST /deals - Create new deal
+  // HIGH-3: Pass userId to set owner on creation
   @Post()
   async create(@Body() data: any, @Request() req) {
-    return this.dealsService.create(data, req.tenantId);
+    const { tenantId, user } = req;
+    return this.dealsService.create(data, tenantId, user?.userId);
   }
 
   // PATCH /deals/:id - Update deal
@@ -56,9 +64,11 @@ export class DealsController {
   }
 
   // GET /deals/export - Export deals (returns CSV data)
+  // HIGH-3: Pass userId and role for ownership-based filtering
   @Get('export')
   async export(@Request() req) {
-    const { data } = await this.dealsService.findAll(req.tenantId, { limit: 10000 });
+    const { tenantId, user } = req;
+    const { data } = await this.dealsService.findAll(tenantId, { limit: 10000 }, user?.userId, user?.role);
     
     // Convert to CSV format
     const headers = ['Deal Name', 'Contact', 'Value', 'Stage', 'Priority', 'Probability', 'Expected Close'];

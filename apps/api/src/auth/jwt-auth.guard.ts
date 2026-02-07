@@ -33,11 +33,15 @@ export class JwtAuthGuard implements CanActivate {
         isSuperAdmin: decoded.isSuperAdmin || false,
         userId: decoded.sub,
         email: decoded.email,
-        tenantId: decoded.tenantId
+        tenantId: decoded.tenantId,
+        role: decoded.role || 'member'
       };
-      
+
       // Also add tenantId directly to request for easy access
       request.tenantId = decoded.tenantId;
+
+      // Add role directly for easy access (HIGH-3)
+      request.userRole = decoded.role || 'member';
       
       return true;
     } catch (error) {

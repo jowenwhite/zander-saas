@@ -1,15 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { getOwnershipFilter, canAccessRecord } from '../common/utils/ownership-filter.util';
 
 @Injectable()
 export class ContactsService {
   constructor(private prisma: PrismaService) {}
 
   // Get all contacts for a tenant (with search, filters, pagination)
-  async findAll(tenantId: string, query: any) {
+  // HIGH-3: Added userId and userRole for ownership-based filtering
+  async findAll(tenantId: string, query: any, userId?: string, userRole?: string) {
     const { search, tags, page = 1, limit = 50, sortBy = 'createdAt', sortOrder = 'desc' } = query;
 
-    const where: any = { tenantId };
+    // HIGH-3: Build ownership filter based on user role
+    const ownershipWhere = userId && userRole
+      ? getOwnershipFilter(
+          { tenantId, userId, userRole },
+          { ownerField: 'ownerId', assignedField: 'assignedToId' }
+        )
+      : { tenantId };
+
+    const where: any = { ...ownershipWhere };
 
     // Search filter
     if (search) {
@@ -54,14 +64,29 @@ export class ContactsService {
     };
   }
 
-  // Get single contact by ID (with tenant check)
-  async findOne(id: string, tenantId: string) {
+  // Get single contact by ID (with tenant and ownership check)
+  // HIGH-3: Added userId and userRole for ownership-based access control
+  async findOne(id: string, tenantId: string, userId?: string, userRole?: string) {
     const contact = await this.prisma.contact.findFirst({
       where: { id, tenantId },
       include: {
         deals: true,
-        // activities: true, // Add when Activity model exists
-        // forms: true // Add when Form model exists
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        assignedTo: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
       }
     });
 
@@ -69,15 +94,49 @@ export class ContactsService {
       throw new NotFoundException('Contact not found');
     }
 
+    // HIGH-3: Check if user can access this contact
+    if (userId && userRole) {
+      const hasAccess = canAccessRecord(
+        contact,
+        { tenantId, userId, userRole },
+        { ownerField: 'ownerId', assignedField: 'assignedToId' }
+      );
+      if (!hasAccess) {
+        throw new ForbiddenException('You do not have permission to access this contact');
+      }
+    }
+
     return contact;
   }
 
   // Create new contact
-  async create(data: any, tenantId: string) {
+  // HIGH-3: Added userId to set owner on creation
+  async create(data: any, tenantId: string, userId?: string) {
     return this.prisma.contact.create({
       data: {
         ...data,
-        tenantId
+        tenantId,
+        // HIGH-3: Set owner and assignee to creator by default
+        ownerId: data.ownerId || userId,
+        assignedToId: data.assignedToId || userId,
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        assignedTo: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
       }
     });
   }

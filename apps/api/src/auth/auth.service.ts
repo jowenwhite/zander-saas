@@ -283,6 +283,7 @@ export class AuthService {
     id: string;
     email: string;
     tenantId: string;
+    role?: string;
   }) {
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
     if (!jwtSecret) {
@@ -293,6 +294,7 @@ export class AuthService {
         sub: user.id,
         email: user.email,
         tenantId: user.tenantId,
+        role: user.role || 'member',
         isSuperAdmin: user.isSuperAdmin || false
       },
       jwtSecret,
@@ -375,6 +377,7 @@ export class AuthService {
     id: string;
     email: string;
     isSuperAdmin?: boolean;
+    role?: string;
   }, tenantId: string) {
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
     if (!jwtSecret) {
@@ -385,6 +388,7 @@ export class AuthService {
         sub: user.id,
         email: user.email,
         tenantId: tenantId,
+        role: user.role || 'member',
         isSuperAdmin: user.isSuperAdmin || false
       },
       jwtSecret,

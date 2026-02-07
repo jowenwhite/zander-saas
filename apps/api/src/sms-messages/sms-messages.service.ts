@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import * as Twilio from 'twilio';
+import { getOwnershipFilter } from '../common/utils/ownership-filter.util';
 
 @Injectable()
 export class SmsMessagesService {
@@ -19,14 +20,16 @@ export class SmsMessagesService {
     }
   }
 
+  // HIGH-3: Added userId to track who sent the SMS
   async sendSms(params: {
     tenantId: string;
     to: string;
     body: string;
     contactId?: string;
     dealId?: string;
+    userId?: string;
   }) {
-    const { tenantId, to, body, contactId, dealId } = params;
+    const { tenantId, to, body, contactId, dealId, userId } = params;
     const fromNumber = process.env.TWILIO_PHONE_NUMBER;
 
     if (!this.twilioClient) {
@@ -47,6 +50,7 @@ export class SmsMessagesService {
           tenantId,
           contactId,
           dealId,
+          userId, // HIGH-3: Track who sent the SMS
           direction: 'outbound',
           fromNumber,
           toNumber: to,
@@ -64,22 +68,45 @@ export class SmsMessagesService {
     }
   }
 
+  // HIGH-3: Added userId and userRole for ownership-based filtering
   async findAll(tenantId: string, filters?: {
     contactId?: string;
     direction?: string;
     limit?: number;
+    userId?: string;
+    userRole?: string;
   }) {
-    const { contactId, direction, limit = 50 } = filters || {};
+    const { contactId, direction, limit = 50, userId, userRole } = filters || {};
+
+    // HIGH-3: For members, they can see: their outbound OR any inbound
+    const adminRoles = ['admin', 'owner'];
+    const isMember = userRole && !adminRoles.includes(userRole.toLowerCase());
+
+    const whereClause = isMember && userId
+      ? {
+          tenantId,
+          ...(contactId && { contactId }),
+          ...(direction && { direction }),
+          // Members can see: their outbound OR any inbound
+          OR: [
+            { userId },           // Their outbound SMS
+            { direction: 'inbound' },  // All inbound SMS
+          ],
+        }
+      : {
+          tenantId,
+          ...(contactId && { contactId }),
+          ...(direction && { direction }),
+        };
 
     return this.prisma.smsMessage.findMany({
-      where: {
-        tenantId,
-        ...(contactId && { contactId }),
-        ...(direction && { direction }),
-      },
+      where: whereClause,
       include: {
         contact: {
           select: { id: true, firstName: true, lastName: true, phone: true },
+        },
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true },
         },
       },
       orderBy: { sentAt: 'desc' },
