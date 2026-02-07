@@ -8,7 +8,9 @@ import {
 } from '@nestjs/common';
 import { BillingService } from './billing.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { Public } from '../auth/jwt-auth.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('billing')
 export class BillingController {
@@ -64,7 +66,9 @@ export class BillingController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  // HIGH-4: Owner-only - subscription changes affect billing
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('owner')
   @Post('upgrade')
   async upgradeSubscription(
     @Request() req: any,
@@ -78,7 +82,9 @@ export class BillingController {
     return { success: true, message: 'Subscription upgraded' };
   }
 
-  @UseGuards(JwtAuthGuard)
+  // HIGH-4: Owner-only - subscription cancellation is critical
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('owner')
   @Post('cancel')
   async cancelSubscription(
     @Request() req: any,
