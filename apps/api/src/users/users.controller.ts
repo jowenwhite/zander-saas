@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -15,6 +17,9 @@ export class UsersController {
     return this.usersService.findOne(id, req.tenantId);
   }
 
+  // HIGH-4: Admin/Owner only - user creation is privileged
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Post('invite')
   async invite(
     @Request() req,
@@ -28,6 +33,9 @@ export class UsersController {
     return this.usersService.invite(req.tenantId, inviteData);
   }
 
+  // HIGH-4: Admin/Owner only - user updates including role changes
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -42,6 +50,9 @@ export class UsersController {
     return this.usersService.update(id, req.tenantId, updateData);
   }
 
+  // HIGH-4: Admin/Owner only - user deletion is critical
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.usersService.remove(id, req.tenantId, req.user.sub);
