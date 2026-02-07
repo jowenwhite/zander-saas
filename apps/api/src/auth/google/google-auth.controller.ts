@@ -1,7 +1,8 @@
-import { Controller, Get, Req, Res, UseGuards, Query, Logger } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Query, Request, Logger } from '@nestjs/common';
 import { Response } from 'express';
 import { GoogleAuthService } from './google-auth.service';
 import { Public } from '../jwt-auth.decorator';
+import { JwtAuthGuard } from '../jwt-auth.guard';
 
 @Controller('auth/google')
 export class GoogleAuthController {
@@ -9,6 +10,7 @@ export class GoogleAuthController {
 
   constructor(private readonly googleAuthService: GoogleAuthService) {}
 
+  // OAuth initiation - must be public for OAuth flow
   @Public()
   @Get()
   async googleAuth(@Query('state') state: string, @Res() res: Response) {
@@ -25,13 +27,14 @@ export class GoogleAuthController {
       'https://www.googleapis.com/auth/calendar.readonly',
       'https://www.googleapis.com/auth/calendar.events',
     ].join(' '));
-    
+
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent&state=${state}`;
-    
+
     this.logger.log(`Redirecting to Google OAuth with state: ${state}`);
     return res.redirect(authUrl);
   }
 
+  // OAuth callback - must be public for Google to redirect here
   @Public()
   @Get('callback')
   async googleAuthCallback(@Query('code') code: string, @Query('state') state: string, @Res() res: Response) {
@@ -50,7 +53,7 @@ export class GoogleAuthController {
 
       // Exchange code for tokens
       const tokens = await this.googleAuthService.exchangeCodeForTokens(code);
-      
+
       this.logger.log(`Tokens received for state/userId: ${state}`);
 
       // Save tokens to database
@@ -70,12 +73,11 @@ export class GoogleAuthController {
     }
   }
 
-  @Public()
+  // SECURED: Requires authentication - users can only check their own status
+  @UseGuards(JwtAuthGuard)
   @Get('status')
-  async getStatus(@Query('userId') userId: string) {
-    if (!userId) {
-      return { connected: false };
-    }
+  async getStatus(@Request() req) {
+    const userId = req.user.sub;
     const token = await this.googleAuthService.getTokenByUserId(userId);
     return {
       connected: !!token,
@@ -83,12 +85,12 @@ export class GoogleAuthController {
     };
   }
 
-  @Public()
+  // SECURED: Requires authentication - users can only disconnect their own integration
+  @UseGuards(JwtAuthGuard)
   @Get('disconnect')
-  async disconnect(@Query('userId') userId: string, @Res() res: Response) {
-    if (userId) {
-      await this.googleAuthService.deleteTokens(userId);
-    }
+  async disconnect(@Request() req, @Res() res: Response) {
+    const userId = req.user.sub;
+    await this.googleAuthService.deleteTokens(userId);
     return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3002'}/settings?google=disconnected`);
   }
 }
