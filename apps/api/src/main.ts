@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as express from 'express';
 
@@ -40,6 +41,16 @@ async function bootstrap() {
       next();
     }
   });
+
+  // MEDIUM-1: Global validation pipe for input validation
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,              // Strip properties not in DTO
+    forbidNonWhitelisted: true,   // Throw error on extra properties
+    transform: true,              // Auto-transform payloads to DTO instances
+    transformOptions: {
+      enableImplicitConversion: true  // Convert primitive types automatically
+    }
+  }));
 
   // Enable CORS for frontend (local and Cloudflare)
   app.enableCors({

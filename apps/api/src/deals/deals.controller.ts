@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { DealsService } from './deals.service';
+import { CreateDealDto, UpdateDealDto, ImportDealsDto } from './dto';
 
 @Controller('deals')
 @UseGuards(JwtAuthGuard) // All routes require authentication
@@ -35,15 +36,17 @@ export class DealsController {
 
   // POST /deals - Create new deal
   // HIGH-3: Pass userId to set owner on creation
+  // MEDIUM-1: Input validation via CreateDealDto
   @Post()
-  async create(@Body() data: any, @Request() req) {
+  async create(@Body() data: CreateDealDto, @Request() req) {
     const { tenantId, user } = req;
     return this.dealsService.create(data, tenantId, user?.userId);
   }
 
   // PATCH /deals/:id - Update deal
+  // MEDIUM-1: Input validation via UpdateDealDto
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() data: any, @Request() req) {
+  async update(@Param('id') id: string, @Body() data: UpdateDealDto, @Request() req) {
     return this.dealsService.update(id, data, req.tenantId);
   }
 
@@ -64,10 +67,11 @@ export class DealsController {
 
   // POST /deals/import - Bulk import
   // HIGH-4: Admin/Owner only - bulk operations are privileged
+  // MEDIUM-1: Input validation via ImportDealsDto (validates each deal)
   @UseGuards(RolesGuard)
   @Roles('admin', 'owner')
   @Post('import')
-  async bulkImport(@Body() data: { deals: any[] }, @Request() req) {
+  async bulkImport(@Body() data: ImportDealsDto, @Request() req) {
     return this.dealsService.bulkImport(data.deals, req.tenantId);
   }
 
