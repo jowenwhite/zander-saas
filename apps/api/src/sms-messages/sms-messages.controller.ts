@@ -10,6 +10,8 @@ import {
   Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { SmsMessagesService } from './sms-messages.service';
 
 @Controller('sms-messages')
@@ -79,8 +81,10 @@ export class SmsMessagesController {
     return this.smsMessagesService.handleStatusWebhook(body);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'owner')
   async delete(@Request() req, @Param('id') id: string) {
     await this.smsMessagesService.delete(id, req.user.tenantId);
     return { success: true };
