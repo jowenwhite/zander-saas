@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottleExceptionFilter } from './common/filters/throttle-exception.filter';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -45,6 +47,10 @@ import { LegalModule } from './legal/legal.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,  // 60 seconds
+      limit: 60,   // 60 requests per minute (global default - generous for authenticated users)
+    }]),
     S3Module,
     StorageModule,
     ContactsModule,
@@ -83,7 +89,15 @@ import { LegalModule } from './legal/legal.module';
     {
       provide: APP_GUARD,
       useClass: PublicGuard,
-    }
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ThrottleExceptionFilter,
+    },
   ],
 })
 export class AppModule {}
