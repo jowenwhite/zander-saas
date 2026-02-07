@@ -428,7 +428,7 @@ export default function ProductionPage() {
               justifyContent: 'center',
               fontWeight: '700',
               fontSize: '1.5rem'
-            }}>JW</div>
+            }}>{userName ? userName.charAt(0).toUpperCase() : 'U'}</div>
             <div>
               <h1 style={{ 
                 fontSize: '2rem', 
@@ -437,7 +437,7 @@ export default function ProductionPage() {
                 margin: 0,
                 marginBottom: '0.25rem'
               }}>
-                {getGreeting()}, Jonathan 👋
+                {getGreeting()}, {userName || 'there'} 👋
               </h1>
               <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
                 Here's what's happening with your sales today
