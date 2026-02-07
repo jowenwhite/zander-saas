@@ -17,12 +17,12 @@ export default function SettingsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
 
-  // Profile State
+  // Profile State - starts empty, populated from API
   const [profile, setProfile] = useState({
-    firstName: 'Jonathan',
-    lastName: 'White',
-    email: 'jonathan@64west.com',
-    phone: '(555) 123-4567',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     timezone: 'America/New_York',
     theme: 'light',
     emailNotifications: true,
@@ -35,20 +35,20 @@ export default function SettingsPage() {
   // User state (for API calls)
   const [user, setUser] = useState<{ id: string; email: string } | null>(null);
 
-  // Company State
+  // Company State - starts empty, populated from API
   const [company, setCompany] = useState({
-    name: '64 West Capital Partners',
-    website: 'https://64west.com',
-    email: 'info@64west.com',
-    phone: '(555) 987-6543',
-    address: '123 Main Street',
-    city: 'Atlanta',
-    state: 'GA',
-    zip: '30301',
-    industry: 'Business Consulting',
+    name: '',
+    website: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+    industry: '',
     fiscalYearStart: 'January',
     currency: 'USD',
-    taxRate: '7.0'
+    taxRate: '0'
   });
 
   // Team State
@@ -2037,6 +2037,14 @@ export default function SettingsPage() {
         <Sidebar collapsed={sidebarCollapsed} />
 
         <main style={{ marginLeft: sidebarCollapsed ? '64px' : '240px', marginTop: '64px', padding: '2rem', transition: 'margin-left 0.3s ease' }}>
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1rem' }}>
+              <div style={{ width: '48px', height: '48px', border: '4px solid var(--zander-border-gray)', borderTopColor: 'var(--zander-red)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+              <p style={{ color: 'var(--zander-gray)', fontSize: '1rem' }}>Loading settings...</p>
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          ) : (
+          <>
           <div style={{ background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.75rem' }}>{profile.firstName?.[0] || ''}{profile.lastName?.[0] || ''}</div>
@@ -2045,7 +2053,7 @@ export default function SettingsPage() {
                 <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9 }}>{profile.email}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
                   <span style={{ fontSize: '0.85rem', padding: '0.25rem 0.75rem', background: 'rgba(255,255,255,0.2)', borderRadius: '12px' }}>Owner</span>
-                  <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>64 West Capital Partners</span>
+                  <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>{company.name || 'Your Company'}</span>
                   <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>• Member since December 2024</span>
                 </div>
               </div>
@@ -2092,6 +2100,8 @@ export default function SettingsPage() {
               {activeTab === 'data' && renderDataTab()}
             </div>
           </div>
+          </>
+          )}
         </main>
       </div>
 
