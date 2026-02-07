@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
@@ -283,7 +283,24 @@ export class CalendarEventsService {
     });
   }
 
-  async updateAttendeeResponse(eventId: string, attendeeId: string, responseStatus: string) {
+  // SECURED: Requires tenant validation to prevent cross-tenant access
+  async updateAttendeeResponse(tenantId: string, eventId: string, attendeeId: string, responseStatus: string) {
+    // Verify event belongs to this tenant
+    const event = await this.prisma.calendarEvent.findFirst({
+      where: { id: eventId, tenantId },
+    });
+    if (!event) {
+      throw new NotFoundException('Event not found or access denied');
+    }
+
+    // Verify attendee belongs to this event and update
+    const attendee = await this.prisma.eventAttendee.findFirst({
+      where: { id: attendeeId, eventId: event.id },
+    });
+    if (!attendee) {
+      throw new NotFoundException('Attendee not found');
+    }
+
     return this.prisma.eventAttendee.update({
       where: { id: attendeeId },
       data: {
@@ -293,7 +310,24 @@ export class CalendarEventsService {
     });
   }
 
-  async updateAttendeeRecordingConsent(eventId: string, attendeeId: string, consented: boolean) {
+  // SECURED: Requires tenant validation to prevent cross-tenant access
+  async updateAttendeeRecordingConsent(tenantId: string, eventId: string, attendeeId: string, consented: boolean) {
+    // Verify event belongs to this tenant
+    const event = await this.prisma.calendarEvent.findFirst({
+      where: { id: eventId, tenantId },
+    });
+    if (!event) {
+      throw new NotFoundException('Event not found or access denied');
+    }
+
+    // Verify attendee belongs to this event and update
+    const attendee = await this.prisma.eventAttendee.findFirst({
+      where: { id: attendeeId, eventId: event.id },
+    });
+    if (!attendee) {
+      throw new NotFoundException('Attendee not found');
+    }
+
     return this.prisma.eventAttendee.update({
       where: { id: attendeeId },
       data: {
@@ -303,7 +337,24 @@ export class CalendarEventsService {
     });
   }
 
-  async removeAttendee(eventId: string, attendeeId: string) {
+  // SECURED: Requires tenant validation to prevent cross-tenant access
+  async removeAttendee(tenantId: string, eventId: string, attendeeId: string) {
+    // Verify event belongs to this tenant
+    const event = await this.prisma.calendarEvent.findFirst({
+      where: { id: eventId, tenantId },
+    });
+    if (!event) {
+      throw new NotFoundException('Event not found or access denied');
+    }
+
+    // Verify attendee belongs to this event before deleting
+    const attendee = await this.prisma.eventAttendee.findFirst({
+      where: { id: attendeeId, eventId: event.id },
+    });
+    if (!attendee) {
+      throw new NotFoundException('Attendee not found');
+    }
+
     return this.prisma.eventAttendee.delete({
       where: { id: attendeeId },
     });

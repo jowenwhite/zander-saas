@@ -145,28 +145,31 @@ export class CalendarEventsController {
 
   @Patch(':id/attendees/:attendeeId/response')
   async updateAttendeeResponse(
+    @Request() req,
     @Param('id') eventId: string,
     @Param('attendeeId') attendeeId: string,
     @Body() body: { responseStatus: string }
   ) {
-    return this.calendarEventsService.updateAttendeeResponse(eventId, attendeeId, body.responseStatus);
+    return this.calendarEventsService.updateAttendeeResponse(req.user.tenantId, eventId, attendeeId, body.responseStatus);
   }
 
   @Patch(':id/attendees/:attendeeId/recording-consent')
   async updateAttendeeRecordingConsent(
+    @Request() req,
     @Param('id') eventId: string,
     @Param('attendeeId') attendeeId: string,
     @Body() body: { consented: boolean }
   ) {
-    return this.calendarEventsService.updateAttendeeRecordingConsent(eventId, attendeeId, body.consented);
+    return this.calendarEventsService.updateAttendeeRecordingConsent(req.user.tenantId, eventId, attendeeId, body.consented);
   }
 
   @Delete(':id/attendees/:attendeeId')
   async removeAttendee(
+    @Request() req,
     @Param('id') eventId: string,
     @Param('attendeeId') attendeeId: string
   ) {
-    await this.calendarEventsService.removeAttendee(eventId, attendeeId);
+    await this.calendarEventsService.removeAttendee(req.user.tenantId, eventId, attendeeId);
     return { success: true };
   }
 
