@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { CallLogsService } from './call-logs.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('call-logs')
 @UseGuards(JwtAuthGuard)
@@ -125,6 +127,9 @@ export class CallLogsController {
     return this.callLogsService.shareSummary(req.user.tenantId, id, body.recipients);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Request() req, @Param('id') id: string) {
     await this.callLogsService.remove(req.user.tenantId, id);
