@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException, UseGuards } from '@nestjs/common';
 import { TreasuryService } from './treasury.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('treasury')
 @UseGuards(JwtAuthGuard)
@@ -137,6 +139,9 @@ export class TreasuryController {
     return this.treasuryService.update(id, data);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Request() req, @Param('id') id: string) {
     this.checkSuperAdmin(req);

@@ -12,6 +12,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { KnowledgeService } from './knowledge.service';
 import { KnowledgeCategory } from '@prisma/client';
 
@@ -117,6 +119,9 @@ export class KnowledgeController {
     return this.knowledgeService.update(id, data);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async delete(@Request() req, @Param('id') id: string) {
     // Only SuperAdmin can delete knowledge articles

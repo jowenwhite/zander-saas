@@ -12,6 +12,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { HeadwindsService } from './headwinds.service';
 import { HeadwindPriority, HeadwindCategory, HeadwindStatus } from '@prisma/client';
 
@@ -118,6 +120,9 @@ export class HeadwindsController {
     return this.headwindsService.update(id, data);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async delete(@Request() req, @Param('id') id: string) {
     // Verify access

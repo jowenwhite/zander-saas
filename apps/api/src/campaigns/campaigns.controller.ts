@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { CampaignsService } from './campaigns.service';
 
 @Controller('campaigns')
@@ -66,6 +68,9 @@ export class CampaignsController {
     return this.campaignsService.update(id, req.tenantId, updateData);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.campaignsService.remove(id, req.tenantId);

@@ -1,5 +1,7 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { ActivitiesService } from './activities.service';
 
 @Controller('activities')
@@ -37,6 +39,9 @@ export class ActivitiesController {
     return this.activitiesService.update(id, data, req.tenantId);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async delete(@Param('id') id: string, @Request() req) {
     return this.activitiesService.delete(id, req.tenantId);

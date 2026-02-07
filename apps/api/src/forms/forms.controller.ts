@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseGuards } from '@nestjs/common';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { FormsService } from './forms.service';
 import { Public } from '../auth/public.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('forms')
 export class FormsController {
@@ -49,7 +51,10 @@ export class FormsController {
     return this.formsService.update(id, req.tenantId, updateData);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
   @SkipThrottle()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.formsService.remove(id, req.tenantId);
