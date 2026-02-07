@@ -3,6 +3,11 @@ import { AutomationService } from './automation.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import {
+  CreateEmailTemplateDto, UpdateEmailTemplateDto, SendTemplateDto,
+  CreateEmailSequenceDto, UpdateEmailSequenceDto, CreateSequenceStepDto, UpdateSequenceStepDto, EnrollContactSequenceDto,
+  CreateScheduledCommunicationDto, UpdateScheduledCommunicationDto
+} from './dto';
 
 @Controller()
 @UseGuards(JwtAuthGuard)
@@ -21,13 +26,15 @@ export class AutomationController {
     return this.automationService.getTemplate(req.tenantId, id);
   }
 
+  // MEDIUM-1: Input validation via CreateEmailTemplateDto
   @Post('templates')
-  createTemplate(@Req() req: any, @Body() body: any) {
+  createTemplate(@Req() req: any, @Body() body: CreateEmailTemplateDto) {
     return this.automationService.createTemplate(req.tenantId, body);
   }
 
+  // MEDIUM-1: Input validation via UpdateEmailTemplateDto
   @Patch('templates/:id')
-  updateTemplate(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+  updateTemplate(@Req() req: any, @Param('id') id: string, @Body() body: UpdateEmailTemplateDto) {
     return this.automationService.updateTemplate(req.tenantId, id, body);
   }
 
@@ -51,13 +58,15 @@ export class AutomationController {
     return this.automationService.getSequence(req.tenantId, id);
   }
 
+  // MEDIUM-1: Input validation via CreateEmailSequenceDto
   @Post('sequences')
-  createSequence(@Req() req: any, @Body() body: any) {
+  createSequence(@Req() req: any, @Body() body: CreateEmailSequenceDto) {
     return this.automationService.createSequence(req.tenantId, body);
   }
 
+  // MEDIUM-1: Input validation via UpdateEmailSequenceDto
   @Patch('sequences/:id')
-  updateSequence(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+  updateSequence(@Req() req: any, @Param('id') id: string, @Body() body: UpdateEmailSequenceDto) {
     return this.automationService.updateSequence(req.tenantId, id, body);
   }
 
@@ -70,14 +79,16 @@ export class AutomationController {
   }
 
   // ============ SEQUENCE STEPS ============
-  
+
+  // MEDIUM-1: Input validation via CreateSequenceStepDto
   @Post('sequences/:id/steps')
-  addSequenceStep(@Req() req: any, @Param('id') sequenceId: string, @Body() body: any) {
+  addSequenceStep(@Req() req: any, @Param('id') sequenceId: string, @Body() body: CreateSequenceStepDto) {
     return this.automationService.addSequenceStep(req.tenantId, sequenceId, body);
   }
 
+  // MEDIUM-1: Input validation via UpdateSequenceStepDto
   @Patch('sequence-steps/:id')
-  updateSequenceStep(@Req() req: any, @Param('id') stepId: string, @Body() body: any) {
+  updateSequenceStep(@Req() req: any, @Param('id') stepId: string, @Body() body: UpdateSequenceStepDto) {
     return this.automationService.updateSequenceStep(req.tenantId, stepId, body);
   }
 
@@ -96,13 +107,15 @@ export class AutomationController {
     return this.automationService.getScheduledCommunications(req.tenantId, status);
   }
 
+  // MEDIUM-1: Input validation via CreateScheduledCommunicationDto
   @Post('scheduled-communications')
-  createScheduledCommunication(@Req() req: any, @Body() body: any) {
+  createScheduledCommunication(@Req() req: any, @Body() body: CreateScheduledCommunicationDto) {
     return this.automationService.createScheduledCommunication(req.tenantId, body);
   }
 
+  // MEDIUM-1: Input validation via UpdateScheduledCommunicationDto
   @Patch('scheduled-communications/:id')
-  updateScheduledCommunication(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+  updateScheduledCommunication(@Req() req: any, @Param('id') id: string, @Body() body: UpdateScheduledCommunicationDto) {
     return this.automationService.updateScheduledCommunication(req.tenantId, id, body);
   }
 
@@ -117,9 +130,10 @@ export class AutomationController {
   }
 
   // ============ SEQUENCE ENROLLMENTS ============
-  
+
+  // MEDIUM-1: Input validation via EnrollContactSequenceDto
   @Post('sequences/:id/enroll')
-  enrollContact(@Req() req: any, @Param('id') sequenceId: string, @Body() body: any) {
+  enrollContact(@Req() req: any, @Param('id') sequenceId: string, @Body() body: EnrollContactSequenceDto) {
     return this.automationService.enrollContact(req.tenantId, sequenceId, body.contactId, body.dealId);
   }
 
@@ -129,13 +143,10 @@ export class AutomationController {
   }
 
   // ============ EMAIL SENDING ============
-  
+
+  // MEDIUM-1: Input validation via SendTemplateDto
   @Post('templates/:id/send')
-  sendTemplateToContact(
-    @Req() req: any,
-    @Param('id') templateId: string,
-    @Body() body: { contactId: string; dealId?: string }
-  ) {
+  sendTemplateToContact(@Req() req: any, @Param('id') templateId: string, @Body() body: SendTemplateDto) {
     return this.automationService.sendTemplateToContact(
       req.tenantId,
       templateId,
