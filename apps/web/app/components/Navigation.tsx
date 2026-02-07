@@ -13,8 +13,8 @@ export default function Navigation({ activePage }: NavigationProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const user = getUser();
 
-  const userName = user ? `${user.firstName} ${user.lastName}` : 'Jonathan White';
-  const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'JW';
+  const userName = user ? `${user.firstName} ${user.lastName}` : 'User';
+  const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'U';
 
   return (
     <>
