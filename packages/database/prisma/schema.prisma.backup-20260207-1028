@@ -1,0 +1,1265 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DealStage {
+  LEAD
+  PROSPECT
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum DealPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum PersonRole {
+  CLIENT
+  VENDOR
+  TEAM
+  PARTNER
+  REFERRAL
+}
+
+enum ProductType {
+  PHYSICAL
+  SERVICE
+  SUBSCRIPTION
+  DIGITAL
+  ACCESS
+  BUNDLE
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  DISCONTINUED
+}
+
+enum PricingModel {
+  SIMPLE
+  TIERED
+  TIME_MATERIALS
+  SUBSCRIPTION
+  COST_PLUS
+  CUSTOM
+}
+
+model Tenant {
+  id                      String                   @id @default(cuid())
+  companyName             String
+  subdomain               String                   @unique
+  tenantType              String                   @default("standard")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  users                   User[]
+  contacts                Contact[]
+  deals                   Deal[]
+  activities              Activity[]
+  pipelineStages          PipelineStage[]
+  forms                   Form[]
+  emailTemplates          EmailTemplate[]
+  emailSequences          EmailSequence[]
+  scheduledCommunications ScheduledCommunication[]
+  emailMessages           EmailMessage[]
+  smsMessages             SmsMessage[]
+  callLogs                CallLog[]
+  calendarEvents          CalendarEvent[]
+  userTenantAccess        UserTenantAccess[]
+  products                Product[]
+  campaigns               Campaign[]
+  stripeCustomerId        String?
+  stripeSubscriptionId    String?
+  subscriptionStatus      String?
+  subscriptionTier        String?
+  subscriptionCohort      String?
+  trialEndsAt             DateTime?
+  rateLockExpiresAt       DateTime?
+  // Company settings
+  website                 String?
+  email                   String?
+  phone                   String?
+  address                 String?
+  city                    String?
+  state                   String?
+  zip                     String?
+  industry                String?
+  fiscalYearStart         Int?                     @default(1)
+  currency                String?                  @default("USD")
+  taxRate                 Float?                   @default(0)
+  headwinds               Headwind[]
+  supportTickets          SupportTicket[]
+  // CMO Module relations
+  workflows               Workflow[]
+  funnels                 Funnel[]
+  personas                Persona[]
+  monthlyThemes           MonthlyTheme[]
+  ideaParkingLot          IdeaParkingLot[]
+  segments                Segment[]
+  contentAssets           ContentAsset[]
+  brandProfile            BrandProfile?
+
+  @@map("tenants")
+}
+
+model User {
+  id                    String             @id @default(cuid())
+  tenantId              String
+  email                 String             @unique
+  firstName             String
+  lastName              String
+  password              String             @default("")
+  phone                 String?
+  role                  String             @default("member")
+  isSuperAdmin          Boolean            @default(false)
+  resetToken            String?
+  resetTokenExpiry      DateTime?
+  // User preferences
+  timezone              String?            @default("America/New_York")
+  emailNotifications    Boolean            @default(true)
+  dealAlerts            Boolean            @default(true)
+  taskReminders         Boolean            @default(true)
+  assemblyReminders     Boolean            @default(true)
+  weeklyDigest          Boolean            @default(true)
+  // Two-Factor Authentication
+  twoFactorEnabled      Boolean            @default(false)
+  twoFactorSecret       String?
+  // Terms & Conditions
+  termsAcceptedAt       DateTime?
+  termsVersion          String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  tenant                Tenant             @relation(fields: [tenantId], references: [id])
+  activities            Activity[]
+  calendarEvents        CalendarEvent[]
+  eventAttendees        EventAttendee[]
+  googleToken           GoogleToken?
+  microsoftToken        MicrosoftToken?
+  tenantAccess          UserTenantAccess[]
+  formSubmissionUpdates FormSubmission[]
+
+  // Onboarding
+  onboardingCompleted Boolean            @default(false)
+  onboardingStep      Int                @default(0)
+  onboardingFocusArea String?
+  onboardingChecklist Json?
+  firstLoginAt        DateTime?
+  // Support Admin
+  headwindsCreated    Headwind[]         @relation("HeadwindCreatedBy")
+  headwindsAssigned   Headwind[]         @relation("HeadwindAssignedTo")
+  knowledgeArticles   KnowledgeArticle[] @relation("KnowledgeCreatedBy")
+  supportTickets      SupportTicket[]
+
+  @@map("users")
+}
+
+model UserTenantAccess {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  role      String   @default("member")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([userId, tenantId])
+  @@map("user_tenant_access")
+}
+
+model Contact {
+  id                      String                   @id @default(cuid())
+  tenantId                String
+  firstName               String
+  lastName                String
+  email                   String
+  phone                   String?
+  role                    String                   @default("member")
+  primaryRole             PersonRole               @default(CLIENT)
+  isSuperAdmin            Boolean                  @default(false)
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  company                 String?
+  title                   String?
+  source                  String?
+  notes                   String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  tenant                  Tenant                   @relation(fields: [tenantId], references: [id])
+  activities              Activity[]
+  deals                   Deal[]
+  formSubmissions         FormSubmission[]
+  sequenceEnrollments     SequenceEnrollment[]
+  scheduledCommunications ScheduledCommunication[]
+  emailMessages           EmailMessage[]
+  smsMessages             SmsMessage[]
+  callLogs                CallLog[]
+  calendarEvents          CalendarEvent[]
+  eventAttendees          EventAttendee[]
+  campaignEnrollments     CampaignEnrollment[]
+  // CMO Module fields
+  leadScore               Int                      @default(0)
+  marketingTags           String[]                 @default([])
+  lastMarketingActivity   DateTime?
+  lifecycleStage          String                   @default("subscriber")
+  personaId               String?
+  persona                 Persona?                 @relation(fields: [personaId], references: [id])
+  segmentMemberships      ContactSegment[]
+  workflowExecutions      WorkflowExecution[]
+
+  @@map("contacts")
+}
+
+model Deal {
+  id                String            @id @default(cuid())
+  tenantId          String
+  dealName          String
+  contactId         String?
+  dealValue         Float
+  probability       Int               @default(50)
+  stage             String            @default("Lead")
+  priority          DealPriority      @default(MEDIUM)
+  status            String            @default("open")
+  expectedCloseDate DateTime?
+  actualCloseDate   DateTime?
+  forecastedValue   Float?
+  winProbability    Float             @default(0.5)
+  notes             String?
+  nextSteps         String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  tenant            Tenant            @relation(fields: [tenantId], references: [id])
+  activities        Activity[]
+  contact           Contact?          @relation(fields: [contactId], references: [id])
+  lineItems         ProjectLineItem[]
+  // Archive & Loss tracking
+  isArchived        Boolean           @default(false)
+  archivedAt        DateTime?
+  archiveReason     String?
+  isLost            Boolean           @default(false)
+  lostAt            DateTime?
+  lossReason        String?
+  stageAtLoss       String?
+
+  @@map("deals")
+}
+
+model Product {
+  id             String            @id @default(cuid())
+  tenantId       String
+  name           String
+  description    String?
+  sku            String?
+  category       String?
+  type           ProductType       @default(SERVICE)
+  status         ProductStatus     @default(ACTIVE)
+  pricingModel   PricingModel      @default(SIMPLE)
+  basePrice      Decimal?          @db.Decimal(10, 2)
+  unit           String            @default("each")
+  costOfGoods    Decimal?          @db.Decimal(10, 2)
+  costUnit       String?
+  targetMargin   Decimal?          @db.Decimal(5, 2)
+  pricingTiers   Json?
+  pricingOptions Json?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  tenant         Tenant            @relation(fields: [tenantId], references: [id])
+  lineItems      ProjectLineItem[]
+
+  @@index([tenantId])
+  @@index([category])
+  @@index([status])
+  @@map("products")
+}
+
+model ProjectLineItem {
+  id            String   @id @default(cuid())
+  projectId     String
+  productId     String?
+  name          String
+  description   String?
+  quantity      Decimal  @default(1) @db.Decimal(10, 2)
+  unit          String   @default("each")
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  discount      Decimal? @db.Decimal(10, 2)
+  discountType  String?
+  total         Decimal  @db.Decimal(10, 2)
+  configuration Json?
+  notes         String?
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  project       Deal     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  product       Product? @relation(fields: [productId], references: [id])
+
+  @@index([projectId])
+  @@index([productId])
+  @@map("project_line_items")
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  tenantId    String
+  type        String // 'email', 'call', 'meeting', 'note', 'task'
+  subject     String?
+  description String?
+  date        DateTime @default(now())
+  contactId   String?
+  dealId      String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  contact     Contact? @relation(fields: [contactId], references: [id])
+  deal        Deal?    @relation(fields: [dealId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([dealId])
+  @@map("activities")
+}
+
+model PipelineStage {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  order       Int
+  probability Int      @default(0)
+  color       String   @default("#6C757D")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@map("pipeline_stages")
+}
+
+model Form {
+  id          String           @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  fields      Json             @default("[]")
+  settings    Json             @default("{}")
+  status      String           @default("draft")
+  formType    String           @default("form") // "form" | "sop"
+  submissions FormSubmission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
+
+  @@map("forms")
+}
+
+model FormSubmission {
+  id              String   @id @default(cuid())
+  formId          String
+  data            Json
+  contactId       String?
+  calendarEventId String?
+  status          String   @default("draft") // "draft" | "completed"
+  version         Int      @default(1)
+  changeLog       Json     @default("[]") // Array of { version, updatedAt, updatedById, changes }
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  updatedById     String?
+  form            Form     @relation(fields: [formId], references: [id])
+  contact         Contact? @relation(fields: [contactId], references: [id])
+  updatedBy       User?    @relation(fields: [updatedById], references: [id])
+
+  @@map("form_submissions")
+}
+
+model EmailTemplate {
+  id            String              @id @default(cuid())
+  tenantId      String
+  name          String
+  subject       String?
+  body          String?
+  type          String              @default("email") // email, sms, call
+  category      String?
+  stage         String?
+  status        String              @default("draft") // draft, active
+  variables     Json                @default("[]")
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  tenant        Tenant              @relation(fields: [tenantId], references: [id])
+  sequenceSteps EmailSequenceStep[]
+
+  @@map("email_templates")
+}
+
+model EmailSequence {
+  id            String               @id @default(cuid())
+  tenantId      String
+  name          String
+  description   String?
+  status        String               @default("draft") // draft, active, paused
+  triggerType   String? // manual, stage_change, form_submission
+  triggerConfig Json                 @default("{}")
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  tenant        Tenant               @relation(fields: [tenantId], references: [id])
+  steps         EmailSequenceStep[]
+  enrollments   SequenceEnrollment[]
+
+  @@map("email_sequences")
+}
+
+model EmailSequenceStep {
+  id         String        @id @default(cuid())
+  sequenceId String
+  templateId String
+  order      Int
+  delayDays  Int           @default(0)
+  delayHours Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  sequence   EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  template   EmailTemplate @relation(fields: [templateId], references: [id])
+
+  @@map("email_sequence_steps")
+}
+
+model SequenceEnrollment {
+  id          String        @id @default(cuid())
+  sequenceId  String
+  contactId   String
+  dealId      String?
+  status      String        @default("active") // active, completed, paused, cancelled
+  currentStep Int           @default(0)
+  enrolledAt  DateTime      @default(now())
+  completedAt DateTime?
+  sequence    EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  contact     Contact       @relation(fields: [contactId], references: [id])
+
+  @@map("sequence_enrollments")
+}
+
+model ScheduledCommunication {
+  id            String    @id @default(cuid())
+  tenantId      String
+  contactId     String
+  dealId        String?
+  templateId    String?
+  type          String // email, sms, call
+  subject       String?
+  body          String?
+  scheduledFor  DateTime
+  status        String    @default("pending") // pending, approved, sent, cancelled
+  needsApproval Boolean   @default(false)
+  sentAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  contact       Contact   @relation(fields: [contactId], references: [id])
+
+  @@map("scheduled_communications")
+}
+
+model EmailMessage {
+  id          String    @id @default(cuid())
+  tenantId    String
+  contactId   String?
+  dealId      String?
+  direction   String // 'inbound' | 'outbound'
+  fromAddress String
+  toAddress   String
+  subject     String
+  body        String
+  htmlBody    String?
+  messageId   String? // Resend message ID
+  inReplyTo   String? // For threading - references parent messageId
+  threadId    String? // Groups related emails
+  status      String    @default("sent") // sent, delivered, opened, failed, received
+  isRead      Boolean   @default(false)
+  isArchived  Boolean   @default(false)
+  isDeleted   Boolean   @default(false)
+  sentAt      DateTime
+  openedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([threadId])
+  @@index([messageId])
+  @@map("email_messages")
+}
+
+model SmsMessage {
+  id          String    @id @default(cuid())
+  tenantId    String
+  contactId   String?
+  dealId      String?
+  direction   String // 'inbound' | 'outbound'
+  fromNumber  String
+  toNumber    String
+  body        String
+  messageSid  String? // Twilio message SID
+  status      String    @default("sent") // sent, delivered, failed, received
+  sentAt      DateTime
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([messageSid])
+  @@map("sms_messages")
+}
+
+model CallLog {
+  id                  String    @id @default(cuid())
+  tenantId            String
+  contactId           String?
+  dealId              String?
+  userId              String? // Who made/received the call
+  // Call Type & Direction
+  type                String // 'online_meeting' | 'voicemail_drop' | 'manual_call'
+  direction           String // 'inbound' | 'outbound'
+  // Phone/Meeting Details
+  fromNumber          String?
+  toNumber            String?
+  platform            String? // 'zoom' | 'google_meet' | 'teams' | 'twilio' | 'phone'
+  meetingUrl          String?
+  meetingId           String? // External meeting ID
+  // Call Outcome & Duration
+  duration            Int? // Duration in seconds
+  outcome             String? // 'completed' | 'voicemail' | 'no_answer' | 'busy' | 'cancelled' | 'scheduled'
+  status              String    @default("completed") // 'scheduled' | 'in_progress' | 'completed' | 'missed'
+  // Scripts & Notes
+  scriptId            String? // Reference to template/script used
+  notes               String?
+  // Recording & Transcription
+  recordingUrl        String?
+  transcription       String? // Full transcription text
+  aiSummary           String? // AI-generated summary
+  // Voicemail Drop specific
+  voicemailTemplateId String? // Pre-recorded voicemail template
+  // Timestamps
+  scheduledAt         DateTime?
+  startedAt           DateTime?
+  endedAt             DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  tenant              Tenant    @relation(fields: [tenantId], references: [id])
+  contact             Contact?  @relation(fields: [contactId], references: [id])
+
+  @@index([tenantId])
+  @@index([contactId])
+  @@index([userId])
+  @@index([type])
+  @@map("call_logs")
+}
+
+model CalendarEvent {
+  id                      String          @id @default(cuid())
+  tenantId                String
+  createdById             String
+  // Event Details
+  title                   String
+  description             String?
+  location                String?
+  meetingUrl              String?
+  meetingPlatform         String? // 'zoom' | 'google_meet' | 'teams' | 'phone' | 'in_person'
+  // Timing
+  startTime               DateTime
+  endTime                 DateTime
+  allDay                  Boolean         @default(false)
+  timezone                String          @default("America/New_York")
+  // Type & Classification
+  eventType               String          @default("meeting") // 'meeting' | 'call' | 'task' | 'reminder' | 'block' | 'shift'
+  category                String? // 'client' | 'internal' | 'personal' | 'work_shift'
+  priority                String          @default("normal") // 'low' | 'normal' | 'high' | 'urgent'
+  color                   String?
+  // Recording Compliance
+  willBeRecorded          Boolean         @default(false)
+  recordingConsentStatus  String? // 'pending' | 'obtained' | 'declined'
+  recordingConsentAt      DateTime?
+  recordingDisclosureSent Boolean         @default(false)
+  // Linked Entities
+  contactId               String?
+  dealId                  String?
+  callLogId               String?
+  // Agenda & Preparation
+  agenda                  String?
+  attachedItems           Json? // Array of { treasuryItemId, type, name } from Treasury
+  attachments             Json?           @default("[]")
+  prepNotes               String?
+  // External Sync
+  externalEventId         String?
+  externalCalendar        String? // 'google' | 'outlook' | 'calendly'
+  syncStatus              String? // 'synced' | 'pending' | 'conflict'
+  lastSyncedAt            DateTime?
+  // Status
+  status                  String          @default("scheduled") // 'scheduled' | 'confirmed' | 'tentative' | 'cancelled' | 'completed'
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  tenant                  Tenant          @relation(fields: [tenantId], references: [id])
+  createdBy               User            @relation(fields: [createdById], references: [id])
+  contact                 Contact?        @relation(fields: [contactId], references: [id])
+  attendees               EventAttendee[]
+  reminders               EventReminder[]
+  // CMO Module fields
+  linkedCampaignId        String?
+  monthlyThemeId          String?
+  marketingChannel        String?
+  contentStatus           String?
+  linkedCampaign          Campaign?       @relation(fields: [linkedCampaignId], references: [id])
+  monthlyTheme            MonthlyTheme?   @relation(fields: [monthlyThemeId], references: [id])
+
+  @@index([tenantId])
+  @@index([createdById])
+  @@index([contactId])
+  @@index([startTime])
+  @@index([status])
+  @@map("calendar_events")
+}
+
+model EventAttendee {
+  id                     String        @id @default(cuid())
+  eventId                String
+  userId                 String?
+  contactId              String?
+  email                  String?
+  name                   String?
+  responseStatus         String        @default("pending") // 'pending' | 'accepted' | 'declined' | 'tentative'
+  respondedAt            DateTime?
+  recordingConsentStatus String? // 'pending' | 'consented' | 'declined'
+  recordingConsentAt     DateTime?
+  inviteSentAt           DateTime?
+  reminderSentAt         DateTime?
+  createdAt              DateTime      @default(now())
+  event                  CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user                   User?         @relation(fields: [userId], references: [id])
+  contact                Contact?      @relation(fields: [contactId], references: [id])
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([contactId])
+  @@map("event_attendees")
+}
+
+model EventReminder {
+  id      String        @id @default(cuid())
+  eventId String
+  type    String // 'email' | 'sms' | 'push'
+  timing  Int // Minutes before event
+  sent    Boolean       @default(false)
+  sentAt  DateTime?
+  event   CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("event_reminders")
+}
+
+model GoogleToken {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  email        String
+  accessToken  String    @db.Text
+  refreshToken String?   @db.Text
+  expiresAt    DateTime?
+  scope        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("google_tokens")
+}
+
+model WaitlistEntry {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String
+  spotNumber        Int       @unique
+  stripePaymentId   String?
+  depositAmount     Int       @default(4900)
+  depositPaidAt     DateTime?
+  depositRefundedAt DateTime?
+  convertedAt       DateTime?
+  convertedTenantId String?
+  status            String    @default("pending")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("waitlist_entries")
+}
+
+model MicrosoftToken {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  email        String
+  accessToken  String    @db.Text
+  refreshToken String?   @db.Text
+  expiresAt    DateTime?
+  scope        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("microsoft_tokens")
+}
+
+// ============================================
+// CAMPAIGN SYSTEM (Replaces Templates + Sequences)
+// ============================================
+
+model Campaign {
+  id             String   @id @default(cuid())
+  tenantId       String
+  name           String
+  description    String?
+  type           String   @default("multi") // "single" | "multi"
+  channels       String[] @default(["email"]) // ["email", "sms", "phone"]
+  status         String   @default("draft") // "draft" | "active" | "paused"
+  triggerType    String? // "manual" | "stage_change" | "form_submission"
+  triggerConfig  Json     @default("{}")
+  isFromTreasury Boolean  @default(false)
+  businessUnit   String?  // 'zander' | 'finance' | 'consulting' | 'all'
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant          Tenant               @relation(fields: [tenantId], references: [id])
+  steps           CampaignStep[]
+  enrollments     CampaignEnrollment[]
+  // CMO Module fields
+  goal            String?
+  budget          Decimal?             @db.Decimal(10, 2)
+  startDate       DateTime?
+  endDate         DateTime?
+  targetSegmentId String?
+  metrics         Json?                @default("{}")
+  targetSegment   Segment?             @relation(fields: [targetSegmentId], references: [id])
+  calendarEvents  CalendarEvent[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("campaigns")
+}
+
+model CampaignStep {
+  id         String   @id @default(cuid())
+  campaignId String
+  order      Int
+  channel    String // "email" | "sms" | "phone"
+  dayOffset  Int      @default(0)
+  hourOffset Int      @default(0)
+  subject    String? // For email
+  content    String   @db.Text
+  status     String   @default("active")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@map("campaign_steps")
+}
+
+model CampaignEnrollment {
+  id          String    @id @default(cuid())
+  campaignId  String
+  contactId   String
+  dealId      String?
+  status      String    @default("active") // "active" | "completed" | "paused" | "cancelled"
+  currentStep Int       @default(0)
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact  Contact  @relation(fields: [contactId], references: [id])
+
+  @@index([campaignId])
+  @@index([contactId])
+  @@map("campaign_enrollments")
+}
+
+// ============================================
+// THE TREASURY (Pre-built Templates Library)
+// ============================================
+
+model TreasuryItem {
+  id          String   @id @default(cuid())
+  type        String // "campaign" | "form" | "sop" | "assembly" | "pipeline" | "product"
+  name        String
+  description String?
+  category    String? // "sales" | "operations" | "finance" | "hr" | "marketing"
+  executive   String? // "CRO" | "COO" | "CFO" | "CMO" | "CPO" | "CIO" | "EA"
+  industry    String? // "cabinet_millwork" | "home_services" | "professional_services" | "general"
+  channels    String[] @default([]) // For campaigns: ["email", "sms", "phone"]
+  content     Json // The actual template data
+  stepCount   Int? // For campaigns: number of steps
+  duration    String? // For campaigns: "7 days", "14 days", etc.
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([category])
+  @@index([executive])
+  @@index([industry])
+  @@map("treasury_items")
+}
+
+// ============================================
+// SUPPORT ADMIN (Platform Operations)
+// ============================================
+
+enum HeadwindPriority {
+  P1
+  P2
+  P3
+}
+
+enum HeadwindCategory {
+  BUG
+  REBUILD
+  NEW_BUILD
+  ENHANCEMENT
+  TASK
+}
+
+enum HeadwindStatus {
+  OPEN
+  IN_PROGRESS
+  TESTING
+  DEPLOYED
+  CLOSED
+}
+
+enum TicketSource {
+  JORDAN
+  BEN
+  MIRANDA
+  DON
+  TED
+  NEO
+  PAM
+  MANUAL
+  ZANDER
+}
+
+enum TicketCategory {
+  PLATFORM
+  BILLING
+  BUG
+  FEATURE_REQUEST
+  HOW_TO
+  OTHER
+}
+
+enum TicketStatus {
+  NEW
+  AI_RESOLVED
+  PENDING_REVIEW
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Headwind {
+  id             String           @id @default(cuid())
+  title          String
+  description    String?
+  priority       HeadwindPriority @default(P2)
+  category       HeadwindCategory @default(BUG)
+  status         HeadwindStatus   @default(OPEN)
+  tenantId       String? // null = system-wide issue
+  assignedToId   String?
+  gitCommit      String?
+  gitBranch      String?
+  resolution     String?
+  estimatedHours Float?
+  dueDate        DateTime?
+  createdById    String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  resolvedAt     DateTime?
+  tenant         Tenant?          @relation(fields: [tenantId], references: [id])
+  createdBy      User             @relation("HeadwindCreatedBy", fields: [createdById], references: [id])
+  assignedTo     User?            @relation("HeadwindAssignedTo", fields: [assignedToId], references: [id])
+  tickets        SupportTicket[]
+
+  @@index([priority])
+  @@index([status])
+  @@index([tenantId])
+  @@map("headwinds")
+}
+
+model SupportTicket {
+  id               String           @id @default(cuid())
+  ticketNumber     String           @unique
+  tenantId         String
+  userId           String
+  createdVia       TicketSource     @default(MANUAL)
+  subject          String
+  description      String
+  category         TicketCategory   @default(OTHER)
+  priority         HeadwindPriority @default(P3)
+  status           TicketStatus     @default(NEW)
+  aiSummary        String?
+  aiResponse       String?
+  linkedHeadwindId String?
+  resolution       String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  resolvedAt       DateTime?
+
+  // SLA Tracking Fields
+  firstResponseAt  DateTime?        // When first response was made
+  firstResponseSLA Int?             @default(24) // Target hours for first response
+  resolutionSLA    Int?             @default(72) // Target hours for resolution
+
+  tenant           Tenant           @relation(fields: [tenantId], references: [id])
+  user             User             @relation(fields: [userId], references: [id])
+  linkedHeadwind   Headwind?        @relation(fields: [linkedHeadwindId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([ticketNumber])
+  @@map("support_tickets")
+}
+
+// ============================================
+// KNOWLEDGE BASE (Platform Documentation)
+// ============================================
+
+enum KnowledgeCategory {
+  PLATFORM_GUIDE
+  FAQ
+  TROUBLESHOOTING
+  RELEASE_NOTES
+  API_DOCS
+}
+
+model KnowledgeArticle {
+  id          String            @id @default(cuid())
+  title       String
+  slug        String            @unique
+  content     String            @db.Text
+  summary     String? // Short description for lists
+  category    KnowledgeCategory @default(PLATFORM_GUIDE)
+  tags        String[]          @default([])
+  searchTerms String?           @db.Text // AI-friendly keywords
+  isPublished Boolean           @default(true)
+  sortOrder   Int               @default(0)
+  viewCount   Int               @default(0)
+
+  createdById String
+  createdBy   User   @relation("KnowledgeCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([isPublished])
+  @@map("knowledge_articles")
+}
+
+// ============================================
+// CMO MODULE - WORKFLOW AUTOMATION
+// ============================================
+
+model Workflow {
+  id              String   @id @default(cuid())
+  tenantId        String
+  name            String
+  description     String?
+  status          String   @default("draft")
+  triggerType     String
+  triggerConfig   Json     @default("{}")
+  entryCount      Int      @default(0)
+  completionCount Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant     Tenant              @relation(fields: [tenantId], references: [id])
+  nodes      WorkflowNode[]
+  executions WorkflowExecution[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("cmo_workflows")
+}
+
+model WorkflowNode {
+  id            String   @id @default(cuid())
+  workflowId    String
+  nodeType      String
+  name          String
+  config        Json     @default("{}")
+  positionX     Int      @default(0)
+  positionY     Int      @default(0)
+  nextNodeId    String?
+  trueBranchId  String?
+  falseBranchId String?
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("cmo_workflow_nodes")
+}
+
+model WorkflowExecution {
+  id            String    @id @default(cuid())
+  workflowId    String
+  contactId     String
+  currentNodeId String?
+  status        String    @default("active")
+  enteredAt     DateTime  @default(now())
+  completedAt   DateTime?
+  exitedAt      DateTime?
+  exitReason    String?
+  stepHistory   Json      @default("[]")
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  contact  Contact  @relation(fields: [contactId], references: [id])
+
+  @@index([workflowId])
+  @@index([contactId])
+  @@index([status])
+  @@map("cmo_workflow_executions")
+}
+
+// ============================================
+// CMO MODULE - FUNNELS
+// ============================================
+
+model Funnel {
+  id               String   @id @default(cuid())
+  tenantId         String
+  name             String
+  description      String?
+  status           String   @default("draft")
+  conversionGoal   String?
+  totalVisits      Int      @default(0)
+  totalConversions Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant Tenant        @relation(fields: [tenantId], references: [id])
+  stages FunnelStage[]
+
+  @@index([tenantId])
+  @@map("cmo_funnels")
+}
+
+model FunnelStage {
+  id             String   @id @default(cuid())
+  funnelId       String
+  name           String
+  stageType      String
+  stageOrder     Int
+  config         Json     @default("{}")
+  entryCount     Int      @default(0)
+  exitCount      Int      @default(0)
+  conversionRate Decimal? @db.Decimal(5, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  funnel Funnel @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+
+  @@index([funnelId])
+  @@map("cmo_funnel_stages")
+}
+
+// ============================================
+// CMO MODULE - PERSONAS
+// ============================================
+
+model Persona {
+  id                String   @id @default(cuid())
+  tenantId          String
+  name              String
+  avatar            String?
+  tagline           String?
+  demographics      Json     @default("{}")
+  psychographics    Json     @default("{}")
+  behaviors         Json     @default("{}")
+  painPoints        String[] @default([])
+  goals             String[] @default([])
+  preferredChannels String[] @default([])
+  brandAffinities   String[] @default([])
+  interview         String?  @db.Text
+  isDefault         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  contacts Contact[]
+
+  @@index([tenantId])
+  @@map("cmo_personas")
+}
+
+// ============================================
+// CMO MODULE - CALENDAR & PLANNING
+// ============================================
+
+model MonthlyTheme {
+  id          String   @id @default(cuid())
+  tenantId    String
+  year        Int
+  month       Int
+  name        String
+  description String?
+  focusAreas  String[] @default([])
+  colorCode   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id])
+  calendarEvents CalendarEvent[]
+
+  @@unique([tenantId, year, month])
+  @@index([tenantId])
+  @@map("cmo_monthly_themes")
+}
+
+model IdeaParkingLot {
+  id          String    @id @default(cuid())
+  tenantId    String
+  title       String
+  description String?
+  category    String?
+  source      String?
+  priority    String    @default("normal")
+  status      String    @default("parked")
+  reviewedAt  DateTime?
+  reviewNotes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("cmo_idea_parking_lot")
+}
+
+// ============================================
+// CMO MODULE - SEGMENTS
+// ============================================
+
+model Segment {
+  id             String    @id @default(cuid())
+  tenantId       String
+  name           String
+  description    String?
+  segmentType    String    @default("dynamic")
+  filterCriteria Json      @default("{}")
+  contactCount   Int       @default(0)
+  lastCalculated DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  tenant    Tenant           @relation(fields: [tenantId], references: [id])
+  members   ContactSegment[]
+  campaigns Campaign[]
+
+  @@index([tenantId])
+  @@map("cmo_segments")
+}
+
+model ContactSegment {
+  id        String   @id @default(cuid())
+  contactId String
+  segmentId String
+  addedAt   DateTime @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  segment Segment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, segmentId])
+  @@index([segmentId])
+  @@map("cmo_contact_segments")
+}
+
+// ============================================
+// CMO MODULE - BRAND ASSETS
+// ============================================
+
+model ContentAsset {
+  id           String   @id @default(cuid())
+  tenantId     String
+  name         String
+  assetType    String
+  description  String?
+  url          String
+  thumbnailUrl String?
+  mimeType     String?
+  fileSize     Int?
+  folder       String?
+  tags         String[] @default([])
+  metadata     Json     @default("{}")
+  isArchived   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([assetType])
+  @@map("cmo_content_assets")
+}
+
+model BrandProfile {
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  primaryColor    String?
+  secondaryColor  String?
+  accentColor     String?
+  fontPrimary     String?
+  fontSecondary   String?
+  logoUrl         String?
+  logoIconUrl     String?
+  voiceTone       String?
+  voiceGuidelines String?  @db.Text
+  tagline         String?
+  mission         String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("cmo_brand_profiles")
+}
+
+// ============================================
+// LEGAL - TERMS & CONDITIONS
+// ============================================
+
+model TermsVersion {
+  id            String   @id @default(cuid())
+  version       String   @unique
+  content       String   @db.Text
+  effectiveDate DateTime
+  createdAt     DateTime @default(now())
+
+  @@map("terms_versions")
+}
