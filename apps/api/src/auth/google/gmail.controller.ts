@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Query, Body, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, Request, Logger, UseGuards } from '@nestjs/common';
 import { GmailService } from './gmail.service';
 import { GoogleAuthService } from './google-auth.service';
-import { Public } from '../jwt-auth.decorator';
+import { JwtAuthGuard } from '../jwt-auth.guard';
 
 @Controller('gmail')
+@UseGuards(JwtAuthGuard)
 export class GmailController {
   private readonly logger = new Logger(GmailController.name);
 
@@ -12,14 +13,14 @@ export class GmailController {
     private readonly googleAuthService: GoogleAuthService,
   ) {}
 
-  @Public()
   @Post('sync')
   async syncEmails(
-    @Body('userId') userId: string,
+    @Request() req,
     @Body('maxResults') maxResults?: number,
   ) {
+    const userId = req.user.sub;
     this.logger.log(`Syncing emails for user: ${userId}`);
-    
+
     // Verify user has connected Gmail
     const token = await this.googleAuthService.getTokenByUserId(userId);
     if (!token) {
@@ -35,14 +36,14 @@ export class GmailController {
     }
   }
 
-  @Public()
   @Get('recent')
   async getRecentEmails(
-    @Query('userId') userId: string,
+    @Request() req,
     @Query('maxResults') maxResults?: string,
   ) {
+    const userId = req.user.sub;
     this.logger.log(`Fetching recent emails for user: ${userId}`);
-    
+
     const token = await this.googleAuthService.getTokenByUserId(userId);
     if (!token) {
       return { success: false, error: 'Gmail not connected', emails: [] };
@@ -60,17 +61,17 @@ export class GmailController {
     }
   }
 
-  @Public()
   @Post('send')
   async sendEmail(
-    @Body('userId') userId: string,
+    @Request() req,
     @Body('to') to: string,
     @Body('subject') subject: string,
     @Body('body') body: string,
     @Body('htmlBody') htmlBody?: string,
   ) {
+    const userId = req.user.sub;
     this.logger.log(`Sending email for user: ${userId} to: ${to}`);
-    
+
     const token = await this.googleAuthService.getTokenByUserId(userId);
     if (!token) {
       return { success: false, error: 'Gmail not connected' };
@@ -85,9 +86,9 @@ export class GmailController {
     }
   }
 
-  @Public()
   @Get('status')
-  async getConnectionStatus(@Query('userId') userId: string) {
+  async getConnectionStatus(@Request() req) {
+    const userId = req.user.sub;
     const token = await this.googleAuthService.getTokenByUserId(userId);
     return {
       connected: !!token,

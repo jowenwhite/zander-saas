@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Query, Body, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, Request, Logger, UseGuards } from '@nestjs/common';
 import { OutlookService } from './outlook.service';
 import { MicrosoftAuthService } from './microsoft-auth.service';
 import { PrismaService } from '../../prisma.service';
-import { Public } from '../jwt-auth.decorator';
+import { JwtAuthGuard } from '../jwt-auth.guard';
 
 @Controller('outlook')
+@UseGuards(JwtAuthGuard)
 export class OutlookController {
   private readonly logger = new Logger(OutlookController.name);
 
@@ -14,14 +15,14 @@ export class OutlookController {
     private readonly prisma: PrismaService,
   ) {}
 
-  @Public()
   @Post('sync')
   async syncEmails(
-    @Body('userId') userId: string,
+    @Request() req,
     @Body('maxResults') maxResults?: number,
   ) {
+    const userId = req.user.sub;
     this.logger.log(`Syncing Outlook emails for user: ${userId}`);
-    
+
     const token = await this.microsoftAuthService.getTokenByUserId(userId);
     if (!token) {
       return { success: false, error: 'Outlook not connected' };
@@ -67,10 +68,10 @@ export class OutlookController {
           const fromAddress = msg.from?.emailAddress?.address || '';
           const toAddresses = msg.toRecipients?.map((r: any) => r.emailAddress?.address).filter(Boolean) || [];
           const toAddress = toAddresses.join(', ');
-          
+
           const isOutbound = fromAddress.toLowerCase() === userOutlookAddress;
           const contactEmail = isOutbound ? toAddresses[0] : fromAddress;
-          
+
           // Try to match contact
           const contact = contactEmail ? await this.findContactByEmail(user.tenantId, contactEmail) : null;
 
@@ -128,17 +129,17 @@ export class OutlookController {
     return deal?.id || null;
   }
 
-  @Public()
   @Post('send')
   async sendEmail(
-    @Body('userId') userId: string,
+    @Request() req,
     @Body('to') to: string | string[],
     @Body('subject') subject: string,
     @Body('body') body: string,
     @Body('isHtml') isHtml?: boolean,
   ) {
+    const userId = req.user.sub;
     this.logger.log(`Sending Outlook email for user: ${userId}`);
-    
+
     const token = await this.microsoftAuthService.getTokenByUserId(userId);
     if (!token) {
       return { success: false, error: 'Outlook not connected' };
