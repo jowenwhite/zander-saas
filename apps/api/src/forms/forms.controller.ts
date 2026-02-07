@@ -4,6 +4,7 @@ import { FormsService } from './forms.service';
 import { Public } from '../auth/public.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CreateFormDto, UpdateFormDto, EventSubmissionDto, SubmissionDataDto } from './dto';
 
 @Controller('forms')
 export class FormsController {
@@ -21,33 +22,17 @@ export class FormsController {
     return this.formsService.findOne(id, req.tenantId);
   }
 
+  // MEDIUM-1: Input validation via CreateFormDto
   @SkipThrottle()
   @Post()
-  async create(
-    @Request() req,
-    @Body() createData: {
-      name: string;
-      description?: string;
-      fields?: any[];
-      settings?: any;
-    }
-  ) {
+  async create(@Request() req, @Body() createData: CreateFormDto) {
     return this.formsService.create(req.tenantId, createData);
   }
 
+  // MEDIUM-1: Input validation via UpdateFormDto
   @SkipThrottle()
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Request() req,
-    @Body() updateData: {
-      name?: string;
-      description?: string;
-      fields?: any[];
-      settings?: any;
-      status?: string;
-    }
-  ) {
+  async update(@Param('id') id: string, @Request() req, @Body() updateData: UpdateFormDto) {
     return this.formsService.update(id, req.tenantId, updateData);
   }
 
@@ -76,16 +61,10 @@ export class FormsController {
   }
 
   // Get or create submission for an attached form (calendar event)
+  // MEDIUM-1: Input validation via EventSubmissionDto
   @SkipThrottle()
   @Post(':id/event-submission')
-  async getOrCreateEventSubmission(
-    @Param('id') formId: string,
-    @Request() req,
-    @Body() body: {
-      calendarEventId: string;
-      contactId?: string;
-    }
-  ) {
+  async getOrCreateEventSubmission(@Param('id') formId: string, @Request() req, @Body() body: EventSubmissionDto) {
     return this.formsService.getOrCreateEventSubmission(
       formId,
       body.calendarEventId,
@@ -103,13 +82,10 @@ export class FormsController {
   }
 
   // Auto-save draft
+  // MEDIUM-1: Input validation via SubmissionDataDto
   @SkipThrottle()
   @Patch('submissions/:submissionId/draft')
-  async saveSubmissionDraft(
-    @Param('submissionId') submissionId: string,
-    @Request() req,
-    @Body() body: { data: any }
-  ) {
+  async saveSubmissionDraft(@Param('submissionId') submissionId: string, @Request() req, @Body() body: SubmissionDataDto) {
     return this.formsService.saveSubmissionDraft(
       submissionId,
       body.data,
@@ -118,13 +94,10 @@ export class FormsController {
   }
 
   // Submit/complete a submission
+  // MEDIUM-1: Input validation via SubmissionDataDto
   @SkipThrottle()
   @Patch('submissions/:submissionId/submit')
-  async submitSubmission(
-    @Param('submissionId') submissionId: string,
-    @Request() req,
-    @Body() body: { data: any }
-  ) {
+  async submitSubmission(@Param('submissionId') submissionId: string, @Request() req, @Body() body: SubmissionDataDto) {
     return this.formsService.submitSubmission(
       submissionId,
       body.data,
