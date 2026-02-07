@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, Logger } from '@nestjs/common';
 import { ProductsService, ProductImportRow } from './products.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('products')
 @UseGuards(JwtAuthGuard)
@@ -33,6 +35,9 @@ export class ProductsController {
     return { data: product };
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async delete(@Param('id') id: string, @Request() req) {
     await this.productsService.delete(id, req.user.tenantId);
@@ -63,6 +68,9 @@ export class ProductsController {
     return { data: results, summary };
   }
 
+  // HIGH-4: Admin/Owner only - bulk operations are privileged
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Post('import')
   async importProducts(
     @Body() body: { rows: ProductImportRow[]; duplicateAction?: 'skip' | 'update' },
