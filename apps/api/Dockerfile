@@ -28,5 +28,6 @@ RUN npx tsc
 # Expose port
 EXPOSE 3001
 
-# Start with compiled JavaScript
-CMD ["node", "dist/main.js"]
+# Start with schema sync then compiled JavaScript
+# db push is idempotent - creates missing tables, does nothing if they exist
+CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/main.js"]
