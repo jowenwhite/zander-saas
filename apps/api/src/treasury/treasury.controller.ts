@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException, UseGuards } from '@nestjs/common';
 import { TreasuryService } from './treasury.service';
-import { Public } from '../auth/public.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('treasury')
+@UseGuards(JwtAuthGuard)
 export class TreasuryController {
   constructor(private readonly treasuryService: TreasuryService) {}
 
@@ -12,7 +13,6 @@ export class TreasuryController {
     }
   }
 
-  @Public()
   @Get()
   async findAll(
     @Query('type') type?: string,
