@@ -12,6 +12,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { SupportTicketsService } from './support-tickets.service';
 import { TicketSource, TicketCategory, TicketStatus, HeadwindPriority } from '@prisma/client';
 
@@ -241,10 +243,13 @@ export class SupportTicketsController {
     return ticket;
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async delete(@Request() req, @Param('id') id: string) {
     const ticket = await this.supportTicketsService.findOne(id);
-    
+
     if (!req.user.isSuperAdmin && ticket.tenantId !== req.user.tenantId) {
       throw new ForbiddenException('Access denied');
     }

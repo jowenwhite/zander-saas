@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { CalendarEventsService } from './calendar-events.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('calendar-events')
 @UseGuards(JwtAuthGuard)
@@ -127,6 +129,9 @@ export class CalendarEventsController {
     });
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id')
   async remove(@Request() req, @Param('id') id: string) {
     await this.calendarEventsService.remove(req.user.tenantId, id);
@@ -163,6 +168,9 @@ export class CalendarEventsController {
     return this.calendarEventsService.updateAttendeeRecordingConsent(req.user.tenantId, eventId, attendeeId, body.consented);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete(':id/attendees/:attendeeId')
   async removeAttendee(
     @Request() req,

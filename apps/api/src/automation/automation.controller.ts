@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { AutomationService } from './automation.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller()
 @UseGuards(JwtAuthGuard)
@@ -29,6 +31,9 @@ export class AutomationController {
     return this.automationService.updateTemplate(req.tenantId, id, body);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete('templates/:id')
   deleteTemplate(@Req() req: any, @Param('id') id: string) {
     return this.automationService.deleteTemplate(req.tenantId, id);
@@ -56,6 +61,9 @@ export class AutomationController {
     return this.automationService.updateSequence(req.tenantId, id, body);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete('sequences/:id')
   deleteSequence(@Req() req: any, @Param('id') id: string) {
     return this.automationService.deleteSequence(req.tenantId, id);
@@ -73,6 +81,9 @@ export class AutomationController {
     return this.automationService.updateSequenceStep(req.tenantId, stepId, body);
   }
 
+  // HIGH-4: Admin/Owner only - deletion is destructive
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'owner')
   @Delete('sequence-steps/:id')
   deleteSequenceStep(@Req() req: any, @Param('id') stepId: string) {
     return this.automationService.deleteSequenceStep(req.tenantId, stepId);
