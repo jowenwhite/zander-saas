@@ -114,7 +114,7 @@ const MOCK_HEALTH: SystemHealth = {
 
 const INITIAL_ZANDER_MESSAGE: ZanderMessage = {
   role: 'zander',
-  content: `Good afternoon, Jonathan. Here's your operational status:
+  content: `Good afternoon. Here's your operational status:
 
 📊 SYSTEM: All systems operational  •  🎫 TICKETS: 3 total (1 auto-resolved, 1 needs review, 1 new)  •  🔴 HEADWINDS: 1 P1 in progress (Gmail sync)  •  👥 TENANTS: 5 active, 35 total users
 
@@ -221,10 +221,12 @@ export default function SupportAdminPage() {
       }
     } catch (error) {
       console.error('Failed to fetch Zander greeting:', error);
-      // Fallback to a simple greeting
+      // Fallback to a simple greeting with dynamic user name
+      const userData = localStorage.getItem('zander_user');
+      const userName = userData ? JSON.parse(userData).firstName || 'there' : 'there';
       const fallback: ZanderMessage = {
         role: 'zander',
-        content: 'Hello Jonathan. I\'m ready to help you manage platform operations. What would you like to know?',
+        content: `Hello ${userName}. I'm ready to help you manage platform operations. What would you like to know?`,
         timestamp: new Date().toISOString()
       };
       setZanderMessages([fallback]);

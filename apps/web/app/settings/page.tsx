@@ -2039,10 +2039,10 @@ export default function SettingsPage() {
         <main style={{ marginLeft: sidebarCollapsed ? '64px' : '240px', marginTop: '64px', padding: '2rem', transition: 'margin-left 0.3s ease' }}>
           <div style={{ background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.75rem' }}>JW</div>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.75rem' }}>{profile.firstName?.[0] || ''}{profile.lastName?.[0] || ''}</div>
               <div>
-                <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: '700' }}>Jonathan White</h1>
-                <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9 }}>jonathan@64west.com</p>
+                <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: '700' }}>{profile.firstName} {profile.lastName}</h1>
+                <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9 }}>{profile.email}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
                   <span style={{ fontSize: '0.85rem', padding: '0.25rem 0.75rem', background: 'rgba(255,255,255,0.2)', borderRadius: '12px' }}>Owner</span>
                   <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>64 West Capital Partners</span>

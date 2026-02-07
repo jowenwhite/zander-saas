@@ -15,9 +15,9 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const user = getUser();
-  const userName = user ? `${user.firstName} ${user.lastName}` : 'Jonathan White';
-  const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'JW';
-  const userEmail = user?.email || 'jonathan@64west.com';
+  const userName = user ? `${user.firstName} ${user.lastName}` : 'User';
+  const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'U';
+  const userEmail = user?.email || '';
 
   // Close dropdown when clicking outside
   useEffect(() => {
