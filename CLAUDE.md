@@ -2,7 +2,7 @@
 
 > **Owner:** Jonathan White
 > **Company:** 64 West Holdings LLC
-> **Last Updated:** January 25, 2026
+> **Last Updated:** February 8, 2026
 
 ---
 
@@ -65,9 +65,15 @@ zander-saas/
 │   └── api/                    # NestJS backend
 │       └── src/
 │           ├── admin/          # Admin endpoints (seed, etc.)
+│           ├── audit-log/      # Audit log API endpoints
 │           ├── auth/           # Authentication
 │           ├── billing/        # Stripe integration
 │           ├── cmo/            # CMO module (COMPLETE)
+│           ├── common/
+│           │   ├── filters/    # Exception filters (MEDIUM-3)
+│           │   ├── interceptors/ # Audit log interceptor (MEDIUM-4)
+│           │   ├── services/   # Audit log service
+│           │   └── types/      # Error response types
 │           ├── cro/            # CRO module
 │           ├── email/          # Resend integration
 │           └── prisma/         # Database service
@@ -143,6 +149,98 @@ zander-saas/
 - `/cmo/brand` - Brand profile management
 - `/cmo/templates` - Email template CRUD
 - `/cmo/ai/ask-don` - Claude AI integration
+
+---
+
+## Security Audit (100% COMPLETE)
+
+**Completed:** February 8, 2026
+**Production:** Docker v12, ECS Task Definition :23
+
+### Security Items Summary
+
+| Priority | Item | Description | Status |
+|----------|------|-------------|--------|
+| HIGH-1 | SQL Injection | Prisma parameterized queries | ✅ Complete |
+| HIGH-2 | Auth Bypass | JWT validation, route guards | ✅ Complete |
+| HIGH-3 | Data Exposure | Tenant isolation, response filtering | ✅ Complete |
+| HIGH-4 | RBAC DELETE | Admin/owner only for deletions | ✅ Complete |
+| MEDIUM-1 | Input Validation | DTOs with class-validator on all endpoints | ✅ Complete |
+| MEDIUM-2 | Request Size | JSON 1MB, URL-encoded 1MB, Raw 5MB limits | ✅ Complete |
+| MEDIUM-3 | Error Handling | Sanitized responses, no stack traces | ✅ Complete |
+| MEDIUM-4 | Audit Logging | All mutations logged with IP/user-agent | ✅ Complete |
+| LOW-1 | CORS | Domain whitelist, env-gated dev origins | ✅ Complete |
+| LOW-2 | Security Headers | Helmet middleware (HSTS, X-Frame-Options) | ✅ Complete |
+
+### Key Security Files
+
+```
+apps/api/src/
+├── common/
+│   ├── filters/
+│   │   ├── http-exception.filter.ts    # Global catch-all, sanitizes errors
+│   │   ├── validation-exception.filter.ts # DTO validation errors
+│   │   ├── payload-too-large.filter.ts # Size limit errors
+│   │   ├── throttle-exception.filter.ts # Rate limit errors
+│   │   └── index.ts
+│   ├── interceptors/
+│   │   ├── audit-log.interceptor.ts    # Auto-logs all mutations
+│   │   └── index.ts
+│   ├── services/
+│   │   ├── audit-log.service.ts        # Audit log CRUD
+│   │   └── index.ts
+│   └── audit-log.module.ts             # Global audit module
+├── audit-log/
+│   ├── audit-log.controller.ts         # Admin-only audit API
+│   └── audit-log.module.ts
+└── main.ts                             # Helmet, CORS, filters, interceptors
+```
+
+### Security Features
+
+**Input Validation (MEDIUM-1)**
+- All endpoints use DTOs with `class-validator` decorators
+- `whitelist: true` strips unknown properties
+- `forbidNonWhitelisted: true` rejects extra properties
+
+**Request Size Limits (MEDIUM-2)**
+- JSON: 1MB limit
+- URL-encoded: 1MB limit
+- Raw/webhooks: 5MB limit
+
+**Error Handling (MEDIUM-3)**
+- 500 errors return generic "Internal server error"
+- Database errors sanitized to "A database error occurred"
+- Stack traces never exposed to clients
+- Full details logged internally
+
+**Audit Logging (MEDIUM-4)**
+- All POST/PUT/PATCH/DELETE operations auto-logged
+- Captures: tenantId, userId, action, resource, resourceId, IP, user-agent
+- Sensitive fields redacted: password, token, secret, apiKey, etc.
+- Admin-only access to audit logs via `/audit-logs`
+
+**CORS (LOW-1)**
+- Production origins: `app.zanderos.com`, `zanderos.com`, `zander.mcfapp.com`
+- Dev origins only in `NODE_ENV !== 'production'`
+- Credentials enabled, methods/headers whitelisted
+
+**Security Headers (LOW-2)**
+- HSTS: 1 year, includeSubDomains, preload
+- X-Frame-Options: DENY
+- X-Content-Type-Options: nosniff
+- X-XSS-Protection: enabled
+- Referrer-Policy: strict-origin-when-cross-origin
+
+### Audit Log API
+
+```bash
+# Query audit logs (admin/owner only)
+GET /audit-logs?action=DELETE&resource=deals&limit=50
+
+# Get audit statistics
+GET /audit-logs/stats?days=30
+```
 
 ---
 
@@ -244,35 +342,47 @@ Push to main branch → Vercel auto-deploys to app.zanderos.com
 
 ### Backend (AWS ECS - Manual)
 
-**Full deployment process:**
+**Current Production:** Docker v12, Task Definition :23
+
+**Full deployment process (SCALE-TO-ZERO METHOD - prevents connection pool issues):**
 ```bash
 # 1. Login to ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 288720721534.dkr.ecr.us-east-1.amazonaws.com
 
 # 2. Build Docker image (from repo root)
 cd /Users/jonathanwhite/dev/zander-saas
-docker build -f Dockerfile.api -t zander-api:latest .
+docker build -t zander-api:v13 -f apps/api/Dockerfile .
 
 # 3. Tag and push to ECR
-docker tag zander-api:latest 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v6
-docker push 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v6
+docker tag zander-api:v13 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v13
+docker push 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v13
 
-# 4. Update ECS task definition (if env vars changed)
-# - Get current: aws ecs describe-task-definition --task-definition zander-api
-# - Modify JSON, register new revision
-# - aws ecs register-task-definition --cli-input-json file://task-def.json
+# 4. Create new task definition revision
+aws ecs describe-task-definition --task-definition zander-api:23 --query 'taskDefinition' > /tmp/task-def.json
+# Edit /tmp/task-def.json: update image to v13, remove taskDefinitionArn, revision, status, etc.
+aws ecs register-task-definition --cli-input-json file:///tmp/task-def.json
 
-# 5. Update ECS service
-aws ecs update-service \
-  --cluster zander-cluster \
-  --service zander-api-service \
-  --task-definition zander-api:17 \
-  --force-new-deployment
+# 5. SCALE-TO-ZERO DEPLOYMENT (CRITICAL - do NOT use --force-new-deployment)
+# Step A: Scale to 0
+aws ecs update-service --cluster zander-cluster --service zander-api-service --desired-count 0
 
-# 6. Monitor deployment
+# Step B: Wait 90 seconds for connections to release
+sleep 90
+
+# Step C: Deploy new task definition
+aws ecs update-service --cluster zander-cluster --service zander-api-service \
+  --desired-count 1 --task-definition zander-api:24
+
+# Step D: Wait for stabilization
+aws ecs wait services-stable --cluster zander-cluster --services zander-api-service
+
+# 6. Verify deployment
 aws ecs describe-services --cluster zander-cluster --services zander-api-service \
-  --query 'services[0].deployments' --output table
+  --query 'services[0].{TaskDef:taskDefinition,Running:runningCount}' --output table
+curl https://api.zanderos.com/health
 ```
+
+**IMPORTANT:** Never use `--force-new-deployment` - it causes connection pool exhaustion. Always use the scale-to-zero method above.
 
 **Run marketing seed on production:**
 ```bash
@@ -398,6 +508,7 @@ ADMIN_SECRET_KEY=1a10d78ea77ff45e4cc49d415fd506a62bc6613597f9e1722848777f3498202
 - **Use transactions** for multi-table operations
 - **Include relations explicitly** — They don't auto-load
 - **Schema location:** `packages/database/prisma/schema.prisma`
+- **AuditLog model** added for security audit logging (Feb 2026)
 
 ### Next.js
 - **'use client'** directive required for hooks, event handlers
@@ -411,8 +522,9 @@ ADMIN_SECRET_KEY=1a10d78ea77ff45e4cc49d415fd506a62bc6613597f9e1722848777f3498202
 
 ### Deployment
 - **Frontend:** Push to main → Vercel auto-deploys
-- **Backend:** Build Docker image → Push to ECR → Update ECS task
-- **Database:** Schema changes auto-apply via `prisma db push` in Dockerfile CMD
+- **Backend:** Build Docker image → Push to ECR → Scale-to-zero → Update ECS task
+- **Database:** Schema changes auto-apply via `prisma db push --skip-generate` in Dockerfile CMD
+- **NEVER use `--force-new-deployment`** — causes connection pool exhaustion
 
 ---
 
@@ -453,19 +565,29 @@ ADMIN_SECRET_KEY=1a10d78ea77ff45e4cc49d415fd506a62bc6613597f9e1722848777f3498202
 
 ## Current Priority
 
-**Testing CMO Module & Bug Fixes**
+**Security Audit Complete - Production Hardened**
 
-The CMO module is deployed to production. Current focus:
-1. Test all CMO features on production (app.zanderos.com/cmo)
-2. Fix any bugs discovered during testing
-3. Gather user feedback
+The full security audit (10 items) was completed and deployed on February 8, 2026:
+- All HIGH priority items (SQL injection, auth bypass, data exposure, RBAC)
+- All MEDIUM priority items (input validation, size limits, error handling, audit logging)
+- All LOW priority items (CORS, security headers)
 
-**Next Major Task: Client → Projects Data Model for MCFOS**
+**Next Major Tasks:**
 
-After CMO stabilization, the next priority is updating the data model to support:
-- Client entities (companies/organizations)
-- Projects linked to clients
-- Better organization for My Cabinet Factory operations
+1. **Client → Projects Data Model for MCFOS**
+   - Client entities (companies/organizations)
+   - Projects linked to clients
+   - Better organization for My Cabinet Factory operations
+
+2. **Audit Log UI**
+   - Build admin dashboard view for audit logs
+   - Add retention policy (archive logs older than 90 days)
+   - Export functionality
+
+3. **CMO Module Testing**
+   - Test all features on production (app.zanderos.com/cmo)
+   - Fix any bugs discovered
+   - Gather user feedback
 
 ---
 
