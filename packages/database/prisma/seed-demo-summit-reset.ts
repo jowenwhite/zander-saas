@@ -4,8 +4,11 @@ import * as readline from 'readline';
 
 const prisma = new PrismaClient();
 
-// Summit Home Services Tenant ID - HARDCODED FOR SAFETY
-const SUMMIT_TENANT_ID = 'cmlnkgwan0000j8hsv1tl8dml';
+// Summit Home Services Subdomain - used for portable lookup
+const SUMMIT_SUBDOMAIN = 'summit-home-services';
+
+// Will be set after tenant verification
+let TENANT_ID: string;
 
 // Hardcoded seed scripts - these are safe, not user input
 const SEED_SCRIPTS = [
@@ -52,24 +55,20 @@ async function promptConfirmation(message: string): Promise<boolean> {
 
 async function verifyTenant(): Promise<boolean> {
   const tenant = await prisma.tenant.findUnique({
-    where: { id: SUMMIT_TENANT_ID },
+    where: { subdomain: SUMMIT_SUBDOMAIN },
   });
 
   if (!tenant) {
-    log(`ERROR: Tenant not found with ID: ${SUMMIT_TENANT_ID}`, colors.red);
+    log(`ERROR: Tenant not found with subdomain: ${SUMMIT_SUBDOMAIN}`, colors.red);
     log('The demo tenant may not exist. Run Phase 1 seed first.', colors.yellow);
     return false;
   }
 
-  if (tenant.subdomain !== 'summit-home-services') {
-    log(`ERROR: Tenant ID does not match expected subdomain!`, colors.red);
-    log(`Expected: summit-home-services`, colors.red);
-    log(`Found: ${tenant.subdomain}`, colors.red);
-    log('Aborting for safety.', colors.red);
-    return false;
-  }
+  // Set global tenant ID for use in delete operations
+  TENANT_ID = tenant.id;
 
   log(`Verified tenant: ${tenant.companyName} (${tenant.subdomain})`, colors.green);
+  log(`Tenant ID: ${tenant.id}`, colors.cyan);
   return true;
 }
 
@@ -88,161 +87,161 @@ async function deleteAllTenantData(): Promise<void> {
 
   // 1. Workflow Executions (references Workflow, Contact)
   const workflowExecutions = await prisma.workflowExecution.deleteMany({
-    where: { workflow: { tenantId: SUMMIT_TENANT_ID } },
+    where: { workflow: { tenantId: TENANT_ID } },
   });
   counts['WorkflowExecution'] = workflowExecutions.count;
   log(`  Deleted ${workflowExecutions.count} workflow executions`, colors.cyan);
 
   // 2. Campaign Enrollments (references Campaign, Contact)
   const campaignEnrollments = await prisma.campaignEnrollment.deleteMany({
-    where: { campaign: { tenantId: SUMMIT_TENANT_ID } },
+    where: { campaign: { tenantId: TENANT_ID } },
   });
   counts['CampaignEnrollment'] = campaignEnrollments.count;
   log(`  Deleted ${campaignEnrollments.count} campaign enrollments`, colors.cyan);
 
   // 3. Activities (references Contact, Deal)
   const activities = await prisma.activity.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Activity'] = activities.count;
   log(`  Deleted ${activities.count} activities/tasks`, colors.cyan);
 
   // 4. Email Messages
   const emailMessages = await prisma.emailMessage.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['EmailMessage'] = emailMessages.count;
   log(`  Deleted ${emailMessages.count} email messages`, colors.cyan);
 
   // 5. SMS Messages
   const smsMessages = await prisma.smsMessage.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['SmsMessage'] = smsMessages.count;
   log(`  Deleted ${smsMessages.count} SMS messages`, colors.cyan);
 
   // 6. Call Logs
   const callLogs = await prisma.callLog.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['CallLog'] = callLogs.count;
   log(`  Deleted ${callLogs.count} call logs`, colors.cyan);
 
   // 7. Event Reminders (references CalendarEvent)
   const eventReminders = await prisma.eventReminder.deleteMany({
-    where: { event: { tenantId: SUMMIT_TENANT_ID } },
+    where: { event: { tenantId: TENANT_ID } },
   });
   counts['EventReminder'] = eventReminders.count;
   log(`  Deleted ${eventReminders.count} event reminders`, colors.cyan);
 
   // 8. Event Attendees (references CalendarEvent)
   const eventAttendees = await prisma.eventAttendee.deleteMany({
-    where: { event: { tenantId: SUMMIT_TENANT_ID } },
+    where: { event: { tenantId: TENANT_ID } },
   });
   counts['EventAttendee'] = eventAttendees.count;
   log(`  Deleted ${eventAttendees.count} event attendees`, colors.cyan);
 
   // 9. Calendar Events
   const calendarEvents = await prisma.calendarEvent.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['CalendarEvent'] = calendarEvents.count;
   log(`  Deleted ${calendarEvents.count} calendar events`, colors.cyan);
 
   // 10. Deals
   const deals = await prisma.deal.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Deal'] = deals.count;
   log(`  Deleted ${deals.count} deals`, colors.cyan);
 
   // 11. Contacts
   const contacts = await prisma.contact.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Contact'] = contacts.count;
   log(`  Deleted ${contacts.count} contacts`, colors.cyan);
 
   // 12. Campaign Steps (cascade should handle, but explicit is safer)
   const campaignSteps = await prisma.campaignStep.deleteMany({
-    where: { campaign: { tenantId: SUMMIT_TENANT_ID } },
+    where: { campaign: { tenantId: TENANT_ID } },
   });
   counts['CampaignStep'] = campaignSteps.count;
   log(`  Deleted ${campaignSteps.count} campaign steps`, colors.cyan);
 
   // 13. Campaigns
   const campaigns = await prisma.campaign.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Campaign'] = campaigns.count;
   log(`  Deleted ${campaigns.count} campaigns`, colors.cyan);
 
   // 14. Workflow Nodes (cascade should handle)
   const workflowNodes = await prisma.workflowNode.deleteMany({
-    where: { workflow: { tenantId: SUMMIT_TENANT_ID } },
+    where: { workflow: { tenantId: TENANT_ID } },
   });
   counts['WorkflowNode'] = workflowNodes.count;
   log(`  Deleted ${workflowNodes.count} workflow nodes`, colors.cyan);
 
   // 15. Workflows
   const workflows = await prisma.workflow.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Workflow'] = workflows.count;
   log(`  Deleted ${workflows.count} workflows`, colors.cyan);
 
   // 16. Funnel Stages (cascade should handle)
   const funnelStages = await prisma.funnelStage.deleteMany({
-    where: { funnel: { tenantId: SUMMIT_TENANT_ID } },
+    where: { funnel: { tenantId: TENANT_ID } },
   });
   counts['FunnelStage'] = funnelStages.count;
   log(`  Deleted ${funnelStages.count} funnel stages`, colors.cyan);
 
   // 17. Funnels
   const funnels = await prisma.funnel.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Funnel'] = funnels.count;
   log(`  Deleted ${funnels.count} funnels`, colors.cyan);
 
   // 18. Products
   const products = await prisma.product.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Product'] = products.count;
   log(`  Deleted ${products.count} products`, colors.cyan);
 
   // 19. Email Templates
   const emailTemplates = await prisma.emailTemplate.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['EmailTemplate'] = emailTemplates.count;
   log(`  Deleted ${emailTemplates.count} email templates`, colors.cyan);
 
   // 20. Monthly Themes
   const monthlyThemes = await prisma.monthlyTheme.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['MonthlyTheme'] = monthlyThemes.count;
   log(`  Deleted ${monthlyThemes.count} monthly themes`, colors.cyan);
 
   // 21. Personas
   const personas = await prisma.persona.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['Persona'] = personas.count;
   log(`  Deleted ${personas.count} personas`, colors.cyan);
 
   // 22. Brand Profile
   const brandProfile = await prisma.brandProfile.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['BrandProfile'] = brandProfile.count;
   log(`  Deleted ${brandProfile.count} brand profile`, colors.cyan);
 
   // 23. Pipeline Stages
   const pipelineStages = await prisma.pipelineStage.deleteMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   counts['PipelineStage'] = pipelineStages.count;
   log(`  Deleted ${pipelineStages.count} pipeline stages`, colors.cyan);
@@ -250,7 +249,7 @@ async function deleteAllTenantData(): Promise<void> {
   // 24. Users (keeping these so demo logins still work)
   // We'll just reset their passwords instead
   const users = await prisma.user.findMany({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: TENANT_ID },
   });
   log(`  Preserved ${users.length} users (demo logins remain active)`, colors.green);
 

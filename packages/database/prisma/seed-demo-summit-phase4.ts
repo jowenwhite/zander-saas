@@ -2,8 +2,8 @@ import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Summit Home Services Tenant ID
-const SUMMIT_TENANT_ID = 'cmlnkgwan0000j8hsv1tl8dml';
+// Summit Home Services subdomain (used for lookup instead of hardcoded ID)
+const SUMMIT_SUBDOMAIN = 'summit-home-services';
 
 // Helper functions for dates
 function daysAgo(days: number): Date {
@@ -865,13 +865,13 @@ async function main() {
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('');
 
-  // Verify tenant exists
+  // Verify tenant exists (lookup by subdomain for portability)
   const tenant = await prisma.tenant.findUnique({
-    where: { id: SUMMIT_TENANT_ID },
+    where: { subdomain: SUMMIT_SUBDOMAIN },
   });
 
   if (!tenant) {
-    throw new Error(`Tenant not found: ${SUMMIT_TENANT_ID}. Run Phase 1 seed first.`);
+    throw new Error(`Tenant not found: ${SUMMIT_SUBDOMAIN}. Run Phase 1 seed first.`);
   }
 
   console.log(`Tenant: ${tenant.companyName} (${tenant.id})`);
@@ -879,7 +879,7 @@ async function main() {
 
   // Get a user for createdById fields
   const user = await prisma.user.findFirst({
-    where: { tenantId: SUMMIT_TENANT_ID, role: 'admin' },
+    where: { tenantId: tenant.id, role: 'admin' },
   });
 
   if (!user) {
@@ -896,13 +896,13 @@ async function main() {
   console.log('─────────────────────────────────────────');
 
   const existingBrand = await prisma.brandProfile.findUnique({
-    where: { tenantId: SUMMIT_TENANT_ID },
+    where: { tenantId: tenant.id },
   });
 
   if (!existingBrand) {
     await prisma.brandProfile.create({
       data: {
-        tenantId: SUMMIT_TENANT_ID,
+        tenantId: tenant.id,
         ...BRAND_PROFILE,
       },
     });
@@ -923,13 +923,13 @@ async function main() {
 
   for (const persona of PERSONAS) {
     const existing = await prisma.persona.findFirst({
-      where: { tenantId: SUMMIT_TENANT_ID, name: persona.name },
+      where: { tenantId: tenant.id, name: persona.name },
     });
 
     if (!existing) {
       await prisma.persona.create({
         data: {
-          tenantId: SUMMIT_TENANT_ID,
+          tenantId: tenant.id,
           ...persona,
         },
       });
@@ -957,13 +957,13 @@ async function main() {
     const { steps, ...campaign } = campaignData;
 
     const existing = await prisma.campaign.findFirst({
-      where: { tenantId: SUMMIT_TENANT_ID, name: campaign.name },
+      where: { tenantId: tenant.id, name: campaign.name },
     });
 
     if (!existing) {
       const createdCampaign = await prisma.campaign.create({
         data: {
-          tenantId: SUMMIT_TENANT_ID,
+          tenantId: tenant.id,
           createdById: user.id,
           name: campaign.name,
           description: campaign.description,
@@ -1015,13 +1015,13 @@ async function main() {
     const { nodes, ...workflow } = workflowData;
 
     const existing = await prisma.workflow.findFirst({
-      where: { tenantId: SUMMIT_TENANT_ID, name: workflow.name },
+      where: { tenantId: tenant.id, name: workflow.name },
     });
 
     if (!existing) {
       const createdWorkflow = await prisma.workflow.create({
         data: {
-          tenantId: SUMMIT_TENANT_ID,
+          tenantId: tenant.id,
           name: workflow.name,
           description: workflow.description,
           status: workflow.status,
@@ -1070,7 +1070,7 @@ async function main() {
   for (const event of CALENDAR_EVENTS) {
     const existing = await prisma.calendarEvent.findFirst({
       where: {
-        tenantId: SUMMIT_TENANT_ID,
+        tenantId: tenant.id,
         title: event.title,
       },
     });
@@ -1078,7 +1078,7 @@ async function main() {
     if (!existing) {
       await prisma.calendarEvent.create({
         data: {
-          tenantId: SUMMIT_TENANT_ID,
+          tenantId: tenant.id,
           createdById: user.id,
           title: event.title,
           description: event.description,
@@ -1114,7 +1114,7 @@ async function main() {
   for (const theme of MONTHLY_THEMES) {
     const existing = await prisma.monthlyTheme.findFirst({
       where: {
-        tenantId: SUMMIT_TENANT_ID,
+        tenantId: tenant.id,
         year: theme.year,
         month: theme.month,
       },
@@ -1123,7 +1123,7 @@ async function main() {
     if (!existing) {
       await prisma.monthlyTheme.create({
         data: {
-          tenantId: SUMMIT_TENANT_ID,
+          tenantId: tenant.id,
           month: theme.month,
           year: theme.year,
           name: theme.name,
@@ -1157,13 +1157,13 @@ async function main() {
     const { stages, ...funnel } = funnelData;
 
     const existing = await prisma.funnel.findFirst({
-      where: { tenantId: SUMMIT_TENANT_ID, name: funnel.name },
+      where: { tenantId: tenant.id, name: funnel.name },
     });
 
     if (!existing) {
       const createdFunnel = await prisma.funnel.create({
         data: {
-          tenantId: SUMMIT_TENANT_ID,
+          tenantId: tenant.id,
           name: funnel.name,
           description: funnel.description,
           status: 'active',
@@ -1211,13 +1211,13 @@ async function main() {
 
   for (const template of EMAIL_TEMPLATES) {
     const existing = await prisma.emailTemplate.findFirst({
-      where: { tenantId: SUMMIT_TENANT_ID, name: template.name },
+      where: { tenantId: tenant.id, name: template.name },
     });
 
     if (!existing) {
       await prisma.emailTemplate.create({
         data: {
-          tenantId: SUMMIT_TENANT_ID,
+          tenantId: tenant.id,
           name: template.name,
           subject: template.subject,
           body: template.body,
