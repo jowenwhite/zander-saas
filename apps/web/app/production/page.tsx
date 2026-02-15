@@ -290,7 +290,7 @@ export default function ProductionPage() {
     return deals.filter(d => d.stage === stageName);
   };
 
-  // Get greeting based on time
+  // Get greeting based on time of day - uses logged-in user's firstName
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
