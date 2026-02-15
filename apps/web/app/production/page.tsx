@@ -63,6 +63,9 @@ const formatStage = (stage: string) => {
 };
 
 export default function ProductionPage() {
+  // Debug: This log confirms the deployed code version
+  console.log('[Zander v2.1] ProductionPage loaded - greeting should be dynamic');
+
   const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -177,6 +180,7 @@ export default function ProductionPage() {
       
       if (res.ok) {
         const data = await res.json();
+        console.log('[Zander v2.1] Onboarding status response:', { firstName: data.firstName, companyName: data.tenant?.companyName });
         setUserName(data.firstName || 'there');
         setCompanyName(data.tenant?.companyName || 'your company');
         
