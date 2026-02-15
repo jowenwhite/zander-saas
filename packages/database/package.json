@@ -14,7 +14,8 @@
     "seed:demo-summit": "npx ts-node prisma/seed-demo-summit.ts",
     "seed:demo-summit-phase2": "npx ts-node prisma/seed-demo-summit-phase2.ts",
     "seed:demo-summit-phase3": "npx ts-node prisma/seed-demo-summit-phase3.ts",
-    "seed:demo-summit-phase4": "npx ts-node prisma/seed-demo-summit-phase4.ts"
+    "seed:demo-summit-phase4": "npx ts-node prisma/seed-demo-summit-phase4.ts",
+    "seed:demo-summit-reset": "npx ts-node prisma/seed-demo-summit-reset.ts"
   },
   "devDependencies": {
     "@prisma/client": "^5.22.0",
