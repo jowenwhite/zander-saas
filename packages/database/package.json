@@ -10,7 +10,8 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "generate": "prisma generate",
-    "seed:marketing": "npx ts-node prisma/seed-marketing.ts"
+    "seed:marketing": "npx ts-node prisma/seed-marketing.ts",
+    "seed:demo-summit": "npx ts-node prisma/seed-demo-summit.ts"
   },
   "devDependencies": {
     "@prisma/client": "^5.22.0",
