@@ -12,7 +12,7 @@
 | **URL** | https://app.zanderos.com |
 | **Primary Login** | mike@summithomeservices.com |
 | **Password** | SummitDemo2026! |
-| **Tenant ID** | cmlnkgwan0000j8hsv1tl8dml |
+| **Tenant ID** | cmlnlxxhj00001ptlu5sy3qdd |
 
 ---
 
@@ -268,7 +268,7 @@ For Super Admin users:
 
 ## Technical Notes
 
-- **Tenant ID:** `cmlnkgwan0000j8hsv1tl8dml`
+- **Tenant ID:** `cmlnlxxhj00001ptlu5sy3qdd`
 - **Seed Scripts Location:** `packages/database/prisma/seed-demo-summit*.ts`
 - **Password Hashing:** bcrypt with 10 rounds
 - **Timestamps:** Realistic distribution over past 4 months
