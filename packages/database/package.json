@@ -12,7 +12,8 @@
     "generate": "prisma generate",
     "seed:marketing": "npx ts-node prisma/seed-marketing.ts",
     "seed:demo-summit": "npx ts-node prisma/seed-demo-summit.ts",
-    "seed:demo-summit-phase2": "npx ts-node prisma/seed-demo-summit-phase2.ts"
+    "seed:demo-summit-phase2": "npx ts-node prisma/seed-demo-summit-phase2.ts",
+    "seed:demo-summit-phase3": "npx ts-node prisma/seed-demo-summit-phase3.ts"
   },
   "devDependencies": {
     "@prisma/client": "^5.22.0",
