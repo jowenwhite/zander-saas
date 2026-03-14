@@ -8,6 +8,7 @@ import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import { logout } from '../utils/auth';
 import Sidebar from '../components/Sidebar';
+import { DollarSign, BarChart3, ClipboardList, Target, Settings, Phone, Mail, Calendar, RefreshCw, FileEdit, CheckSquare, TrendingUp, Gem, Sprout, FileText, TrendingDown, Handshake } from 'lucide-react';
 import OnboardingWizard from '../components/OnboardingWizard';
 
 interface Contact {
@@ -94,18 +95,35 @@ export default function ProductionPage() {
     return ['won_revenue', 'pipeline_value', 'closing_soon', 'win_rate'];
   });
   
+  // KPI icon helper
+  const getKpiIcon = (iconKey: string, size: number = 24) => {
+    const icons: Record<string, React.ReactNode> = {
+      dollar: <DollarSign size={size} />,
+      chart: <BarChart3 size={size} />,
+      handshake: <Handshake size={size} />,
+      trending: <TrendingUp size={size} />,
+      gem: <Gem size={size} />,
+      clipboard: <ClipboardList size={size} />,
+      target: <Target size={size} />,
+      sprout: <Sprout size={size} />,
+      file: <FileText size={size} />,
+      trendingDown: <TrendingDown size={size} />,
+    };
+    return icons[iconKey] || <BarChart3 size={size} />;
+  };
+
   // KPI Library - all available metrics
   const kpiLibrary = [
-    { id: 'won_revenue', name: 'Won This Month', icon: '💰', color: '#E74C3C', gradient: 'linear-gradient(135deg, #E74C3C 0%, #d93426 100%)' },
-    { id: 'pipeline_value', name: 'Pipeline Value', icon: '📊', color: '#27AE60', gradient: 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' },
-    { id: 'closing_soon', name: 'Closing This Week', icon: '🤝', color: '#3498DB', gradient: 'linear-gradient(135deg, #3498DB 0%, #2471a3 100%)' },
-    { id: 'win_rate', name: 'Win Rate', icon: '📈', color: '#9B59B6', gradient: 'linear-gradient(135deg, #9B59B6 0%, #7d3c98 100%)' },
-    { id: 'avg_deal_size', name: 'Avg Deal Size', icon: '💎', color: '#F39C12', gradient: 'linear-gradient(135deg, #F39C12 0%, #d68910 100%)' },
-    { id: 'total_deals', name: 'Total Deals', icon: '📋', color: '#1ABC9C', gradient: 'linear-gradient(135deg, #1ABC9C 0%, #16a085 100%)' },
-    { id: 'weighted_pipeline', name: 'Weighted Pipeline', icon: '🎯', color: '#E67E22', gradient: 'linear-gradient(135deg, #E67E22 0%, #d35400 100%)' },
-    { id: 'leads_count', name: 'New Leads', icon: '🌱', color: '#2ECC71', gradient: 'linear-gradient(135deg, #2ECC71 0%, #27ae60 100%)' },
-    { id: 'proposals_out', name: 'Proposals Out', icon: '📄', color: '#9B59B6', gradient: 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)' },
-    { id: 'lost_deals', name: 'Lost This Month', icon: '📉', color: '#95A5A6', gradient: 'linear-gradient(135deg, #95A5A6 0%, #7f8c8d 100%)' },
+    { id: 'won_revenue', name: 'Won This Month', icon: 'dollar', color: '#E74C3C', gradient: 'linear-gradient(135deg, #E74C3C 0%, #d93426 100%)' },
+    { id: 'pipeline_value', name: 'Pipeline Value', icon: 'chart', color: '#27AE60', gradient: 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' },
+    { id: 'closing_soon', name: 'Closing This Week', icon: 'handshake', color: '#3498DB', gradient: 'linear-gradient(135deg, #3498DB 0%, #2471a3 100%)' },
+    { id: 'win_rate', name: 'Win Rate', icon: 'trending', color: '#9B59B6', gradient: 'linear-gradient(135deg, #9B59B6 0%, #7d3c98 100%)' },
+    { id: 'avg_deal_size', name: 'Avg Deal Size', icon: 'gem', color: '#F39C12', gradient: 'linear-gradient(135deg, #F39C12 0%, #d68910 100%)' },
+    { id: 'total_deals', name: 'Total Deals', icon: 'clipboard', color: '#1ABC9C', gradient: 'linear-gradient(135deg, #1ABC9C 0%, #16a085 100%)' },
+    { id: 'weighted_pipeline', name: 'Weighted Pipeline', icon: 'target', color: '#E67E22', gradient: 'linear-gradient(135deg, #E67E22 0%, #d35400 100%)' },
+    { id: 'leads_count', name: 'New Leads', icon: 'sprout', color: '#2ECC71', gradient: 'linear-gradient(135deg, #2ECC71 0%, #27ae60 100%)' },
+    { id: 'proposals_out', name: 'Proposals Out', icon: 'file', color: '#9B59B6', gradient: 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)' },
+    { id: 'lost_deals', name: 'Lost This Month', icon: 'trendingDown', color: '#95A5A6', gradient: 'linear-gradient(135deg, #95A5A6 0%, #7f8c8d 100%)' },
   ];
   
   // Calculate KPI values
@@ -507,7 +525,7 @@ export default function ProductionPage() {
                 gap: '0.5rem'
               }}
             >
-              ⚙️ Customize
+              <Settings size={14} /> Customize
             </button>
           </div>
         </div>
@@ -554,7 +572,7 @@ export default function ProductionPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '1.25rem'
-                  }}>{kpi.icon}</div>
+                  }}>{getKpiIcon(kpi.icon)}</div>
                   {kpiData.trend && (
                     <span style={{
                       padding: '0.25rem 0.5rem',
@@ -761,9 +779,9 @@ export default function ProductionPage() {
                               activity.type === 'meeting' ? 'rgba(155, 89, 182, 0.1)' : activity.type === 'stage_change' ? 'rgba(39, 174, 96, 0.1)' :
                               'rgba(39, 174, 96, 0.1)'
                   }}>
-                    {activity.type === 'call' ? '📞' :
-                     activity.type === 'email' ? '📧' :
-                     activity.type === 'meeting' ? '📅' : activity.type === 'stage_change' ? '🔄' : '📝'}
+                    {activity.type === 'call' ? <Phone size={18} /> :
+                     activity.type === 'email' ? <Mail size={18} /> :
+                     activity.type === 'meeting' ? <Calendar size={18} /> : activity.type === 'stage_change' ? <RefreshCw size={18} /> : <FileEdit size={18} />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ 
@@ -787,7 +805,7 @@ export default function ProductionPage() {
             </ul>
             ) : (
               <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📋</div>
+                <div style={{ marginBottom: '0.5rem', color: '#00CCEE' }}><ClipboardList size={32} /></div>
                 <div>No recent activity</div>
                 <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Activities will appear here as you work on deals</div>
               </div>
@@ -1597,7 +1615,7 @@ export default function ProductionPage() {
               alignItems: 'center'
             }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>⚙️ Customize Dashboard</h2>
+                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}><Settings size={14} /> Customize Dashboard</h2>
                 <p style={{ margin: '0.25rem 0 0 0', opacity: 0.8, fontSize: '0.9rem' }}>Select which KPIs appear in your dashboard widgets</p>
               </div>
               <button
@@ -1663,7 +1681,7 @@ export default function ProductionPage() {
                         >
                           {kpiLibrary.map((kpi) => (
                             <option key={kpi.id} value={kpi.id}>
-                              {kpi.icon} {kpi.name}
+                              {getKpiIcon(kpi.icon)} {kpi.name}
                             </option>
                           ))}
                         </select>
@@ -1700,7 +1718,7 @@ export default function ProductionPage() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '0.9rem'
-                        }}>{kpi.icon}</div>
+                        }}>{getKpiIcon(kpi.icon)}</div>
                         <div>
                           <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.875rem' }}>{kpi.name}</div>
                           {isSelected && <div style={{ fontSize: '0.7rem', color: '#00CCEE' }}>In use</div>}
