@@ -823,7 +823,7 @@ export default function CommunicationsPage() {
 
   return (
     <AuthGuard>
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ minHeight: '100vh', background: '#09090F' }}>
       <NavBar activeModule="cro" />
 
       <Sidebar />
@@ -832,7 +832,7 @@ export default function CommunicationsPage() {
       <main style={{ marginLeft: '240px', marginTop: '64px', padding: '2rem' }}>
         {/* Page Header */}
         <div style={{
-          background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+          background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
           borderRadius: '12px',
           padding: '2rem',
           color: 'white',
@@ -869,8 +869,8 @@ export default function CommunicationsPage() {
                 onClick={() => { setEditingTemplate(null); setTemplateForm({ name: '', subject: '', body: '', type: 'email', category: '', stage: '', status: 'draft' }); setShowTemplateModal(true); }}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  background: 'var(--zander-gold)',
-                  color: 'var(--zander-navy)',
+                  background: '#00CCEE',
+                  color: '#F0F0F5',
                   border: 'none',
                   borderRadius: '8px',
                   fontWeight: '700',
@@ -887,9 +887,9 @@ export default function CommunicationsPage() {
         {/* SuperAdmin Tenant Toggle - Only visible for SuperAdmin */}
         {isSuperAdmin && accessibleTenants.length > 1 && (
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
-            border: '2px solid var(--zander-gold)',
+            border: '2px solid #00CCEE',
             marginBottom: '1rem',
             padding: '1rem',
             display: 'flex',
@@ -898,7 +898,7 @@ export default function CommunicationsPage() {
           }}>
             <span style={{ 
               fontWeight: '600', 
-              color: 'var(--zander-navy)',
+              color: '#F0F0F5',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem'
@@ -913,9 +913,9 @@ export default function CommunicationsPage() {
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  background: viewMode === 'single' ? 'var(--zander-navy)' : 'transparent',
-                  color: viewMode === 'single' ? 'white' : 'var(--zander-navy)',
-                  border: viewMode === 'single' ? 'none' : '1px solid var(--zander-border-gray)',
+                  background: viewMode === 'single' ? '#13131A' : 'transparent',
+                  color: viewMode === 'single' ? 'white' : '#13131A',
+                  border: viewMode === 'single' ? 'none' : '1px solid #2A2A38',
                   borderRadius: '6px',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -937,8 +937,8 @@ export default function CommunicationsPage() {
                     style={{
                       padding: '0.5rem 1rem',
                       background: isSelected ? colors.bg : 'transparent',
-                      color: isSelected ? colors.text : 'var(--zander-navy)',
-                      border: isSelected ? 'none' : '1px solid var(--zander-border-gray)',
+                      color: isSelected ? colors.text : '#13131A',
+                      border: isSelected ? 'none' : '1px solid #2A2A38',
                       borderRadius: '6px',
                       fontWeight: '600',
                       cursor: 'pointer',
@@ -959,9 +959,9 @@ export default function CommunicationsPage() {
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-gold)' : 'transparent',
-                  color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-navy)' : 'var(--zander-navy)',
-                  border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid var(--zander-border-gray)',
+                  background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#00CCEE' : 'transparent',
+                  color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#13131A' : '#13131A',
+                  border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid #2A2A38',
                   borderRadius: '6px',
                   fontWeight: '700',
                   cursor: 'pointer',
@@ -979,40 +979,40 @@ export default function CommunicationsPage() {
 
         {/* Stats */}
         <div style={{
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '2px solid #2A2A38',
           borderRadius: '12px',
           padding: '1.5rem',
           marginBottom: '2rem'
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>{loading ? '...' : campaigns.length}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Campaigns</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#00CCEE' }}>{loading ? '...' : campaigns.length}</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Campaigns</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
               <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#27AE60' }}>{loading ? '...' : campaigns.filter(c => c.status === 'active').length}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Active</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Active</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{loading ? '...' : campaigns.reduce((sum, c) => sum + (c._count?.enrollments || 0), 0)}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Active Enrollments</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#F0F0F5' }}>{loading ? '...' : campaigns.reduce((sum, c) => sum + (c._count?.enrollments || 0), 0)}</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Active Enrollments</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-gold)' }}>{loading ? '...' : communications.filter(c => c.status === 'pending').length}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Pending Approval</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#00CCEE' }}>{loading ? '...' : communications.filter(c => c.status === 'pending').length}</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Pending Approval</div>
             </div>
           </div>
         </div>
 
         {/* Main Tabs */}
         <div style={{
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
-          border: '2px solid var(--zander-border-gray)',
+          border: '2px solid #2A2A38',
           overflow: 'hidden'
         }}>
-          <div style={{ display: 'flex', borderBottom: '2px solid var(--zander-border-gray)' }}>
+          <div style={{ display: 'flex', borderBottom: '2px solid #2A2A38' }}>
             {[
               { id: 'inbox', label: 'Inbox', icon: '📥' },
               { id: 'campaigns', label: 'Campaigns', icon: '🚀' },
@@ -1023,11 +1023,11 @@ export default function CommunicationsPage() {
                 onClick={() => setActiveTab(tab.id as any)}
                 style={{
                   flex: 1, padding: '1rem',
-                  background: activeTab === tab.id ? 'var(--zander-off-white)' : 'white',
+                  background: activeTab === tab.id ? '#09090F' : 'white',
                   border: 'none',
-                  borderBottom: activeTab === tab.id ? '3px solid var(--zander-red)' : '3px solid transparent',
+                  borderBottom: activeTab === tab.id ? '3px solid #00CCEE' : '3px solid transparent',
                   cursor: 'pointer', fontWeight: '600',
-                  color: activeTab === tab.id ? 'var(--zander-red)' : 'var(--zander-gray)',
+                  color: activeTab === tab.id ? '#00CCEE' : '#8888A0',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
                 }}
               >
@@ -1050,9 +1050,9 @@ export default function CommunicationsPage() {
                             onClick={() => setCallsFilter(f)}
                             style={{
                               padding: '0.5rem 1rem',
-                              background: callsFilter === f ? 'var(--zander-navy)' : 'white',
-                              color: callsFilter === f ? 'white' : 'var(--zander-navy)',
-                              border: '1px solid var(--zander-border-gray)',
+                              background: callsFilter === f ? '#13131A' : 'white',
+                              color: callsFilter === f ? 'white' : '#13131A',
+                              border: '1px solid #2A2A38',
                               borderRadius: '6px',
                               cursor: 'pointer',
                               fontWeight: callsFilter === f ? '600' : '400'
@@ -1070,9 +1070,9 @@ export default function CommunicationsPage() {
                             onClick={() => setInboxFilter(f)}
                             style={{
                               padding: '0.5rem 1rem',
-                              background: inboxFilter === f ? 'var(--zander-navy)' : 'white',
-                              color: inboxFilter === f ? 'white' : 'var(--zander-navy)',
-                              border: '1px solid var(--zander-border-gray)',
+                              background: inboxFilter === f ? '#13131A' : 'white',
+                              color: inboxFilter === f ? 'white' : '#13131A',
+                              border: '1px solid #2A2A38',
                               borderRadius: '6px',
                               cursor: 'pointer',
                               fontWeight: inboxFilter === f ? '600' : '400'
@@ -1090,7 +1090,7 @@ export default function CommunicationsPage() {
                         style={{
                           padding: '0.4rem 0.75rem',
                           background: messageType === 'email' ? 'white' : 'transparent',
-                          color: messageType === 'email' ? 'var(--zander-navy)' : '#666',
+                          color: messageType === 'email' ? '#13131A' : '#666',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -1105,7 +1105,7 @@ export default function CommunicationsPage() {
                         style={{
                           padding: '0.4rem 0.75rem',
                           background: messageType === 'sms' ? 'white' : 'transparent',
-                          color: messageType === 'sms' ? 'var(--zander-navy)' : '#666',
+                          color: messageType === 'sms' ? '#13131A' : '#666',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -1120,7 +1120,7 @@ export default function CommunicationsPage() {
                         style={{
                           padding: '0.4rem 0.75rem',
                           background: messageType === 'calls' ? 'white' : 'transparent',
-                          color: messageType === 'calls' ? 'var(--zander-navy)' : '#666',
+                          color: messageType === 'calls' ? '#13131A' : '#666',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -1136,7 +1136,7 @@ export default function CommunicationsPage() {
                     onClick={() => messageType === 'email' ? setShowComposeModal(true) : messageType === 'sms' ? setShowSmsCompose(true) : setShowLogCall(true)}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+                      background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '8px',
@@ -1151,7 +1151,7 @@ export default function CommunicationsPage() {
                       onClick={() => setShowScheduleMeeting(true)}
                       style={{
                         padding: '0.75rem 1.5rem',
-                        background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+                        background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -1173,7 +1173,7 @@ export default function CommunicationsPage() {
                         style={{
                           padding: '0.35rem 0.75rem',
                           background: inboxView === 'list' ? 'white' : 'transparent',
-                          color: inboxView === 'list' ? 'var(--zander-navy)' : '#666',
+                          color: inboxView === 'list' ? '#13131A' : '#666',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -1189,7 +1189,7 @@ export default function CommunicationsPage() {
                         style={{
                           padding: '0.35rem 0.75rem',
                           background: inboxView === 'threads' ? 'white' : 'transparent',
-                          color: inboxView === 'threads' ? 'var(--zander-navy)' : '#666',
+                          color: inboxView === 'threads' ? '#13131A' : '#666',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -1207,8 +1207,8 @@ export default function CommunicationsPage() {
                         style={{
                           padding: '0.35rem 0.75rem',
                           background: 'transparent',
-                          color: 'var(--zander-navy)',
-                          border: '1px solid var(--zander-border-gray)',
+                          color: '#F0F0F5',
+                          border: '1px solid #2A2A38',
                           borderRadius: '6px',
                           cursor: 'pointer',
                           fontSize: '0.75rem',
@@ -1222,10 +1222,10 @@ export default function CommunicationsPage() {
                 )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: selectedEmail || selectedThread ? 'minmax(280px, 350px) 1fr' : '1fr', gap: '1rem' }}>
-                  <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', maxHeight: '500px', overflowY: 'auto' }}>
+                  <div style={{ border: '1px solid #2A2A38', borderRadius: '8px', maxHeight: '500px', overflowY: 'auto' }}>
                     {messageType === 'email' ? (
                       emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).length === 0 ? (
-                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+                        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
                           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📭</div>
                           <p>No emails yet</p>
                         </div>
@@ -1241,14 +1241,14 @@ export default function CommunicationsPage() {
                                   onClick={() => loadThread(thread.threadId)}
                                   style={{
                                     padding: '0.75rem 1rem',
-                                    borderBottom: '1px solid var(--zander-border-gray)',
+                                    borderBottom: '1px solid #2A2A38',
                                     cursor: 'pointer',
                                     background: selectedThread === thread.threadId ? 'rgba(191, 10, 48, 0.05)' : thread.unreadCount > 0 ? 'rgba(25, 118, 210, 0.03)' : 'transparent',
-                                    borderLeft: selectedThread === thread.threadId ? '3px solid var(--zander-red)' : thread.unreadCount > 0 ? '3px solid #1976d2' : '3px solid transparent'
+                                    borderLeft: selectedThread === thread.threadId ? '3px solid #00CCEE' : thread.unreadCount > 0 ? '3px solid #1976d2' : '3px solid transparent'
                                   }}
                                 >
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                                    <span style={{ fontWeight: thread.unreadCount > 0 ? '700' : '500', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                                    <span style={{ fontWeight: thread.unreadCount > 0 ? '700' : '500', fontSize: '0.85rem', color: '#F0F0F5' }}>
                                       🧵 {thread.latestEmail.subject}
                                     </span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1257,13 +1257,13 @@ export default function CommunicationsPage() {
                                           {thread.unreadCount}
                                         </span>
                                       )}
-                                      <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                      <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>
                                         {new Date(thread.latestEmail.sentAt).toLocaleDateString()}
                                       </span>
                                     </div>
                                   </div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                    <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>
                                       {thread.emails.length} messages
                                     </span>
                                     <span style={{ fontSize: '0.75rem', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -1278,17 +1278,17 @@ export default function CommunicationsPage() {
                                   onClick={() => { setSelectedEmail(email); setSelectedThread(null); if (!email.isRead && email.direction === 'inbound') handleMarkAsRead(email.id); }}
                                   style={{
                                     padding: '0.75rem 1rem',
-                                    borderBottom: '1px solid var(--zander-border-gray)',
+                                    borderBottom: '1px solid #2A2A38',
                                     cursor: 'pointer',
                                     background: selectedEmail?.id === email.id ? 'rgba(191, 10, 48, 0.05)' : !email.isRead && email.direction === 'inbound' ? 'rgba(25, 118, 210, 0.03)' : 'transparent',
-                                    borderLeft: selectedEmail?.id === email.id ? '3px solid var(--zander-red)' : !email.isRead && email.direction === 'inbound' ? '3px solid #1976d2' : '3px solid transparent'
+                                    borderLeft: selectedEmail?.id === email.id ? '3px solid #00CCEE' : !email.isRead && email.direction === 'inbound' ? '3px solid #1976d2' : '3px solid transparent'
                                   }}
                                 >
                                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                                    <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                                    <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.85rem', color: '#F0F0F5' }}>
                                       {email.direction === 'inbound' ? email.fromAddress : email.toAddress}
                                     </span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                                    <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>
                                       {new Date(email.sentAt).toLocaleDateString()}
                                     </span>
                                   </div>
@@ -1321,21 +1321,21 @@ export default function CommunicationsPage() {
                           }}
                           style={{
                             padding: '0.75rem 1rem',
-                            borderBottom: '1px solid var(--zander-border-gray)',
+                            borderBottom: '1px solid #2A2A38',
                             cursor: 'pointer',
                             background: selectedEmail?.id === email.id ? 'rgba(191, 10, 48, 0.05)' : !email.isRead && email.direction === 'inbound' ? 'rgba(25, 118, 210, 0.03)' : 'transparent',
-                            borderLeft: selectedEmail?.id === email.id ? '3px solid var(--zander-red)' : !email.isRead && email.direction === 'inbound' ? '3px solid #1976d2' : '3px solid transparent',
+                            borderLeft: selectedEmail?.id === email.id ? '3px solid #00CCEE' : !email.isRead && email.direction === 'inbound' ? '3px solid #1976d2' : '3px solid transparent',
                             position: 'relative'
                           }}
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                            <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.85rem', color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.85rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                               {!email.isRead && email.direction === 'inbound' && (
                                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1976d2', display: 'inline-block' }}></span>
                               )}
                               {email.direction === 'inbound' ? email.fromAddress : email.toAddress}
                             </span>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                            <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>
                               {new Date(email.sentAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -1363,7 +1363,7 @@ export default function CommunicationsPage() {
                               gap: '0.25rem',
                               opacity: 0,
                               transition: 'opacity 0.2s',
-                              background: 'white',
+                              background: '#1C1C26',
                               padding: '0.25rem',
                               borderRadius: '4px',
                               boxShadow: '0 1px 4px rgba(0,0,0,0.15)'
@@ -1396,7 +1396,7 @@ export default function CommunicationsPage() {
                             <button
                               onClick={() => handleDeleteEmail(email.id)}
                               title="Delete"
-                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: 'var(--zander-red)' }}
+                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: '#00CCEE' }}
                             >
                               🗑️
                             </button>
@@ -1407,7 +1407,7 @@ export default function CommunicationsPage() {
                     ) : messageType === 'sms' ? (
                       /* SMS Messages */
                       smsMessages.filter(s => inboxFilter === 'all' || s.direction === inboxFilter).length === 0 ? (
-                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+                        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
                           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</div>
                           <p>No SMS messages yet</p>
                           <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Configure Twilio to send SMS</p>
@@ -1418,16 +1418,16 @@ export default function CommunicationsPage() {
                             key={sms.id}
                             style={{
                               padding: '0.75rem 1rem',
-                              borderBottom: '1px solid var(--zander-border-gray)',
+                              borderBottom: '1px solid #2A2A38',
                               cursor: 'pointer',
                               background: 'transparent'
                             }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                              <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                              <span style={{ fontWeight: '600', fontSize: '0.85rem', color: '#F0F0F5' }}>
                                 {sms.direction === 'inbound' ? sms.fromNumber : sms.toNumber}
                               </span>
-                              <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+                              <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>
                                 {new Date(sms.sentAt).toLocaleDateString()}
                               </span>
                             </div>
@@ -1450,7 +1450,7 @@ export default function CommunicationsPage() {
                                     }).catch(err => console.error('Delete SMS error:', err));
                                   }
                                 }}
-                                style={{ padding: '0.25rem 0.5rem', background: 'transparent', color: 'var(--zander-red)', border: '1px solid var(--zander-red)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', opacity: 0.7 }}
+                                style={{ padding: '0.25rem 0.5rem', background: 'transparent', color: '#00CCEE', border: '1px solid #00CCEE', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', opacity: 0.7 }}
                                 onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
                                 onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
                               >
@@ -1463,7 +1463,7 @@ export default function CommunicationsPage() {
                     ) : (
                       /* Call Logs */
                       callLogs.filter(c => callsFilter === 'all' || (callsFilter === 'scheduled' ? c.status === 'scheduled' : c.status !== 'scheduled')).length === 0 ? (
-                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+                        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
                           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📞</div>
                           <p>No call logs yet</p>
                           <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Log your first call to get started</p>
@@ -1475,17 +1475,17 @@ export default function CommunicationsPage() {
                             onClick={() => { setSelectedCall(call); setTranscriptText(call.transcription || ''); setShowCallDetails(true); }}
                             style={{
                               padding: '0.75rem 1rem',
-                              borderBottom: '1px solid var(--zander-border-gray)',
+                              borderBottom: '1px solid #2A2A38',
                               cursor: 'pointer',
                               background: call.status === 'scheduled' ? 'rgba(25, 118, 210, 0.05)' : 'transparent',
                               borderLeft: call.status === 'scheduled' ? '3px solid #1976d2' : '3px solid transparent'
                             }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                              <span style={{ fontWeight: '600', fontSize: '0.85rem', color: 'var(--zander-navy)' }}>
+                              <span style={{ fontWeight: '600', fontSize: '0.85rem', color: '#F0F0F5' }}>
                                 {call.contact ? call.contact.firstName + ' ' + call.contact.lastName : (call.direction === 'inbound' ? call.fromNumber : call.toNumber) || 'Unknown'}
                               </span>
-                              <span style={{ fontSize: '0.7rem', color: call.status === 'scheduled' ? '#1976d2' : 'var(--zander-gray)' }}>
+                              <span style={{ fontSize: '0.7rem', color: call.status === 'scheduled' ? '#1976d2' : '#8888A0' }}>
                                 {call.scheduledAt ? new Date(call.scheduledAt).toLocaleString() : new Date(call.createdAt).toLocaleDateString()}
                               </span>
                             </div>
@@ -1519,12 +1519,12 @@ export default function CommunicationsPage() {
                               )}
                             </div>
                             {call.notes && (
-                              <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {call.notes.substring(0, 60)}{call.notes.length > 60 ? '...' : ''}
                               </div>
                             )}
                             {call.platform && call.type === 'online_meeting' && (
-                              <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>
                                 via {call.platform === 'zoom' ? '📹 Zoom' : call.platform === 'google_meet' ? '🎦 Google Meet' : call.platform === 'teams' ? '👥 Teams' : call.platform}
                               </div>
                             )}
@@ -1535,32 +1535,32 @@ export default function CommunicationsPage() {
                   </div>
                   {/* Thread View */}
                   {selectedThread && threadEmails.length > 0 && !selectedEmail && (
-                    <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', overflow: 'hidden' }}>
-                      <div style={{ padding: '1rem', background: 'var(--zander-off-white)', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--zander-navy)', margin: 0 }}>
+                    <div style={{ border: '1px solid #2A2A38', borderRadius: '8px', overflow: 'hidden' }}>
+                      <div style={{ padding: '1rem', background: '#09090F', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#F0F0F5', margin: 0 }}>
                           🧵 {threadEmails[0]?.subject} ({threadEmails.length} messages)
                         </h3>
                         <button onClick={() => { setSelectedThread(null); setThreadEmails([]); }} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
                       </div>
                       <div style={{ maxHeight: '450px', overflowY: 'auto' }}>
                         {threadEmails.map((email, idx) => (
-                          <div key={email.id} style={{ padding: '1rem', borderBottom: idx < threadEmails.length - 1 ? '1px solid var(--zander-border-gray)' : 'none', background: !email.isRead && email.direction === 'inbound' ? 'rgba(25, 118, 210, 0.03)' : 'white' }}>
+                          <div key={email.id} style={{ padding: '1rem', borderBottom: idx < threadEmails.length - 1 ? '1px solid #2A2A38' : 'none', background: !email.isRead && email.direction === 'inbound' ? 'rgba(25, 118, 210, 0.03)' : 'white' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                               <div>
-                                <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.9rem', color: 'var(--zander-navy)' }}>
+                                <span style={{ fontWeight: !email.isRead && email.direction === 'inbound' ? '700' : '500', fontSize: '0.9rem', color: '#F0F0F5' }}>
                                   {email.direction === 'inbound' ? email.fromAddress : `To: ${email.toAddress}`}
                                 </span>
                                 <span style={{ marginLeft: '0.5rem', fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
                                   {email.direction === 'inbound' ? '📥' : '📤'}
                                 </span>
                               </div>
-                              <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{new Date(email.sentAt).toLocaleString()}</span>
+                              <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{new Date(email.sentAt).toLocaleString()}</span>
                             </div>
                             <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap', fontSize: '0.9rem', color: '#333' }}>{email.body}</div>
                           </div>
                         ))}
                       </div>
-                      <div style={{ padding: '1rem', background: 'var(--zander-off-white)', borderTop: '1px solid var(--zander-border-gray)' }}>
+                      <div style={{ padding: '1rem', background: '#09090F', borderTop: '1px solid #2A2A38' }}>
                         <button
                           onClick={() => {
                             const lastEmail = threadEmails[threadEmails.length - 1];
@@ -1572,7 +1572,7 @@ export default function CommunicationsPage() {
                             });
                             setShowComposeModal(true);
                           }}
-                          style={{ padding: "0.5rem 1rem", background: "var(--zander-navy)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
+                          style={{ padding: "0.5rem 1rem", background: "#13131A", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           ↩️ Reply to Thread
                         </button>
@@ -1582,14 +1582,14 @@ export default function CommunicationsPage() {
 
                   {/* Single Email View */}
                   {selectedEmail && (
-                    <div style={{ border: '1px solid var(--zander-border-gray)', borderRadius: '8px', padding: '1rem' }}>
+                    <div style={{ border: '1px solid #2A2A38', borderRadius: '8px', padding: '1rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{selectedEmail.subject}</h3>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#F0F0F5' }}>{selectedEmail.subject}</h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           {selectedEmail.direction === 'inbound' && (
                             <button
                               onClick={() => selectedEmail.isRead ? handleMarkAsUnread(selectedEmail.id) : handleMarkAsRead(selectedEmail.id)}
-                              style={{ padding: '0.35rem 0.6rem', background: 'transparent', border: '1px solid var(--zander-border-gray)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                              style={{ padding: '0.35rem 0.6rem', background: 'transparent', border: '1px solid #2A2A38', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
                               title={selectedEmail.isRead ? 'Mark as unread' : 'Mark as read'}
                             >
                               {selectedEmail.isRead ? '○ Unread' : '● Read'}
@@ -1598,7 +1598,7 @@ export default function CommunicationsPage() {
                           <button onClick={() => setSelectedEmail(null)} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
                         </div>
                       </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)', marginBottom: '1rem' }}>
+                      <div style={{ fontSize: '0.85rem', color: '#8888A0', marginBottom: '1rem' }}>
                         <p><strong>From:</strong> {selectedEmail.fromAddress}</p>
                         <p><strong>To:</strong> {selectedEmail.toAddress}</p>
                         <p><strong>Date:</strong> {new Date(selectedEmail.sentAt).toLocaleString()}</p>
@@ -1613,7 +1613,7 @@ export default function CommunicationsPage() {
                           </p>
                         )}
                       </div>
-                      <hr style={{ border: 'none', borderTop: '1px solid var(--zander-border-gray)', margin: '1rem 0' }} />
+                      <hr style={{ border: 'none', borderTop: '1px solid #2A2A38', margin: '1rem 0' }} />
                       <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{selectedEmail.body}</div>
                       <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                         <button
@@ -1626,7 +1626,7 @@ export default function CommunicationsPage() {
                             });
                             setShowComposeModal(true);
                           }}
-                          style={{ padding: "0.5rem 1rem", background: "var(--zander-navy)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
+                          style={{ padding: "0.5rem 1rem", background: "#13131A", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           ↩️ Reply
                         </button>
@@ -1646,13 +1646,13 @@ export default function CommunicationsPage() {
                         </button>
                         <button
                           onClick={() => handleArchiveEmail(selectedEmail.id)}
-                          style={{ padding: "0.5rem 1rem", background: "var(--zander-gold)", color: "var(--zander-navy)", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
+                          style={{ padding: "0.5rem 1rem", background: "#00CCEE", color: "#F0F0F5", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           📦 Archive
                         </button>
                         <button
                           onClick={() => handleDeleteEmail(selectedEmail.id)}
-                          style={{ padding: "0.5rem 1rem", background: "transparent", color: "var(--zander-red)", border: "1px solid var(--zander-red)", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
+                          style={{ padding: "0.5rem 1rem", background: "transparent", color: "#00CCEE", border: "1px solid #00CCEE", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
                           🗑️ Delete
                         </button>
@@ -1674,9 +1674,9 @@ export default function CommunicationsPage() {
                         onClick={() => setCampaignFilter(filter)}
                         style={{
                           padding: '0.5rem 1rem',
-                          background: campaignFilter === filter ? 'var(--zander-navy)' : 'white',
-                          color: campaignFilter === filter ? 'white' : 'var(--zander-navy)',
-                          border: '1px solid var(--zander-border-gray)',
+                          background: campaignFilter === filter ? '#13131A' : 'white',
+                          color: campaignFilter === filter ? 'white' : '#13131A',
+                          border: '1px solid #2A2A38',
                           borderRadius: '6px',
                           cursor: 'pointer',
                           fontWeight: '500',
@@ -1692,8 +1692,8 @@ export default function CommunicationsPage() {
                       onClick={() => setShowTreasuryModal(true)}
                       style={{
                         padding: '0.75rem 1.5rem',
-                        background: 'var(--zander-gold)',
-                        color: 'var(--zander-navy)',
+                        background: '#00CCEE',
+                        color: '#F0F0F5',
                         border: 'none',
                         borderRadius: '8px',
                         fontWeight: '600',
@@ -1709,7 +1709,7 @@ export default function CommunicationsPage() {
                       onClick={() => setShowCampaignModal(true)}
                       style={{
                         padding: '0.75rem 1.5rem',
-                        background: 'var(--zander-red)',
+                        background: '#00CCEE',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -1724,17 +1724,17 @@ export default function CommunicationsPage() {
 
                 {/* Campaign List */}
                 {loading ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>Loading campaigns...</div>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>Loading campaigns...</div>
                 ) : filteredCampaigns.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚀</div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Campaigns Yet</h3>
-                    <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem' }}>Create multi-step outreach campaigns or browse The Treasury for ready-made templates</p>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Campaigns Yet</h3>
+                    <p style={{ color: '#8888A0', marginBottom: '1rem' }}>Create multi-step outreach campaigns or browse The Treasury for ready-made templates</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                      <button onClick={() => setShowTreasuryModal(true)} style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-gold)', color: 'var(--zander-navy)', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                      <button onClick={() => setShowTreasuryModal(true)} style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: '#F0F0F5', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
                         🏛️ Browse Treasury
                       </button>
-                      <button onClick={() => setShowCampaignModal(true)} style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                      <button onClick={() => setShowCampaignModal(true)} style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
                         + Create Campaign
                       </button>
                     </div>
@@ -1745,8 +1745,8 @@ export default function CommunicationsPage() {
                       <div 
                         key={campaign.id} 
                         style={{ 
-                          background: 'white', 
-                          border: '2px solid var(--zander-border-gray)', 
+                          background: '#1C1C26', 
+                          border: '2px solid #2A2A38', 
                           borderRadius: '12px', 
                           padding: '1.5rem',
                           transition: 'border-color 0.2s'
@@ -1754,13 +1754,13 @@ export default function CommunicationsPage() {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                           <div>
-                            <h4 style={{ margin: '0 0 0.25rem 0', color: 'var(--zander-navy)' }}>{campaign.name}</h4>
-                            {campaign.isFromTreasury && <span style={{ fontSize: '0.65rem', color: 'var(--zander-gold)', fontWeight: '600' }}>🏛️ FROM TREASURY</span>}
+                            <h4 style={{ margin: '0 0 0.25rem 0', color: '#F0F0F5' }}>{campaign.name}</h4>
+                            {campaign.isFromTreasury && <span style={{ fontSize: '0.65rem', color: '#00CCEE', fontWeight: '600' }}>🏛️ FROM TREASURY</span>}
                           </div>
                           <span style={{
                             padding: '0.25rem 0.5rem',
                             background: campaign.status === 'active' ? 'rgba(39, 174, 96, 0.1)' : campaign.status === 'paused' ? 'rgba(240, 179, 35, 0.1)' : 'rgba(108, 117, 125, 0.1)',
-                            color: campaign.status === 'active' ? '#27AE60' : campaign.status === 'paused' ? '#B8860B' : 'var(--zander-gray)',
+                            color: campaign.status === 'active' ? '#27AE60' : campaign.status === 'paused' ? '#B8860B' : '#8888A0',
                             borderRadius: '4px', 
                             fontSize: '0.65rem', 
                             fontWeight: '600', 
@@ -1771,7 +1771,7 @@ export default function CommunicationsPage() {
                         </div>
 
                         {campaign.description && (
-                          <p style={{ color: 'var(--zander-gray)', fontSize: '0.85rem', margin: '0 0 1rem 0', lineHeight: '1.4' }}>
+                          <p style={{ color: '#8888A0', fontSize: '0.85rem', margin: '0 0 1rem 0', lineHeight: '1.4' }}>
                             {campaign.description}
                           </p>
                         )}
@@ -1779,7 +1779,7 @@ export default function CommunicationsPage() {
                         {/* Channel Indicators */}
                         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                           {campaign.channels.includes('email') && (
-                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(191, 10, 48, 0.1)', color: 'var(--zander-red)', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(0, 204, 238, 0.1)', color: '#00CCEE', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
                               📧 Email
                             </span>
                           )}
@@ -1789,18 +1789,18 @@ export default function CommunicationsPage() {
                             </span>
                           )}
                           {campaign.channels.includes('phone') && (
-                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(12, 35, 64, 0.1)', color: 'var(--zander-navy)', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(12, 35, 64, 0.1)', color: '#F0F0F5', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
                               📞 Phone
                             </span>
                           )}
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid #2A2A38' }}>
                           <div style={{ display: 'flex', gap: '1rem' }}>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                            <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>
                               {campaign.steps?.length || 0} steps
                             </span>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                            <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>
                               {campaign._count?.enrollments || 0} enrolled
                             </span>
                           </div>
@@ -1809,8 +1809,8 @@ export default function CommunicationsPage() {
                               onClick={() => handleEditCampaign(campaign)} 
                               style={{ 
                                 padding: '0.5rem 1rem', 
-                                background: 'var(--zander-gold)', 
-                                color: 'var(--zander-navy)', 
+                                background: '#00CCEE', 
+                                color: '#F0F0F5', 
                                 border: 'none', 
                                 borderRadius: '6px', 
                                 fontWeight: '600', 
@@ -1825,8 +1825,8 @@ export default function CommunicationsPage() {
                               style={{ 
                                 padding: '0.5rem 0.75rem', 
                                 background: 'transparent', 
-                                color: 'var(--zander-red)', 
-                                border: '1px solid var(--zander-red)', 
+                                color: '#00CCEE', 
+                                border: '1px solid #00CCEE', 
                                 borderRadius: '6px', 
                                 fontSize: '0.75rem', 
                                 cursor: 'pointer' 
@@ -1853,9 +1853,9 @@ export default function CommunicationsPage() {
                       onClick={() => setCommFilter(filter)}
                       style={{
                         padding: '0.5rem 1rem',
-                        background: commFilter === filter ? 'var(--zander-navy)' : 'white',
-                        color: commFilter === filter ? 'white' : 'var(--zander-navy)',
-                        border: '1px solid var(--zander-border-gray)',
+                        background: commFilter === filter ? '#13131A' : 'white',
+                        color: commFilter === filter ? 'white' : '#13131A',
+                        border: '1px solid #2A2A38',
                         borderRadius: '6px', cursor: 'pointer', fontWeight: '500', textTransform: 'capitalize'
                       }}
                     >
@@ -1865,17 +1865,17 @@ export default function CommunicationsPage() {
                 </div>
                 
                 {loading ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>Loading...</div>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>Loading...</div>
                 ) : filteredComms.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Scheduled Communications</h3>
-                    <p style={{ color: 'var(--zander-gray)' }}>Scheduled emails and messages will appear here</p>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Scheduled Communications</h3>
+                    <p style={{ color: '#8888A0' }}>Scheduled emails and messages will appear here</p>
                   </div>
                 ) : (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: 'var(--zander-navy)', color: 'white' }}>
+                      <tr style={{ background: '#13131A', color: 'white' }}>
                         <th style={{ padding: '1rem', textAlign: 'left' }}>Contact</th>
                         <th style={{ padding: '1rem', textAlign: 'left' }}>Type</th>
                         <th style={{ padding: '1rem', textAlign: 'left' }}>Subject</th>
@@ -1886,19 +1886,19 @@ export default function CommunicationsPage() {
                     </thead>
                     <tbody>
                       {filteredComms.map((comm, index) => (
-                        <tr key={comm.id} style={{ background: index % 2 === 0 ? 'white' : 'var(--zander-off-white)', borderBottom: '1px solid var(--zander-border-gray)' }}>
+                        <tr key={comm.id} style={{ background: index % 2 === 0 ? 'white' : '#09090F', borderBottom: '1px solid #2A2A38' }}>
                           <td style={{ padding: '1rem' }}>
-                            <div style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>{comm.contact?.firstName} {comm.contact?.lastName}</div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{comm.contact?.email}</div>
+                            <div style={{ fontWeight: '500', color: '#F0F0F5' }}>{comm.contact?.firstName} {comm.contact?.lastName}</div>
+                            <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{comm.contact?.email}</div>
                           </td>
                           <td style={{ padding: '1rem' }}><span style={{ ...getTypeColor(comm.type), padding: '0.25rem 0.5rem', borderRadius: '4px' }}>{getTypeIcon(comm.type)} {comm.type}</span></td>
-                          <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>{comm.subject || '—'}</td>
-                          <td style={{ padding: '1rem', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>{formatDate(comm.scheduledFor)}</td>
+                          <td style={{ padding: '1rem', color: '#8888A0' }}>{comm.subject || '—'}</td>
+                          <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#8888A0' }}>{formatDate(comm.scheduledFor)}</td>
                           <td style={{ padding: '1rem' }}>
                             <span style={{
                               padding: '0.25rem 0.5rem',
                               background: comm.status === 'pending' ? 'rgba(240, 179, 35, 0.1)' : comm.status === 'approved' ? 'rgba(52, 152, 219, 0.1)' : comm.status === 'sent' ? 'rgba(39, 174, 96, 0.1)' : 'rgba(108, 117, 125, 0.1)',
-                              color: comm.status === 'pending' ? '#B8860B' : comm.status === 'approved' ? '#3498DB' : comm.status === 'sent' ? '#27AE60' : 'var(--zander-gray)',
+                              color: comm.status === 'pending' ? '#B8860B' : comm.status === 'approved' ? '#3498DB' : comm.status === 'sent' ? '#27AE60' : '#8888A0',
                               borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600', textTransform: 'uppercase'
                             }}>{comm.status}</span>
                           </td>
@@ -1906,7 +1906,7 @@ export default function CommunicationsPage() {
                             {comm.status === 'pending' && (
                               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                                 <button onClick={() => handleApproveCommunication(comm.id)} style={{ padding: '0.5rem 0.75rem', background: '#27AE60', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>✓</button>
-                                <button onClick={() => handleCancelCommunication(comm.id)} style={{ padding: '0.5rem 0.75rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>✕</button>
+                                <button onClick={() => handleCancelCommunication(comm.id)} style={{ padding: '0.5rem 0.75rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>✕</button>
                               </div>
                             )}
                           </td>
@@ -1924,17 +1924,17 @@ export default function CommunicationsPage() {
       {/* Template Modal */}
       {showTemplateModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
-            <h2 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)' }}>{editingTemplate ? 'Edit Template' : 'New Template'}</h2>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
+            <h2 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5' }}>{editingTemplate ? 'Edit Template' : 'New Template'}</h2>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Name *</label>
-                <input type="text" value={templateForm.name} onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Name *</label>
+                <input type="text" value={templateForm.name} onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Type</label>
-                <select value={templateForm.type} onChange={(e) => setTemplateForm({ ...templateForm, type: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Type</label>
+                <select value={templateForm.type} onChange={(e) => setTemplateForm({ ...templateForm, type: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }}>
                   <option value="email">Email</option>
                   <option value="sms">SMS</option>
                   <option value="call">Call Script</option>
@@ -1944,24 +1944,24 @@ export default function CommunicationsPage() {
             
             {templateForm.type === 'email' && (
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Subject</label>
-                <input type="text" value={templateForm.subject} onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Subject</label>
+                <input type="text" value={templateForm.subject} onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
             )}
             
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Body</label>
-              <textarea value={templateForm.body} onChange={(e) => setTemplateForm({ ...templateForm, body: e.target.value })} rows={6} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical', boxSizing: 'border-box' }} placeholder="Use {{firstName}}, {{lastName}}, {{company}} for personalization..." />
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Body</label>
+              <textarea value={templateForm.body} onChange={(e) => setTemplateForm({ ...templateForm, body: e.target.value })} rows={6} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', resize: 'vertical', boxSizing: 'border-box' }} placeholder="Use {{firstName}}, {{lastName}}, {{company}} for personalization..." />
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Category</label>
-                <input type="text" value={templateForm.category} onChange={(e) => setTemplateForm({ ...templateForm, category: e.target.value })} placeholder="e.g., Follow-up" style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Category</label>
+                <input type="text" value={templateForm.category} onChange={(e) => setTemplateForm({ ...templateForm, category: e.target.value })} placeholder="e.g., Follow-up" style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Pipeline Stage</label>
-                <select value={templateForm.stage} onChange={(e) => setTemplateForm({ ...templateForm, stage: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Pipeline Stage</label>
+                <select value={templateForm.stage} onChange={(e) => setTemplateForm({ ...templateForm, stage: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }}>
                   <option value="">Any Stage</option>
                   <option value="PROSPECT">Prospect</option>
                   <option value="QUALIFIED">Qualified</option>
@@ -1972,8 +1972,8 @@ export default function CommunicationsPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Status</label>
-                <select value={templateForm.status} onChange={(e) => setTemplateForm({ ...templateForm, status: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Status</label>
+                <select value={templateForm.status} onChange={(e) => setTemplateForm({ ...templateForm, status: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }}>
                   <option value="draft">Draft</option>
                   <option value="active">Active</option>
                 </select>
@@ -1981,8 +1981,8 @@ export default function CommunicationsPage() {
             </div>
             
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => { setShowTemplateModal(false); setEditingTemplate(null); }} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: 'var(--zander-gray)' }}>Cancel</button>
-              <button onClick={handleSaveTemplate} disabled={saving || !templateForm.name} style={{ padding: '0.75rem 1.5rem', background: saving || !templateForm.name ? 'var(--zander-gray)' : 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: saving || !templateForm.name ? 'not-allowed' : 'pointer' }}>{saving ? 'Saving...' : 'Save Template'}</button>
+              <button onClick={() => { setShowTemplateModal(false); setEditingTemplate(null); }} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid #2A2A38', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: '#8888A0' }}>Cancel</button>
+              <button onClick={handleSaveTemplate} disabled={saving || !templateForm.name} style={{ padding: '0.75rem 1.5rem', background: saving || !templateForm.name ? '#8888A0' : '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: saving || !templateForm.name ? 'not-allowed' : 'pointer' }}>{saving ? 'Saving...' : 'Save Template'}</button>
             </div>
           </div>
         </div>
@@ -1991,22 +1991,22 @@ export default function CommunicationsPage() {
       {/* Sequence Modal */}
       {showSequenceModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '500px' }}>
-            <h2 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)' }}>{editingSequence ? 'Edit Sequence' : 'New Sequence'}</h2>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '500px' }}>
+            <h2 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5' }}>{editingSequence ? 'Edit Sequence' : 'New Sequence'}</h2>
             
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Name *</label>
-              <input type="text" value={sequenceForm.name} onChange={(e) => setSequenceForm({ ...sequenceForm, name: e.target.value })} placeholder="e.g., New Lead Nurture" style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }} />
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Name *</label>
+              <input type="text" value={sequenceForm.name} onChange={(e) => setSequenceForm({ ...sequenceForm, name: e.target.value })} placeholder="e.g., New Lead Nurture" style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }} />
             </div>
             
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Description</label>
-              <textarea value={sequenceForm.description} onChange={(e) => setSequenceForm({ ...sequenceForm, description: e.target.value })} rows={3} placeholder="Describe what this sequence does..." style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical', boxSizing: 'border-box' }} />
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Description</label>
+              <textarea value={sequenceForm.description} onChange={(e) => setSequenceForm({ ...sequenceForm, description: e.target.value })} rows={3} placeholder="Describe what this sequence does..." style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', resize: 'vertical', boxSizing: 'border-box' }} />
             </div>
             
             <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Status</label>
-              <select value={sequenceForm.status} onChange={(e) => setSequenceForm({ ...sequenceForm, status: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', boxSizing: 'border-box' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Status</label>
+              <select value={sequenceForm.status} onChange={(e) => setSequenceForm({ ...sequenceForm, status: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', boxSizing: 'border-box' }}>
                 <option value="draft">Draft</option>
                 <option value="active">Active</option>
                 <option value="paused">Paused</option>
@@ -2014,8 +2014,8 @@ export default function CommunicationsPage() {
             </div>
             
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => { setShowSequenceModal(false); setEditingSequence(null); }} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: 'var(--zander-gray)' }}>Cancel</button>
-              <button onClick={handleSaveSequence} disabled={saving || !sequenceForm.name} style={{ padding: '0.75rem 1.5rem', background: saving || !sequenceForm.name ? 'var(--zander-gray)' : 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: saving || !sequenceForm.name ? 'not-allowed' : 'pointer' }}>{saving ? 'Saving...' : 'Save Sequence'}</button>
+              <button onClick={() => { setShowSequenceModal(false); setEditingSequence(null); }} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid #2A2A38', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: '#8888A0' }}>Cancel</button>
+              <button onClick={handleSaveSequence} disabled={saving || !sequenceForm.name} style={{ padding: '0.75rem 1.5rem', background: saving || !sequenceForm.name ? '#8888A0' : '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: saving || !sequenceForm.name ? 'not-allowed' : 'pointer' }}>{saving ? 'Saving...' : 'Save Sequence'}</button>
             </div>
           </div>
         </div>
@@ -2023,15 +2023,15 @@ export default function CommunicationsPage() {
       {/* SEND EMAIL MODAL */}
       {showSendModal && sendingTemplate && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', width: '500px', maxWidth: '90%' }}>
-            <h2 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>📤 Send Email</h2>
-            <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '16px', padding: '2rem', width: '500px', maxWidth: '90%' }}>
+            <h2 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>📤 Send Email</h2>
+            <div style={{ background: '#09090F', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
               <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>{sendingTemplate.name}</div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>{sendingTemplate.subject}</div>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>{sendingTemplate.subject}</div>
             </div>
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Select Recipient</label>
-              <select value={selectedContactId} onChange={(e) => setSelectedContactId(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px' }}>
+              <select value={selectedContactId} onChange={(e) => setSelectedContactId(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px' }}>
                 <option value="">Choose a contact...</option>
                 {(contacts || []).filter(c => c.email).map(c => (
                   <option key={c.id} value={c.id}>{c.firstName} {c.lastName} ({c.email})</option>
@@ -2039,13 +2039,13 @@ export default function CommunicationsPage() {
               </select>
             </div>
             {sendResult && (
-              <div style={{ padding: '1rem', borderRadius: '8px', marginBottom: '1rem', background: sendResult.success ? 'rgba(39,174,96,0.1)' : 'rgba(191,10,48,0.1)', color: sendResult.success ? '#27AE60' : 'var(--zander-red)' }}>
+              <div style={{ padding: '1rem', borderRadius: '8px', marginBottom: '1rem', background: sendResult.success ? 'rgba(39,174,96,0.1)' : 'rgba(191,10,48,0.1)', color: sendResult.success ? '#27AE60' : '#00CCEE' }}>
                 {sendResult.success ? '✅' : '❌'} {sendResult.message}
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-              <button onClick={() => setShowSendModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={sendEmailToContact} disabled={!selectedContactId || sendingEmail} style={{ padding: '0.75rem 1.5rem', background: !selectedContactId || sendingEmail ? 'var(--zander-gray)' : 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', cursor: !selectedContactId || sendingEmail ? 'not-allowed' : 'pointer' }}>
+              <button onClick={() => setShowSendModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={sendEmailToContact} disabled={!selectedContactId || sendingEmail} style={{ padding: '0.75rem 1.5rem', background: !selectedContactId || sendingEmail ? '#8888A0' : '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', cursor: !selectedContactId || sendingEmail ? 'not-allowed' : 'pointer' }}>
                 {sendingEmail ? 'Sending...' : 'Send Email'}
               </button>
             </div>
@@ -2056,9 +2056,9 @@ export default function CommunicationsPage() {
       {/* Compose Email Modal */}
       {showComposeModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', width: '600px', maxHeight: '80vh', overflow: 'auto' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--zander-navy)' }}>New Email</h2>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '600px', maxHeight: '80vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5' }}>New Email</h2>
               <button onClick={() => setShowComposeModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={async (e) => {
@@ -2076,24 +2076,24 @@ export default function CommunicationsPage() {
               finally { setSending(false); }
             }} style={{ padding: '1.5rem' }}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>To</label>
-                <select value={composeForm.contactId} onChange={(e) => { const c = contacts.find(x => x.id === e.target.value); setComposeForm({ ...composeForm, contactId: e.target.value, to: c?.email || composeForm.to }); }} style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', marginBottom: '0.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>To</label>
+                <select value={composeForm.contactId} onChange={(e) => { const c = contacts.find(x => x.id === e.target.value); setComposeForm({ ...composeForm, contactId: e.target.value, to: c?.email || composeForm.to }); }} style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', marginBottom: '0.5rem' }}>
                   <option value="">Select a contact or enter email below</option>
                   {contacts.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName} ({c.email})</option>)}
                 </select>
-                <input type="email" value={composeForm.to} onChange={(e) => setComposeForm({ ...composeForm, to: e.target.value })} placeholder="Or enter email address" required style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }} />
+                <input type="email" value={composeForm.to} onChange={(e) => setComposeForm({ ...composeForm, to: e.target.value })} placeholder="Or enter email address" required style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }} />
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Subject</label>
-                <input type="text" value={composeForm.subject} onChange={(e) => setComposeForm({ ...composeForm, subject: e.target.value })} required style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }} />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Subject</label>
+                <input type="text" value={composeForm.subject} onChange={(e) => setComposeForm({ ...composeForm, subject: e.target.value })} required style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }} />
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Message</label>
-                <textarea value={composeForm.body} onChange={(e) => setComposeForm({ ...composeForm, body: e.target.value })} required rows={10} style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }} />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Message</label>
+                <textarea value={composeForm.body} onChange={(e) => setComposeForm({ ...composeForm, body: e.target.value })} required rows={10} style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', resize: 'vertical' }} />
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowComposeModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={sending} style={{ padding: '0.75rem 1.5rem', background: sending ? 'var(--zander-gray)' : 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sending ? 'not-allowed' : 'pointer' }}>{sending ? 'Sending...' : '📤 Send Email'}</button>
+                <button type="button" onClick={() => setShowComposeModal(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={sending} style={{ padding: '0.75rem 1.5rem', background: sending ? '#8888A0' : 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sending ? 'not-allowed' : 'pointer' }}>{sending ? 'Sending...' : '📤 Send Email'}</button>
               </div>
             </form>
           </div>
@@ -2102,21 +2102,21 @@ export default function CommunicationsPage() {
       {/* SMS Compose Modal */}
       {showSmsCompose && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', width: '500px', maxHeight: '80vh', overflow: 'auto' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--zander-navy)' }}>💬 New SMS</h2>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '500px', maxHeight: '80vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5' }}>💬 New SMS</h2>
               <button onClick={() => setShowSmsCompose(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSendSms} style={{ padding: '1.5rem' }}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>To</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>To</label>
                 <select 
                   value={smsForm.contactId} 
                   onChange={(e) => { 
                     const c = contacts.find(x => x.id === e.target.value); 
                     setSmsForm({ ...smsForm, contactId: e.target.value, to: (c as any)?.phone || smsForm.to }); 
                   }} 
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', marginBottom: '0.5rem' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', marginBottom: '0.5rem' }}
                 >
                   <option value="">Select a contact or enter number below</option>
                   {contacts.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
@@ -2127,13 +2127,13 @@ export default function CommunicationsPage() {
                   onChange={(e) => setSmsForm({ ...smsForm, to: e.target.value })} 
                   placeholder="Phone number (e.g., 678-555-1234)" 
                   required 
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }} 
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }} 
                 />
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <label style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>Message</label>
-                  <span style={{ fontSize: '0.75rem', color: smsForm.body.length > 160 ? 'var(--zander-red)' : 'var(--zander-gray)' }}>
+                  <label style={{ fontWeight: '500', color: '#F0F0F5' }}>Message</label>
+                  <span style={{ fontSize: '0.75rem', color: smsForm.body.length > 160 ? '#00CCEE' : '#8888A0' }}>
                     {smsForm.body.length}/160 {smsForm.body.length > 160 ? '(' + Math.ceil(smsForm.body.length / 160) + ' segments)' : ''}
                   </span>
                 </div>
@@ -2144,15 +2144,15 @@ export default function CommunicationsPage() {
                   rows={4} 
                   maxLength={480}
                   placeholder="Type your message..."
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }} 
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', resize: 'vertical' }} 
                 />
-                <p style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+                <p style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.5rem' }}>
                   SMS messages over 160 characters will be sent as multiple segments
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowSmsCompose(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={sendingSms || !smsForm.to || !smsForm.body} style={{ padding: '0.75rem 1.5rem', background: sendingSms || !smsForm.to || !smsForm.body ? 'var(--zander-gray)' : 'linear-gradient(135deg, #27AE60 0%, #219a52 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sendingSms || !smsForm.to || !smsForm.body ? 'not-allowed' : 'pointer' }}>
+                <button type="button" onClick={() => setShowSmsCompose(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={sendingSms || !smsForm.to || !smsForm.body} style={{ padding: '0.75rem 1.5rem', background: sendingSms || !smsForm.to || !smsForm.body ? '#8888A0' : 'linear-gradient(135deg, #27AE60 0%, #219a52 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sendingSms || !smsForm.to || !smsForm.body ? 'not-allowed' : 'pointer' }}>
                   {sendingSms ? 'Sending...' : '💬 Send SMS'}
                 </button>
               </div>
@@ -2163,20 +2163,20 @@ export default function CommunicationsPage() {
       {/* Log Call Modal */}
       {showLogCall && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', width: '550px', maxHeight: '85vh', overflow: 'auto' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--zander-navy)' }}>📞 Log Call</h2>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '550px', maxHeight: '85vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5' }}>📞 Log Call</h2>
               <button onClick={() => setShowLogCall(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleLogCall} style={{ padding: '1.5rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Call Type *</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Call Type *</label>
                   <select
                     value={callForm.type}
                     onChange={(e) => setCallForm({ ...callForm, type: e.target.value })}
                     required
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                   >
                     <option value="manual_call">📞 Manual Call</option>
                     <option value="online_meeting">🎥 Online Meeting</option>
@@ -2184,12 +2184,12 @@ export default function CommunicationsPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Direction *</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Direction *</label>
                   <select
                     value={callForm.direction}
                     onChange={(e) => setCallForm({ ...callForm, direction: e.target.value })}
                     required
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                   >
                     <option value="outbound">📤 Outbound</option>
                     <option value="inbound">📥 Inbound</option>
@@ -2199,11 +2199,11 @@ export default function CommunicationsPage() {
               
               {callForm.type === 'online_meeting' && (
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Platform</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Platform</label>
                   <select
                     value={callForm.platform}
                     onChange={(e) => setCallForm({ ...callForm, platform: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                   >
                     <option value="">Select platform...</option>
                     <option value="zoom">Zoom</option>
@@ -2215,14 +2215,14 @@ export default function CommunicationsPage() {
               )}
 
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Contact</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Contact</label>
                 <select
                   value={callForm.contactId}
                   onChange={(e) => {
                     const c = contacts.find(x => x.id === e.target.value);
                     setCallForm({ ...callForm, contactId: e.target.value, toNumber: (c as any)?.phone || callForm.toNumber });
                   }}
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', marginBottom: '0.5rem' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', marginBottom: '0.5rem' }}
                 >
                   <option value="">Select a contact or enter number below</option>
                   {contacts.map(c => <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>)}
@@ -2232,28 +2232,28 @@ export default function CommunicationsPage() {
                   value={callForm.toNumber}
                   onChange={(e) => setCallForm({ ...callForm, toNumber: e.target.value })}
                   placeholder="Phone number (optional)"
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                 />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Duration (minutes)</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Duration (minutes)</label>
                   <input
                     type="number"
                     value={callForm.duration}
                     onChange={(e) => setCallForm({ ...callForm, duration: e.target.value })}
                     placeholder="e.g., 15"
                     min="0"
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Outcome</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Outcome</label>
                   <select
                     value={callForm.outcome}
                     onChange={(e) => setCallForm({ ...callForm, outcome: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                   >
                     <option value="completed">✅ Completed</option>
                     <option value="voicemail">📫 Left Voicemail</option>
@@ -2266,19 +2266,19 @@ export default function CommunicationsPage() {
               </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Notes</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Notes</label>
                 <textarea
                   value={callForm.notes}
                   onChange={(e) => setCallForm({ ...callForm, notes: e.target.value })}
                   rows={4}
                   placeholder="Call summary, action items, follow-up needed..."
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', resize: 'vertical' }}
                 />
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowLogCall(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={savingCall || !callForm.type} style={{ padding: '0.75rem 1.5rem', background: savingCall || !callForm.type ? 'var(--zander-gray)' : 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingCall || !callForm.type ? 'not-allowed' : 'pointer' }}>
+                <button type="button" onClick={() => setShowLogCall(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={savingCall || !callForm.type} style={{ padding: '0.75rem 1.5rem', background: savingCall || !callForm.type ? '#8888A0' : 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingCall || !callForm.type ? 'not-allowed' : 'pointer' }}>
                   {savingCall ? 'Saving...' : '📞 Log Call'}
                 </button>
               </div>
@@ -2290,19 +2290,19 @@ export default function CommunicationsPage() {
       {/* Schedule Meeting Modal */}
       {showScheduleMeeting && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', width: '500px', maxHeight: '85vh', overflow: 'auto' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px 12px 0 0' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '500px', maxHeight: '85vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px 12px 0 0' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'white' }}>🎥 Schedule Assembly</h2>
               <button onClick={() => setShowScheduleMeeting(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'white' }}>×</button>
             </div>
             <form onSubmit={handleScheduleMeeting} style={{ padding: '1.5rem' }}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Platform *</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Platform *</label>
                 <select
                   value={meetingForm.platform}
                   onChange={(e) => setMeetingForm({ ...meetingForm, platform: e.target.value })}
                   required
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                 >
                   <option value="zoom">📹 Zoom</option>
                   <option value="google_meet">🎦 Google Meet</option>
@@ -2311,32 +2311,32 @@ export default function CommunicationsPage() {
                 </select>
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Meeting URL *</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Meeting URL *</label>
                 <input
                   type="url"
                   value={meetingForm.meetingUrl}
                   onChange={(e) => setMeetingForm({ ...meetingForm, meetingUrl: e.target.value })}
                   placeholder="https://zoom.us/j/123456789 or meet.google.com/abc-defg-hij"
                   required
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                 />
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Scheduled Date & Time *</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Scheduled Date & Time *</label>
                 <input
                   type="datetime-local"
                   value={meetingForm.scheduledAt}
                   onChange={(e) => setMeetingForm({ ...meetingForm, scheduledAt: e.target.value })}
                   required
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                 />
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Contact (Optional)</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Contact (Optional)</label>
                 <select
                   value={meetingForm.contactId}
                   onChange={(e) => setMeetingForm({ ...meetingForm, contactId: e.target.value })}
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }}
                 >
                   <option value="">-- Select Contact --</option>
                   {contacts.map(c => (
@@ -2345,18 +2345,18 @@ export default function CommunicationsPage() {
                 </select>
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--zander-navy)' }}>Notes / Agenda</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Notes / Agenda</label>
                 <textarea
                   value={meetingForm.notes}
                   onChange={(e) => setMeetingForm({ ...meetingForm, notes: e.target.value })}
                   rows={3}
                   placeholder="Meeting agenda, topics to discuss, preparation needed..."
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', resize: 'vertical' }}
                 />
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowScheduleMeeting(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={savingMeeting} style={{ padding: '0.75rem 1.5rem', background: savingMeeting ? 'var(--zander-gray)' : 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingMeeting ? 'not-allowed' : 'pointer' }}>
+                <button type="button" onClick={() => setShowScheduleMeeting(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" disabled={savingMeeting} style={{ padding: '0.75rem 1.5rem', background: savingMeeting ? '#8888A0' : 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingMeeting ? 'not-allowed' : 'pointer' }}>
                   {savingMeeting ? 'Scheduling...' : '🎥 Schedule Assembly'}
                 </button>
               </div>
@@ -2368,8 +2368,8 @@ export default function CommunicationsPage() {
       {/* Call Details Modal */}
       {showCallDetails && selectedCall && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px 12px 0 0' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px 12px 0 0' }}>
               <div>
                 <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem' }}>📞 Call Details</h2>
                 <p style={{ margin: '0.25rem 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
@@ -2383,27 +2383,27 @@ export default function CommunicationsPage() {
               {/* Call Info */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Type</div>
+                  <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Type</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.type === 'online_meeting' ? '🎥 Online Meeting' : selectedCall.type === 'voicemail_drop' ? '📱 Voicemail' : '📞 Phone Call'}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Duration</div>
+                  <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Duration</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.duration ? Math.floor(selectedCall.duration / 60) + 'm ' + (selectedCall.duration % 60) + 's' : 'N/A'}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Status</div>
+                  <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Status</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: '600', color: selectedCall.status === 'completed' ? '#27ae60' : selectedCall.status === 'scheduled' ? '#1976d2' : '#666' }}>{selectedCall.status || 'Unknown'}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Direction</div>
+                  <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Direction</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.direction === 'inbound' ? '📥 Inbound' : '📤 Outbound'}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Outcome</div>
+                  <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Outcome</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.outcome || 'N/A'}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Date</div>
+                  <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Date</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{new Date(selectedCall.createdAt).toLocaleDateString()}</div>
                 </div>
               </div>
@@ -2411,7 +2411,7 @@ export default function CommunicationsPage() {
               {/* Notes */}
               {selectedCall.notes && (
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>📝 Notes</h3>
+                  <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem' }}>📝 Notes</h3>
                   <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.6' }}>{selectedCall.notes}</div>
                 </div>
               )}
@@ -2419,7 +2419,7 @@ export default function CommunicationsPage() {
               {/* Audio Recording Player */}
               {selectedCall.recordingUrl && (
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     🎧 Call Recording
                     <span style={{ background: '#e8f5e9', color: '#2e7d32', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>AUDIO</span>
                   </h3>
@@ -2489,14 +2489,14 @@ export default function CommunicationsPage() {
               )}
               {/* Transcript Section */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>📝 Transcript / Meeting Notes</h3>
+                <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem' }}>📝 Transcript / Meeting Notes</h3>
                 <textarea
                   value={transcriptText}
                   onChange={(e) => setTranscriptText(e.target.value)}
                   placeholder="Paste your call transcript, Zoom transcript export, meeting notes, or key points here..."
-                  style={{ width: '100%', minHeight: '150px', padding: '1rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.6', resize: 'vertical' }}
+                  style={{ width: '100%', minHeight: '150px', padding: '1rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.6', resize: 'vertical' }}
                 />
-                <p style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+                <p style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.5rem' }}>
                   Tip: You can paste transcripts from Zoom, Otter.ai, Google Meet, or type your own notes
                 </p>
               </div>
@@ -2539,7 +2539,7 @@ export default function CommunicationsPage() {
               {/* AI Summary Display */}
               {selectedCall.aiSummary && (
                 <div style={{ marginBottom: '1rem' }}>
-                  <h3 style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ background: 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem' }}>AI</span>
                     Summary
                   </h3>
@@ -2558,7 +2558,7 @@ export default function CommunicationsPage() {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
               <button
                 onClick={() => {
                   if (confirm('Delete this call log?')) {
@@ -2572,7 +2572,7 @@ export default function CommunicationsPage() {
                     }).catch(err => console.error('Delete call error:', err));
                   }
                 }}
-                style={{ padding: '0.5rem 1.5rem', background: 'transparent', color: 'var(--zander-red)', border: '1px solid var(--zander-red)', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}
+                style={{ padding: '0.5rem 1.5rem', background: 'transparent', color: '#00CCEE', border: '1px solid #00CCEE', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}
               >
                 🗑️ Delete
               </button>
@@ -2585,7 +2585,7 @@ export default function CommunicationsPage() {
       {/* Share Summary Modal */}
       {showShareModal && selectedCall && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-          <div style={{ background: 'white', borderRadius: '12px', width: '90%', maxWidth: '500px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '500px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', borderRadius: '12px 12px 0 0' }}>
               <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem' }}>📧 Share Call Summary</h2>
               <p style={{ margin: '0.25rem 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
@@ -2679,7 +2679,7 @@ export default function CommunicationsPage() {
           zIndex: 1000
         }}>
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
             width: '90%',
             maxWidth: '900px',
@@ -2690,17 +2690,17 @@ export default function CommunicationsPage() {
           }}>
             {/* Header */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--zander-gold) 0%, #d4a017 100%)',
+              background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
               padding: '1.5rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
               <div>
-                <h2 style={{ margin: 0, color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h2 style={{ margin: 0, color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   🏛️ The Treasury
                 </h2>
-                <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-navy)', opacity: 0.8, fontSize: '0.9rem' }}>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#F0F0F5', opacity: 0.8, fontSize: '0.9rem' }}>
                   Pre-built campaign templates ready to customize
                 </p>
               </div>
@@ -2714,7 +2714,7 @@ export default function CommunicationsPage() {
                   height: '36px',
                   cursor: 'pointer',
                   fontSize: '1.2rem',
-                  color: 'var(--zander-navy)'
+                  color: '#F0F0F5'
                 }}
               >
                 ✕
@@ -2722,14 +2722,14 @@ export default function CommunicationsPage() {
             </div>
 
             {/* Filters */}
-            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--zander-border-gray)', background: '#f8f9fa' }}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', background: '#f8f9fa' }}>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Category</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Category</label>
                   <select
                     value={treasuryFilter.category}
                     onChange={(e) => setTreasuryFilter({ ...treasuryFilter, category: e.target.value })}
-                    style={{ padding: '0.5rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', minWidth: '150px' }}
+                    style={{ padding: '0.5rem', border: '1px solid #2A2A38', borderRadius: '6px', minWidth: '150px' }}
                   >
                     <option value="">All Categories</option>
                     <option value="sales">Sales & Revenue</option>
@@ -2740,11 +2740,11 @@ export default function CommunicationsPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Executive</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Executive</label>
                   <select
                     value={treasuryFilter.executive}
                     onChange={(e) => setTreasuryFilter({ ...treasuryFilter, executive: e.target.value })}
-                    style={{ padding: '0.5rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', minWidth: '120px' }}
+                    style={{ padding: '0.5rem', border: '1px solid #2A2A38', borderRadius: '6px', minWidth: '120px' }}
                   >
                     <option value="">All</option>
                     <option value="CRO">CRO</option>
@@ -2757,11 +2757,11 @@ export default function CommunicationsPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Industry</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Industry</label>
                   <select
                     value={treasuryFilter.industry}
                     onChange={(e) => setTreasuryFilter({ ...treasuryFilter, industry: e.target.value })}
-                    style={{ padding: '0.5rem', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', minWidth: '150px' }}
+                    style={{ padding: '0.5rem', border: '1px solid #2A2A38', borderRadius: '6px', minWidth: '150px' }}
                   >
                     <option value="">All Industries</option>
                     <option value="cabinet_millwork">Cabinet & Millwork</option>
@@ -2771,7 +2771,7 @@ export default function CommunicationsPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Channels</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Channels</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     {['email', 'sms', 'phone'].map((ch) => (
                       <button
@@ -2784,9 +2784,9 @@ export default function CommunicationsPage() {
                         }}
                         style={{
                           padding: '0.5rem 0.75rem',
-                          background: treasuryFilter.channels.includes(ch) ? 'var(--zander-navy)' : 'white',
-                          color: treasuryFilter.channels.includes(ch) ? 'white' : 'var(--zander-navy)',
-                          border: '1px solid var(--zander-border-gray)',
+                          background: treasuryFilter.channels.includes(ch) ? '#13131A' : 'white',
+                          color: treasuryFilter.channels.includes(ch) ? 'white' : '#13131A',
+                          border: '1px solid #2A2A38',
                           borderRadius: '6px',
                           cursor: 'pointer',
                           fontSize: '0.8rem'
@@ -2803,14 +2803,14 @@ export default function CommunicationsPage() {
             {/* Content */}
             <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem' }}>
               {treasuryLoading ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                   Loading treasury items...
                 </div>
               ) : treasuryItems.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '3rem' }}>
                   <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
-                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Templates Found</h3>
-                  <p style={{ color: 'var(--zander-gray)' }}>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Templates Found</h3>
+                  <p style={{ color: '#8888A0' }}>
                     {treasuryFilter.category || treasuryFilter.executive || treasuryFilter.industry || treasuryFilter.channels.length > 0
                       ? 'Try adjusting your filters to see more templates'
                       : 'Campaign templates will appear here as they are added'}
@@ -2822,29 +2822,29 @@ export default function CommunicationsPage() {
                     <div
                       key={item.id}
                       style={{
-                        background: 'white',
-                        border: '2px solid var(--zander-border-gray)',
+                        background: '#1C1C26',
+                        border: '2px solid #2A2A38',
                         borderRadius: '12px',
                         padding: '1.25rem',
                         transition: 'all 0.2s',
                         cursor: 'pointer'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--zander-gold)';
+                        e.currentTarget.style.borderColor = '#00CCEE';
                         e.currentTarget.style.boxShadow = '0 4px 12px rgba(240, 179, 35, 0.2)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+                        e.currentTarget.style.borderColor = '#2A2A38';
                         e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
-                        <h4 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1rem' }}>{item.name}</h4>
+                        <h4 style={{ margin: 0, color: '#F0F0F5', fontSize: '1rem' }}>{item.name}</h4>
                         {item.executive && (
                           <span style={{
                             padding: '0.2rem 0.5rem',
                             background: 'rgba(12, 35, 64, 0.1)',
-                            color: 'var(--zander-navy)',
+                            color: '#F0F0F5',
                             borderRadius: '4px',
                             fontSize: '0.65rem',
                             fontWeight: '600'
@@ -2855,7 +2855,7 @@ export default function CommunicationsPage() {
                       </div>
 
                       {item.description && (
-                        <p style={{ color: 'var(--zander-gray)', fontSize: '0.85rem', margin: '0 0 1rem 0', lineHeight: '1.4' }}>
+                        <p style={{ color: '#8888A0', fontSize: '0.85rem', margin: '0 0 1rem 0', lineHeight: '1.4' }}>
                           {item.description}
                         </p>
                       )}
@@ -2868,7 +2868,7 @@ export default function CommunicationsPage() {
                             style={{
                               padding: '0.2rem 0.5rem',
                               background: ch === 'email' ? 'rgba(191, 10, 48, 0.1)' : ch === 'sms' ? 'rgba(39, 174, 96, 0.1)' : 'rgba(12, 35, 64, 0.1)',
-                              color: ch === 'email' ? 'var(--zander-red)' : ch === 'sms' ? '#27AE60' : 'var(--zander-navy)',
+                              color: ch === 'email' ? '#00CCEE' : ch === 'sms' ? '#27AE60' : '#13131A',
                               borderRadius: '4px',
                               fontSize: '0.65rem',
                               fontWeight: '600'
@@ -2880,21 +2880,21 @@ export default function CommunicationsPage() {
                       </div>
 
                       {/* Meta info */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--zander-border-gray)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid #2A2A38' }}>
                         <div style={{ display: 'flex', gap: '0.75rem' }}>
                           {item.stepCount && (
-                            <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{item.stepCount} steps</span>
+                            <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{item.stepCount} steps</span>
                           )}
                           {item.duration && (
-                            <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{item.duration}</span>
+                            <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{item.duration}</span>
                           )}
                         </div>
                         <button
                           onClick={() => handleAddFromTreasury(item)}
                           style={{
                             padding: '0.5rem 1rem',
-                            background: 'var(--zander-gold)',
-                            color: 'var(--zander-navy)',
+                            background: '#00CCEE',
+                            color: '#F0F0F5',
                             border: 'none',
                             borderRadius: '6px',
                             fontWeight: '600',

@@ -605,14 +605,14 @@ export default function SchedulePage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', background: '#09090F' }}>
         <NavBar activeModule="cro" />
         <Sidebar />
 
         <main style={{ marginLeft: '240px', marginTop: '64px', padding: '2rem' }}>
           {/* Page Header */}
           <div style={{
-            background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+            background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
             borderRadius: '12px',
             padding: '2rem',
             color: 'white',
@@ -649,8 +649,8 @@ export default function SchedulePage() {
                   onClick={() => setShowCreateModal(true)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'var(--zander-gold)',
-                    color: 'var(--zander-navy)',
+                    background: '#00CCEE',
+                    color: '#F0F0F5',
                     border: 'none',
                     borderRadius: '8px',
                     fontWeight: '700',
@@ -670,9 +670,9 @@ export default function SchedulePage() {
           {/* SuperAdmin Tenant Toggle - Only visible for SuperAdmin */}
           {isSuperAdmin && accessibleTenants.length > 1 && (
             <div style={{
-              background: 'white',
+              background: '#1C1C26',
               borderRadius: '12px',
-              border: '2px solid var(--zander-gold)',
+              border: '2px solid #00CCEE',
               marginBottom: '1rem',
               padding: '1rem',
               display: 'flex',
@@ -681,7 +681,7 @@ export default function SchedulePage() {
             }}>
               <span style={{ 
                 fontWeight: '600', 
-                color: 'var(--zander-navy)',
+                color: '#F0F0F5',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem'
@@ -696,9 +696,9 @@ export default function SchedulePage() {
                   }}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: viewMode === 'single' ? 'var(--zander-navy)' : 'transparent',
-                    color: viewMode === 'single' ? 'white' : 'var(--zander-navy)',
-                    border: viewMode === 'single' ? 'none' : '1px solid var(--zander-border-gray)',
+                    background: viewMode === 'single' ? '#13131A' : 'transparent',
+                    color: viewMode === 'single' ? 'white' : '#13131A',
+                    border: viewMode === 'single' ? 'none' : '1px solid #2A2A38',
                     borderRadius: '6px',
                     fontWeight: '600',
                     cursor: 'pointer',
@@ -720,8 +720,8 @@ export default function SchedulePage() {
                       style={{
                         padding: '0.5rem 1rem',
                         background: isSelected ? colors.bg : 'transparent',
-                        color: isSelected ? colors.text : 'var(--zander-navy)',
-                        border: isSelected ? 'none' : '1px solid var(--zander-border-gray)',
+                        color: isSelected ? colors.text : '#13131A',
+                        border: isSelected ? 'none' : '1px solid #2A2A38',
                         borderRadius: '6px',
                         fontWeight: '600',
                         cursor: 'pointer',
@@ -742,9 +742,9 @@ export default function SchedulePage() {
                   }}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-gold)' : 'transparent',
-                    color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'var(--zander-navy)' : 'var(--zander-navy)',
-                    border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid var(--zander-border-gray)',
+                    background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#00CCEE' : 'transparent',
+                    color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#13131A' : '#13131A',
+                    border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid #2A2A38',
                     borderRadius: '6px',
                     fontWeight: '700',
                     cursor: 'pointer',
@@ -762,9 +762,9 @@ export default function SchedulePage() {
 
           {/* View Tabs & Navigation */}
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
-            border: '2px solid var(--zander-border-gray)',
+            border: '2px solid #2A2A38',
             marginBottom: '1.5rem',
             padding: '1rem',
             display: 'flex',
@@ -783,9 +783,9 @@ export default function SchedulePage() {
                   onClick={() => setView(tab.id as any)}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: view === tab.id ? 'var(--zander-navy)' : 'transparent',
-                    color: view === tab.id ? 'white' : 'var(--zander-navy)',
-                    border: view === tab.id ? 'none' : '1px solid var(--zander-border-gray)',
+                    background: view === tab.id ? '#13131A' : 'transparent',
+                    color: view === tab.id ? 'white' : '#13131A',
+                    border: view === tab.id ? 'none' : '1px solid #2A2A38',
                     borderRadius: '6px',
                     fontWeight: '600',
                     cursor: 'pointer',
@@ -812,14 +812,14 @@ export default function SchedulePage() {
                   style={{
                     padding: '0.5rem 0.75rem',
                     background: 'transparent',
-                    border: '1px solid var(--zander-border-gray)',
+                    border: '1px solid #2A2A38',
                     borderRadius: '6px',
                     cursor: 'pointer'
                   }}
                 >
                   ←
                 </button>
-                <span style={{ fontWeight: '600', color: 'var(--zander-navy)', minWidth: '150px', textAlign: 'center' }}>
+                <span style={{ fontWeight: '600', color: '#F0F0F5', minWidth: '150px', textAlign: 'center' }}>
                   {view === 'week' 
                     ? `${formatDate(getWeekStart(selectedDate).toISOString())} - ${formatDate(getWeekEnd(selectedDate).toISOString())}`
                     : selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -835,7 +835,7 @@ export default function SchedulePage() {
                   style={{
                     padding: '0.5rem 0.75rem',
                     background: 'transparent',
-                    border: '1px solid var(--zander-border-gray)',
+                    border: '1px solid #2A2A38',
                     borderRadius: '6px',
                     cursor: 'pointer'
                   }}
@@ -846,7 +846,7 @@ export default function SchedulePage() {
                   onClick={() => setSelectedDate(new Date())}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
@@ -862,27 +862,27 @@ export default function SchedulePage() {
 
           {/* Events Content */}
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
-            border: '2px solid var(--zander-border-gray)',
+            border: '2px solid #2A2A38',
             minHeight: '400px'
           }}>
             {loading ? (
-              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+              <div style={{ padding: '3rem', textAlign: 'center', color: '#8888A0' }}>
                 Loading schedule...
               </div>
             ) : events.length === 0 ? (
               <div style={{ padding: '3rem', textAlign: 'center' }}>
                 <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📅</div>
-                <h3 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>No Assemblies Scheduled</h3>
-                <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>
+                <h3 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>No Assemblies Scheduled</h3>
+                <p style={{ color: '#8888A0', marginBottom: '1.5rem' }}>
                   {view === 'today' ? "Your day is clear! Schedule something or enjoy the free time." : "No events found for this period."}
                 </p>
                 <button
                   onClick={() => setShowCreateModal(true)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -898,7 +898,7 @@ export default function SchedulePage() {
                 {/* Today View - Timeline style */}
                 {view === 'today' && (
                   <div>
-                    <h3 style={{ margin: '0 0 1rem', color: 'var(--zander-navy)' }}>Today's Schedule</h3>
+                    <h3 style={{ margin: '0 0 1rem', color: '#F0F0F5' }}>Today's Schedule</h3>
                     {events.map((event) => (
                       <div
                         key={event.id}
@@ -908,7 +908,7 @@ export default function SchedulePage() {
                           gap: '1rem',
                           padding: '1rem',
                           marginBottom: '0.75rem',
-                          background: 'var(--zander-off-white)',
+                          background: '#09090F',
                           borderRadius: '8px',
                           borderLeft: `4px solid ${getCategoryColor(event.category)}`,
                           cursor: 'pointer',
@@ -916,17 +916,17 @@ export default function SchedulePage() {
                         }}
                       >
                         <div style={{ minWidth: '80px', textAlign: 'center' }}>
-                          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+                          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
                             {formatTime(event.startTime)}
                           </div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                             {formatTime(event.endTime)}
                           </div>
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                             <span>{getEventTypeIcon(event.eventType)}</span>
-                            <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{event.title}</span>
+                            <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{event.title}</span>
                             {/* Tenant badge for multi-tenant view */}
                             {viewMode === 'all' && (event as any).tenant && (
                               <span style={{
@@ -945,7 +945,7 @@ export default function SchedulePage() {
                             )}
                             {event.willBeRecorded && (
                               <span style={{
-                                background: '#BF0A30',
+                                background: '#00CCEE',
                                 color: 'white',
                                 padding: '0.125rem 0.5rem',
                                 borderRadius: '4px',
@@ -957,7 +957,7 @@ export default function SchedulePage() {
                             )}
                             {event.priority === 'urgent' && (
                               <span style={{
-                                background: 'var(--zander-red)',
+                                background: '#00CCEE',
                                 color: 'white',
                                 padding: '0.125rem 0.5rem',
                                 borderRadius: '4px',
@@ -968,7 +968,7 @@ export default function SchedulePage() {
                               </span>
                             )}
                           </div>
-                          <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                             {event.contact && `${event.contact.firstName} ${event.contact.lastName}`}
                             {event.contact && event.meetingPlatform && ' • '}
                             {event.meetingPlatform && getPlatformIcon(event.meetingPlatform)}
@@ -1005,7 +1005,7 @@ export default function SchedulePage() {
                 {/* Agenda View - List style */}
                 {view === 'agenda' && (
                   <div>
-                    <h3 style={{ margin: '0 0 1rem', color: 'var(--zander-navy)' }}>Upcoming Events</h3>
+                    <h3 style={{ margin: '0 0 1rem', color: '#F0F0F5' }}>Upcoming Events</h3>
                     {events.map((event) => (
                       <div
                         key={event.id}
@@ -1015,24 +1015,24 @@ export default function SchedulePage() {
                           gap: '1rem',
                           padding: '1rem',
                           marginBottom: '0.75rem',
-                          background: 'var(--zander-off-white)',
+                          background: '#09090F',
                           borderRadius: '8px',
                           borderLeft: `4px solid ${getCategoryColor(event.category)}`,
                           cursor: 'pointer'
                         }}
                       >
                         <div style={{ minWidth: '120px' }}>
-                          <div style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                          <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
                             {formatDate(event.startTime)}
                           </div>
-                          <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                             {formatTime(event.startTime)} - {formatTime(event.endTime)}
                           </div>
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                             <span>{getEventTypeIcon(event.eventType)}</span>
-                            <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{event.title}</span>
+                            <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{event.title}</span>
                             {/* Tenant badge for multi-tenant view */}
                             {viewMode === 'all' && (event as any).tenant && (
                               <span style={{
@@ -1051,7 +1051,7 @@ export default function SchedulePage() {
                             )}
                             {event.willBeRecorded && (
                               <span style={{
-                                background: '#BF0A30',
+                                background: '#00CCEE',
                                 color: 'white',
                                 padding: '0.125rem 0.5rem',
                                 borderRadius: '4px',
@@ -1062,7 +1062,7 @@ export default function SchedulePage() {
                               </span>
                             )}
                           </div>
-                          <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                             {event.contact && `${event.contact.firstName} ${event.contact.lastName}`}
                             {event.meetingPlatform && ` • ${getPlatformIcon(event.meetingPlatform)}`}
                           </div>
@@ -1087,7 +1087,7 @@ export default function SchedulePage() {
                 {/* Week View - Simple grid */}
                 {view === 'week' && (
                   <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', background: 'var(--zander-border-gray)', borderRadius: '8px', overflow: 'hidden' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', background: '#2A2A38', borderRadius: '8px', overflow: 'hidden' }}>
                       {Array.from({ length: 7 }).map((_, i) => {
                         const d = new Date(getWeekStart(selectedDate));
                         d.setDate(d.getDate() + i);
@@ -1095,12 +1095,12 @@ export default function SchedulePage() {
                         const isToday = d.toDateString() === today.toDateString();
                         
                         return (
-                          <div key={i} style={{ background: 'white', minHeight: '150px' }}>
+                          <div key={i} style={{ background: '#1C1C26', minHeight: '150px' }}>
                             <div style={{
                               padding: '0.75rem',
-                              borderBottom: '1px solid var(--zander-border-gray)',
-                              background: isToday ? 'var(--zander-red)' : 'var(--zander-off-white)',
-                              color: isToday ? 'white' : 'var(--zander-navy)',
+                              borderBottom: '1px solid #2A2A38',
+                              background: isToday ? '#00CCEE' : '#09090F',
+                              color: isToday ? 'white' : '#13131A',
                               fontWeight: '600',
                               textAlign: 'center'
                             }}>
@@ -1129,7 +1129,7 @@ export default function SchedulePage() {
                                 </div>
                               ))}
                               {dayEvents.length > 3 && (
-                                <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.7rem', color: '#8888A0', textAlign: 'center' }}>
                                   +{dayEvents.length - 3} more
                                 </div>
                               )}
@@ -1144,11 +1144,11 @@ export default function SchedulePage() {
                 {/* Month View - Calendar grid */}
                 {view === 'month' && (
                   <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', background: 'var(--zander-border-gray)', borderRadius: '8px', overflow: 'hidden' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', background: '#2A2A38', borderRadius: '8px', overflow: 'hidden' }}>
                       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                         <div key={day} style={{
                           padding: '0.5rem',
-                          background: 'var(--zander-navy)',
+                          background: '#13131A',
                           color: 'white',
                           textAlign: 'center',
                           fontWeight: '600',
@@ -1176,13 +1176,13 @@ export default function SchedulePage() {
                           const isToday = d.toDateString() === today.toDateString();
                           
                           cells.push(
-                            <div key={day} style={{ background: 'white', minHeight: '80px', padding: '0.25rem' }}>
+                            <div key={day} style={{ background: '#1C1C26', minHeight: '80px', padding: '0.25rem' }}>
                               <div style={{
                                 width: '24px',
                                 height: '24px',
                                 borderRadius: '50%',
-                                background: isToday ? 'var(--zander-red)' : 'transparent',
-                                color: isToday ? 'white' : 'var(--zander-navy)',
+                                background: isToday ? '#00CCEE' : 'transparent',
+                                color: isToday ? 'white' : '#13131A',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -1213,7 +1213,7 @@ export default function SchedulePage() {
                                 </div>
                               ))}
                               {dayEvents.length > 2 && (
-                                <div style={{ fontSize: '0.6rem', color: 'var(--zander-gray)' }}>
+                                <div style={{ fontSize: '0.6rem', color: '#8888A0' }}>
                                   +{dayEvents.length - 2}
                                 </div>
                               )}
@@ -1238,15 +1238,15 @@ export default function SchedulePage() {
             background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
           }}>
             <div style={{
-              background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
+              background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
             }}>
-              <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
+              <div style={{ background: '#13131A', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
                 <h2 style={{ margin: 0 }}>New Assembly</h2>
               </div>
               <div style={{ padding: '1.5rem' }}>
                 {/* Title */}
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                     Event Title *
                   </label>
                   <input
@@ -1254,32 +1254,32 @@ export default function SchedulePage() {
                     value={newEvent.title}
                     onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                     placeholder="e.g., Client Meeting with Johnson Corp"
-                    style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                   />
                 </div>
 
                 {/* Date/Time Row */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Start *
                     </label>
                     <input
                       type="datetime-local"
                       value={newEvent.startTime}
                       onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       End *
                     </label>
                     <input
                       type="datetime-local"
                       value={newEvent.endTime}
                       onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                     />
                   </div>
                 </div>
@@ -1287,13 +1287,13 @@ export default function SchedulePage() {
                 {/* Type & Category Row */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Event Type
                     </label>
                     <select
                       value={newEvent.eventType}
                       onChange={(e) => setNewEvent({ ...newEvent, eventType: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                     >
                       <option value="meeting">👥 Meeting</option>
                       <option value="call">📞 Call</option>
@@ -1304,13 +1304,13 @@ export default function SchedulePage() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Category
                     </label>
                     <select
                       value={newEvent.category}
                       onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                     >
                       <option value="client">🔴 Client</option>
                       <option value="internal">🔵 Internal</option>
@@ -1323,13 +1323,13 @@ export default function SchedulePage() {
                 {/* Meeting Platform */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Meeting Platform
                     </label>
                     <select
                       value={newEvent.meetingPlatform}
                       onChange={(e) => setNewEvent({ ...newEvent, meetingPlatform: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                     >
                       <option value="">Select Platform...</option>
                       <option value="zoom">📹 Zoom</option>
@@ -1340,7 +1340,7 @@ export default function SchedulePage() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Meeting URL
                     </label>
                     <input
@@ -1348,20 +1348,20 @@ export default function SchedulePage() {
                       value={newEvent.meetingUrl}
                       onChange={(e) => setNewEvent({ ...newEvent, meetingUrl: e.target.value })}
                       placeholder="https://zoom.us/j/..."
-                      style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                     />
                   </div>
                 </div>
 
                 {/* Contact */}
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                     Related Contact
                   </label>
                   <select
                     value={newEvent.contactId}
                     onChange={(e) => setNewEvent({ ...newEvent, contactId: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box' }}
                   >
                     <option value="">Select Contact...</option>
                     {contacts.map((c) => (
@@ -1373,23 +1373,23 @@ export default function SchedulePage() {
                 {/* Recording Toggle */}
                 <div style={{
                   padding: '1rem',
-                  background: newEvent.willBeRecorded ? 'rgba(191, 10, 48, 0.1)' : 'var(--zander-off-white)',
+                  background: newEvent.willBeRecorded ? 'rgba(191, 10, 48, 0.1)' : '#09090F',
                   borderRadius: '8px',
                   marginBottom: '1rem',
-                  border: newEvent.willBeRecorded ? '2px solid var(--zander-red)' : '2px solid var(--zander-border-gray)'
+                  border: newEvent.willBeRecorded ? '2px solid #00CCEE' : '2px solid #2A2A38'
                 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
                       checked={newEvent.willBeRecorded}
                       onChange={(e) => setNewEvent({ ...newEvent, willBeRecorded: e.target.checked })}
-                      style={{ width: '20px', height: '20px', accentColor: 'var(--zander-red)' }}
+                      style={{ width: '20px', height: '20px', accentColor: '#00CCEE' }}
                     />
                     <div>
-                      <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5' }}>
                         🔴 This meeting will be recorded
                       </div>
-                      <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+                      <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                         Recording disclosure will be automatically included in invitations
                       </div>
                     </div>
@@ -1398,11 +1398,11 @@ export default function SchedulePage() {
                     <div style={{
                       marginTop: '1rem',
                       padding: '0.75rem',
-                      background: 'white',
+                      background: '#1C1C26',
                       borderRadius: '6px',
                       fontSize: '0.8rem',
-                      color: 'var(--zander-navy)',
-                      border: '1px solid var(--zander-red)'
+                      color: '#F0F0F5',
+                      border: '1px solid #00CCEE'
                     }}>
                       <strong>⚠️ Recording Disclosure (will be added to invite):</strong>
                       <p style={{ margin: '0.5rem 0 0', lineHeight: '1.5' }}>{RECORDING_DISCLOSURE}</p>
@@ -1412,7 +1412,7 @@ export default function SchedulePage() {
 
                 {/* Agenda */}
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                     Agenda / Notes
                   </label>
                   <textarea
@@ -1420,7 +1420,7 @@ export default function SchedulePage() {
                     onChange={(e) => setNewEvent({ ...newEvent, agenda: e.target.value })}
                     placeholder="Meeting agenda, topics to discuss, preparation notes..."
                     rows={4}
-                    style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '1rem', resize: 'vertical', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', resize: 'vertical', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -1428,7 +1428,7 @@ export default function SchedulePage() {
 
                 {/* Attach from Treasury */}
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                     📎 Attached Items from Treasury
                   </label>
                   
@@ -1443,9 +1443,9 @@ export default function SchedulePage() {
                             alignItems: 'center',
                             gap: '0.5rem',
                             padding: '0.5rem 0.75rem',
-                            background: 'var(--zander-off-white)',
+                            background: '#09090F',
                             borderRadius: '6px',
-                            border: '1px solid var(--zander-border-gray)'
+                            border: '1px solid #2A2A38'
                           }}
                         >
                           <span>{getTreasuryTypeIcon(item.type)}</span>
@@ -1457,7 +1457,7 @@ export default function SchedulePage() {
                               border: 'none',
                               cursor: 'pointer',
                               padding: '0 0.25rem',
-                              color: 'var(--zander-gray)',
+                              color: '#8888A0',
                               fontSize: '1.1rem'
                             }}
                           >
@@ -1474,11 +1474,11 @@ export default function SchedulePage() {
                     onClick={() => setShowAttachTreasuryPicker(true)}
                     style={{
                       padding: '0.5rem 1rem',
-                      background: 'white',
-                      border: '2px dashed var(--zander-border-gray)',
+                      background: '#1C1C26',
+                      border: '2px dashed #2A2A38',
                       borderRadius: '6px',
                       cursor: 'pointer',
-                      color: 'var(--zander-navy)',
+                      color: '#F0F0F5',
                       fontWeight: '500',
                       display: 'flex',
                       alignItems: 'center',
@@ -1489,10 +1489,10 @@ export default function SchedulePage() {
                   </button>
                 </div>
               {/* Modal Footer */}
-              <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => { setShowCreateModal(false); resetNewEvent(); }}
-                  style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: 'var(--zander-gray)' }}
+                  style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '2px solid #2A2A38', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', color: '#8888A0' }}
                 >
                   Cancel
                 </button>
@@ -1501,7 +1501,7 @@ export default function SchedulePage() {
                   disabled={saving}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: saving ? 'var(--zander-gray)' : 'var(--zander-red)',
+                    background: saving ? '#8888A0' : '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
@@ -1523,7 +1523,7 @@ export default function SchedulePage() {
             background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
           }}>
             <div style={{
-              background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
+              background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
             }}>
               <div style={{
                 background: `linear-gradient(135deg, ${getCategoryColor(selectedEvent.category)} 0%, ${getCategoryColor(selectedEvent.category)}dd 100%)`,
@@ -1560,18 +1560,18 @@ export default function SchedulePage() {
                 {(selectedEvent.contact || selectedEvent.meetingPlatform) && (
                   <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
                     {selectedEvent.contact && (
-                      <div style={{ padding: '0.75rem 1rem', background: 'var(--zander-off-white)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ padding: '0.75rem 1rem', background: '#09090F', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span>👤</span>
                         <span>{selectedEvent.contact.firstName} {selectedEvent.contact.lastName}</span>
                       </div>
                     )}
                     {selectedEvent.meetingPlatform && (
-                      <div style={{ padding: '0.75rem 1rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
+                      <div style={{ padding: '0.75rem 1rem', background: '#09090F', borderRadius: '8px' }}>
                         {getPlatformIcon(selectedEvent.meetingPlatform)}
                       </div>
                     )}
                     {selectedEvent.location && (
-                      <div style={{ padding: '0.75rem 1rem', background: 'var(--zander-off-white)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ padding: '0.75rem 1rem', background: '#09090F', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span>📍</span>
                         <span>{selectedEvent.location}</span>
                       </div>
@@ -1605,18 +1605,18 @@ export default function SchedulePage() {
                 {selectedEvent.willBeRecorded && (
                   <div style={{
                     padding: '1rem',
-                    background: 'rgba(191, 10, 48, 0.1)',
-                    border: '1px solid var(--zander-red)',
+                    background: 'rgba(0, 204, 238, 0.1)',
+                    border: '1px solid #00CCEE',
                     borderRadius: '8px',
                     marginBottom: '1rem'
                   }}>
-                    <div style={{ fontWeight: '600', color: 'var(--zander-red)', marginBottom: '0.5rem' }}>
+                    <div style={{ fontWeight: '600', color: '#00CCEE', marginBottom: '0.5rem' }}>
                       🔴 Recording Notice
                     </div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--zander-navy)', lineHeight: '1.5' }}>
+                    <div style={{ fontSize: '0.875rem', color: '#F0F0F5', lineHeight: '1.5' }}>
                       {RECORDING_DISCLOSURE}
                     </div>
-                    <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                    <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: '#8888A0' }}>
                       Disclosure sent: {selectedEvent.recordingDisclosureSent ? '✅ Yes' : '⏳ Pending'}
                       {selectedEvent.recordingConsentStatus && ` • Consent: ${selectedEvent.recordingConsentStatus}`}
                     </div>
@@ -1626,10 +1626,10 @@ export default function SchedulePage() {
                 {/* Agenda */}
                 {selectedEvent.agenda && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>📋 Agenda</h4>
+                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>📋 Agenda</h4>
                     <div style={{
                       padding: '1rem',
-                      background: 'var(--zander-off-white)',
+                      background: '#09090F',
                       borderRadius: '8px',
                       whiteSpace: 'pre-wrap',
                       fontSize: '0.9rem',
@@ -1643,7 +1643,7 @@ export default function SchedulePage() {
                 {/* Attached Items */}
                 {selectedEvent.attachedItems && selectedEvent.attachedItems.length > 0 && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>📎 Attached Items</h4>
+                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>📎 Attached Items</h4>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                       {selectedEvent.attachedItems.map((item: any, index: number) => (
                         <div
@@ -1654,9 +1654,9 @@ export default function SchedulePage() {
                             alignItems: 'center',
                             gap: '0.5rem',
                             padding: '0.5rem 0.75rem',
-                            background: item.type === 'form' ? 'rgba(191, 10, 48, 0.05)' : 'var(--zander-off-white)',
+                            background: item.type === 'form' ? 'rgba(191, 10, 48, 0.05)' : '#09090F',
                             borderRadius: '6px',
-                            border: item.type === 'form' ? '2px solid var(--zander-red)' : '1px solid var(--zander-border-gray)',
+                            border: item.type === 'form' ? '2px solid #00CCEE' : '1px solid #2A2A38',
                             cursor: item.type === 'form' ? 'pointer' : 'default',
                             transition: 'all 0.2s ease'
                           }}
@@ -1697,7 +1697,7 @@ export default function SchedulePage() {
                           {item.type !== 'form' && (
                             <span style={{
                               background: item.type === 'sop' ? 'rgba(0, 86, 135, 0.1)' : 'rgba(240, 179, 35, 0.2)',
-                              color: item.type === 'sop' ? 'var(--zander-blue)' : '#b8860b',
+                              color: item.type === 'sop' ? '#00CCEE' : '#b8860b',
                               padding: '0.1rem 0.4rem',
                               borderRadius: '4px',
                               fontSize: '0.65rem',
@@ -1715,8 +1715,8 @@ export default function SchedulePage() {
                 {/* Description */}
                 {selectedEvent.description && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>📝 Description</h4>
-                    <p style={{ margin: 0, color: 'var(--zander-gray)', lineHeight: '1.6' }}>
+                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>📝 Description</h4>
+                    <p style={{ margin: 0, color: '#8888A0', lineHeight: '1.6' }}>
                       {selectedEvent.description}
                     </p>
                   </div>
@@ -1738,7 +1738,7 @@ export default function SchedulePage() {
                   <span style={{
                     padding: '0.25rem 0.75rem',
                     background: selectedEvent.status === 'scheduled' ? 'rgba(39, 174, 96, 0.1)' : 'rgba(108, 117, 125, 0.1)',
-                    color: selectedEvent.status === 'scheduled' ? '#27AE60' : 'var(--zander-gray)',
+                    color: selectedEvent.status === 'scheduled' ? '#27AE60' : '#8888A0',
                     borderRadius: '4px',
                     fontSize: '0.75rem',
                     fontWeight: '600',
@@ -1750,14 +1750,14 @@ export default function SchedulePage() {
               </div>
 
               {/* Modal Footer */}
-              <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--zander-border-gray)', display: 'flex', gap: '1rem', justifyContent: 'space-between' }}>
+              <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', gap: '1rem', justifyContent: 'space-between' }}>
                 <button
                   onClick={() => handleDeleteEvent(selectedEvent.id)}
                   style={{
                     padding: '0.75rem 1.5rem',
                     background: 'transparent',
-                    border: '2px solid var(--zander-red)',
-                    color: 'var(--zander-red)',
+                    border: '2px solid #00CCEE',
+                    color: '#00CCEE',
                     borderRadius: '6px',
                     fontWeight: '600',
                     cursor: 'pointer'
@@ -1771,11 +1771,11 @@ export default function SchedulePage() {
                     style={{
                       padding: '0.75rem 1.5rem',
                       background: 'transparent',
-                      border: '2px solid var(--zander-border-gray)',
+                      border: '2px solid #2A2A38',
                       borderRadius: '6px',
                       fontWeight: '600',
                       cursor: 'pointer',
-                      color: 'var(--zander-gray)'
+                      color: '#8888A0'
                     }}
                   >
                     Cancel Assembly
@@ -1784,7 +1784,7 @@ export default function SchedulePage() {
                     onClick={() => { setShowEventModal(false); setSelectedEvent(null); }}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      background: 'var(--zander-navy)',
+                      background: '#13131A',
                       color: 'white',
                       border: 'none',
                       borderRadius: '6px',
@@ -1815,7 +1815,7 @@ export default function SchedulePage() {
             zIndex: 1000
           }}>
             <div style={{
-              background: 'white',
+              background: '#1C1C26',
               borderRadius: '12px',
               width: '90%',
               maxWidth: '900px',
@@ -1826,17 +1826,17 @@ export default function SchedulePage() {
             }}>
               {/* Header */}
               <div style={{
-                background: 'linear-gradient(135deg, var(--zander-gold) 0%, #d4a017 100%)',
+                background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
                 padding: '1.5rem',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center'
               }}>
                 <div>
-                  <h2 style={{ margin: 0, color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <h2 style={{ margin: 0, color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     🏛️ The Treasury
                   </h2>
-                  <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-navy)', opacity: 0.8, fontSize: '0.9rem' }}>
+                  <p style={{ margin: '0.25rem 0 0 0', color: '#F0F0F5', opacity: 0.8, fontSize: '0.9rem' }}>
                     Pre-built assembly templates ready to customize
                   </p>
                 </div>
@@ -1859,11 +1859,11 @@ export default function SchedulePage() {
                 </button>
               </div>
               {/* Filters */}
-              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 <select
                   value={treasuryFilter.category}
                   onChange={(e) => setTreasuryFilter({ ...treasuryFilter, category: e.target.value })}
-                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #2A2A38' }}
                 >
                   <option value="">All Categories</option>
                   <option value="sales">Sales</option>
@@ -1874,7 +1874,7 @@ export default function SchedulePage() {
                 <select
                   value={treasuryFilter.executive}
                   onChange={(e) => setTreasuryFilter({ ...treasuryFilter, executive: e.target.value })}
-                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #2A2A38' }}
                 >
                   <option value="">All Executives</option>
                   <option value="CRO">CRO</option>
@@ -1885,7 +1885,7 @@ export default function SchedulePage() {
                 <select
                   value={treasuryFilter.industry}
                   onChange={(e) => setTreasuryFilter({ ...treasuryFilter, industry: e.target.value })}
-                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                  style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #2A2A38' }}
                 >
                   <option value="">All Industries</option>
                   <option value="general">General</option>
@@ -1897,14 +1897,14 @@ export default function SchedulePage() {
               {/* Content */}
               <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
                 {treasuryLoading ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                     <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
                     <p>Loading templates...</p>
                   </div>
                 ) : treasuryItems.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Templates Found</h3>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Templates Found</h3>
                     <p style={{ margin: 0 }}>Try adjusting your filters or check back later for new templates.</p>
                   </div>
                 ) : (
@@ -1913,21 +1913,21 @@ export default function SchedulePage() {
                       <div
                         key={item.id}
                         style={{
-                          border: '2px solid var(--zander-border-gray)',
+                          border: '2px solid #2A2A38',
                           borderRadius: '12px',
                           padding: '1.25rem',
                           transition: 'all 0.2s ease',
                           cursor: 'pointer'
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--zander-gold)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.boxShadow = 'none'; }}
+                        onMouseOver={(e) => { e.currentTarget.style.borderColor = '#00CCEE'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.borderColor = '#2A2A38'; e.currentTarget.style.boxShadow = 'none'; }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                           <span style={{ fontSize: '1.5rem' }}>📅</span>
                           {item.duration && (
                             <span style={{
                               background: 'rgba(0, 86, 135, 0.1)',
-                              color: 'var(--zander-blue)',
+                              color: '#00CCEE',
                               padding: '0.25rem 0.5rem',
                               borderRadius: '4px',
                               fontSize: '0.7rem',
@@ -1937,18 +1937,18 @@ export default function SchedulePage() {
                             </span>
                           )}
                         </div>
-                        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>{item.name}</h4>
-                        <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                        <h4 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5', fontSize: '1rem' }}>{item.name}</h4>
+                        <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.85rem', lineHeight: '1.4' }}>
                           {item.description || 'No description available'}
                         </p>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                           {item.executive && (
-                            <span style={{ background: 'var(--zander-off-white)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--zander-navy)' }}>
+                            <span style={{ background: '#09090F', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: '#F0F0F5' }}>
                               {item.executive}
                             </span>
                           )}
                           {item.industry && (
-                            <span style={{ background: 'var(--zander-off-white)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--zander-navy)' }}>
+                            <span style={{ background: '#09090F', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: '#F0F0F5' }}>
                               {item.industry.replace('_', ' ')}
                             </span>
                           )}
@@ -1958,7 +1958,7 @@ export default function SchedulePage() {
                           style={{
                             width: '100%',
                             padding: '0.6rem',
-                            background: 'var(--zander-navy)',
+                            background: '#13131A',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -1985,9 +1985,9 @@ export default function SchedulePage() {
             background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100
           }}>
             <div style={{
-              background: 'white', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column'
+              background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column'
             }}>
-              <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ background: '#13131A', color: 'white', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ margin: 0 }}>📎 Attach from Treasury</h3>
                 <button
                   onClick={() => setShowAttachTreasuryPicker(false)}
@@ -1998,7 +1998,7 @@ export default function SchedulePage() {
               </div>
               <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
                 {allTreasuryItems.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+                  <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
                     <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
                     <p>Loading items...</p>
                   </div>
@@ -2009,21 +2009,21 @@ export default function SchedulePage() {
                         key={item.id}
                         onClick={() => handleAttachItem(item)}
                         style={{
-                          border: '2px solid var(--zander-border-gray)',
+                          border: '2px solid #2A2A38',
                           borderRadius: '8px',
                           padding: '1rem',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                           opacity: newEvent.attachedItems.some(a => a.treasuryItemId === item.id) ? 0.5 : 1
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--zander-gold)'; e.currentTarget.style.background = 'var(--zander-off-white)'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.background = 'white'; }}
+                        onMouseOver={(e) => { e.currentTarget.style.borderColor = '#00CCEE'; e.currentTarget.style.background = '#1C1C26'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.borderColor = '#2A2A38'; e.currentTarget.style.background = '#1C1C26'; }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                           <span style={{ fontSize: '1.25rem' }}>{getTreasuryTypeIcon(item.type)}</span>
                           <span style={{
                             background: item.type === 'form' ? 'rgba(191, 10, 48, 0.1)' : item.type === 'sop' ? 'rgba(0, 86, 135, 0.1)' : item.type === 'campaign' ? 'rgba(240, 179, 35, 0.2)' : 'rgba(12, 35, 64, 0.1)',
-                            color: item.type === 'form' ? 'var(--zander-red)' : item.type === 'sop' ? 'var(--zander-blue)' : item.type === 'campaign' ? '#b8860b' : 'var(--zander-navy)',
+                            color: item.type === 'form' ? '#00CCEE' : item.type === 'sop' ? '#00CCEE' : item.type === 'campaign' ? '#b8860b' : '#13131A',
                             padding: '0.15rem 0.5rem',
                             borderRadius: '4px',
                             fontSize: '0.7rem',
@@ -2033,14 +2033,14 @@ export default function SchedulePage() {
                             {item.type}
                           </span>
                         </div>
-                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.95rem' }}>{item.name}</div>
+                        <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.95rem' }}>{item.name}</div>
                         {item.description && (
-                          <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)', marginTop: '0.25rem', lineHeight: '1.4' }}>
+                          <div style={{ fontSize: '0.8rem', color: '#8888A0', marginTop: '0.25rem', lineHeight: '1.4' }}>
                             {item.description.length > 60 ? item.description.substring(0, 60) + '...' : item.description}
                           </div>
                         )}
                         {newEvent.attachedItems.some(a => a.treasuryItemId === item.id) && (
-                          <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--zander-green)', fontWeight: '600' }}>
+                          <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#27AE60', fontWeight: '600' }}>
                             ✓ Already attached
                           </div>
                         )}

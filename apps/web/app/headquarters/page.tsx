@@ -16,7 +16,7 @@ export default function HeadquartersPage() {
   // ============ DATA ============
 
   const keystoneMetrics = [
-    { id: 'cro', icon: '💼', label: 'Pipeline Value', value: '$139,000', trend: 'up', trendValue: '12%', module: 'CRO', color: '#BF0A30' },
+    { id: 'cro', icon: '💼', label: 'Pipeline Value', value: '$139,000', trend: 'up', trendValue: '12%', module: 'CRO', color: '#00CCEE' },
     { id: 'cfo', icon: '📊', label: 'Cash on Hand', value: '$47,500', trend: 'down', trendValue: '3%', module: 'CFO', color: '#2E7D32' },
     { id: 'coo', icon: '⚙️', label: 'On-Time Delivery', value: '94%', trend: 'flat', trendValue: '', module: 'COO', color: '#5E35B1' },
     { id: 'cmo', icon: '🎨', label: 'Leads This Month', value: '12', trend: 'up', trendValue: '8%', module: 'CMO', color: '#F57C00' },
@@ -150,7 +150,7 @@ export default function HeadquartersPage() {
   const getTrendColor = (trend: string) => {
     if (trend === 'up') return '#28A745';
     if (trend === 'down') return '#DC3545';
-    return 'var(--zander-gray)';
+    return '#8888A0';
   };
 
   const getPriorityStyle = (priority: string) => {
@@ -179,7 +179,7 @@ export default function HeadquartersPage() {
   const renderAssemblyContent = () => (
     <div>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--zander-border-gray)', paddingBottom: '1rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #2A2A38', paddingBottom: '1rem' }}>
         {[
           { id: 'upcoming', label: 'Upcoming', count: upcomingMeetings.length },
           { id: 'past', label: 'Past Meetings', count: pastMeetings.length },
@@ -190,8 +190,8 @@ export default function HeadquartersPage() {
             onClick={() => setActiveTab(tab.id)}
             style={{
               padding: '0.75rem 1.25rem',
-              background: activeTab === tab.id ? 'var(--zander-red)' : 'transparent',
-              color: activeTab === tab.id ? 'white' : 'var(--zander-gray)',
+              background: activeTab === tab.id ? '#00CCEE' : 'transparent',
+              color: activeTab === tab.id ? 'white' : '#8888A0',
               border: 'none',
               borderRadius: '8px',
               fontWeight: '600',
@@ -203,7 +203,7 @@ export default function HeadquartersPage() {
           >
             {tab.label}
             <span style={{
-              background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : 'var(--zander-off-white)',
+              background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : '#09090F',
               padding: '0.15rem 0.5rem',
               borderRadius: '10px',
               fontSize: '0.75rem'
@@ -216,22 +216,22 @@ export default function HeadquartersPage() {
       {activeTab === 'upcoming' && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Upcoming Assemblies</h3>
-            <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Schedule New</button>
+            <h3 style={{ margin: 0, color: '#F0F0F5' }}>Upcoming Assemblies</h3>
+            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Schedule New</button>
           </div>
           {upcomingMeetings.map((meeting) => (
-            <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <div style={{ width: '50px', height: '50px', background: 'white', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--zander-border-gray)' }}>
-                <span style={{ fontSize: '0.65rem', color: 'var(--zander-gray)', textTransform: 'uppercase' }}>{meeting.date === 'Today' ? 'Today' : meeting.date === 'Tomorrow' ? 'Tom' : meeting.date.split(' ')[0]}</span>
-                <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{meeting.date === 'Today' || meeting.date === 'Tomorrow' ? '•' : meeting.date.split(' ')[1]}</span>
+            <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+              <div style={{ width: '50px', height: '50px', background: '#1C1C26', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px solid #2A2A38' }}>
+                <span style={{ fontSize: '0.65rem', color: '#8888A0', textTransform: 'uppercase' }}>{meeting.date === 'Today' ? 'Today' : meeting.date === 'Tomorrow' ? 'Tom' : meeting.date.split(' ')[0]}</span>
+                <span style={{ fontSize: '1rem', fontWeight: '700', color: '#F0F0F5' }}>{meeting.date === 'Today' || meeting.date === 'Tomorrow' ? '•' : meeting.date.split(' ')[1]}</span>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{meeting.title}</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{meeting.time} • {meeting.attendees} attendees</div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{meeting.title}</div>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{meeting.time} • {meeting.attendees} attendees</div>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Join</button>
-                <button style={{ padding: '0.5rem 1rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Agenda</button>
+                <button style={{ padding: '0.5rem 1rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Join</button>
+                <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Agenda</button>
               </div>
             </div>
           ))}
@@ -241,18 +241,18 @@ export default function HeadquartersPage() {
       {/* Past Meetings */}
       {activeTab === 'past' && (
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>Meeting History</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Meeting History</h3>
           {pastMeetings.map((meeting) => (
-            <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <div style={{ width: '50px', height: '50px', background: 'white', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--zander-border-gray)' }}>
+            <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+              <div style={{ width: '50px', height: '50px', background: '#1C1C26', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #2A2A38' }}>
                 <span style={{ fontSize: '1.25rem' }}>📋</span>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{meeting.title}</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{meeting.date} • {meeting.duration} • {meeting.actionItems} action items</div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{meeting.title}</div>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{meeting.date} • {meeting.duration} • {meeting.actionItems} action items</div>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button style={{ padding: '0.5rem 1rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>View Notes</button>
+                <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>View Notes</button>
               </div>
             </div>
           ))}
@@ -262,19 +262,19 @@ export default function HeadquartersPage() {
       {/* Templates */}
       {activeTab === 'templates' && (
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>Meeting Templates</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Meeting Templates</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             {meetingTemplates.map((template) => (
-              <div key={template.id} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', border: '2px solid var(--zander-border-gray)' }}>
+              <div key={template.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', border: '2px solid #2A2A38' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <span style={{ fontSize: '1.5rem' }}>{template.icon}</span>
                   <div>
-                    <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{template.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{template.duration}</div>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{template.name}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{template.duration}</div>
                   </div>
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'var(--zander-gray)', margin: '0 0 1rem 0' }}>{template.description}</p>
-                <button style={{ width: '100%', padding: '0.5rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Use Template</button>
+                <p style={{ fontSize: '0.85rem', color: '#8888A0', margin: '0 0 1rem 0' }}>{template.description}</p>
+                <button style={{ width: '100%', padding: '0.5rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Use Template</button>
               </div>
             ))}
           </div>
@@ -286,7 +286,7 @@ export default function HeadquartersPage() {
   const renderCampaignsContent = () => (
     <div>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--zander-border-gray)', paddingBottom: '1rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #2A2A38', paddingBottom: '1rem' }}>
         {[
           { id: 'my', label: 'My Campaign' },
           { id: 'quarterly', label: 'Quarterly' },
@@ -297,8 +297,8 @@ export default function HeadquartersPage() {
             onClick={() => setActiveTab(tab.id)}
             style={{
               padding: '0.75rem 1.25rem',
-              background: activeTab === tab.id ? 'var(--zander-red)' : 'transparent',
-              color: activeTab === tab.id ? 'white' : 'var(--zander-gray)',
+              background: activeTab === tab.id ? '#00CCEE' : 'transparent',
+              color: activeTab === tab.id ? 'white' : '#8888A0',
               border: 'none',
               borderRadius: '8px',
               fontWeight: '600',
@@ -315,22 +315,22 @@ export default function HeadquartersPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
-              <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>My Campaign</h3>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--zander-gray)' }}>Your personal priorities for this quarter</p>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>My Campaign</h3>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Your personal priorities for this quarter</p>
             </div>
-            <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Priority</button>
+            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Priority</button>
           </div>
           {myCampaignItems.map((item) => (
-            <div key={item.id} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${item.progress === 100 ? '#28A745' : 'var(--zander-red)'}` }}>
+            <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${item.progress === 100 ? '#28A745' : '#00CCEE'}` }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                 <div>
-                  <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{item.title}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Target: {item.target} • Current: {item.current} • Due: {item.dueDate}</div>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {item.target} • Current: {item.current} • Due: {item.dueDate}</div>
                 </div>
-                <span style={{ fontSize: '1.25rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : 'var(--zander-navy)' }}>{item.progress}%</span>
+                <span style={{ fontSize: '1.25rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
               </div>
-              <div style={{ height: '10px', background: 'white', borderRadius: '5px', overflow: 'hidden' }}>
-                <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : 'var(--zander-red)', borderRadius: '5px', transition: 'width 0.3s ease' }} />
+              <div style={{ height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
+                <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '5px', transition: 'width 0.3s ease' }} />
               </div>
             </div>
           ))}
@@ -342,26 +342,26 @@ export default function HeadquartersPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
-              <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Q4 2024 Campaigns</h3>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--zander-gray)' }}>Team-wide quarterly priorities</p>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>Q4 2024 Campaigns</h3>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Team-wide quarterly priorities</p>
             </div>
           </div>
           {quarterlyCampaigns.map((item) => {
             const statusStyle = getStatusStyle(item.status);
             return (
-              <div key={item.id} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem' }}>
+              <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Owner: {item.owner}</div>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Owner: {item.owner}</div>
                   </div>
                   <span style={{ fontSize: '0.7rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: statusStyle.bg, color: statusStyle.color }}>{statusStyle.label}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ flex: 1, height: '10px', background: 'white', borderRadius: '5px', overflow: 'hidden' }}>
-                    <div style={{ width: item.progress + '%', height: '100%', background: item.status === 'complete' || item.status === 'ahead' ? '#28A745' : item.status === 'at-risk' ? '#DC3545' : 'var(--zander-navy)', borderRadius: '5px' }} />
+                  <div style={{ flex: 1, height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
+                    <div style={{ width: item.progress + '%', height: '100%', background: item.status === 'complete' || item.status === 'ahead' ? '#28A745' : item.status === 'at-risk' ? '#DC3545' : '#13131A', borderRadius: '5px' }} />
                   </div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--zander-navy)', minWidth: '45px' }}>{item.progress}%</span>
+                  <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#F0F0F5', minWidth: '45px' }}>{item.progress}%</span>
                 </div>
               </div>
             );
@@ -374,20 +374,20 @@ export default function HeadquartersPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
-              <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>2024 Annual Campaign</h3>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--zander-gray)' }}>Company-wide annual objectives</p>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>2024 Annual Campaign</h3>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Company-wide annual objectives</p>
             </div>
           </div>
           {annualCampaigns.map((item) => (
-            <div key={item.id} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem' }}>
+            <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{item.title}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Target: {item.target} • Current: {item.current}</div>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {item.target} • Current: {item.current}</div>
                 </div>
-                <span style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{item.progress}%</span>
+                <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>{item.progress}%</span>
               </div>
-              <div style={{ height: '10px', background: 'white', borderRadius: '5px', overflow: 'hidden' }}>
+              <div style={{ height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
                 <div style={{ width: item.progress + '%', height: '100%', background: item.progress >= 75 ? '#28A745' : item.progress >= 50 ? '#F0B323' : '#DC3545', borderRadius: '5px' }} />
               </div>
             </div>
@@ -400,7 +400,7 @@ export default function HeadquartersPage() {
   const renderHeadwindsContent = () => (
     <div>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--zander-border-gray)', paddingBottom: '1rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #2A2A38', paddingBottom: '1rem' }}>
         {[
           { id: 'active', label: 'Active Headwinds', count: activeHeadwinds.length },
           { id: 'victories', label: 'Victories', count: victories.length },
@@ -411,8 +411,8 @@ export default function HeadquartersPage() {
             onClick={() => setActiveTab(tab.id)}
             style={{
               padding: '0.75rem 1.25rem',
-              background: activeTab === tab.id ? 'var(--zander-red)' : 'transparent',
-              color: activeTab === tab.id ? 'white' : 'var(--zander-gray)',
+              background: activeTab === tab.id ? '#00CCEE' : 'transparent',
+              color: activeTab === tab.id ? 'white' : '#8888A0',
               border: 'none',
               borderRadius: '8px',
               fontWeight: '600',
@@ -424,7 +424,7 @@ export default function HeadquartersPage() {
           >
             {tab.label}
             <span style={{
-              background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : 'var(--zander-off-white)',
+              background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : '#09090F',
               padding: '0.15rem 0.5rem',
               borderRadius: '10px',
               fontSize: '0.75rem'
@@ -437,23 +437,23 @@ export default function HeadquartersPage() {
       {activeTab === 'active' && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Active Headwinds</h3>
-            <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Headwind</button>
+            <h3 style={{ margin: 0, color: '#F0F0F5' }}>Active Headwinds</h3>
+            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Headwind</button>
           </div>
           {activeHeadwinds.map((item) => {
             const priorityStyle = getPriorityStyle(item.priority);
             return (
-              <div key={item.id} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${priorityStyle.color}` }}>
+              <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${priorityStyle.color}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.35rem' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Owner: {item.owner} • Category: {item.category} • {item.days} days old</div>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.35rem' }}>{item.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Owner: {item.owner} • Category: {item.category} • {item.days} days old</div>
                   </div>
                   <span style={{ fontSize: '0.65rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: priorityStyle.bg, color: priorityStyle.color }}>{priorityStyle.label}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
                   <button style={{ padding: '0.4rem 0.75rem', background: '#28A745', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>✓ Mark Resolved</button>
-                  <button style={{ padding: '0.4rem 0.75rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Discuss in Assembly</button>
+                  <button style={{ padding: '0.4rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Discuss in Assembly</button>
                 </div>
               </div>
             );
@@ -464,13 +464,13 @@ export default function HeadquartersPage() {
       {/* Victories */}
       {activeTab === 'victories' && (
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>🏆 Victories - Resolved Headwinds</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>🏆 Victories - Resolved Headwinds</h3>
           {victories.map((item) => (
             <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: '4px solid #28A745' }}>
               <span style={{ color: '#28A745', fontSize: '1.25rem' }}>✓</span>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{item.title}</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Resolved: {item.date} • By: {item.resolvedBy} • Took {item.daysToResolve} days</div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Resolved: {item.date} • By: {item.resolvedBy} • Took {item.daysToResolve} days</div>
               </div>
             </div>
           ))}
@@ -482,19 +482,19 @@ export default function HeadquartersPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
-              <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>The Horizon</h3>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--zander-gray)' }}>Future considerations and parking lot items</p>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>The Horizon</h3>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Future considerations and parking lot items</p>
             </div>
-            <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add to Horizon</button>
+            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add to Horizon</button>
           </div>
           {horizonItems.map((item) => (
-            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem' }}>
+            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
               <span style={{ fontSize: '1.25rem', opacity: 0.5 }}>🔮</span>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{item.title}</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Added: {item.addedDate} • Category: {item.category}</div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Added: {item.addedDate} • Category: {item.category}</div>
               </div>
-              <button style={{ padding: '0.4rem 0.75rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Promote to Headwind</button>
+              <button style={{ padding: '0.4rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Promote to Headwind</button>
             </div>
           ))}
         </div>
@@ -508,10 +508,10 @@ export default function HeadquartersPage() {
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           <span style={{ fontSize: '1.5rem' }}>🎯</span>
-          <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Vision</h3>
+          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Vision</h3>
         </div>
         <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-off-white) 0%, #f8f6f3 100%)', borderRadius: '10px', borderLeft: '4px solid var(--zander-red)' }}>
-          <p style={{ margin: 0, fontSize: '1.1rem', color: 'var(--zander-navy)', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.vision}"</p>
+          <p style={{ margin: 0, fontSize: '1.1rem', color: '#F0F0F5', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.vision}"</p>
         </div>
       </div>
 
@@ -519,10 +519,10 @@ export default function HeadquartersPage() {
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           <span style={{ fontSize: '1.5rem' }}>🚀</span>
-          <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Mission</h3>
+          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Mission</h3>
         </div>
         <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-off-white) 0%, #f8f6f3 100%)', borderRadius: '10px', borderLeft: '4px solid var(--zander-navy)' }}>
-          <p style={{ margin: 0, fontSize: '1.1rem', color: 'var(--zander-navy)', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.mission}"</p>
+          <p style={{ margin: 0, fontSize: '1.1rem', color: '#F0F0F5', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.mission}"</p>
         </div>
       </div>
 
@@ -530,13 +530,13 @@ export default function HeadquartersPage() {
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           <span style={{ fontSize: '1.5rem' }}>⚖️</span>
-          <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Core Values</h3>
+          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Core Values</h3>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           {foundingPrinciples.values.map((value) => (
-            <div key={value.id} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', borderTop: '3px solid var(--zander-gold)' }}>
-              <div style={{ fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem', fontSize: '1rem' }}>{value.title}</div>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--zander-gray)', lineHeight: '1.5' }}>{value.description}</p>
+            <div key={value.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', borderTop: '3px solid var(--zander-gold)' }}>
+              <div style={{ fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem', fontSize: '1rem' }}>{value.title}</div>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#8888A0', lineHeight: '1.5' }}>{value.description}</p>
             </div>
           ))}
         </div>
@@ -546,9 +546,9 @@ export default function HeadquartersPage() {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           <span style={{ fontSize: '1.5rem' }}>📖</span>
-          <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Our Story</h3>
+          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Our Story</h3>
         </div>
-        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '10px', color: 'white' }}>
+        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '10px', color: 'white' }}>
           <p style={{ margin: 0, fontSize: '1rem', lineHeight: '1.8' }}>{foundingPrinciples.story}</p>
         </div>
       </div>
@@ -561,9 +561,9 @@ export default function HeadquartersPage() {
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           <span style={{ fontSize: '1.5rem' }}>🌟</span>
-          <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>The Legacy We're Building</h3>
+          <h3 style={{ margin: 0, color: '#F0F0F5' }}>The Legacy We're Building</h3>
         </div>
-        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '10px', color: 'white' }}>
+        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '10px', color: 'white' }}>
           <p style={{ margin: 0, fontSize: '1.05rem', lineHeight: '1.7' }}>{legacyVision}</p>
         </div>
       </div>
@@ -572,7 +572,7 @@ export default function HeadquartersPage() {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           <span style={{ fontSize: '1.5rem' }}>🗺️</span>
-          <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>3-5 Year Roadmap</h3>
+          <h3 style={{ margin: 0, color: '#F0F0F5' }}>3-5 Year Roadmap</h3>
         </div>
         <div style={{ position: 'relative' }}>
           {/* Timeline line */}
@@ -585,7 +585,7 @@ export default function HeadquartersPage() {
                 width: '50px',
                 height: '50px',
                 borderRadius: '50%',
-                background: milestone.progress > 0 ? 'var(--zander-red)' : 'var(--zander-border-gray)',
+                background: milestone.progress > 0 ? '#00CCEE' : 'var(--zander-border-gray)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
@@ -599,21 +599,21 @@ export default function HeadquartersPage() {
               </div>
               
               {/* Content */}
-              <div style={{ flex: 1, padding: '1rem 1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', borderLeft: `4px solid ${milestone.progress > 0 ? 'var(--zander-red)' : 'var(--zander-border-gray)'}` }}>
+              <div style={{ flex: 1, padding: '1rem 1.25rem', background: '#09090F', borderRadius: '10px', borderLeft: `4px solid ${milestone.progress > 0 ? '#00CCEE' : 'var(--zander-border-gray)'}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <div style={{ fontWeight: '700', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>{milestone.title}</div>
+                  <div style={{ fontWeight: '700', color: '#F0F0F5', fontSize: '1.1rem' }}>{milestone.title}</div>
                   {milestone.progress > 0 && (
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--zander-red)' }}>{milestone.progress}% Complete</span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#00CCEE' }}>{milestone.progress}% Complete</span>
                   )}
                 </div>
                 <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
                   {milestone.goals.map((goal, i) => (
-                    <li key={i} style={{ fontSize: '0.9rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>{goal}</li>
+                    <li key={i} style={{ fontSize: '0.9rem', color: '#8888A0', marginBottom: '0.25rem' }}>{goal}</li>
                   ))}
                 </ul>
                 {milestone.progress > 0 && (
-                  <div style={{ marginTop: '0.75rem', height: '6px', background: 'white', borderRadius: '3px', overflow: 'hidden' }}>
-                    <div style={{ width: milestone.progress + '%', height: '100%', background: 'var(--zander-red)', borderRadius: '3px' }} />
+                  <div style={{ marginTop: '0.75rem', height: '6px', background: '#1C1C26', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ width: milestone.progress + '%', height: '100%', background: '#00CCEE', borderRadius: '3px' }} />
                   </div>
                 )}
               </div>
@@ -627,7 +627,7 @@ export default function HeadquartersPage() {
   const renderLedgerContent = () => (
     <div>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--zander-border-gray)', paddingBottom: '1rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #2A2A38', paddingBottom: '1rem' }}>
         {[
           { id: 'company', label: 'Company Ledger' },
           { id: 'team', label: 'Team Ledger' },
@@ -637,8 +637,8 @@ export default function HeadquartersPage() {
             onClick={() => setActiveTab(tab.id)}
             style={{
               padding: '0.75rem 1.25rem',
-              background: activeTab === tab.id ? 'var(--zander-red)' : 'transparent',
-              color: activeTab === tab.id ? 'white' : 'var(--zander-gray)',
+              background: activeTab === tab.id ? '#00CCEE' : 'transparent',
+              color: activeTab === tab.id ? 'white' : '#8888A0',
               border: 'none',
               borderRadius: '8px',
               fontWeight: '600',
@@ -653,22 +653,22 @@ export default function HeadquartersPage() {
       {/* Company Ledger */}
       {activeTab === 'company' && (
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>Company Performance</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Company Performance</h3>
           {ledgerMetrics.company.map((metric) => (
-            <div key={metric.id} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', marginBottom: '0.75rem' }}>
+            <div key={metric.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                 <div>
-                  <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{metric.name}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Target: {metric.target}</div>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{metric.name}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {metric.target}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{metric.value}</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>{metric.value}</div>
                   <div style={{ fontSize: '0.8rem', color: getTrendColor(metric.trend), fontWeight: '600' }}>
                     {getTrendIcon(metric.trend)} {metric.progress}% of goal
                   </div>
                 </div>
               </div>
-              <div style={{ height: '8px', background: 'white', borderRadius: '4px', overflow: 'hidden' }}>
+              <div style={{ height: '8px', background: '#1C1C26', borderRadius: '4px', overflow: 'hidden' }}>
                 <div style={{ width: Math.min(metric.progress, 100) + '%', height: '100%', background: metric.progress >= 90 ? '#28A745' : metric.progress >= 70 ? '#F0B323' : '#DC3545', borderRadius: '4px' }} />
               </div>
             </div>
@@ -679,9 +679,9 @@ export default function HeadquartersPage() {
       {/* Team Ledger */}
       {activeTab === 'team' && (
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>Team Keystones</h3>
-          <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '0.75rem 1rem', background: 'var(--zander-navy)', color: 'white', fontWeight: '600', fontSize: '0.8rem' }}>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Team Keystones</h3>
+          <div style={{ background: '#09090F', borderRadius: '10px', overflow: 'hidden' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '0.75rem 1rem', background: '#13131A', color: 'white', fontWeight: '600', fontSize: '0.8rem' }}>
               <div>Team</div>
               <div>Keystone</div>
               <div>Current</div>
@@ -689,11 +689,11 @@ export default function HeadquartersPage() {
               <div style={{ textAlign: 'center' }}>Status</div>
             </div>
             {ledgerMetrics.team.map((team) => (
-              <div key={team.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '1rem', borderBottom: '1px solid var(--zander-border-gray)', alignItems: 'center' }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{team.name}</div>
-                <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>{team.keystone}</div>
-                <div style={{ fontWeight: '700', color: 'var(--zander-navy)' }}>{team.value}</div>
-                <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>{team.owner}</div>
+              <div key={team.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '1rem', borderBottom: '1px solid #2A2A38', alignItems: 'center' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{team.name}</div>
+                <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{team.keystone}</div>
+                <div style={{ fontWeight: '700', color: '#F0F0F5' }}>{team.value}</div>
+                <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{team.owner}</div>
                 <div style={{ textAlign: 'center' }}>
                   <span style={{
                     display: 'inline-block',
@@ -722,7 +722,7 @@ export default function HeadquartersPage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', background: '#09090F' }}>
         <NavBar activeModule="cro" />
 
 
@@ -732,7 +732,7 @@ export default function HeadquartersPage() {
         {/* Main Content */}
         <main style={{ marginLeft: sidebarCollapsed ? '64px' : '240px', marginTop: '64px', padding: '2rem', transition: 'margin-left 0.3s ease' }}>
           {/* Page Header */}
-          <div style={{ background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
+          <div style={{ background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <span style={{ fontSize: '2.5rem' }}>🏛️</span>
               <div>
@@ -743,21 +743,21 @@ export default function HeadquartersPage() {
           </div>
 
           {/* Keystones Row */}
-          <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', border: '2px solid var(--zander-border-gray)' }}>
-            <h2 style={{ margin: '0 0 1rem 0', fontSize: '1rem', color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', border: '2px solid #2A2A38' }}>
+            <h2 style={{ margin: '0 0 1rem 0', fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               📊 Keystones
-              <span style={{ fontSize: '0.75rem', fontWeight: '400', color: 'var(--zander-gray)' }}>Your vital signs at a glance</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: '400', color: '#8888A0' }}>Your vital signs at a glance</span>
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1rem' }}>
               {keystoneMetrics.map((metric) => (
-                <a key={metric.id} href={metric.module === 'CRO' ? '/' : '/' + metric.module.toLowerCase()} style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1rem', textDecoration: 'none', borderLeft: '4px solid ' + metric.color, transition: 'all 0.2s ease' }}>
+                <a key={metric.id} href={metric.module === 'CRO' ? '/' : '/' + metric.module.toLowerCase()} style={{ background: '#09090F', borderRadius: '10px', padding: '1rem', textDecoration: 'none', borderLeft: '4px solid ' + metric.color, transition: 'all 0.2s ease' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                     <span style={{ fontSize: '1rem' }}>{metric.icon}</span>
                     <span style={{ fontSize: '0.65rem', fontWeight: '700', color: metric.color }}>{metric.module}</span>
                   </div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.15rem' }}>{metric.value}</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.15rem' }}>{metric.value}</div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--zander-gray)' }}>{metric.label}</span>
+                    <span style={{ fontSize: '0.65rem', color: '#8888A0' }}>{metric.label}</span>
                     {metric.trendValue && <span style={{ fontSize: '0.7rem', color: getTrendColor(metric.trend), fontWeight: '600' }}>{getTrendIcon(metric.trend)} {metric.trendValue}</span>}
                   </div>
                 </a>
@@ -772,20 +772,20 @@ export default function HeadquartersPage() {
                 key={btn.id}
                 onClick={() => handleModalOpen(btn.id)}
                 style={{
-                  background: 'white',
-                  border: '2px solid var(--zander-border-gray)',
+                  background: '#1C1C26',
+                  border: '2px solid #2A2A38',
                   borderRadius: '12px',
                   padding: '1.25rem 1rem',
                   cursor: 'pointer',
                   textAlign: 'center',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--zander-red)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseOver={(e) => { e.currentTarget.style.borderColor = '#00CCEE'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                 onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.transform = 'translateY(0)'; }}
               >
                 <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>{btn.icon}</span>
-                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--zander-navy)', display: 'block' }}>{btn.label}</span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>{btn.description}</span>
+                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#F0F0F5', display: 'block' }}>{btn.label}</span>
+                <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>{btn.description}</span>
               </button>
             ))}
           </div>
@@ -793,17 +793,17 @@ export default function HeadquartersPage() {
           {/* Dashboard Cards - 2x2 Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             {/* Today's Assembly */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', border: '2px solid var(--zander-border-gray)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   📅 Today's Assembly
                 </h3>
-                <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>@ {todayAssembly.time}</span>
+                <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>@ {todayAssembly.time}</span>
               </div>
-              <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>{todayAssembly.title}</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)', marginBottom: '0.75rem' }}>👥 {todayAssembly.attendees} attendees</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+              <div style={{ background: '#09090F', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>{todayAssembly.title}</div>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0', marginBottom: '0.75rem' }}>👥 {todayAssembly.attendees} attendees</div>
+                <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                   <strong>Agenda:</strong>
                   <ul style={{ margin: '0.5rem 0 0 1rem', padding: 0 }}>
                     {todayAssembly.agenda.map((item, i) => (
@@ -813,69 +813,69 @@ export default function HeadquartersPage() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button style={{ flex: 1, padding: '0.75rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Join Meeting</button>
-                <button onClick={() => handleModalOpen('assembly')} style={{ flex: 1, padding: '0.75rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>View Agenda</button>
+                <button style={{ flex: 1, padding: '0.75rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Join Meeting</button>
+                <button onClick={() => handleModalOpen('assembly')} style={{ flex: 1, padding: '0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>View Agenda</button>
               </div>
             </div>
 
             {/* Active Headwinds */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', border: '2px solid var(--zander-border-gray)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   🌀 Active Headwinds
-                  <span style={{ background: 'var(--zander-red)', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>{activeHeadwinds.length}</span>
+                  <span style={{ background: '#00CCEE', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>{activeHeadwinds.length}</span>
                 </h3>
-                <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: 'var(--zander-red)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
+                <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
               {activeHeadwinds.map((item) => {
                 const priorityStyle = getPriorityStyle(item.priority);
                 return (
-                  <div key={item.id} style={{ padding: '0.75rem', background: 'var(--zander-off-white)', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid ' + priorityStyle.color }}>
+                  <div key={item.id} style={{ padding: '0.75rem', background: '#09090F', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid ' + priorityStyle.color }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--zander-navy)', flex: 1 }}>{item.title}</span>
+                      <span style={{ fontSize: '0.85rem', color: '#F0F0F5', flex: 1 }}>{item.title}</span>
                       <span style={{ fontSize: '0.6rem', fontWeight: '700', padding: '0.2rem 0.5rem', borderRadius: '4px', background: priorityStyle.bg, color: priorityStyle.color }}>{priorityStyle.label}</span>
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginTop: '0.35rem' }}>{item.days} days old</div>
+                    <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.35rem' }}>{item.days} days old</div>
                   </div>
                 );
               })}
             </div>
 
             {/* My Campaign Progress */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', border: '2px solid var(--zander-border-gray)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   🎯 My Campaign Progress
                 </h3>
-                <button onClick={() => handleModalOpen('campaigns')} style={{ fontSize: '0.75rem', color: 'var(--zander-red)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
+                <button onClick={() => handleModalOpen('campaigns')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
               {myCampaignItems.map((item) => (
                 <div key={item.id} style={{ marginBottom: '0.75rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--zander-navy)' }}>{item.title}</span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : 'var(--zander-navy)' }}>{item.progress}%</span>
+                    <span style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
                   </div>
-                  <div style={{ height: '8px', background: 'var(--zander-off-white)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : 'var(--zander-red)', borderRadius: '4px', transition: 'width 0.3s ease' }} />
+                  <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '4px', transition: 'width 0.3s ease' }} />
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Recent Victories */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', border: '2px solid var(--zander-border-gray)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   🏆 Recent Victories
                 </h3>
-                <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: 'var(--zander-red)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
+                <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
               {victories.slice(0, 3).map((item) => (
                 <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.75rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid #28A745' }}>
                   <span style={{ color: '#28A745', fontSize: '1rem' }}>✓</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--zander-navy)' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>{item.date}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>{item.date}</div>
                   </div>
                 </div>
               ))}
@@ -898,7 +898,7 @@ export default function HeadquartersPage() {
             zIndex: 2000
           }} onClick={() => setActiveModal(null)}>
             <div style={{
-              background: 'white',
+              background: '#1C1C26',
               borderRadius: '16px',
               width: '90%',
               maxWidth: '900px',
@@ -908,7 +908,7 @@ export default function HeadquartersPage() {
             }} onClick={(e) => e.stopPropagation()}>
               {/* Modal Header */}
               <div style={{
-                background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+                background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
                 padding: '1.5rem 2rem',
                 color: 'white',
                 display: 'flex',

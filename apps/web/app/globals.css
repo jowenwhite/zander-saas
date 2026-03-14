@@ -140,6 +140,11 @@ a { color: #00CCEE !important; }
   color: #8888A0 !important;
 }
 
+/* Sora headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sora), var(--font-display), system-ui, sans-serif !important;
+}
+
 [class*="nav"] a:hover,
 [class*="sidebar"] a:hover {
   color: #F0F0F5 !important;

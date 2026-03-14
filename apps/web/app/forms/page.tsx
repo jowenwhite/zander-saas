@@ -474,7 +474,7 @@ export default function FormsPage() {
 
   return (
     <AuthGuard>
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ minHeight: '100vh', background: '#09090F' }}>
       <NavBar activeModule="cro" />
 
       <Sidebar collapsed={sidebarCollapsed} />
@@ -483,7 +483,7 @@ export default function FormsPage() {
       <main style={{ marginLeft: '240px', marginTop: '64px', padding: '2rem' }}>
         {/* Page Header */}
         <div style={{
-          background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+          background: 'linear-gradient(135deg, #00CCEE 0%, #00A8C6 100%)',
           borderRadius: '12px',
           padding: '2rem',
           color: 'white',
@@ -521,7 +521,7 @@ export default function FormsPage() {
                 style={{
                   padding: '0.75rem 1.5rem',
                   background: 'var(--zander-gold)',
-                  color: 'var(--zander-navy)',
+                  color: '#F0F0F5',
                   border: 'none',
                   borderRadius: '8px',
                   fontWeight: '700',
@@ -539,29 +539,29 @@ export default function FormsPage() {
 
         {/* Stats Overview */}
         <div style={{
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '2px solid #2A2A38',
           borderRadius: '12px',
           padding: '1.5rem',
           marginBottom: '2rem'
         }}>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)' }}>Forms Overview</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Forms Overview</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>{loading ? '...' : totalForms}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Total Forms</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#00CCEE' }}>{loading ? '...' : totalForms}</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Total Forms</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
               <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#27AE60' }}>{loading ? '...' : activeForms}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Active Forms</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Active Forms</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{loading ? '...' : totalSubmissions}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Total Submissions</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#F0F0F5' }}>{loading ? '...' : totalSubmissions}</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Total Submissions</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
               <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-gold)' }}>{sortedCategories.length}</div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Categories</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Categories</div>
             </div>
           </div>
         </div>
@@ -570,11 +570,11 @@ export default function FormsPage() {
         <div style={{
           background: 'white',
           borderRadius: '12px',
-          border: '2px solid var(--zander-border-gray)',
+          border: '2px solid #2A2A38',
           overflow: 'hidden'
         }}>
           {/* Tab Headers */}
-          <div style={{ display: 'flex', borderBottom: '2px solid var(--zander-border-gray)' }}>
+          <div style={{ display: 'flex', borderBottom: '2px solid #2A2A38' }}>
             {[
               { id: 'forms', label: 'Forms', icon: '📋' },
               { id: 'sops', label: 'SOPs', icon: '📖' },
@@ -611,27 +611,27 @@ export default function FormsPage() {
             {activeTab === 'forms' && (
               <div>
                 {loading ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                     Loading forms...
                   </div>
                 ) : error ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-red)' }}>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#00CCEE' }}>
                     {error}
-                    <button onClick={fetchForms} style={{ marginLeft: '1rem', padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
+                    <button onClick={fetchForms} style={{ marginLeft: '1rem', padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
                       Retry
                     </button>
                   </div>
                 ) : forms.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Forms Yet</h3>
-                    <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem' }}>Get started by activating an Industry Pack or creating a custom form</p>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Forms Yet</h3>
+                    <p style={{ color: '#8888A0', marginBottom: '1rem' }}>Get started by activating an Industry Pack or creating a custom form</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                       <button
                         onClick={() => setShowTreasuryModal(true)}
                         style={{
                           padding: '0.75rem 1.5rem',
-                          background: 'var(--zander-navy)',
+                          background: '#13131A',
                           color: 'white',
                           border: 'none',
                           borderRadius: '8px',
@@ -645,7 +645,7 @@ export default function FormsPage() {
                         onClick={() => setShowCreateModal(true)}
                         style={{
                           padding: '0.75rem 1.5rem',
-                          background: 'var(--zander-red)',
+                          background: '#00CCEE',
                           color: 'white',
                           border: 'none',
                           borderRadius: '8px',
@@ -670,7 +670,7 @@ export default function FormsPage() {
                             justifyContent: 'space-between',
                             padding: '1rem 1.25rem',
                             background: expandedCategory === category ? 'var(--zander-off-white)' : 'white',
-                            border: '2px solid var(--zander-border-gray)',
+                            border: '2px solid #2A2A38',
                             borderRadius: expandedCategory === category ? '8px 8px 0 0' : '8px',
                             cursor: 'pointer',
                             textAlign: 'left'
@@ -679,8 +679,8 @@ export default function FormsPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             <span style={{ fontSize: '1.5rem' }}>{categoryIcons[category] || '📋'}</span>
                             <div>
-                              <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem' }}>{category}</div>
-                              <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                              <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem' }}>{category}</div>
+                              <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
                                 {groupedForms[category].length} form{groupedForms[category].length !== 1 ? 's' : ''} • {groupedForms[category].reduce((s, f) => s + (f._count?.submissions || 0), 0)} submissions
                               </div>
                             </div>
@@ -688,20 +688,20 @@ export default function FormsPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <span style={{
                               padding: '0.25rem 0.75rem',
-                              background: 'rgba(191, 10, 48, 0.1)',
-                              color: 'var(--zander-red)',
+                              background: 'rgba(0, 204, 238, 0.1)',
+                              color: '#00CCEE',
                               borderRadius: '12px',
                               fontSize: '0.75rem',
                               fontWeight: '600'
                             }}>
                               {groupedForms[category].length} forms
                             </span>
-                            <span style={{ color: 'var(--zander-gray)', transform: expandedCategory === category ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+                            <span style={{ color: '#8888A0', transform: expandedCategory === category ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
                           </div>
                         </button>
                         {expandedCategory === category && (
                           <div style={{
-                            border: '2px solid var(--zander-border-gray)',
+                            border: '2px solid #2A2A38',
                             borderTop: 'none',
                             borderRadius: '0 0 8px 8px',
                             overflow: 'hidden'
@@ -719,12 +719,12 @@ export default function FormsPage() {
                                 }}
                               >
                                 <div>
-                                  <div style={{ fontWeight: '500', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{form.name}</div>
-                                  <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{form.description || 'No description'}</div>
+                                  <div style={{ fontWeight: '500', color: '#F0F0F5', marginBottom: '0.25rem' }}>{form.name}</div>
+                                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{form.description || 'No description'}</div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                  <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{form.fields?.length || 0} fields</span>
-                                  <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{form._count?.submissions || 0} submitted</span>
+                                  <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{form.fields?.length || 0} fields</span>
+                                  <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{form._count?.submissions || 0} submitted</span>
                                   <span
                                     onClick={(e) => { e.stopPropagation(); handleToggleStatus(form); }}
                                     style={{
@@ -745,7 +745,7 @@ export default function FormsPage() {
                                     style={{
                                       padding: '0.5rem 1rem',
                                       background: 'var(--zander-gold)',
-                                      color: 'var(--zander-navy)',
+                                      color: '#F0F0F5',
                                       border: 'none',
                                       borderRadius: '6px',
                                       fontWeight: '600',
@@ -760,7 +760,7 @@ export default function FormsPage() {
                                     style={{
                                       padding: '0.5rem 0.75rem',
                                       background: 'transparent',
-                                      color: 'var(--zander-red)',
+                                      color: '#00CCEE',
                                       border: '1px solid var(--zander-red)',
                                       borderRadius: '6px',
                                       fontWeight: '600',
@@ -786,12 +786,12 @@ export default function FormsPage() {
             {activeTab === 'submissions' && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Recent Submissions</h3>
+                  <h3 style={{ margin: 0, color: '#F0F0F5' }}>Recent Submissions</h3>
                   <button
                     onClick={() => alert('Export functionality coming soon!')}
                     style={{
                       padding: '0.5rem 1rem',
-                      background: 'var(--zander-navy)',
+                      background: '#13131A',
                       color: 'white',
                       border: 'none',
                       borderRadius: '6px',
@@ -804,19 +804,19 @@ export default function FormsPage() {
                   </button>
                 </div>
                 {submissionsLoading ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                     Loading submissions...
                   </div>
                 ) : submissions.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📥</div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Submissions Yet</h3>
-                    <p style={{ color: 'var(--zander-gray)' }}>Form submissions will appear here</p>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Submissions Yet</h3>
+                    <p style={{ color: '#8888A0' }}>Form submissions will appear here</p>
                   </div>
                 ) : (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: 'var(--zander-navy)', color: 'white' }}>
+                      <tr style={{ background: '#13131A', color: 'white' }}>
                         <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600' }}>Form</th>
                         <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600' }}>Submitted</th>
                         <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600' }}>Data Preview</th>
@@ -825,10 +825,10 @@ export default function FormsPage() {
                     </thead>
                     <tbody>
                       {submissions.map((submission: any, index) => (
-                        <tr key={submission.id} style={{ background: index % 2 === 0 ? 'white' : 'var(--zander-off-white)', borderBottom: '1px solid var(--zander-border-gray)' }}>
-                          <td style={{ padding: '1rem', color: 'var(--zander-navy)', fontWeight: '500' }}>{submission.formName || 'Unknown Form'}</td>
-                          <td style={{ padding: '1rem', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>{formatDate(submission.createdAt)}</td>
-                          <td style={{ padding: '1rem', fontSize: '0.8rem', color: 'var(--zander-gray)', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <tr key={submission.id} style={{ background: index % 2 === 0 ? 'white' : 'var(--zander-off-white)', borderBottom: '1px solid #2A2A38' }}>
+                          <td style={{ padding: '1rem', color: '#F0F0F5', fontWeight: '500' }}>{submission.formName || 'Unknown Form'}</td>
+                          <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#8888A0' }}>{formatDate(submission.createdAt)}</td>
+                          <td style={{ padding: '1rem', fontSize: '0.8rem', color: '#8888A0', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {JSON.stringify(submission.data).substring(0, 50)}...
                           </td>
                           <td style={{ padding: '1rem', textAlign: 'center' }}>
@@ -836,7 +836,7 @@ export default function FormsPage() {
                               onClick={() => setViewingSubmission(submission)}
                               style={{
                                 padding: '0.5rem 1rem',
-                                background: 'var(--zander-navy)',
+                                background: '#13131A',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '6px',
@@ -860,7 +860,7 @@ export default function FormsPage() {
             {activeTab === 'sops' && (
               <div>
                 <div style={{
-                  background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+                  background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
                   borderRadius: '8px',
                   padding: '1.5rem',
                   color: 'white',
@@ -874,15 +874,15 @@ export default function FormsPage() {
                 {forms.filter(f => f.formType === 'sop').length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📖</div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No SOPs Yet</h3>
-                    <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem' }}>Create your first Standard Operating Procedure or browse The Treasury for templates</p>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No SOPs Yet</h3>
+                    <p style={{ color: '#8888A0', marginBottom: '1rem' }}>Create your first Standard Operating Procedure or browse The Treasury for templates</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                       <button
                         onClick={() => setShowTreasuryModal(true)}
                         style={{
                           padding: '0.75rem 1.5rem',
                           background: 'var(--zander-gold)',
-                          color: 'var(--zander-navy)',
+                          color: '#F0F0F5',
                           border: 'none',
                           borderRadius: '8px',
                           fontWeight: '600',
@@ -895,7 +895,7 @@ export default function FormsPage() {
                         onClick={() => setShowCreateModal(true)}
                         style={{
                           padding: '0.75rem 1.5rem',
-                          background: 'var(--zander-red)',
+                          background: '#00CCEE',
                           color: 'white',
                           border: 'none',
                           borderRadius: '8px',
@@ -914,7 +914,7 @@ export default function FormsPage() {
                         key={sop.id}
                         style={{
                           background: 'white',
-                          border: '2px solid var(--zander-border-gray)',
+                          border: '2px solid #2A2A38',
                           borderRadius: '8px',
                           padding: '1.25rem',
                           cursor: 'pointer',
@@ -923,7 +923,7 @@ export default function FormsPage() {
                         onClick={() => setViewingForm(sop)}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
-                          <h4 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1rem' }}>{sop.name}</h4>
+                          <h4 style={{ margin: 0, color: '#F0F0F5', fontSize: '1rem' }}>{sop.name}</h4>
                           <span style={{
                             padding: '0.2rem 0.5rem',
                             background: sop.status === 'active' ? 'rgba(39, 174, 96, 0.1)' : 'rgba(108, 117, 125, 0.1)',
@@ -935,11 +935,11 @@ export default function FormsPage() {
                           }}>{sop.status}</span>
                         </div>
                         {sop.description && (
-                          <p style={{ margin: '0 0 0.75rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                          <p style={{ margin: '0 0 0.75rem 0', color: '#8888A0', fontSize: '0.85rem', lineHeight: '1.4' }}>
                             {sop.description}
                           </p>
                         )}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: '#8888A0' }}>
                           <span>📖 {sop.fields?.length || 0} steps</span>
                           <span>{new Date(sop.updatedAt).toLocaleDateString()}</span>
                         </div>
@@ -961,7 +961,7 @@ export default function FormsPage() {
           <div style={{
             background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
           }}>
-            <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
+            <div style={{ background: '#13131A', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
               <h2 style={{ margin: 0 }}>{viewingForm.name}</h2>
               {viewingForm.description && <p style={{ margin: '0.5rem 0 0', opacity: 0.8, fontSize: '0.9rem' }}>{viewingForm.description}</p>}
             </div>
@@ -970,8 +970,8 @@ export default function FormsPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {viewingForm.fields.map((field: any) => (
                     <div key={field.id}>
-                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
-                        {field.label} {field.required && <span style={{ color: 'var(--zander-red)' }}>*</span>}
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
+                        {field.label} {field.required && <span style={{ color: '#00CCEE' }}>*</span>}
                       </label>
                       {field.type === 'text' || field.type === 'email' ? (
                         <input
@@ -979,7 +979,7 @@ export default function FormsPage() {
                           placeholder={field.placeholder || ''}
                           value={formData[field.id] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem' }}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                         />
                       ) : field.type === 'textarea' ? (
                         <textarea
@@ -987,13 +987,13 @@ export default function FormsPage() {
                           rows={field.rows || 3}
                           value={formData[field.id] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem', resize: 'vertical' }}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', resize: 'vertical' }}
                         />
                       ) : field.type === 'select' ? (
                         <select
                           value={formData[field.id] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem', background: 'white' }}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', background: 'white' }}
                         >
                           <option value="">Select...</option>
                           {field.options?.map((opt: any) => (
@@ -1006,17 +1006,17 @@ export default function FormsPage() {
                           placeholder={field.placeholder || ''}
                           value={formData[field.id] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #DEE2E6', borderRadius: '6px', fontSize: '1rem' }}
+                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                         />
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p style={{ color: '#666', textAlign: 'center', padding: '2rem' }}>This form has no fields configured yet.</p>
+                <p style={{ color: '#8888A0', textAlign: 'center', padding: '2rem' }}>This form has no fields configured yet.</p>
               )}
             </div>
-            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #DEE2E6', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => { setViewingForm(null); setFormData({}); }}
                 style={{ padding: '0.75rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
@@ -1026,7 +1026,7 @@ export default function FormsPage() {
               <button
                 onClick={handleSubmitForm}
                 disabled={submitting}
-                style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', opacity: submitting ? 0.7 : 1 }}
+                style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', opacity: submitting ? 0.7 : 1 }}
               >
                 {submitting ? 'Submitting...' : 'Submit'}
               </button>
@@ -1044,7 +1044,7 @@ export default function FormsPage() {
           <div style={{
             background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
           }}>
-            <div style={{ background: 'var(--zander-navy)', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
+            <div style={{ background: '#13131A', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
               <h2 style={{ margin: 0 }}>Submission Details</h2>
               <p style={{ margin: '0.5rem 0 0', opacity: 0.8, fontSize: '0.9rem' }}>
                 Submitted: {new Date(viewingSubmission.createdAt).toLocaleString()}
@@ -1052,17 +1052,17 @@ export default function FormsPage() {
             </div>
             <div style={{ padding: '1.5rem' }}>
               {viewingSubmission.contact && (
-                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
-                  <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)' }}>Contact</h4>
+                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#09090F', borderRadius: '8px' }}>
+                  <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>Contact</h4>
                   <p style={{ margin: 0 }}>{viewingSubmission.contact.firstName} {viewingSubmission.contact.lastName}</p>
-                  <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>{viewingSubmission.contact.email}</p>
+                  <p style={{ margin: 0, color: '#8888A0', fontSize: '0.9rem' }}>{viewingSubmission.contact.email}</p>
                 </div>
               )}
-              <h4 style={{ margin: '0 0 1rem', color: 'var(--zander-navy)' }}>Form Data</h4>
+              <h4 style={{ margin: '0 0 1rem', color: '#F0F0F5' }}>Form Data</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {Object.entries(viewingSubmission.data?.data || viewingSubmission.data || {}).map(([key, value]) => (
-                  <div key={key} style={{ padding: '0.75rem', background: '#f8f9fa', borderRadius: '6px' }}>
-                    <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>
+                  <div key={key} style={{ padding: '0.75rem', background: '#13131A', borderRadius: '6px' }}>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem', textTransform: 'capitalize' }}>
                       {key.replace(/_/g, ' ')}
                     </div>
                     <div style={{ color: '#333' }}>{String(value) || '-'}</div>
@@ -1070,10 +1070,10 @@ export default function FormsPage() {
                 ))}
               </div>
             </div>
-            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #DEE2E6', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setViewingSubmission(null)}
-                style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                style={{ padding: '0.75rem 1.5rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
               >
                 Close
               </button>
@@ -1104,10 +1104,10 @@ export default function FormsPage() {
             maxWidth: '500px',
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
           }}>
-            <h2 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)' }}>Create New Form</h2>
+            <h2 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5' }}>Create New Form</h2>
             
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                 Form Name *
               </label>
               <input
@@ -1118,7 +1118,7 @@ export default function FormsPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '6px',
                   fontSize: '1rem',
                   boxSizing: 'border-box'
@@ -1127,7 +1127,7 @@ export default function FormsPage() {
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                 Category
               </label>
               <select
@@ -1136,7 +1136,7 @@ export default function FormsPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '6px',
                   fontSize: '1rem',
                   boxSizing: 'border-box'
@@ -1152,7 +1152,7 @@ export default function FormsPage() {
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                 Description
               </label>
               <textarea
@@ -1163,7 +1163,7 @@ export default function FormsPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '6px',
                   fontSize: '1rem',
                   resize: 'vertical',
@@ -1173,7 +1173,7 @@ export default function FormsPage() {
             </div>
 
             <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                 Status
               </label>
               <select
@@ -1182,7 +1182,7 @@ export default function FormsPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '6px',
                   fontSize: '1rem',
                   boxSizing: 'border-box'
@@ -1199,11 +1199,11 @@ export default function FormsPage() {
                 style={{
                   padding: '0.75rem 1.5rem',
                   background: 'transparent',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '6px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  color: 'var(--zander-gray)'
+                  color: '#8888A0'
                 }}
               >
                 Cancel
@@ -1254,17 +1254,17 @@ export default function FormsPage() {
           }}>
             {/* Header */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--zander-gold) 0%, #d4a017 100%)',
+              background: 'linear-gradient(135deg, #F0B323 0%, #d4a017 100%)',
               padding: '1.5rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
               <div>
-                <h2 style={{ margin: 0, color: 'var(--zander-navy)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h2 style={{ margin: 0, color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   🏛️ The Treasury
                 </h2>
-                <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-navy)', opacity: 0.8, fontSize: '0.9rem' }}>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#F0F0F5', opacity: 0.8, fontSize: '0.9rem' }}>
                   Pre-built form and SOP templates ready to customize
                 </p>
               </div>
@@ -1287,7 +1287,7 @@ export default function FormsPage() {
               </button>
             </div>
             {/* Filters */}
-            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <select
                 value={treasuryFilter.type}
                 onChange={(e) => setTreasuryFilter({ ...treasuryFilter, type: e.target.value as 'form' | 'sop' | 'all' })}
@@ -1334,14 +1334,14 @@ export default function FormsPage() {
             {/* Content */}
             <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
               {treasuryLoading ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                   <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
                   <p>Loading templates...</p>
                 </div>
               ) : treasuryItems.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                   <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
-                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No Templates Found</h3>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Templates Found</h3>
                   <p style={{ margin: 0 }}>Try adjusting your filters or check back later for new templates.</p>
                 </div>
               ) : (
@@ -1350,7 +1350,7 @@ export default function FormsPage() {
                     <div
                       key={item.id}
                       style={{
-                        border: '2px solid var(--zander-border-gray)',
+                        border: '2px solid #2A2A38',
                         borderRadius: '12px',
                         padding: '1.25rem',
                         transition: 'all 0.2s ease',
@@ -1373,18 +1373,18 @@ export default function FormsPage() {
                           {item.type}
                         </span>
                       </div>
-                      <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>{item.name}</h4>
-                      <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                      <h4 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5', fontSize: '1rem' }}>{item.name}</h4>
+                      <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.85rem', lineHeight: '1.4' }}>
                         {item.description || 'No description available'}
                       </p>
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                         {item.executive && (
-                          <span style={{ background: 'var(--zander-off-white)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--zander-navy)' }}>
+                          <span style={{ background: '#09090F', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: '#F0F0F5' }}>
                             {item.executive}
                           </span>
                         )}
                         {item.industry && (
-                          <span style={{ background: 'var(--zander-off-white)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--zander-navy)' }}>
+                          <span style={{ background: '#09090F', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', color: '#F0F0F5' }}>
                             {item.industry.replace('_', ' ')}
                           </span>
                         )}
@@ -1394,7 +1394,7 @@ export default function FormsPage() {
                         style={{
                           width: '100%',
                           padding: '0.6rem',
-                          background: 'var(--zander-navy)',
+                          background: '#13131A',
                           color: 'white',
                           border: 'none',
                           borderRadius: '6px',

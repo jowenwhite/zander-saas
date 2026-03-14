@@ -803,54 +803,54 @@ export default function SettingsPage() {
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
         <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Personal Information</h3>
+          <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Personal Information</h3>
           
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>First Name</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>First Name</label>
             <input
               type="text"
               value={profile.firstName}
               onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Last Name</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Last Name</label>
             <input
               type="text"
               value={profile.lastName}
               onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Email</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Email</label>
             <input
               type="email"
               value={profile.email}
               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Phone</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Phone</label>
             <input
               type="tel"
               value={profile.phone}
               onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Timezone</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Timezone</label>
             <select
               value={profile.timezone}
               onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem', background: 'white' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#1C1C26' }}
             >
               <option value="America/New_York">Eastern Time (ET)</option>
               <option value="America/Chicago">Central Time (CT)</option>
@@ -860,15 +860,15 @@ export default function SettingsPage() {
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Password</label>
-            <button style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Change Password</button>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Password</label>
+            <button style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Change Password</button>
           </div>
         </div>
 
         <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Notifications</h3>
+          <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Notifications</h3>
 
-          <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.25rem' }}>
+          <div style={{ background: '#09090F', borderRadius: '10px', padding: '1.25rem' }}>
             {[
               { key: 'emailNotifications', label: 'Email Notifications', description: 'Receive important updates via email' },
               { key: 'dealAlerts', label: 'Deal Alerts', description: 'Notify when deals are created, won, or lost' },
@@ -876,10 +876,10 @@ export default function SettingsPage() {
               { key: 'assemblyReminders', label: 'Assembly Reminders', description: 'Remind me before scheduled meetings' },
               { key: 'weeklyDigest', label: 'Weekly Digest', description: 'Receive a weekly summary email' },
             ].map((item) => (
-              <div key={item.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--zander-border-gray)' }}>
+              <div key={item.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #2A2A38' }}>
                 <div>
-                  <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.15rem' }}>{item.label}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{item.description}</div>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.15rem' }}>{item.label}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{item.description}</div>
                 </div>
                 <label style={{ position: 'relative', display: 'inline-block', width: '50px', height: '28px' }}>
                   <input
@@ -895,7 +895,7 @@ export default function SettingsPage() {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: (profile as any)[item.key] ? 'var(--zander-red)' : '#ccc',
+                    background: (profile as any)[item.key] ? '#00CCEE' : '#ccc',
                     borderRadius: '28px',
                     transition: '0.3s'
                   }}>
@@ -906,7 +906,7 @@ export default function SettingsPage() {
                       width: '20px',
                       left: (profile as any)[item.key] ? '26px' : '4px',
                       bottom: '4px',
-                      background: 'white',
+                      background: '#1C1C26',
                       borderRadius: '50%',
                       transition: '0.3s'
                     }} />
@@ -916,7 +916,7 @@ export default function SettingsPage() {
             ))}
           </div>
 
-          <button onClick={saveProfile} disabled={saving} style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
+          <button onClick={saveProfile} disabled={saving} style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
         </div>
       </div>
     </div>
@@ -926,54 +926,54 @@ export default function SettingsPage() {
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
         <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Company Information</h3>
+          <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Company Information</h3>
           
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Company Name</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Company Name</label>
             <input
               type="text"
               value={company.name}
               onChange={(e) => setCompany({ ...company, name: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Website</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Website</label>
             <input
               type="url"
               value={company.website}
               onChange={(e) => setCompany({ ...company, website: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Email</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Email</label>
             <input
               type="email"
               value={company.email}
               onChange={(e) => setCompany({ ...company, email: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Phone</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Phone</label>
             <input
               type="tel"
               value={company.phone}
               onChange={(e) => setCompany({ ...company, phone: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Industry</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Industry</label>
             <select
               value={company.industry}
               onChange={(e) => setCompany({ ...company, industry: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem', background: 'white' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#1C1C26' }}
             >
               <option value="Business Consulting">Business Consulting</option>
               <option value="Manufacturing">Manufacturing</option>
@@ -987,65 +987,65 @@ export default function SettingsPage() {
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Company Logo</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Company Logo</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '80px', height: '80px', background: 'var(--zander-off-white)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--zander-border-gray)' }}>
+              <div style={{ width: '80px', height: '80px', background: '#09090F', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed #2A2A38' }}>
                 <span style={{ fontSize: '2rem' }}>🏢</span>
               </div>
-              <button style={{ padding: '0.5rem 1rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Upload Logo</button>
+              <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Upload Logo</button>
             </div>
           </div>
         </div>
 
         <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Address & Preferences</h3>
+          <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Address & Preferences</h3>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Street Address</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Street Address</label>
             <input
               type="text"
               value={company.address}
               onChange={(e) => setCompany({ ...company, address: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>City</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>City</label>
               <input
                 type="text"
                 value={company.city}
                 onChange={(e) => setCompany({ ...company, city: e.target.value })}
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>State</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>State</label>
               <input
                 type="text"
                 value={company.state}
                 onChange={(e) => setCompany({ ...company, state: e.target.value })}
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>ZIP</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>ZIP</label>
               <input
                 type="text"
                 value={company.zip}
                 onChange={(e) => setCompany({ ...company, zip: e.target.value })}
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
               />
             </div>
           </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Fiscal Year Start</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Fiscal Year Start</label>
             <select
               value={company.fiscalYearStart}
               onChange={(e) => setCompany({ ...company, fiscalYearStart: e.target.value })}
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem', background: 'white' }}
+              style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#1C1C26' }}
             >
               {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(month => (
                 <option key={month} value={month}>{month}</option>
@@ -1055,11 +1055,11 @@ export default function SettingsPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Currency</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Currency</label>
               <select
                 value={company.currency}
                 onChange={(e) => setCompany({ ...company, currency: e.target.value })}
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem', background: 'white' }}
+                style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#1C1C26' }}
               >
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -1068,17 +1068,17 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Tax Rate (%)</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Tax Rate (%)</label>
               <input
                 type="text"
                 value={company.taxRate}
                 onChange={(e) => setCompany({ ...company, taxRate: e.target.value })}
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
               />
             </div>
           </div>
 
-          <button onClick={saveCompany} disabled={saving} style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
+          <button onClick={saveCompany} disabled={saving} style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
         </div>
       </div>
     </div>
@@ -1088,14 +1088,14 @@ export default function SettingsPage() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Team Members</h3>
-          <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>{team.length} members</p>
+          <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.1rem' }}>Team Members</h3>
+          <p style={{ margin: '0.25rem 0 0 0', color: '#8888A0', fontSize: '0.9rem' }}>{team.length} members</p>
         </div>
-        <button style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }} onClick={() => setShowInviteModal(true)}>+ Invite Member</button>
+        <button style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }} onClick={() => setShowInviteModal(true)}>+ Invite Member</button>
       </div>
 
-      <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1.5fr 1fr 100px', padding: '0.75rem 1rem', background: 'var(--zander-navy)', color: 'white', fontWeight: '600', fontSize: '0.8rem' }}>
+      <div style={{ background: '#09090F', borderRadius: '10px', overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1.5fr 1fr 100px', padding: '0.75rem 1rem', background: '#13131A', color: 'white', fontWeight: '600', fontSize: '0.8rem' }}>
           <div>Name</div>
           <div>Email</div>
           <div>Role</div>
@@ -1107,21 +1107,21 @@ export default function SettingsPage() {
           const roleStyle = getRoleStyle(member.role);
           const statusStyle = getStatusStyle(member.status);
           return (
-            <div key={member.id} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1.5fr 1fr 100px', padding: '1rem', borderBottom: '1px solid var(--zander-border-gray)', alignItems: 'center', background: 'white' }}>
+            <div key={member.id} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1.5fr 1fr 100px', padding: '1rem', borderBottom: '1px solid #2A2A38', alignItems: 'center', background: '#1C1C26' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', fontSize: '0.8rem' }}>{member.avatar}</div>
-                <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{member.name}</span>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', fontSize: '0.8rem' }}>{member.avatar}</div>
+                <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{member.name}</span>
               </div>
-              <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>{member.email}</div>
+              <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{member.email}</div>
               <div>
                 <span style={{ fontSize: '0.7rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: roleStyle.bg, color: roleStyle.color }}>{member.role}</span>
               </div>
-              <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>{member.keystone || '—'}</div>
+              <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{member.keystone || '—'}</div>
               <div>
                 <span style={{ fontSize: '0.7rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: statusStyle.bg, color: statusStyle.color }}>{statusStyle.label}</span>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <button style={{ padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Edit</button>
+                <button style={{ padding: '0.35rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Edit</button>
               </div>
             </div>
           );
@@ -1129,7 +1129,7 @@ export default function SettingsPage() {
       </div>
 
       <div style={{ marginTop: '2rem' }}>
-        <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Roles & Permissions</h3>
+        <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Roles & Permissions</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
           {[
             { role: 'Owner', description: 'Full access to all settings, billing, and data', permissions: 'Everything' },
@@ -1139,9 +1139,9 @@ export default function SettingsPage() {
           ].map((item) => {
             const style = getRoleStyle(item.role);
             return (
-              <div key={item.role} style={{ padding: '1.25rem', background: 'var(--zander-off-white)', borderRadius: '10px', borderTop: `3px solid ${style.color}` }}>
-                <div style={{ fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>{item.role}</div>
-                <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.85rem', color: 'var(--zander-gray)', lineHeight: '1.4' }}>{item.description}</p>
+              <div key={item.role} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', borderTop: `3px solid ${style.color}` }}>
+                <div style={{ fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem' }}>{item.role}</div>
+                <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.85rem', color: '#8888A0', lineHeight: '1.4' }}>{item.description}</p>
                 <div style={{ fontSize: '0.75rem', color: style.color, fontWeight: '600' }}>{item.permissions}</div>
               </div>
             );
@@ -1156,15 +1156,15 @@ export default function SettingsPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Project Stages</h3>
-            <button style={{ padding: '0.5rem 1rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.85rem' }} onClick={addStage}>+ Add Stage</button>
+            <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.1rem' }}>Project Stages</h3>
+            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.85rem' }} onClick={addStage}>+ Add Stage</button>
           </div>
-          <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.85rem' }}>Drag to reorder stages. Deals will follow this sequence.</p>
+          <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.85rem' }}>Drag to reorder stages. Deals will follow this sequence.</p>
 
-          <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '0.5rem' }}>
+          <div style={{ background: '#09090F', borderRadius: '10px', padding: '0.5rem' }}>
             {stages.map((stage, index) => (
-              <div key={stage.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'white', borderRadius: '8px', marginBottom: '0.5rem', border: '2px solid var(--zander-border-gray)' }}>
-                <span style={{ cursor: 'grab', color: 'var(--zander-gray)' }}>⋮⋮</span>
+              <div key={stage.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#1C1C26', borderRadius: '8px', marginBottom: '0.5rem', border: '2px solid #2A2A38' }}>
+                <span style={{ cursor: 'grab', color: '#8888A0' }}>⋮⋮</span>
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: stage.color }} />
                 <div style={{ flex: 1 }}>
                   <input
@@ -1175,11 +1175,11 @@ export default function SettingsPage() {
                       newStages[index].name = e.target.value;
                       setStages(newStages);
                     }}
-                    style={{ border: 'none', background: 'transparent', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem', width: '100%' }}
+                    style={{ border: 'none', background: 'transparent', fontWeight: '600', color: '#F0F0F5', fontSize: '1rem', width: '100%' }}
                   />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Probability:</span>
+                  <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>Probability:</span>
                   <input
                     type="number"
                     value={stage.probability}
@@ -1188,50 +1188,50 @@ export default function SettingsPage() {
                       newStages[index].probability = parseInt(e.target.value) || 0;
                       setStages(newStages);
                     }}
-                    style={{ width: '60px', padding: '0.35rem', border: '1px solid var(--zander-border-gray)', borderRadius: '4px', textAlign: 'center' }}
+                    style={{ width: '60px', padding: '0.35rem', border: '1px solid #2A2A38', borderRadius: '4px', textAlign: 'center' }}
                   />
-                  <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>%</span>
+                  <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>%</span>
                 </div>
-                <button style={{ padding: '0.35rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--zander-gray)' }} onClick={() => deleteStage(stage.id)}>🗑️</button>
+                <button style={{ padding: '0.35rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#8888A0' }} onClick={() => deleteStage(stage.id)}>🗑️</button>
               </div>
             ))}
           </div>
 
-          <button style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }} onClick={saveAllStages} disabled={saving}>{saving ? "Saving..." : "Save Stages"}</button>
+          <button style={{ marginTop: '1.5rem', padding: '0.75rem 2rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '1rem' }} onClick={saveAllStages} disabled={saving}>{saving ? "Saving..." : "Save Stages"}</button>
         </div>
 
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Project Settings</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Project Settings</h3>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Stale Project Threshold (days)</label>
-            <p style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-gray)', fontSize: '0.8rem' }}>Flag projects with no activity after this many days</p>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Stale Project Threshold (days)</label>
+            <p style={{ margin: '0 0 0.5rem 0', color: '#8888A0', fontSize: '0.8rem' }}>Flag projects with no activity after this many days</p>
             <input
               type="number"
               defaultValue={14}
-              style={{ width: '100px', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+              style={{ width: '100px', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Win Reasons</label>
-            <p style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-gray)', fontSize: '0.8rem' }}>Track why deals are won</p>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Win Reasons</label>
+            <p style={{ margin: '0 0 0.5rem 0', color: '#8888A0', fontSize: '0.8rem' }}>Track why deals are won</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {['Price', 'Quality', 'Relationship', 'Timing', 'Features', 'Referral'].map((reason) => (
                 <span key={reason} style={{ padding: '0.35rem 0.75rem', background: 'rgba(40, 167, 69, 0.1)', color: '#28A745', borderRadius: '15px', fontSize: '0.8rem', fontWeight: '600' }}>{reason} ×</span>
               ))}
-              <button style={{ padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-navy)', border: '1px dashed var(--zander-border-gray)', borderRadius: '15px', fontSize: '0.8rem', cursor: 'pointer' }}>+ Add</button>
+              <button style={{ padding: '0.35rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px dashed #2A2A38', borderRadius: '15px', fontSize: '0.8rem', cursor: 'pointer' }}>+ Add</button>
             </div>
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Loss Reasons</label>
-            <p style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-gray)', fontSize: '0.8rem' }}>Track why deals are lost</p>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Loss Reasons</label>
+            <p style={{ margin: '0 0 0.5rem 0', color: '#8888A0', fontSize: '0.8rem' }}>Track why deals are lost</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {['Price Too High', 'Lost to Competitor', 'No Budget', 'Timing', 'No Response', 'Went Another Direction'].map((reason) => (
                 <span key={reason} style={{ padding: '0.35rem 0.75rem', background: 'rgba(220, 53, 69, 0.1)', color: '#DC3545', borderRadius: '15px', fontSize: '0.8rem', fontWeight: '600' }}>{reason} ×</span>
               ))}
-              <button style={{ padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-navy)', border: '1px dashed var(--zander-border-gray)', borderRadius: '15px', fontSize: '0.8rem', cursor: 'pointer' }}>+ Add</button>
+              <button style={{ padding: '0.35rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px dashed #2A2A38', borderRadius: '15px', fontSize: '0.8rem', cursor: 'pointer' }}>+ Add</button>
             </div>
           </div>
         </div>
@@ -1243,43 +1243,43 @@ export default function SettingsPage() {
     <div>
       {Object.entries(integrations).map(([category, items]) => (
         <div key={category} style={{ marginBottom: '2rem' }}>
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem', textTransform: 'capitalize' }}>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem', textTransform: 'capitalize' }}>
             {category === 'crm' ? 'CRM & Sales' : category === 'email' ? 'Email & Communication' : category === 'calendar' ? 'Calendar & Scheduling' : category === 'storage' ? 'Cloud Storage' : category}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
             {items.map((integration) => (
-              <div key={integration.id} style={{ padding: '1.25rem', background: 'white', borderRadius: '10px', border: integration.connected ? '2px solid #28A745' : '2px solid var(--zander-border-gray)', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                <div style={{ width: '48px', height: '48px', background: integration.connected ? 'rgba(40, 167, 69, 0.1)' : 'var(--zander-off-white)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>{integration.icon}</div>
+              <div key={integration.id} style={{ padding: '1.25rem', background: '#1C1C26', borderRadius: '10px', border: integration.connected ? '2px solid #28A745' : '2px solid #2A2A38', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                <div style={{ width: '48px', height: '48px', background: integration.connected ? 'rgba(40, 167, 69, 0.1)' : '#09090F', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>{integration.icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{integration.name}</span>
+                    <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{integration.name}</span>
                     {integration.status === 'soon' && (
                       <span style={{ fontSize: '0.6rem', fontWeight: '700', padding: '0.15rem 0.5rem', borderRadius: '10px', background: 'rgba(240, 179, 35, 0.2)', color: '#B8860B' }}>SOON</span>
                     )}
                   </div>
-                  <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.8rem', color: 'var(--zander-gray)', lineHeight: '1.4' }}>{integration.description}</p>
+                  <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.8rem', color: '#8888A0', lineHeight: '1.4' }}>{integration.description}</p>
                   {integration.connected ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28A745' }} />
                       <span style={{ fontSize: '0.8rem', color: '#28A745', fontWeight: '600' }}>Connected</span>
                       {(integration.id === 'gmail' || integration.id === 'outlook') && (
-                        <button onClick={integration.id === 'gmail' ? handleSyncGmail : handleSyncOutlook} disabled={integration.id === 'gmail' ? syncingGmail : syncingOutlook} style={{ padding: '0.35rem 0.75rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: (integration.id === 'gmail' ? syncingGmail : syncingOutlook) ? 'wait' : 'pointer', marginLeft: '0.5rem' }}>
+                        <button onClick={integration.id === 'gmail' ? handleSyncGmail : handleSyncOutlook} disabled={integration.id === 'gmail' ? syncingGmail : syncingOutlook} style={{ padding: '0.35rem 0.75rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: (integration.id === 'gmail' ? syncingGmail : syncingOutlook) ? 'wait' : 'pointer', marginLeft: '0.5rem' }}>
                           {(integration.id === 'gmail' ? syncingGmail : syncingOutlook) ? 'Syncing...' : 'Sync Now'}
                         </button>
                       )}
                       {(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive' || integration.id === 'outlook') && (
-                        <button onClick={integration.id === 'outlook' ? handleDisconnectOutlook : handleDisconnectGmail} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: 'white', color: 'var(--zander-gray)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
+                        <button onClick={integration.id === 'outlook' ? handleDisconnectOutlook : handleDisconnectGmail} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: '#1C1C26', color: '#8888A0', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
                       )}
                     </div>
                   ) : integration.status === 'available' ? (
                     <button 
                       onClick={integration.id === 'outlook' ? handleConnectOutlook : (integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive') ? handleConnectGmail : undefined}
-                      style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}
+                      style={{ padding: '0.5rem 1rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}
                     >
                       Connect
                     </button>
                   ) : (
-                    <button disabled style={{ padding: '0.5rem 1rem', background: 'var(--zander-off-white)', color: 'var(--zander-gray)', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'not-allowed' }}>Coming Soon</button>
+                    <button disabled style={{ padding: '0.5rem 1rem', background: '#09090F', color: '#8888A0', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'not-allowed' }}>Coming Soon</button>
                   )}
                 </div>
               </div>
@@ -1296,7 +1296,7 @@ export default function SettingsPage() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '4rem' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
-            <div style={{ color: 'var(--zander-gray)' }}>Loading billing information...</div>
+            <div style={{ color: '#8888A0' }}>Loading billing information...</div>
           </div>
         </div>
       );
@@ -1314,8 +1314,8 @@ export default function SettingsPage() {
         {/* Current Subscription */}
         {billing ? (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Current Subscription</h3>
-            <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px', color: 'white', marginBottom: '1rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Current Subscription</h3>
+            <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px', color: 'white', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                 <div>
                   <div style={{ fontSize: '0.8rem', opacity: 0.8, marginBottom: '0.25rem' }}>Current Plan</div>
@@ -1351,14 +1351,14 @@ export default function SettingsPage() {
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button 
                 onClick={handleManageBilling}
-                style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
               >
                 💳 Manage Payment Method
               </button>
               {!billing.cancelAtPeriodEnd && (
                 <button 
                   onClick={handleCancelSubscription}
-                  style={{ padding: '0.75rem 1.5rem', background: 'white', color: '#DC3545', border: '2px solid #DC3545', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                  style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#DC3545', border: '2px solid #DC3545', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
                 >
                   Cancel Subscription
                 </button>
@@ -1366,16 +1366,16 @@ export default function SettingsPage() {
             </div>
           </div>
         ) : (
-          <div style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--zander-off-white)', borderRadius: '12px', textAlign: 'center' }}>
+          <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#09090F', borderRadius: '12px', textAlign: 'center' }}>
             <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🚀</div>
-            <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No Active Subscription</div>
-            <div style={{ color: 'var(--zander-gray)', fontSize: '0.9rem' }}>Choose a plan below to get started with Zander</div>
+            <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>No Active Subscription</div>
+            <div style={{ color: '#8888A0', fontSize: '0.9rem' }}>Choose a plan below to get started with Zander</div>
           </div>
         )}
 
         {/* Billing Interval Toggle */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', background: 'var(--zander-off-white)', borderRadius: '8px', padding: '4px' }}>
+          <div style={{ display: 'flex', background: '#09090F', borderRadius: '8px', padding: '4px' }}>
             <button
               onClick={() => setSelectedInterval('month')}
               style={{
@@ -1385,7 +1385,7 @@ export default function SettingsPage() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 background: selectedInterval === 'month' ? 'white' : 'transparent',
-                color: selectedInterval === 'month' ? 'var(--zander-navy)' : 'var(--zander-gray)',
+                color: selectedInterval === 'month' ? '#13131A' : '#8888A0',
                 boxShadow: selectedInterval === 'month' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
@@ -1400,7 +1400,7 @@ export default function SettingsPage() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 background: selectedInterval === 'year' ? 'white' : 'transparent',
-                color: selectedInterval === 'year' ? 'var(--zander-navy)' : 'var(--zander-gray)',
+                color: selectedInterval === 'year' ? '#13131A' : '#8888A0',
                 boxShadow: selectedInterval === 'year' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
@@ -1421,9 +1421,9 @@ export default function SettingsPage() {
                 key={tier.id}
                 style={{
                   padding: '1.5rem',
-                  background: 'white',
+                  background: '#1C1C26',
                   borderRadius: '12px',
-                  border: tier.popular ? '2px solid var(--zander-red)' : '2px solid var(--zander-border-gray)',
+                  border: tier.popular ? '2px solid #00CCEE' : '2px solid #2A2A38',
                   position: 'relative',
                   boxShadow: tier.popular ? '0 4px 12px rgba(191, 10, 48, 0.15)' : 'none'
                 }}
@@ -1434,7 +1434,7 @@ export default function SettingsPage() {
                     top: '-12px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     padding: '0.25rem 1rem',
                     borderRadius: '20px',
@@ -1446,21 +1446,21 @@ export default function SettingsPage() {
                   </div>
                 )}
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                  <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{tier.name}</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>{tier.description}</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>{tier.name}</div>
+                  <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{tier.description}</div>
                 </div>
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                   {price ? (
                     <>
-                      <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>
+                      <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#00CCEE' }}>
                         {formatPrice(price.interval === 'year' ? price.amount / 12 : price.amount)}
                       </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
+                      <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>
                         per month{price.interval === 'year' && ' (billed annually)'}
                       </div>
                     </>
                   ) : (
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>Contact Us</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>Contact Us</div>
                   )}
                 </div>
                 <div style={{ marginBottom: '1.5rem' }}>
@@ -1489,8 +1489,8 @@ export default function SettingsPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      background: 'var(--zander-off-white)',
-                      color: 'var(--zander-gray)',
+                      background: '#09090F',
+                      color: '#8888A0',
                       border: 'none',
                       borderRadius: '8px',
                       fontWeight: '600',
@@ -1506,9 +1506,9 @@ export default function SettingsPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      background: tier.popular ? 'var(--zander-red)' : 'white',
-                      color: tier.popular ? 'white' : 'var(--zander-navy)',
-                      border: tier.popular ? 'none' : '2px solid var(--zander-navy)',
+                      background: tier.popular ? '#00CCEE' : 'white',
+                      color: tier.popular ? 'white' : '#13131A',
+                      border: tier.popular ? 'none' : '2px solid #13131A',
                       borderRadius: '8px',
                       fontWeight: '600',
                       cursor: upgradeLoading ? 'wait' : 'pointer',
@@ -1613,9 +1613,9 @@ export default function SettingsPage() {
 
   const renderSecurityTab = () => (
     <div>
-      <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Two-Factor Authentication</h3>
+      <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Two-Factor Authentication</h3>
 
-      <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+      <div style={{ background: '#09090F', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
           <div style={{
             width: '48px',
@@ -1630,10 +1630,10 @@ export default function SettingsPage() {
             {twoFactorEnabled ? '🔒' : '🔓'}
           </div>
           <div>
-            <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem' }}>
+            <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem' }}>
               {twoFactorEnabled ? '2FA is Enabled' : '2FA is Disabled'}
             </div>
-            <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>
+            <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>
               {twoFactorEnabled
                 ? 'Your account is protected with two-factor authentication'
                 : 'Add an extra layer of security to your account'}
@@ -1647,7 +1647,7 @@ export default function SettingsPage() {
             disabled={twoFactorLoading}
             style={{
               padding: '0.75rem 1.5rem',
-              background: 'var(--zander-navy)',
+              background: '#13131A',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -1662,28 +1662,28 @@ export default function SettingsPage() {
 
         {twoFactorSetupData && (
           <div style={{ marginTop: '1rem' }}>
-            <div style={{ background: 'white', borderRadius: '8px', padding: '1.5rem', marginBottom: '1rem' }}>
-              <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontWeight: '600' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '8px', padding: '1.5rem', marginBottom: '1rem' }}>
+              <p style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontWeight: '600' }}>
                 Step 1: Scan this QR code with your authenticator app
               </p>
-              <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.875rem' }}>
+              <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.875rem' }}>
                 Use Google Authenticator, Authy, or any TOTP-compatible app
               </p>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                 <img src={twoFactorSetupData.qrCodeUrl} alt="2FA QR Code" style={{ width: '200px', height: '200px' }} />
               </div>
-              <div style={{ background: 'var(--zander-off-white)', borderRadius: '6px', padding: '0.75rem', textAlign: 'center' }}>
-                <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+              <div style={{ background: '#09090F', borderRadius: '6px', padding: '0.75rem', textAlign: 'center' }}>
+                <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: '#8888A0' }}>
                   Or enter this code manually:
                 </p>
-                <code style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--zander-navy)', letterSpacing: '2px' }}>
+                <code style={{ fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5', letterSpacing: '2px' }}>
                   {twoFactorSetupData.secret}
                 </code>
               </div>
             </div>
 
-            <div style={{ background: 'white', borderRadius: '8px', padding: '1.5rem' }}>
-              <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontWeight: '600' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '8px', padding: '1.5rem' }}>
+              <p style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontWeight: '600' }}>
                 Step 2: Enter the 6-digit code from your app
               </p>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -1696,7 +1696,7 @@ export default function SettingsPage() {
                   style={{
                     width: '150px',
                     padding: '0.75rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1.25rem',
                     textAlign: 'center',
@@ -1709,7 +1709,7 @@ export default function SettingsPage() {
                   disabled={twoFactorLoading || twoFactorCode.length !== 6}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: twoFactorCode.length === 6 ? '#28A745' : 'var(--zander-border-gray)',
+                    background: twoFactorCode.length === 6 ? '#28A745' : '#2A2A38',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -1724,8 +1724,8 @@ export default function SettingsPage() {
                   style={{
                     padding: '0.75rem 1.5rem',
                     background: 'transparent',
-                    color: 'var(--zander-gray)',
-                    border: '2px solid var(--zander-border-gray)',
+                    color: '#8888A0',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontWeight: '600',
                     cursor: 'pointer'
@@ -1744,8 +1744,8 @@ export default function SettingsPage() {
             style={{
               padding: '0.75rem 1.5rem',
               background: 'transparent',
-              color: 'var(--zander-red)',
-              border: '2px solid var(--zander-red)',
+              color: '#00CCEE',
+              border: '2px solid #00CCEE',
               borderRadius: '8px',
               fontWeight: '600',
               cursor: 'pointer'
@@ -1756,17 +1756,17 @@ export default function SettingsPage() {
         )}
       </div>
 
-      <h3 style={{ margin: '2rem 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Password</h3>
-      <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem' }}>
-        <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+      <h3 style={{ margin: '2rem 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Password</h3>
+      <div style={{ background: '#09090F', borderRadius: '10px', padding: '1.5rem' }}>
+        <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.9rem' }}>
           Keep your account secure by using a strong, unique password.
         </p>
         <button
           style={{
             padding: '0.75rem 1.5rem',
-            background: 'white',
-            color: 'var(--zander-navy)',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            color: '#F0F0F5',
+            border: '2px solid #2A2A38',
             borderRadius: '8px',
             fontWeight: '600',
             cursor: 'pointer'
@@ -1819,15 +1819,15 @@ export default function SettingsPage() {
 
     return (
       <div>
-        <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Terms of Service</h3>
+        <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Terms of Service</h3>
 
         {termsLoading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
             Loading...
           </div>
         ) : (
           <>
-            <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ background: '#09090F', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
                 <div style={{
                   width: '48px',
@@ -1843,14 +1843,14 @@ export default function SettingsPage() {
                   {termsData.needsAcceptance ? '⚠️' : '✓'}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '0.5rem' }}>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem', marginBottom: '0.5rem' }}>
                     {termsData.userVersion
                       ? termsData.needsAcceptance
                         ? 'Updated Terms Available'
                         : 'Terms Accepted'
                       : 'Terms Not Yet Accepted'}
                   </div>
-                  <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.875rem', lineHeight: 1.6 }}>
                     {termsData.userVersion && (
                       <div>
                         <span style={{ fontWeight: '500' }}>Your accepted version:</span> {termsData.userVersion}
@@ -1885,17 +1885,17 @@ export default function SettingsPage() {
                 padding: '1.5rem',
                 marginBottom: '1.5rem'
               }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>
                   Action Required
                 </div>
-                <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+                <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.9rem' }}>
                   Please review and accept the updated Terms of Service to continue using Zander.
                 </p>
                 <button
                   onClick={handleAcceptTerms}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'var(--zander-navy)',
+                    background: '#13131A',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -1915,9 +1915,9 @@ export default function SettingsPage() {
                 rel="noopener noreferrer"
                 style={{
                   padding: '0.75rem 1.5rem',
-                  background: 'white',
-                  color: 'var(--zander-navy)',
-                  border: '2px solid var(--zander-border-gray)',
+                  background: '#1C1C26',
+                  color: '#F0F0F5',
+                  border: '2px solid #2A2A38',
                   borderRadius: '8px',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -1931,9 +1931,9 @@ export default function SettingsPage() {
           </>
         )}
 
-        <h3 style={{ margin: '2rem 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Privacy Policy</h3>
-        <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem' }}>
-          <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+        <h3 style={{ margin: '2rem 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Privacy Policy</h3>
+        <div style={{ background: '#09090F', borderRadius: '10px', padding: '1.5rem' }}>
+          <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.9rem' }}>
             Learn about how we collect, use, and protect your data.
           </p>
           <a
@@ -1942,9 +1942,9 @@ export default function SettingsPage() {
             rel="noopener noreferrer"
             style={{
               padding: '0.75rem 1.5rem',
-              background: 'white',
-              color: 'var(--zander-navy)',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              color: '#F0F0F5',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               fontWeight: '600',
               cursor: 'pointer',
@@ -1963,24 +1963,24 @@ export default function SettingsPage() {
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
         <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Export Data</h3>
+          <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Export Data</h3>
           
-          <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>Download all your data in a portable format. This includes contacts, deals, communications, and settings.</p>
+          <div style={{ background: '#09090F', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.9rem' }}>Download all your data in a portable format. This includes contacts, deals, communications, and settings.</p>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <button style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }} onClick={exportCSV}>Export as CSV</button>
-              <button style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Export as JSON</button>
+              <button style={{ padding: '0.75rem 1.5rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }} onClick={exportCSV}>Export as CSV</button>
+              <button style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Export as JSON</button>
             </div>
           </div>
 
-          <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Data Retention</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Data Retention</h3>
           
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Keep deleted items for</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Keep deleted items for</label>
             <select
               value={dataRetention}
               onChange={(e) => setDataRetention(e.target.value)}
-              style={{ width: '200px', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem', background: 'white' }}
+              style={{ width: '200px', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#1C1C26' }}
             >
               <option value="30">30 days</option>
               <option value="60">60 days</option>
@@ -1992,9 +1992,9 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.1rem' }}>Audit Log</h3>
+          <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>Audit Log</h3>
           
-          <div style={{ background: 'var(--zander-off-white)', borderRadius: '10px', overflow: 'hidden', marginBottom: '1.5rem' }}>
+          <div style={{ background: '#09090F', borderRadius: '10px', overflow: 'hidden', marginBottom: '1.5rem' }}>
             {[
               { action: 'Deal updated', user: 'Jonathan White', target: 'Johnson Kitchen Remodel', time: '2 hours ago' },
               { action: 'Contact created', user: 'David Sheets', target: 'Mike Anderson', time: '5 hours ago' },
@@ -2002,26 +2002,26 @@ export default function SettingsPage() {
               { action: 'User invited', user: 'Jonathan White', target: 'emily@64west.com', time: '2 days ago' },
               { action: 'Settings updated', user: 'Jonathan White', target: 'Company Info', time: '3 days ago' },
             ].map((log, i) => (
-              <div key={i} style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--zander-border-gray)', background: 'white' }}>
+              <div key={i} style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #2A2A38', background: '#1C1C26' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{log.action}</span>
-                    <span style={{ color: 'var(--zander-gray)' }}> — {log.target}</span>
+                    <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{log.action}</span>
+                    <span style={{ color: '#8888A0' }}> — {log.target}</span>
                   </div>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{log.time}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>{log.time}</span>
                 </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>by {log.user}</div>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0', marginTop: '0.25rem' }}>by {log.user}</div>
               </div>
             ))}
           </div>
 
-          <button style={{ padding: '0.5rem 1rem', background: 'white', color: 'var(--zander-navy)', border: '1px solid var(--zander-border-gray)', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}>View Full Audit Log</button>
+          <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}>View Full Audit Log</button>
 
           <h3 style={{ margin: '2rem 0 1rem 0', color: '#DC3545', fontSize: '1.1rem' }}>Danger Zone</h3>
           
           <div style={{ padding: '1.5rem', background: 'rgba(220, 53, 69, 0.05)', borderRadius: '10px', border: '2px solid rgba(220, 53, 69, 0.2)' }}>
             <div style={{ fontWeight: '600', color: '#DC3545', marginBottom: '0.5rem' }}>Delete Account</div>
-            <p style={{ margin: '0 0 1rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>Permanently delete your account and all associated data. This action cannot be undone.</p>
+            <p style={{ margin: '0 0 1rem 0', color: '#8888A0', fontSize: '0.9rem' }}>Permanently delete your account and all associated data. This action cannot be undone.</p>
             <button style={{ padding: '0.75rem 1.5rem', background: '#DC3545', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Delete My Account</button>
           </div>
         </div>
@@ -2031,7 +2031,7 @@ export default function SettingsPage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', background: '#09090F' }}>
         <NavBar activeModule="cro" />
 
         <Sidebar collapsed={sidebarCollapsed} />
@@ -2039,15 +2039,15 @@ export default function SettingsPage() {
         <main style={{ marginLeft: sidebarCollapsed ? '64px' : '240px', marginTop: '64px', padding: '2rem', transition: 'margin-left 0.3s ease' }}>
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1rem' }}>
-              <div style={{ width: '48px', height: '48px', border: '4px solid var(--zander-border-gray)', borderTopColor: 'var(--zander-red)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-              <p style={{ color: 'var(--zander-gray)', fontSize: '1rem' }}>Loading settings...</p>
+              <div style={{ width: '48px', height: '48px', border: '4px solid #2A2A38', borderTopColor: '#00CCEE', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+              <p style={{ color: '#8888A0', fontSize: '1rem' }}>Loading settings...</p>
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
           ) : (
           <>
-          <div style={{ background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
+          <div style={{ background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.75rem' }}>{profile.firstName?.[0] || ''}{profile.lastName?.[0] || ''}</div>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.75rem' }}>{profile.firstName?.[0] || ''}{profile.lastName?.[0] || ''}</div>
               <div>
                 <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: '700' }}>{profile.firstName} {profile.lastName}</h1>
                 <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9 }}>{profile.email}</p>
@@ -2060,8 +2060,8 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div style={{ background: 'white', borderRadius: '12px', border: '2px solid var(--zander-border-gray)', overflow: 'hidden' }}>
-            <div style={{ display: 'flex', borderBottom: '2px solid var(--zander-border-gray)' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '2px solid #2A2A38', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', borderBottom: '2px solid #2A2A38' }}>
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -2069,12 +2069,12 @@ export default function SettingsPage() {
                   style={{
                     flex: 1,
                     padding: '1rem',
-                    background: activeTab === tab.id ? 'var(--zander-off-white)' : 'white',
+                    background: activeTab === tab.id ? '#09090F' : 'white',
                     border: 'none',
-                    borderBottom: activeTab === tab.id ? '3px solid var(--zander-red)' : '3px solid transparent',
+                    borderBottom: activeTab === tab.id ? '3px solid #00CCEE' : '3px solid transparent',
                     cursor: 'pointer',
                     fontWeight: '600',
-                    color: activeTab === tab.id ? 'var(--zander-navy)' : 'var(--zander-gray)',
+                    color: activeTab === tab.id ? '#13131A' : '#8888A0',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2108,31 +2108,31 @@ export default function SettingsPage() {
       {/* Invite Modal */}
       {showInviteModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '450px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
-            <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.3rem' }}>Invite Team Member</h3>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '450px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.3rem' }}>Invite Team Member</h3>
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>First Name *</label>
-              <input type="text" value={inviteForm.firstName} onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>First Name *</label>
+              <input type="text" value={inviteForm.firstName} onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }} />
             </div>
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Last Name *</label>
-              <input type="text" value={inviteForm.lastName} onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Last Name *</label>
+              <input type="text" value={inviteForm.lastName} onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }} />
             </div>
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Email *</label>
-              <input type="email" value={inviteForm.email} onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} />
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Email *</label>
+              <input type="email" value={inviteForm.email} onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }} />
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Role</label>
-              <select value={inviteForm.role} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Role</label>
+              <select value={inviteForm.role} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}>
                 <option value="member">Member</option>
                 <option value="manager">Manager</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowInviteModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={inviteUser} disabled={saving} style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>{saving ? 'Sending...' : 'Send Invite'}</button>
+              <button onClick={() => setShowInviteModal(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={inviteUser} disabled={saving} style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>{saving ? 'Sending...' : 'Send Invite'}</button>
             </div>
           </div>
         </div>
@@ -2141,32 +2141,32 @@ export default function SettingsPage() {
       {/* Disable 2FA Modal */}
       {showDisable2FAModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '400px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1.3rem' }}>Disable Two-Factor Authentication</h3>
-            <p style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '400px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.3rem' }}>Disable Two-Factor Authentication</h3>
+            <p style={{ margin: '0 0 1.5rem 0', color: '#8888A0', fontSize: '0.9rem' }}>
               This will make your account less secure. Enter your password to confirm.
             </p>
             <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>Password</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Password</label>
               <input
                 type="password"
                 value={disable2FAPassword}
                 onChange={(e) => setDisable2FAPassword(e.target.value)}
                 placeholder="Enter your password"
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem' }}
               />
             </div>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => { setShowDisable2FAModal(false); setDisable2FAPassword(''); }}
-                style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-navy)', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
               >
                 Cancel
               </button>
               <button
                 onClick={disable2FA}
                 disabled={twoFactorLoading || !disable2FAPassword}
-                style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', opacity: (!disable2FAPassword || twoFactorLoading) ? 0.7 : 1 }}
+                style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', opacity: (!disable2FAPassword || twoFactorLoading) ? 0.7 : 1 }}
               >
                 {twoFactorLoading ? 'Disabling...' : 'Disable 2FA'}
               </button>

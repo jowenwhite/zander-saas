@@ -80,7 +80,7 @@ export default function SignupPage() {
       {/* Navy Sidebar */}
       <div style={{
         width: '33.333%',
-        background: 'linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%)',
+        background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -127,7 +127,7 @@ export default function SignupPage() {
       {/* Signup Form */}
       <div style={{
         width: '66.667%',
-        background: 'white',
+        background: '#09090F',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -137,17 +137,17 @@ export default function SignupPage() {
             fontSize: '2rem',
             fontWeight: '700',
             marginBottom: '0.5rem',
-            color: '#0C2340'
+            color: '#F0F0F5'
           }}>Create Your Account</h2>
-          <p style={{ marginBottom: '2rem', color: '#6C757D' }}>
+          <p style={{ marginBottom: '2rem', color: '#8888A0' }}>
             Start transforming your business with Zander
           </p>
 
           {error && (
             <div style={{
-              background: 'rgba(191, 10, 48, 0.1)',
-              border: '1px solid #BF0A30',
-              color: '#BF0A30',
+              background: 'rgba(0, 204, 238, 0.1)',
+              border: '1px solid #00CCEE',
+              color: '#00CCEE',
               padding: '0.75rem 1rem',
               borderRadius: '8px',
               marginBottom: '1.5rem',
@@ -164,7 +164,7 @@ export default function SignupPage() {
                   display: 'block',
                   fontSize: '0.875rem',
                   fontWeight: '600',
-                  color: '#343A40',
+                  color: '#F0F0F5',
                   marginBottom: '0.5rem'
                 }}>
                   First Name
@@ -178,7 +178,7 @@ export default function SignupPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    border: '2px solid #DEE2E6',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem',
                     outline: 'none',
@@ -191,7 +191,7 @@ export default function SignupPage() {
                   display: 'block',
                   fontSize: '0.875rem',
                   fontWeight: '600',
-                  color: '#343A40',
+                  color: '#F0F0F5',
                   marginBottom: '0.5rem'
                 }}>
                   Last Name
@@ -205,7 +205,7 @@ export default function SignupPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    border: '2px solid #DEE2E6',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem',
                     outline: 'none',
@@ -220,7 +220,7 @@ export default function SignupPage() {
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '600',
-                color: '#343A40',
+                color: '#F0F0F5',
                 marginBottom: '0.5rem'
               }}>
                 Work Email
@@ -234,7 +234,7 @@ export default function SignupPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
-                  border: '2px solid #DEE2E6',
+                  border: '2px solid #2A2A38',
                   borderRadius: '8px',
                   fontSize: '1rem',
                   outline: 'none',
@@ -248,7 +248,7 @@ export default function SignupPage() {
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '600',
-                color: '#343A40',
+                color: '#F0F0F5',
                 marginBottom: '0.5rem'
               }}>
                 Password
@@ -263,7 +263,7 @@ export default function SignupPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
-                  border: '2px solid #DEE2E6',
+                  border: '2px solid #2A2A38',
                   borderRadius: '8px',
                   fontSize: '1rem',
                   outline: 'none',
@@ -277,7 +277,7 @@ export default function SignupPage() {
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '600',
-                color: '#343A40',
+                color: '#F0F0F5',
                 marginBottom: '0.5rem'
               }}>
                 Company Name
@@ -291,7 +291,7 @@ export default function SignupPage() {
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
-                  border: '2px solid #DEE2E6',
+                  border: '2px solid #2A2A38',
                   borderRadius: '8px',
                   fontSize: '1rem',
                   outline: 'none',
@@ -321,9 +321,9 @@ export default function SignupPage() {
           </form>
 
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.875rem', color: '#6C757D' }}>
+            <p style={{ fontSize: '0.875rem', color: '#8888A0' }}>
               Already have an account?{' '}
-              <a href="/login" style={{ color: '#BF0A30', textDecoration: 'none', fontWeight: '600' }}>
+              <a href="/login" style={{ color: '#00CCEE', textDecoration: 'none', fontWeight: '600' }}>
                 Sign in
               </a>
             </p>
@@ -332,7 +332,7 @@ export default function SignupPage() {
           <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
             <p style={{ fontSize: '0.75rem', color: '#ADB5BD' }}>
               By creating an account, you agree to our{' '}
-              <a href="/legal/terms" style={{ color: '#6C757D' }}>Terms of Service</a>
+              <a href="/legal/terms" style={{ color: '#8888A0' }}>Terms of Service</a>
             </p>
           </div>
         </div>
