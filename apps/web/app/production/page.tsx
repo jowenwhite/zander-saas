@@ -382,7 +382,7 @@ export default function ProductionPage() {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        background: 'var(--zander-off-white)'
+        background: '#09090F'
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ marginBottom: '1rem' }}>
@@ -394,7 +394,7 @@ export default function ProductionPage() {
               priority
             />
           </div>
-          <div style={{ color: 'var(--zander-gray)' }}>Loading Zander...</div>
+          <div style={{ color: '#8888A0' }}>Loading Zander...</div>
         </div>
       </div>
     );
@@ -410,7 +410,7 @@ export default function ProductionPage() {
         companyName={companyName}
       />
 
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ minHeight: '100vh', background: '#09090F' }}>
       <NavBar activeModule={activeModule} />
 
       <Sidebar collapsed={sidebarCollapsed} />
@@ -446,13 +446,13 @@ export default function ProductionPage() {
               <h1 style={{ 
                 fontSize: '2rem', 
                 fontWeight: '700', 
-                color: 'var(--zander-navy)', 
+                color: '#F0F0F5', 
                 margin: 0,
                 marginBottom: '0.25rem'
               }}>
                 {getGreeting()}, {userName || 'there'} 👋
               </h1>
-              <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
+              <p style={{ color: '#8888A0', margin: 0 }}>
                 Here's what's happening with your sales today
               </p>
             </div>
@@ -463,9 +463,9 @@ export default function ProductionPage() {
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
-                border: '2px solid var(--zander-navy)',
-                background: 'white',
-                color: 'var(--zander-navy)',
+                border: '2px solid #2A2A38',
+                background: '#1C1C26',
+                color: '#F0F0F5',
                 fontWeight: '600',
                 cursor: 'pointer',
                 display: 'flex',
@@ -481,7 +481,7 @@ export default function ProductionPage() {
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
                 border: 'none',
-                background: 'var(--zander-red)',
+                background: '#00CCEE',
                 color: 'white',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -497,9 +497,9 @@ export default function ProductionPage() {
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
-                border: '2px solid var(--zander-border-gray)',
-                background: 'white',
-                color: 'var(--zander-gray)',
+                border: '2px solid #2A2A38',
+                background: '#1C1C26',
+                color: '#8888A0',
                 fontWeight: '600',
                 cursor: 'pointer',
                 display: 'flex',
@@ -525,8 +525,8 @@ export default function ProductionPage() {
             const kpiData = getKpiValue(kpiId);
             return (
               <div key={kpiId} style={{
-                background: 'white',
-                border: '2px solid var(--zander-border-gray)',
+                background: '#1C1C26',
+                border: '2px solid #2A2A38',
                 borderRadius: '12px',
                 padding: '1.5rem',
                 cursor: 'pointer',
@@ -566,13 +566,13 @@ export default function ProductionPage() {
                     }}>{kpiData.trendUp ? '↑' : '↓'} {kpiData.trend.replace(/[+-]/g, '')}</span>
                   )}
                 </div>
-                <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                   {kpiData.value}
                 </div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>
                   {kpi.name}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                   {kpiData.detail}
                 </div>
               </div>
@@ -586,8 +586,8 @@ export default function ProductionPage() {
         }}>
           {/* Pipeline Preview */}
           <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '12px',
             padding: '1.5rem'
           }}>
@@ -600,7 +600,7 @@ export default function ProductionPage() {
               <h3 style={{ 
                 fontSize: '1.25rem', 
                 fontWeight: '700', 
-                color: 'var(--zander-navy)', 
+                color: '#F0F0F5', 
                 margin: 0 
               }}>Projects Overview</h3>
               <button style={{
@@ -608,7 +608,7 @@ export default function ProductionPage() {
                 borderRadius: '6px',
                 border: 'none',
                 background: 'transparent',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 fontWeight: '600',
                 cursor: 'pointer',
                 display: 'flex',
@@ -631,7 +631,7 @@ export default function ProductionPage() {
                 return (
 
                   <div key={stageObj.id} style={{
-                    background: 'var(--zander-off-white)',
+                    background: '#09090F',
                     borderRadius: '8px',
                     padding: '1rem',
                     minHeight: '200px'
@@ -642,16 +642,16 @@ export default function ProductionPage() {
                       alignItems: 'center',
                       marginBottom: '1rem',
                       paddingBottom: '0.75rem',
-                      borderBottom: '2px solid var(--zander-border-gray)'
+                      borderBottom: '2px solid #2A2A38'
                     }}>
                       <span style={{ 
                         fontWeight: '600', 
-                        color: 'var(--zander-navy)', 
+                        color: '#F0F0F5', 
                         fontSize: '0.875rem' 
                       }}>{stageObj.name}</span>
                       <span style={{
                         padding: '0.25rem 0.5rem',
-                        background: 'var(--zander-red)',
+                        background: '#00CCEE',
                         color: 'white',
                         borderRadius: '50%',
                         fontSize: '0.75rem',
@@ -663,8 +663,8 @@ export default function ProductionPage() {
 
                     {stageDeals.slice(0, 3).map((deal) => (
                       <div key={deal.id} onClick={() => router.push('/deals/' + deal.id)} style={{
-                        background: 'white',
-                        border: '1px solid var(--zander-border-gray)',
+                        background: '#1C1C26',
+                        border: '1px solid #2A2A38',
                         borderRadius: '6px',
                         padding: '0.75rem',
                         marginBottom: '0.5rem',
@@ -674,7 +674,7 @@ export default function ProductionPage() {
                         <div style={{
                           fontWeight: '600',
                           fontSize: '0.875rem',
-                          color: 'var(--zander-navy)',
+                          color: '#F0F0F5',
                           marginBottom: '0.25rem',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -682,7 +682,7 @@ export default function ProductionPage() {
                         }}>{deal.dealName}</div>
                         <div style={{
                           fontSize: '0.75rem',
-                          color: 'var(--zander-red)',
+                          color: '#00CCEE',
                           fontWeight: '600'
                         }}>{formatCurrency(deal.dealValue)}</div>
                       </div>
@@ -693,7 +693,7 @@ export default function ProductionPage() {
                         textAlign: 'center', 
                         marginTop: '0.5rem',
                         fontSize: '0.75rem',
-                        color: 'var(--zander-gray)'
+                        color: '#8888A0'
                       }}>
                         +{stageDeals.length - 3} more
                       </div>
@@ -714,8 +714,8 @@ export default function ProductionPage() {
         }}>
           {/* Activity Feed */}
           <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '12px',
             padding: '1.5rem'
           }}>
@@ -728,7 +728,7 @@ export default function ProductionPage() {
               <h3 style={{ 
                 fontSize: '1.25rem', 
                 fontWeight: '700', 
-                color: 'var(--zander-navy)', 
+                color: '#F0F0F5', 
                 margin: 0 
               }}>Recent Activity</h3>
             </div>
@@ -768,25 +768,25 @@ export default function ProductionPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ 
                       fontWeight: '600', 
-                      color: 'var(--zander-navy)', 
+                      color: '#F0F0F5', 
                       marginBottom: '0.25rem',
                       fontSize: '0.875rem'
                     }}>{activity.title}</div>
                     <div style={{ 
                       fontSize: '0.8rem', 
-                      color: 'var(--zander-gray)',
+                      color: '#8888A0',
                       marginBottom: '0.25rem'
                     }}>{activity.description}</div>
                     <div style={{ 
                       fontSize: '0.75rem', 
-                      color: 'var(--zander-gray)' 
+                      color: '#8888A0' 
                     }}>{activity.date}</div>
                   </div>
                 </li>
               ))}
             </ul>
             ) : (
-              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📋</div>
                 <div>No recent activity</div>
                 <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Activities will appear here as you work on deals</div>
@@ -795,15 +795,15 @@ export default function ProductionPage() {
           </div>
           {/* Action Required */}
           <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '12px',
             padding: '1.5rem'
           }}>
             <h3 style={{ 
               fontSize: '1.25rem', 
               fontWeight: '700', 
-              color: 'var(--zander-navy)', 
+              color: '#F0F0F5', 
               margin: 0,
               marginBottom: '1.5rem'
             }}>Action Required</h3>
@@ -814,7 +814,7 @@ export default function ProductionPage() {
                 alignItems: 'start',
                 gap: '0.75rem',
                 padding: '1rem',
-                background: 'var(--zander-off-white)',
+                background: '#09090F',
                 borderRadius: '8px',
                 marginBottom: '0.75rem',
                 cursor: 'pointer'
@@ -822,7 +822,7 @@ export default function ProductionPage() {
                 <div style={{
                   width: '20px',
                   height: '20px',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '4px',
                   flexShrink: 0,
                   marginTop: '0.25rem'
@@ -830,14 +830,14 @@ export default function ProductionPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{ 
                     fontWeight: '600', 
-                    color: 'var(--zander-navy)',
+                    color: '#F0F0F5',
                     marginBottom: '0.25rem'
                   }}>{task.title}</div>
                   <div style={{ 
                     display: 'flex',
                     gap: '1rem',
                     fontSize: '0.75rem',
-                    color: 'var(--zander-gray)'
+                    color: '#8888A0'
                   }}>
                     <span>📋 {task.detail}</span>
                     {task.priority === 'high' && (
@@ -853,7 +853,7 @@ export default function ProductionPage() {
                 </div>
               </div>
             )) : (
-              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
                 <div>No action required</div>
                 <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>All deals are progressing smoothly</div>
@@ -863,8 +863,8 @@ export default function ProductionPage() {
 
           {/* Upcoming Assemblies */}
           <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '12px',
             padding: '1.5rem'
           }}>
@@ -877,7 +877,7 @@ export default function ProductionPage() {
               <h3 style={{
                 fontSize: '1.25rem',
                 fontWeight: '700',
-                color: 'var(--zander-navy)',
+                color: '#F0F0F5',
                 margin: 0
               }}>Upcoming Assemblies</h3>
               <span style={{
@@ -895,7 +895,7 @@ export default function ProductionPage() {
                 alignItems: 'start',
                 gap: '0.75rem',
                 padding: '1rem',
-                background: 'var(--zander-off-white)',
+                background: '#09090F',
                 borderRadius: '8px',
                 marginBottom: '0.75rem',
                 cursor: 'pointer'
@@ -914,14 +914,14 @@ export default function ProductionPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{
                     fontWeight: '600',
-                    color: 'var(--zander-navy)',
+                    color: '#F0F0F5',
                     marginBottom: '0.25rem'
                   }}>{assembly.title}</div>
                   <div style={{
                     display: 'flex',
                     gap: '1rem',
                     fontSize: '0.75rem',
-                    color: 'var(--zander-gray)'
+                    color: '#8888A0'
                   }}>
                     <span>🕐 {new Date(assembly.startTime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(assembly.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
                     {assembly.eventType && (
@@ -938,7 +938,7 @@ export default function ProductionPage() {
                 </div>
               </div>
             )) : (
-              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
                 <div>No upcoming assemblies scheduled</div>
               </div>
@@ -947,7 +947,7 @@ export default function ProductionPage() {
         </div>
         {/* Analytics Section */}
         <div style={{ marginTop: '3rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '1.5rem' }}>
             📊 Analytics
           </h2>
           
@@ -959,8 +959,8 @@ export default function ProductionPage() {
             marginBottom: '2rem'
           }}>
             <div style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '12px',
               padding: '1.5rem'
             }}>
@@ -976,15 +976,15 @@ export default function ProductionPage() {
                   fontSize: '1.5rem'
                 }}>💰</div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {formatCurrency(deals.reduce((sum, d) => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST' ? sum + d.dealValue : sum, 0))}
               </div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Total Pipeline</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Total Pipeline</div>
             </div>
 
             <div style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '12px',
               padding: '1.5rem'
             }}>
@@ -1000,15 +1000,15 @@ export default function ProductionPage() {
                   fontSize: '1.5rem'
                 }}>🎯</div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {formatCurrency(deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + (d.dealValue * d.probability / 100), 0))}
               </div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Weighted Pipeline</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Weighted Pipeline</div>
             </div>
 
             <div style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '12px',
               padding: '1.5rem'
             }}>
@@ -1024,19 +1024,19 @@ export default function ProductionPage() {
                   fontSize: '1.5rem'
                 }}>📊</div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {(() => {
                   const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
                   const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
                   return won + lost > 0 ? ((won / (won + lost)) * 100).toFixed(1) : '0';
                 })()}%
               </div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Win Rate</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Win Rate</div>
             </div>
 
             <div style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '12px',
               padding: '1.5rem'
             }}>
@@ -1052,14 +1052,14 @@ export default function ProductionPage() {
                   fontSize: '1.5rem'
                 }}>📈</div>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {(() => {
                   const activeDeals = deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST');
                   const total = activeDeals.reduce((sum, d) => sum + d.dealValue, 0);
                   return activeDeals.length > 0 ? formatCurrency(total / activeDeals.length) : '$0';
                 })()}
               </div>
-              <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Avg Deal Size</div>
+              <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Avg Deal Size</div>
             </div>
           </div>
 
@@ -1067,12 +1067,12 @@ export default function ProductionPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
             {/* Pipeline Funnel */}
             <div style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '12px',
               padding: '1.5rem'
             }}>
-              <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.25rem' }}>Pipeline Funnel</h3>
+              <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.25rem' }}>Pipeline Funnel</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'].map((stage) => {
                   const stageDeals = deals.filter(d => d.stage === stage);
@@ -1081,10 +1081,10 @@ export default function ProductionPage() {
                   const stageLabels: Record<string, string> = { 'LEAD': 'Lead', 'PROSPECT': 'Prospect', 'QUALIFIED': 'Qualified', 'PROPOSAL': 'Proposal', 'NEGOTIATION': 'Negotiation', 'CLOSED_WON': 'Closed Won' };
                   return (
                     <div key={stage} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <div style={{ width: '100px', fontSize: '0.875rem', color: 'var(--zander-navy)', fontWeight: '500' }}>
+                      <div style={{ width: '100px', fontSize: '0.875rem', color: '#F0F0F5', fontWeight: '500' }}>
                         {stageLabels[stage] || stage}
                       </div>
-                      <div style={{ flex: 1, height: '32px', background: 'var(--zander-off-white)', borderRadius: '6px', overflow: 'hidden' }}>
+                      <div style={{ flex: 1, height: '32px', background: '#09090F', borderRadius: '6px', overflow: 'hidden' }}>
                         <div style={{
                           width: `${(stageValue / maxValue) * 100}%`,
                           height: '100%',
@@ -1102,7 +1102,7 @@ export default function ProductionPage() {
                           )}
                         </div>
                       </div>
-                      <div style={{ width: '50px', textAlign: 'right', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+                      <div style={{ width: '50px', textAlign: 'right', fontSize: '0.875rem', color: '#8888A0' }}>
                         {stageDeals.length}
                       </div>
                     </div>
@@ -1113,19 +1113,19 @@ export default function ProductionPage() {
 
             {/* Win/Loss Summary */}
             <div style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '12px',
               padding: '1.5rem'
             }}>
-              <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--zander-navy)', fontSize: '1.25rem' }}>Win/Loss Summary</h3>
+              <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.25rem' }}>Win/Loss Summary</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Won</span>
+                    <span style={{ color: '#8888A0', fontSize: '0.875rem' }}>Won</span>
                     <span style={{ color: '#27AE60', fontWeight: '600' }}>{deals.filter(d => d.stage === 'CLOSED_WON').length} deals</span>
                   </div>
-                  <div style={{ height: '8px', background: 'var(--zander-off-white)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
                     <div style={{
                       width: (() => {
                         const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
@@ -1144,10 +1144,10 @@ export default function ProductionPage() {
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>Lost</span>
-                    <span style={{ color: 'var(--zander-red)', fontWeight: '600' }}>{deals.filter(d => d.stage === 'CLOSED_LOST').length} deals</span>
+                    <span style={{ color: '#8888A0', fontSize: '0.875rem' }}>Lost</span>
+                    <span style={{ color: '#00CCEE', fontWeight: '600' }}>{deals.filter(d => d.stage === 'CLOSED_LOST').length} deals</span>
                   </div>
-                  <div style={{ height: '8px', background: 'var(--zander-off-white)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
                     <div style={{
                       width: (() => {
                         const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
@@ -1155,11 +1155,11 @@ export default function ProductionPage() {
                         return won + lost > 0 ? `${(lost / (won + lost)) * 100}%` : '0%';
                       })(),
                       height: '100%',
-                      background: 'var(--zander-red)',
+                      background: '#00CCEE',
                       borderRadius: '4px'
                     }}></div>
                   </div>
-                  <div style={{ marginTop: '0.5rem', fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-red)' }}>
+                  <div style={{ marginTop: '0.5rem', fontSize: '1.25rem', fontWeight: '700', color: '#00CCEE' }}>
                     {formatCurrency(deals.filter(d => d.stage === 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}
                   </div>
                 </div>
@@ -1167,14 +1167,14 @@ export default function ProductionPage() {
                 <div style={{
                   marginTop: '1rem',
                   padding: '1rem',
-                  background: 'var(--zander-off-white)',
+                  background: '#09090F',
                   borderRadius: '8px',
                   textAlign: 'center'
                 }}>
-                  <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>
                     Conversion Rate
                   </div>
-                  <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+                  <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5' }}>
                     {(() => {
                       const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
                       const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
@@ -1188,22 +1188,22 @@ export default function ProductionPage() {
 
           {/* Stage Breakdown Table */}
           <div style={{
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '12px',
             overflow: 'hidden'
           }}>
-            <div style={{ padding: '1.5rem', borderBottom: '2px solid var(--zander-border-gray)' }}>
-              <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.25rem' }}>Stage Breakdown</h3>
+            <div style={{ padding: '1.5rem', borderBottom: '2px solid #2A2A38' }}>
+              <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.25rem' }}>Stage Breakdown</h3>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: 'var(--zander-off-white)' }}>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--zander-navy)' }}>Stage</th>
-                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>Deals</th>
-                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>Value</th>
-                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>Avg Deal</th>
-                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>% of Pipeline</th>
+                <tr style={{ background: '#09090F' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#F0F0F5' }}>Stage</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#F0F0F5' }}>Deals</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#F0F0F5' }}>Value</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#F0F0F5' }}>Avg Deal</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#F0F0F5' }}>% of Pipeline</th>
                 </tr>
               </thead>
               <tbody>
@@ -1222,15 +1222,15 @@ export default function ProductionPage() {
                             borderRadius: '50%',
                             background: stage === 'CLOSED_WON' ? '#27AE60' : 'var(--zander-red)'
                           }}></div>
-                          <span style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>{stageLabels[stage] || stage}</span>
+                          <span style={{ fontWeight: '500', color: '#F0F0F5' }}>{stageLabels[stage] || stage}</span>
                         </div>
                       </td>
-                      <td style={{ padding: '1rem', textAlign: 'right', color: 'var(--zander-gray)' }}>{stageDeals.length}</td>
-                      <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)' }}>{formatCurrency(stageValue)}</td>
-                      <td style={{ padding: '1rem', textAlign: 'right', color: 'var(--zander-gray)' }}>
+                      <td style={{ padding: '1rem', textAlign: 'right', color: '#8888A0' }}>{stageDeals.length}</td>
+                      <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#F0F0F5' }}>{formatCurrency(stageValue)}</td>
+                      <td style={{ padding: '1rem', textAlign: 'right', color: '#8888A0' }}>
                         {stageDeals.length > 0 ? formatCurrency(stageValue / stageDeals.length) : '$0'}
                       </td>
-                      <td style={{ padding: '1rem', textAlign: 'right', color: 'var(--zander-gray)' }}>
+                      <td style={{ padding: '1rem', textAlign: 'right', color: '#8888A0' }}>
                         {totalPipeline > 0 ? ((stageValue / totalPipeline) * 100).toFixed(1) : '0'}%
                       </td>
                     </tr>
@@ -1272,16 +1272,16 @@ export default function ProductionPage() {
           zIndex: 1100
         }}>
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
             padding: '2rem',
             maxWidth: '500px',
             width: '90%'
           }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Project</h2>
+            <h2 style={{ marginBottom: '1.5rem', color: '#F0F0F5' }}>New Project</h2>
             <form onSubmit={handleCreateDeal}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                   Deal Name *
                 </label>
                 <input
@@ -1291,7 +1291,7 @@ export default function ProductionPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem'
                   }}
@@ -1300,7 +1300,7 @@ export default function ProductionPage() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                     Value *
                   </label>
                   <input
@@ -1310,7 +1310,7 @@ export default function ProductionPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '2px solid var(--zander-border-gray)',
+                      border: '2px solid #2A2A38',
                       borderRadius: '8px',
                       fontSize: '1rem'
                     }}
@@ -1318,7 +1318,7 @@ export default function ProductionPage() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                     Probability %
                   </label>
                   <input
@@ -1328,7 +1328,7 @@ export default function ProductionPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '2px solid var(--zander-border-gray)',
+                      border: '2px solid #2A2A38',
                       borderRadius: '8px',
                       fontSize: '1rem'
                     }}
@@ -1338,7 +1338,7 @@ export default function ProductionPage() {
                 </div>
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                   Stage
                 </label>
                 <select
@@ -1347,7 +1347,7 @@ export default function ProductionPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem'
                   }}
@@ -1358,7 +1358,7 @@ export default function ProductionPage() {
                 </select>
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                   Contact (Optional)
                 </label>
                 <select
@@ -1367,7 +1367,7 @@ export default function ProductionPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem'
                   }}
@@ -1386,9 +1386,9 @@ export default function ProductionPage() {
                   onClick={() => setShowNewDealModal(false)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
-                    background: 'white',
+                    background: '#1C1C26',
                     cursor: 'pointer',
                     fontWeight: '600'
                   }}
@@ -1399,7 +1399,7 @@ export default function ProductionPage() {
                   type="submit"
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -1430,17 +1430,17 @@ export default function ProductionPage() {
           zIndex: 1100
         }}>
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
             padding: '2rem',
             maxWidth: '500px',
             width: '90%'
           }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Person</h2>
+            <h2 style={{ marginBottom: '1.5rem', color: '#F0F0F5' }}>New Person</h2>
             <form onSubmit={handleCreateContact}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                     First Name *
                   </label>
                   <input
@@ -1450,7 +1450,7 @@ export default function ProductionPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '2px solid var(--zander-border-gray)',
+                      border: '2px solid #2A2A38',
                       borderRadius: '8px',
                       fontSize: '1rem'
                     }}
@@ -1458,7 +1458,7 @@ export default function ProductionPage() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                     Last Name *
                   </label>
                   <input
@@ -1468,7 +1468,7 @@ export default function ProductionPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '2px solid var(--zander-border-gray)',
+                      border: '2px solid #2A2A38',
                       borderRadius: '8px',
                       fontSize: '1rem'
                     }}
@@ -1477,7 +1477,7 @@ export default function ProductionPage() {
                 </div>
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                   Email *
                 </label>
                 <input
@@ -1487,7 +1487,7 @@ export default function ProductionPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem'
                   }}
@@ -1495,7 +1495,7 @@ export default function ProductionPage() {
                 />
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                   Company
                 </label>
                 <input
@@ -1505,14 +1505,14 @@ export default function ProductionPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem'
                   }}
                 />
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
                   Phone
                 </label>
                 <input
@@ -1522,7 +1522,7 @@ export default function ProductionPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem'
                   }}
@@ -1534,9 +1534,9 @@ export default function ProductionPage() {
                   onClick={() => setShowNewContactModal(false)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
-                    background: 'white',
+                    background: '#1C1C26',
                     cursor: 'pointer',
                     fontWeight: '600'
                   }}
@@ -1547,7 +1547,7 @@ export default function ProductionPage() {
                   type="submit"
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -1578,7 +1578,7 @@ export default function ProductionPage() {
           zIndex: 1000
         }} onClick={() => setShowWidgetSettings(false)}>
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '16px',
             width: '600px',
             maxHeight: '85vh',
@@ -1620,13 +1620,13 @@ export default function ProductionPage() {
             
             {/* Modal Body */}
             <div style={{ padding: '2rem', flex: 1, overflowY: 'auto' }}>
-              <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              <p style={{ color: '#8888A0', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                 Choose 4 KPIs to display in your dashboard. Click a slot to change its metric.
               </p>
               
               {/* Current Widget Slots */}
               <div style={{ marginBottom: '2rem' }}>
-                <h3 style={{ color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
+                <h3 style={{ color: '#F0F0F5', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
                   📊 Your Dashboard Widgets
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
@@ -1634,12 +1634,12 @@ export default function ProductionPage() {
                     const currentKpiId = widgetConfig[slotIndex];
                     return (
                       <div key={slotIndex} style={{
-                        border: '2px solid var(--zander-border-gray)',
+                        border: '2px solid #2A2A38',
                         borderRadius: '12px',
                         padding: '1rem',
-                        background: 'var(--zander-off-white)'
+                        background: '#09090F'
                       }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                           Widget {slotIndex + 1}
                         </div>
                         <select
@@ -1652,12 +1652,12 @@ export default function ProductionPage() {
                           style={{
                             width: '100%',
                             padding: '0.75rem',
-                            border: '2px solid var(--zander-border-gray)',
+                            border: '2px solid #2A2A38',
                             borderRadius: '8px',
                             fontSize: '1rem',
                             fontWeight: '600',
-                            color: 'var(--zander-navy)',
-                            background: 'white',
+                            color: '#F0F0F5',
+                            background: '#1C1C26',
                             cursor: 'pointer'
                           }}
                         >
@@ -1675,7 +1675,7 @@ export default function ProductionPage() {
               
               {/* Available KPIs Reference */}
               <div>
-                <h3 style={{ color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
+                <h3 style={{ color: '#F0F0F5', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
                   📋 Available KPIs
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
@@ -1702,8 +1702,8 @@ export default function ProductionPage() {
                           fontSize: '0.9rem'
                         }}>{kpi.icon}</div>
                         <div>
-                          <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.875rem' }}>{kpi.name}</div>
-                          {isSelected && <div style={{ fontSize: '0.7rem', color: 'var(--zander-red)' }}>In use</div>}
+                          <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.875rem' }}>{kpi.name}</div>
+                          {isSelected && <div style={{ fontSize: '0.7rem', color: '#00CCEE' }}>In use</div>}
                         </div>
                       </div>
                     );
@@ -1715,11 +1715,11 @@ export default function ProductionPage() {
             {/* Modal Footer */}
             <div style={{
               padding: '1rem 2rem',
-              borderTop: '1px solid var(--zander-border-gray)',
+              borderTop: '1px solid #2A2A38',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              background: 'var(--zander-off-white)'
+              background: '#09090F'
             }}>
               <button
                 onClick={() => {
@@ -1727,10 +1727,10 @@ export default function ProductionPage() {
                 }}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '8px',
-                  background: 'white',
-                  color: 'var(--zander-gray)',
+                  background: '#1C1C26',
+                  color: '#8888A0',
                   fontWeight: '600',
                   cursor: 'pointer'
                 }}
@@ -1743,7 +1743,7 @@ export default function ProductionPage() {
                   padding: '0.75rem 2rem',
                   border: 'none',
                   borderRadius: '8px',
-                  background: 'var(--zander-red)',
+                  background: '#00CCEE',
                   color: 'white',
                   fontWeight: '600',
                   cursor: 'pointer'

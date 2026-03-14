@@ -43,8 +43,8 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
 
   return (
     <nav style={{
-      background: 'white',
-      borderBottom: '2px solid var(--zander-border-gray)',
+      background: '#13131A',
+      borderBottom: '2px solid #2A2A38',
       padding: '0 1.5rem',
       height: '64px',
       display: 'flex',
@@ -145,7 +145,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
               padding: '0.35rem 0.5rem',
               borderRadius: '8px',
               transition: 'background 0.2s ease',
-              background: showUserMenu ? 'var(--zander-off-white)' : 'transparent'
+              background: showUserMenu ? '#1C1C26' : 'transparent'
             }}
           >
             <div style={{
@@ -162,7 +162,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
             }}>
               {userInitials}
             </div>
-            <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{userName}</span>
+            <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{userName}</span>
             <span style={{ 
               fontSize: '0.6rem', 
               color: 'var(--zander-gray)',
@@ -178,8 +178,8 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
               top: '100%',
               right: 0,
               marginTop: '0.5rem',
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '10px',
               boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
               minWidth: '240px',
@@ -187,10 +187,10 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
               zIndex: 1001
             }}>
               {/* User Info Header */}
-              <div style={{ 
-                padding: '1rem', 
-                borderBottom: '1px solid var(--zander-border-gray)',
-                background: 'var(--zander-off-white)'
+              <div style={{
+                padding: '1rem',
+                borderBottom: '1px solid #2A2A38',
+                background: '#13131A'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{
@@ -208,8 +208,8 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                     {userInitials}
                   </div>
                   <div>
-                    <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{userName}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{userEmail}</div>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{userName}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{userEmail}</div>
                   </div>
                 </div>
               </div>
@@ -223,11 +223,11 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                     alignItems: 'center',
                     gap: '0.75rem',
                     padding: '0.75rem 1rem',
-                    color: 'var(--zander-navy)',
+                    color: '#F0F0F5',
                     textDecoration: 'none',
                     transition: 'background 0.2s ease'
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'var(--zander-off-white)'}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#1C1C26'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
                   <span>⚙️</span>
@@ -241,11 +241,11 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                     alignItems: 'center',
                     gap: '0.75rem',
                     padding: '0.75rem 1rem',
-                    color: 'var(--zander-navy)',
+                    color: '#F0F0F5',
                     textDecoration: 'none',
                     transition: 'background 0.2s ease'
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'var(--zander-off-white)'}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#1C1C26'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
                   <span>👤</span>
@@ -259,11 +259,11 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                     alignItems: 'center',
                     gap: '0.75rem',
                     padding: '0.75rem 1rem',
-                    color: 'var(--zander-navy)',
+                    color: '#F0F0F5',
                     textDecoration: 'none',
                     transition: 'background 0.2s ease'
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'var(--zander-off-white)'}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#1C1C26'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
                   <span>💳</span>
@@ -272,7 +272,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
               </div>
 
               {/* Logout */}
-              <div style={{ borderTop: '1px solid var(--zander-border-gray)', padding: '0.5rem 0' }}>
+              <div style={{ borderTop: '1px solid #2A2A38', padding: '0.5rem 0' }}>
                 <button
                   onClick={logout}
                   style={{
@@ -284,7 +284,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                     background: 'none',
                     border: 'none',
                     textAlign: 'left',
-                    color: 'var(--zander-red)',
+                    color: '#00CCEE',
                     cursor: 'pointer',
                     fontWeight: '600',
                     fontSize: '0.95rem',

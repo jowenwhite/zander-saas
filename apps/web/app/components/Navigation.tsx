@@ -21,8 +21,8 @@ export default function Navigation({ activePage }: NavigationProps) {
     <>
       {/* Top Navigation */}
       <nav style={{
-        background: 'white',
-        borderBottom: '2px solid var(--zander-border-gray)',
+        background: '#13131A',
+        borderBottom: '2px solid #2A2A38',
         padding: '0 1.5rem',
         height: '64px',
         display: 'flex',
@@ -106,22 +106,22 @@ export default function Navigation({ activePage }: NavigationProps) {
               top: '100%',
               right: 0,
               marginTop: '0.5rem',
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               minWidth: '200px',
               overflow: 'hidden',
               zIndex: 1001
             }}>
-              <div style={{ padding: '1rem', borderBottom: '1px solid var(--zander-border-gray)' }}>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{userName}</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>{user?.email || 'user@example.com'}</div>
+              <div style={{ padding: '1rem', borderBottom: '1px solid #2A2A38' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{userName}</div>
+                <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>{user?.email || 'user@example.com'}</div>
               </div>
               <a href="#" style={{
                 display: 'block',
                 padding: '0.75rem 1rem',
-                color: 'var(--zander-navy)',
+                color: '#F0F0F5',
                 textDecoration: 'none',
                 transition: 'background 0.2s ease'
               }}>
@@ -130,13 +130,13 @@ export default function Navigation({ activePage }: NavigationProps) {
               <a href="#" style={{
                 display: 'block',
                 padding: '0.75rem 1rem',
-                color: 'var(--zander-navy)',
+                color: '#F0F0F5',
                 textDecoration: 'none',
                 transition: 'background 0.2s ease'
               }}>
                 👤 Profile
               </a>
-              <div style={{ borderTop: '1px solid var(--zander-border-gray)' }}>
+              <div style={{ borderTop: '1px solid #2A2A38' }}>
                 <button
                   onClick={logout}
                   style={{
@@ -145,7 +145,7 @@ export default function Navigation({ activePage }: NavigationProps) {
                     background: 'none',
                     border: 'none',
                     textAlign: 'left',
-                    color: 'var(--zander-red)',
+                    color: '#00CCEE',
                     cursor: 'pointer',
                     fontWeight: '600',
                     fontSize: '1rem'
@@ -168,14 +168,14 @@ export default function Navigation({ activePage }: NavigationProps) {
         top: '64px',
         bottom: 0,
         width: '240px',
-        background: 'white',
-        borderRight: '2px solid var(--zander-border-gray)',
+        background: '#13131A',
+        borderRight: '2px solid #2A2A38',
         padding: '1.5rem 0',
         overflow: 'hidden',
         zIndex: 900
       }}>
         <div style={{ padding: '0 1rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#8888A0', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
             Sales & Revenue
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -193,8 +193,8 @@ export default function Navigation({ activePage }: NavigationProps) {
                   padding: '0.75rem 1rem',
                   borderRadius: '8px',
                   textDecoration: 'none',
-                  color: activePage === item.id ? 'var(--zander-red)' : 'var(--zander-navy)',
-                  background: activePage === item.id ? 'rgba(191, 10, 48, 0.1)' : 'transparent',
+                  color: activePage === item.id ? '#00CCEE' : '#F0F0F5',
+                  background: activePage === item.id ? 'rgba(0, 204, 238, 0.1)' : 'transparent',
                   fontWeight: activePage === item.id ? '600' : '400'
                 }}>
                   <span>{item.icon}</span>
@@ -206,7 +206,7 @@ export default function Navigation({ activePage }: NavigationProps) {
         </div>
 
         <div style={{ padding: '0 1rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--zander-gray)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#8888A0', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>
             Tools
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -223,7 +223,7 @@ export default function Navigation({ activePage }: NavigationProps) {
                   padding: '0.75rem 1rem',
                   borderRadius: '8px',
                   textDecoration: 'none',
-                  color: 'var(--zander-navy)'
+                  color: '#F0F0F5'
                 }}>
                   <span>{item.icon}</span>
                   <span>{item.label}</span>

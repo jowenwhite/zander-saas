@@ -204,7 +204,7 @@ export default function ProjectsPage() {
   if (loading) {
     return (
 
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#09090F' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ marginBottom: '1rem' }}>
             <Image
@@ -215,7 +215,7 @@ export default function ProjectsPage() {
               priority
             />
           </div>
-          <div style={{ color: 'var(--zander-gray)' }}>Loading Projects...</div>
+          <div style={{ color: '#8888A0' }}>Loading Projects...</div>
         </div>
       </div>
     );
@@ -224,7 +224,7 @@ export default function ProjectsPage() {
   return (
     <AuthGuard>
 
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ minHeight: '100vh', background: '#09090F' }}>
       {/* Top Navigation */}
       <NavBar activeModule="cro" />
 
@@ -235,12 +235,12 @@ export default function ProjectsPage() {
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0 }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
               Projects
             </h1>
             <div style={{
               padding: '0.5rem 1rem',
-              background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+              background: 'linear-gradient(135deg, #00CCEE 0%, #00B0CC 100%)',
               color: 'white',
               borderRadius: '8px',
               fontWeight: '700',
@@ -250,15 +250,15 @@ export default function ProjectsPage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <a href="/projects/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+            <a href="/projects/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid #2A2A38', background: '#1C1C26', color: '#F0F0F5', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
             <button
             onClick={() => setShowNewDealModal(true)}
             style={{
               padding: '0.75rem 1.5rem',
               borderRadius: '8px',
               border: 'none',
-              background: 'var(--zander-red)',
-              color: 'white',
+              background: '#00CCEE',
+              color: '#000000',
               fontWeight: '600',
               cursor: 'pointer',
               display: 'flex',
@@ -271,8 +271,8 @@ export default function ProjectsPage() {
         </div>
           </div>
         <div style={{
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '2px solid #2A2A38',
           borderRadius: '12px',
           padding: '1rem 1.5rem',
           marginBottom: '1.5rem',
@@ -281,7 +281,7 @@ export default function ProjectsPage() {
           alignItems: 'center'
         }}>
           <div style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
-            <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--zander-gray)' }}>🔍</span>
+            <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#8888A0' }}>🔍</span>
             <input
               type="text"
               placeholder="Search projects..."
@@ -290,10 +290,12 @@ export default function ProjectsPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem 0.75rem 3rem',
-                border: '2px solid var(--zander-border-gray)',
+                border: '2px solid #2A2A38',
                 borderRadius: '8px',
                 fontSize: '1rem',
-                outline: 'none'
+                outline: 'none',
+                background: '#13131A',
+                color: '#F0F0F5'
               }}
             />
           </div>
@@ -303,9 +305,9 @@ export default function ProjectsPage() {
               onClick={() => setViewFilter('active')}
               style={{
                 padding: '0.5rem 1rem',
-                background: viewFilter === 'active' ? 'var(--zander-navy)' : 'white',
-                color: viewFilter === 'active' ? 'white' : 'var(--zander-navy)',
-                border: '2px solid var(--zander-navy)',
+                background: viewFilter === 'active' ? '#00CCEE' : '#1C1C26',
+                color: viewFilter === 'active' ? '#000000' : '#F0F0F5',
+                border: '2px solid #00CCEE',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontWeight: '600',
@@ -318,9 +320,9 @@ export default function ProjectsPage() {
               onClick={() => setViewFilter('lost')}
               style={{
                 padding: '0.5rem 1rem',
-                background: viewFilter === 'lost' ? 'var(--zander-red)' : 'white',
-                color: viewFilter === 'lost' ? 'white' : 'var(--zander-red)',
-                border: '2px solid var(--zander-red)',
+                background: viewFilter === 'lost' ? '#BF0A30' : '#1C1C26',
+                color: viewFilter === 'lost' ? 'white' : '#BF0A30',
+                border: '2px solid #BF0A30',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontWeight: '600',
@@ -333,9 +335,9 @@ export default function ProjectsPage() {
               onClick={() => setViewFilter('archived')}
               style={{
                 padding: '0.5rem 1rem',
-                background: viewFilter === 'archived' ? '#666' : 'white',
-                color: viewFilter === 'archived' ? 'white' : '#666',
-                border: '2px solid #666',
+                background: viewFilter === 'archived' ? '#55556A' : '#1C1C26',
+                color: viewFilter === 'archived' ? '#F0F0F5' : '#8888A0',
+                border: '2px solid #55556A',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontWeight: '600',
@@ -356,21 +358,21 @@ export default function ProjectsPage() {
         }}>
           {stages.map((stage) => (
             <div key={stage.name} style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               padding: '1rem',
               textAlign: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s ease'
             }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {formatCurrency(getStageValue(stage.name))}
               </div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>
                 {stage.name}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+              <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                 {getDealsByStage(stage.name).length} deals
               </div>
             </div>
@@ -398,12 +400,12 @@ export default function ProjectsPage() {
                 onDrop={(e) => handleDrop(e, stage.name)}
                 style={{
                   flex: '0 0 320px',
-                  background: isOver ? 'rgba(191, 10, 48, 0.05)' : 'var(--zander-off-white)',
+                  background: isOver ? 'rgba(0, 204, 238, 0.1)' : '#13131A',
                   borderRadius: '12px',
                   padding: '1rem',
                   display: 'flex',
                   flexDirection: 'column',
-                  border: isOver ? '2px dashed var(--zander-red)' : '2px solid transparent',
+                  border: isOver ? '2px dashed #00CCEE' : '2px solid #2A2A38',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -414,15 +416,15 @@ export default function ProjectsPage() {
                   alignItems: 'center',
                   padding: '0.75rem',
                   marginBottom: '1rem',
-                  background: 'white',
+                  background: '#1C1C26',
                   borderRadius: '8px',
-                  border: '2px solid var(--zander-border-gray)'
+                  border: '2px solid #2A2A38'
                 }}>
                   <div>
-                    <div style={{ fontWeight: '700', color: 'var(--zander-navy)', fontSize: '1rem', marginBottom: '0.25rem' }}>
+                    <div style={{ fontWeight: '700', color: '#F0F0F5', fontSize: '1rem', marginBottom: '0.25rem' }}>
                       {stage.name}
                     </div>
-                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#8888A0' }}>
                       <span>{formatCurrency(getStageValue(stage.name))}</span>
                       <span>•</span>
                       <span>{stageDeals.length} deals</span>
@@ -430,8 +432,8 @@ export default function ProjectsPage() {
                   </div>
                   <div style={{
                     padding: '0.25rem 0.75rem',
-                    background: 'var(--zander-red)',
-                    color: 'white',
+                    background: '#00CCEE',
+                    color: '#000000',
                     borderRadius: '12px',
                     fontWeight: '700',
                     fontSize: '0.875rem'
@@ -446,7 +448,7 @@ export default function ProjectsPage() {
                     <div style={{
                       textAlign: 'center',
                       padding: '2rem',
-                      color: 'var(--zander-gray)',
+                      color: '#8888A0',
                       fontSize: '0.875rem'
                     }}>
                       <div style={{ fontSize: '2rem', marginBottom: '0.5rem', opacity: 0.5 }}>📭</div>
@@ -460,8 +462,8 @@ export default function ProjectsPage() {
                         onDragStart={(e) => handleDragStart(e, deal)}
                         onDragEnd={handleDragEnd}
                         style={{
-                          background: 'white',
-                          border: '2px solid var(--zander-border-gray)',
+                          background: '#1C1C26',
+                          border: '2px solid #2A2A38',
                           borderRadius: '8px',
                           padding: '1rem',
                           cursor: 'grab',
@@ -471,11 +473,11 @@ export default function ProjectsPage() {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                           <div>
-                            <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                            <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                               {deal.dealName}
                             </div>
                             {deal.contact && (
-                              <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                              <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
                                 {deal.contact.firstName} {deal.contact.lastName}
                               </div>
                             )}
@@ -485,17 +487,17 @@ export default function ProjectsPage() {
                             borderRadius: '4px',
                             fontSize: '0.7rem',
                             fontWeight: '600',
-                            background: deal.dealValue > 50000 ? 'rgba(191, 10, 48, 0.1)' : deal.dealValue > 25000 ? 'rgba(240, 179, 35, 0.2)' : 'rgba(108, 117, 125, 0.1)',
-                            color: deal.dealValue > 50000 ? 'var(--zander-red)' : deal.dealValue > 25000 ? '#B8860B' : 'var(--zander-gray)'
+                            background: deal.dealValue > 50000 ? 'rgba(0, 204, 238, 0.2)' : deal.dealValue > 25000 ? 'rgba(240, 179, 35, 0.2)' : 'rgba(136, 136, 160, 0.2)',
+                            color: deal.dealValue > 50000 ? '#00CCEE' : deal.dealValue > 25000 ? '#F0B323' : '#8888A0'
                           }}>
                             {deal.dealValue > 50000 ? 'High' : deal.dealValue > 25000 ? 'Medium' : 'Low'}
                           </div>
                         </div>
                         
-                        <div style={{ 
-                          fontSize: '1.25rem', 
-                          fontWeight: '700', 
-                          color: 'var(--zander-red)',
+                        <div style={{
+                          fontSize: '1.25rem',
+                          fontWeight: '700',
+                          color: '#00CCEE',
                           marginBottom: '0.75rem'
                         }}>
                           {formatCurrency(deal.dealValue)}
@@ -505,7 +507,7 @@ export default function ProjectsPage() {
                           <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
                             <button onClick={() => deal.contact?.email && (window.location.href = '/communications?compose=true&to=' + encodeURIComponent(deal.contact.email) + '&subject=' + encodeURIComponent('Re: ' + deal.dealName))} title="Send Email" style={{
                               padding: '0.4rem 0.6rem',
-                              background: 'var(--zander-navy)',
+                              background: '#2A2A38',
                               border: 'none',
                               borderRadius: '6px',
                               cursor: deal.contact?.email ? 'pointer' : 'not-allowed',
@@ -514,7 +516,7 @@ export default function ProjectsPage() {
                             }}>📧</button>
                             <button onClick={() => window.location.href = '/deals/' + deal.id + '?tab=notes'} title="View Notes" style={{
                               padding: '0.4rem 0.6rem',
-                              background: 'var(--zander-gold)',
+                              background: '#F0B323',
                               border: 'none',
                               borderRadius: '6px',
                               cursor: 'pointer',
@@ -522,20 +524,20 @@ export default function ProjectsPage() {
                             }}>📝</button>
                             <button onClick={() => window.location.href = '/deals/' + deal.id} title="View Deal" style={{
                               padding: '0.4rem 0.6rem',
-                              background: 'var(--zander-red)',
+                              background: '#00CCEE',
                               border: 'none',
                               borderRadius: '6px',
                               cursor: 'pointer',
                               fontSize: '1rem',
-                              color: 'white'
+                              color: '#000000'
                             }}>👁</button>
                           </div>
                           <div style={{
                             width: '28px',
                             height: '28px',
                             borderRadius: '50%',
-                            background: 'var(--zander-navy)',
-                            color: 'white',
+                            background: '#2A2A38',
+                            color: '#F0F0F5',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -555,40 +557,40 @@ export default function ProjectsPage() {
 
       {/* New Project Modal */}
       {showNewDealModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', maxWidth: '500px', width: '90%' }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--zander-navy)' }}>New Project</h2>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '2rem', maxWidth: '500px', width: '90%', border: '2px solid #2A2A38' }}>
+            <h2 style={{ marginBottom: '1.5rem', color: '#F0F0F5' }}>New Project</h2>
             <form onSubmit={handleCreateDeal}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Deal Name *</label>
-                <input type="text" value={dealForm.dealName} onChange={(e) => setDealForm({...dealForm, dealName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Deal Name *</label>
+                <input type="text" value={dealForm.dealName} onChange={(e) => setDealForm({...dealForm, dealName: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }} required />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Value *</label>
-                  <input type="number" value={dealForm.dealValue} onChange={(e) => setDealForm({...dealForm, dealValue: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} required />
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Value *</label>
+                  <input type="number" value={dealForm.dealValue} onChange={(e) => setDealForm({...dealForm, dealValue: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }} required />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Probability %</label>
-                  <input type="number" value={dealForm.probability} onChange={(e) => setDealForm({...dealForm, probability: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }} min="0" max="100" />
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Probability %</label>
+                  <input type="number" value={dealForm.probability} onChange={(e) => setDealForm({...dealForm, probability: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }} min="0" max="100" />
                 </div>
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Stage</label>
-                <select value={dealForm.stage} onChange={(e) => setDealForm({...dealForm, stage: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Stage</label>
+                <select value={dealForm.stage} onChange={(e) => setDealForm({...dealForm, stage: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }}>
                   {stages.map(stage => <option key={stage.name} value={stage.name}>{stage.name}</option>)}
                 </select>
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>Contact (Optional)</label>
-                <select value={dealForm.contactId} onChange={(e) => setDealForm({...dealForm, contactId: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', fontSize: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Contact (Optional)</label>
+                <select value={dealForm.contactId} onChange={(e) => setDealForm({...dealForm, contactId: e.target.value})} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '8px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }}>
                   <option value="">Select a contact...</option>
                   {contacts.map(contact => <option key={contact.id} value={contact.id}>{contact.firstName} {contact.lastName}</option>)}
                 </select>
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowNewDealModal(false)} style={{ padding: '0.75rem 1.5rem', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', background: 'white', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
-                <button type="submit" style={{ padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Create Deal</button>
+                <button type="button" onClick={() => setShowNewDealModal(false)} style={{ padding: '0.75rem 1.5rem', border: '2px solid #2A2A38', borderRadius: '8px', background: '#13131A', color: '#F0F0F5', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
+                <button type="submit" style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: '#000000', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Create Deal</button>
               </div>
             </form>
           </div>
