@@ -6,11 +6,53 @@ import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { logout } from '../utils/auth';
+import { User, Building2, Users, BarChart3, Link2, Lock, ScrollText, CreditCard, Database, Mail, Inbox, Send, Cloud, MessageSquare, FileText, Calendar, Clock, FolderOpen, Package, Rocket, BookOpen, CalendarClock, AlertTriangle, Trash2, Check } from 'lucide-react';
 
 // Helper functions for month conversion
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const getMonthName = (monthNum: number): string => MONTHS[monthNum - 1] || 'January';
 const getMonthNumber = (monthName: string): number => MONTHS.indexOf(monthName) + 1 || 1;
+
+// Tab icon helper
+const getTabIcon = (iconKey: string, size: number = 16): React.ReactNode => {
+  const icons: Record<string, React.ReactNode> = {
+    profile: <User size={size} />,
+    company: <Building2 size={size} />,
+    team: <Users size={size} />,
+    pipeline: <BarChart3 size={size} />,
+    integrations: <Link2 size={size} />,
+    security: <Lock size={size} />,
+    legal: <ScrollText size={size} />,
+    billing: <CreditCard size={size} />,
+    data: <Database size={size} />,
+  };
+  return icons[iconKey] || <User size={size} />;
+};
+
+// Integration icon helper
+const getIntegrationIcon = (iconKey: string, size: number = 24): React.ReactNode => {
+  const icons: Record<string, React.ReactNode> = {
+    quickbooks: <BookOpen size={size} />,
+    xero: <BookOpen size={size} />,
+    freshbooks: <BookOpen size={size} />,
+    gmail: <Mail size={size} />,
+    outlook: <Inbox size={size} />,
+    resend: <Send size={size} />,
+    hubspot: <Cloud size={size} />,
+    salesforce: <Cloud size={size} />,
+    pipedrive: <Cloud size={size} />,
+    slack: <MessageSquare size={size} />,
+    monday: <BarChart3 size={size} />,
+    notion: <FileText size={size} />,
+    gcal: <Calendar size={size} />,
+    outlook_cal: <CalendarClock size={size} />,
+    calendly: <Clock size={size} />,
+    gdrive: <FolderOpen size={size} />,
+    dropbox: <Package size={size} />,
+    onedrive: <Cloud size={size} />,
+  };
+  return icons[iconKey] || <Cloud size={size} />;
+};
 
 export default function SettingsPage() {
   const [activeModule, setActiveModule] = useState('cro');
@@ -174,34 +216,34 @@ export default function SettingsPage() {
 
   const integrations = {
     accounting: [
-      { id: 'quickbooks', name: 'QuickBooks', description: 'Sync invoices, payments, and financial data', icon: '📗', status: 'available', connected: false },
-      { id: 'xero', name: 'Xero', description: 'Connect your Xero account', icon: '📘', status: 'soon', connected: false },
-      { id: 'freshbooks', name: 'FreshBooks', description: 'Import invoices and expenses', icon: '📙', status: 'soon', connected: false },
+      { id: 'quickbooks', name: 'QuickBooks', description: 'Sync invoices, payments, and financial data', status: 'available', connected: false },
+      { id: 'xero', name: 'Xero', description: 'Connect your Xero account', status: 'soon', connected: false },
+      { id: 'freshbooks', name: 'FreshBooks', description: 'Import invoices and expenses', status: 'soon', connected: false },
     ],
     email: [
-      { id: 'gmail', name: 'Gmail / Google', description: gmailEmail ? `Connected: ${gmailEmail}` : 'Sync emails, contacts, and calendar', icon: '📧', status: 'available', connected: gmailConnected },
-      { id: 'outlook', name: 'Microsoft Outlook', description: outlookEmail ? `Connected: ${outlookEmail}` : 'Connect Outlook/Office 365', icon: '📬', status: 'available', connected: outlookConnected },
-      { id: 'resend', name: 'Resend', description: 'Transactional email sending', icon: '✉️', status: 'available', connected: true },
+      { id: 'gmail', name: 'Gmail / Google', description: gmailEmail ? `Connected: ${gmailEmail}` : 'Sync emails, contacts, and calendar', status: 'available', connected: gmailConnected },
+      { id: 'outlook', name: 'Microsoft Outlook', description: outlookEmail ? `Connected: ${outlookEmail}` : 'Connect Outlook/Office 365', status: 'available', connected: outlookConnected },
+      { id: 'resend', name: 'Resend', description: 'Transactional email sending', status: 'available', connected: true },
     ],
     crm: [
-      { id: 'hubspot', name: 'HubSpot', description: 'Migrate from HubSpot CRM', icon: '🟠', status: 'soon', connected: false },
-      { id: 'salesforce', name: 'Salesforce', description: 'Migrate from Salesforce', icon: '☁️', status: 'soon', connected: false },
-      { id: 'pipedrive', name: 'Pipedrive', description: 'Import deals and contacts', icon: '🟢', status: 'soon', connected: false },
+      { id: 'hubspot', name: 'HubSpot', description: 'Migrate from HubSpot CRM', status: 'soon', connected: false },
+      { id: 'salesforce', name: 'Salesforce', description: 'Migrate from Salesforce', status: 'soon', connected: false },
+      { id: 'pipedrive', name: 'Pipedrive', description: 'Import deals and contacts', status: 'soon', connected: false },
     ],
     productivity: [
-      { id: 'slack', name: 'Slack', description: 'Get notifications in Slack', icon: '💬', status: 'soon', connected: false },
-      { id: 'monday', name: 'Monday.com', description: 'Sync tasks and projects', icon: '📊', status: 'soon', connected: false },
-      { id: 'notion', name: 'Notion', description: 'Connect your workspace', icon: '📝', status: 'soon', connected: false },
+      { id: 'slack', name: 'Slack', description: 'Get notifications in Slack', status: 'soon', connected: false },
+      { id: 'monday', name: 'Monday.com', description: 'Sync tasks and projects', status: 'soon', connected: false },
+      { id: 'notion', name: 'Notion', description: 'Connect your workspace', status: 'soon', connected: false },
     ],
     calendar: [
-      { id: 'gcal', name: 'Google Calendar', description: 'Sync meetings and events', icon: '📅', status: 'available', connected: gmailConnected },
-      { id: 'outlook_cal', name: 'Outlook Calendar', description: 'Connect Outlook calendar', icon: '🗓️', status: 'soon', connected: false },
-      { id: 'calendly', name: 'Calendly', description: 'Scheduling integration', icon: '⏰', status: 'soon', connected: false },
+      { id: 'gcal', name: 'Google Calendar', description: 'Sync meetings and events', status: 'available', connected: gmailConnected },
+      { id: 'outlook_cal', name: 'Outlook Calendar', description: 'Connect Outlook calendar', status: 'soon', connected: false },
+      { id: 'calendly', name: 'Calendly', description: 'Scheduling integration', status: 'soon', connected: false },
     ],
     storage: [
-      { id: 'gdrive', name: 'Google Drive', description: 'Store and access files', icon: '📁', status: 'available', connected: gmailConnected },
-      { id: 'dropbox', name: 'Dropbox', description: 'Connect Dropbox storage', icon: '📦', status: 'soon', connected: false },
-      { id: 'onedrive', name: 'OneDrive', description: 'Microsoft cloud storage', icon: '☁️', status: 'soon', connected: false },
+      { id: 'gdrive', name: 'Google Drive', description: 'Store and access files', status: 'available', connected: gmailConnected },
+      { id: 'dropbox', name: 'Dropbox', description: 'Connect Dropbox storage', status: 'soon', connected: false },
+      { id: 'onedrive', name: 'OneDrive', description: 'Microsoft cloud storage', status: 'soon', connected: false },
     ],
   };
 
@@ -775,15 +817,15 @@ export default function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'company', label: 'Company', icon: '🏢' },
-    { id: 'team', label: 'Team', icon: '👥' },
-    { id: 'pipeline', label: 'Projects', icon: '📊' },
-    { id: 'integrations', label: 'Integrations', icon: '🔗' },
-    { id: 'security', label: 'Security', icon: '🔐' },
-    { id: 'legal', label: 'Legal', icon: '📜' },
-    { id: 'billing', label: 'Billing', icon: '💳' },
-    { id: 'data', label: 'Data', icon: '🗄️' },
+    { id: 'profile', label: 'Profile' },
+    { id: 'company', label: 'Company' },
+    { id: 'team', label: 'Team' },
+    { id: 'pipeline', label: 'Projects' },
+    { id: 'integrations', label: 'Integrations' },
+    { id: 'security', label: 'Security' },
+    { id: 'legal', label: 'Legal' },
+    { id: 'billing', label: 'Billing' },
+    { id: 'data', label: 'Data' },
   ];
 
   const getRoleStyle = (role: string) => {
@@ -989,8 +1031,8 @@ export default function SettingsPage() {
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Company Logo</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '80px', height: '80px', background: '#09090F', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed #2A2A38' }}>
-                <span style={{ fontSize: '2rem' }}>🏢</span>
+              <div style={{ width: '80px', height: '80px', background: '#09090F', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed #2A2A38', color: '#8888A0' }}>
+                <Building2 size={32} />
               </div>
               <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Upload Logo</button>
             </div>
@@ -1192,7 +1234,7 @@ export default function SettingsPage() {
                   />
                   <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>%</span>
                 </div>
-                <button style={{ padding: '0.35rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#8888A0' }} onClick={() => deleteStage(stage.id)}>🗑️</button>
+                <button style={{ padding: '0.35rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#8888A0' }} onClick={() => deleteStage(stage.id)}><Trash2 size={14} /></button>
               </div>
             ))}
           </div>
@@ -1249,7 +1291,7 @@ export default function SettingsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
             {items.map((integration) => (
               <div key={integration.id} style={{ padding: '1.25rem', background: '#1C1C26', borderRadius: '10px', border: integration.connected ? '2px solid #28A745' : '2px solid #2A2A38', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                <div style={{ width: '48px', height: '48px', background: integration.connected ? 'rgba(40, 167, 69, 0.1)' : '#09090F', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>{integration.icon}</div>
+                <div style={{ width: '48px', height: '48px', background: integration.connected ? 'rgba(40, 167, 69, 0.1)' : '#09090F', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: integration.connected ? '#28A745' : '#8888A0' }}>{getIntegrationIcon(integration.id)}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{integration.name}</span>
@@ -1335,13 +1377,13 @@ export default function SettingsPage() {
                 </div>
               </div>
               {billing.trialEnd && new Date(billing.trialEnd) > new Date() && (
-                <div style={{ fontSize: '0.85rem', opacity: 0.9, background: 'rgba(240, 179, 35, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', marginBottom: '0.5rem' }}>
-                  ⏰ Trial ends: {new Date(billing.trialEnd).toLocaleDateString()}
+                <div style={{ fontSize: '0.85rem', opacity: 0.9, background: 'rgba(240, 179, 35, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Clock size={14} /> Trial ends: {new Date(billing.trialEnd).toLocaleDateString()}
                 </div>
               )}
               {billing.cancelAtPeriodEnd && (
-                <div style={{ fontSize: '0.85rem', opacity: 0.9, background: 'rgba(220, 53, 69, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', marginBottom: '0.5rem' }}>
-                  ⚠️ Cancels at period end: {new Date(billing.currentPeriodEnd).toLocaleDateString()}
+                <div style={{ fontSize: '0.85rem', opacity: 0.9, background: 'rgba(220, 53, 69, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <AlertTriangle size={14} /> Cancels at period end: {new Date(billing.currentPeriodEnd).toLocaleDateString()}
                 </div>
               )}
               <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>
@@ -1349,11 +1391,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <button 
+              <button
                 onClick={handleManageBilling}
-                style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
-                💳 Manage Payment Method
+                <CreditCard size={16} /> Manage Payment Method
               </button>
               {!billing.cancelAtPeriodEnd && (
                 <button 
@@ -1367,7 +1409,7 @@ export default function SettingsPage() {
           </div>
         ) : (
           <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#09090F', borderRadius: '12px', textAlign: 'center' }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🚀</div>
+            <div style={{ marginBottom: '0.5rem', color: '#00CCEE' }}><Rocket size={32} /></div>
             <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>No Active Subscription</div>
             <div style={{ color: '#8888A0', fontSize: '0.9rem' }}>Choose a plan below to get started with Zander</div>
           </div>
@@ -1465,20 +1507,20 @@ export default function SettingsPage() {
                 </div>
                 <div style={{ marginBottom: '1.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
-                    <span style={{ color: '#28A745' }}>✓</span>
+                    <Check size={14} style={{ color: '#28A745' }} />
                     <span>{tier.executives} AI Executive{tier.executives > 1 ? 's' : ''}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
-                    <span style={{ color: '#28A745' }}>✓</span>
+                    <Check size={14} style={{ color: '#28A745' }} />
                     <span>{tier.teamMembers} Team Members</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
-                    <span style={{ color: '#28A745' }}>✓</span>
+                    <Check size={14} style={{ color: '#28A745' }} />
                     <span>{tier.storage} Storage</span>
                   </div>
                   {tier.customFeatures && tier.customFeatures.map((feature: string, idx: number) => (
                     <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
-                      <span style={{ color: '#28A745' }}>✓</span>
+                      <Check size={14} style={{ color: '#28A745' }} />
                       <span>{feature}</span>
                     </div>
                   ))}
@@ -1837,10 +1879,10 @@ export default function SettingsPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem',
+                  color: termsData.needsAcceptance ? '#F0B323' : '#28A745',
                   flexShrink: 0
                 }}>
-                  {termsData.needsAcceptance ? '⚠️' : '✓'}
+                  {termsData.needsAcceptance ? <AlertTriangle size={24} /> : <Check size={24} />}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem', marginBottom: '0.5rem' }}>
@@ -2082,7 +2124,7 @@ export default function SettingsPage() {
                     transition: 'all 0.2s'
                   }}
                 >
-                  <span>{tab.icon}</span>
+                  <span>{getTabIcon(tab.id)}</span>
                   <span>{tab.label}</span>
                 </button>
               ))}
