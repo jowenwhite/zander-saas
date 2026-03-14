@@ -120,7 +120,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
       {/* Logo and Tenant Switcher */}
       {!collapsed && (
         <div style={{
-          padding: '20px 16px 16px 16px',
+          padding: '24px 20px 16px 20px',
           borderBottom: '1px solid #2A2A38'
         }}>
           <div style={{
@@ -131,7 +131,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
                 src="/images/zander-logo.svg"
                 alt="Zander"
                 style={{
-                  width: '160px',
+                  width: '180px',
                   height: 'auto',
                   display: 'block',
                   maxWidth: '100%'

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import TermsModal from '../components/TermsModal';
 
 export default function LoginPage() {
@@ -101,20 +100,23 @@ export default function LoginPage() {
       }}>
         <div>
           <div style={{ marginBottom: '16px' }}>
-            <Image
-              src="/images/zander-logo-white.svg"
+            <img
+              src="/images/zander-logo.svg"
               alt="Zander"
-              width={280}
-              height={70}
-              priority
               style={{
-                height: '70px',
-                width: 'auto',
-                objectFit: 'contain'
+                width: '220px',
+                height: 'auto',
+                display: 'block'
               }}
             />
           </div>
-          <p style={{ fontSize: '1.4rem', fontWeight: '600', color: '#F0F0F5', margin: 0, marginTop: '16px' }}>
+          <p style={{
+            fontSize: '1.3rem',
+            fontWeight: '600',
+            color: '#F0F0F5',
+            marginTop: '20px',
+            lineHeight: '1.4'
+          }}>
             Your AI-Powered Executive Team
           </p>
         </div>
