@@ -202,7 +202,7 @@ export default function ProductsPage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-light-gray)' }}>
+      <div style={{ minHeight: '100vh', background: '#09090F' }}>
         <NavBar />
         <Sidebar />
         
@@ -214,12 +214,12 @@ export default function ProductsPage() {
                 <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
                   Products
                 </h1>
-                <p style={{ color: 'var(--zander-gray)', margin: '0.5rem 0 0' }}>
+                <p style={{ color: '#8888A0', margin: '0.5rem 0 0' }}>
                   Manage your products and services catalog
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <a href="/products/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: '#13131A', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+                <a href="/products/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '1px solid #2A2A38', background: '#1C1C26', color: '#F0F0F5', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
                 <button
                   onClick={() => setShowNewProductModal(true)}
                   style={{
@@ -249,10 +249,12 @@ export default function ProductsPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
                   padding: '0.75rem 1rem',
-                  border: '1px solid var(--zander-border-gray)',
+                  border: '1px solid #2A2A38',
                   borderRadius: '8px',
                   width: '300px',
-                  fontSize: '0.95rem'
+                  fontSize: '0.95rem',
+                  background: '#1C1C26',
+                  color: '#F0F0F5'
                 }}
               />
               <select
@@ -260,10 +262,11 @@ export default function ProductsPage() {
                 onChange={(e) => setFilterType(e.target.value)}
                 style={{
                   padding: '0.75rem 1rem',
-                  border: '1px solid var(--zander-border-gray)',
+                  border: '1px solid #2A2A38',
                   borderRadius: '8px',
                   fontSize: '0.95rem',
-                  background: 'white'
+                  background: '#1C1C26',
+                  color: '#F0F0F5'
                 }}
               >
                 <option value="all">All Types</option>
@@ -276,10 +279,11 @@ export default function ProductsPage() {
                 onChange={(e) => setFilterStatus(e.target.value)}
                 style={{
                   padding: '0.75rem 1rem',
-                  border: '1px solid var(--zander-border-gray)',
+                  border: '1px solid #2A2A38',
                   borderRadius: '8px',
                   fontSize: '0.95rem',
-                  background: 'white'
+                  background: '#1C1C26',
+                  color: '#F0F0F5'
                 }}
               >
                 <option value="all">All Status</option>
@@ -291,20 +295,20 @@ export default function ProductsPage() {
 
             {/* Products Grid */}
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>
                 Loading products...
               </div>
             ) : filteredProducts.length === 0 ? (
               <div style={{
                 textAlign: 'center',
                 padding: '4rem',
-                background: 'white',
+                background: '#1C1C26',
                 borderRadius: '12px',
-                border: '1px solid var(--zander-border-gray)'
+                border: '1px solid #2A2A38'
               }}>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
-                <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No products yet</h3>
-                <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>
+                <h3 style={{ color: '#F0F0F5', marginBottom: '0.5rem' }}>No products yet</h3>
+                <p style={{ color: '#8888A0', marginBottom: '1.5rem' }}>
                   Add your first product to get started
                 </p>
                 <button
@@ -328,9 +332,9 @@ export default function ProductsPage() {
                   <div
                     key={product.id}
                     style={{
-                      background: 'white',
+                      background: '#1C1C26',
                       borderRadius: '12px',
-                      border: '1px solid var(--zander-border-gray)',
+                      border: '1px solid #2A2A38',
                       padding: '1.5rem',
                       transition: 'box-shadow 0.2s ease',
                       cursor: 'pointer'
@@ -341,11 +345,11 @@ export default function ProductsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <span style={{ fontSize: '1.5rem' }}>{getTypeIcon(product.type)}</span>
                         <div>
-                          <h3 style={{ margin: 0, color: '#13131A', fontSize: '1.1rem', fontWeight: '600' }}>
+                          <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.1rem', fontWeight: '600' }}>
                             {product.name}
                           </h3>
                           {product.sku && (
-                            <span style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
+                            <span style={{ fontSize: '0.85rem', color: '#8888A0' }}>
                               SKU: {product.sku}
                             </span>
                           )}
@@ -365,16 +369,16 @@ export default function ProductsPage() {
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                           {product.basePrice ? formatCurrency(product.basePrice) : '—'}
                         </div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
+                        <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>
                           per {product.unit.replace('_', ' ')}
                         </div>
                       </div>
                       {product.costOfGoods && product.basePrice && (
                         <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>
                             Cost: {formatCurrency(product.costOfGoods)}
                           </div>
                           <div style={{ fontSize: '0.95rem', fontWeight: '600', color: '#28a745' }}>
@@ -385,13 +389,13 @@ export default function ProductsPage() {
                     </div>
 
                     {product.category && (
-                      <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
+                      <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2A2A38' }}>
                         <span style={{
                           padding: '0.25rem 0.5rem',
-                          background: 'var(--zander-light-gray)',
+                          background: '#252530',
                           borderRadius: '4px',
                           fontSize: '0.8rem',
-                          color: 'var(--zander-gray)'
+                          color: '#8888A0'
                         }}>
                           {product.category}
                         </span>
@@ -419,7 +423,7 @@ export default function ProductsPage() {
             zIndex: 1000
           }}>
             <div style={{
-              background: 'white',
+              background: '#1C1C26',
               borderRadius: '12px',
               width: '100%',
               maxWidth: '600px',
@@ -428,12 +432,13 @@ export default function ProductsPage() {
             }}>
               <div style={{
                 padding: '1.5rem',
-                borderBottom: '1px solid var(--zander-border-gray)',
+                borderBottom: '1px solid #2A2A38',
+                background: '#13131A',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center'
               }}>
-                <h2 style={{ margin: 0, color: '#13131A' }}>
+                <h2 style={{ margin: 0, color: '#F0F0F5' }}>
                   {editingProduct ? 'Edit Product' : 'New Product'}
                 </h2>
                 <button
@@ -443,7 +448,7 @@ export default function ProductsPage() {
                     border: 'none',
                     fontSize: '1.5rem',
                     cursor: 'pointer',
-                    color: 'var(--zander-gray)'
+                    color: '#8888A0'
                   }}
                 >
                   ×
@@ -453,7 +458,7 @@ export default function ProductsPage() {
               <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
                 {/* Level 1: Basic Info */}
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ margin: '0 0 1rem', color: '#13131A', fontSize: '1rem' }}>
+                  <h3 style={{ margin: '0 0 1rem', color: '#F0F0F5', fontSize: '1rem' }}>
                     Basic Information
                   </h3>
                   
@@ -469,7 +474,7 @@ export default function ProductsPage() {
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '1px solid var(--zander-border-gray)',
+                        border: '1px solid #2A2A38',
                         borderRadius: '8px',
                         fontSize: '1rem'
                       }}
@@ -490,7 +495,7 @@ export default function ProductsPage() {
                         style={{
                           width: '100%',
                           padding: '0.75rem',
-                          border: '1px solid var(--zander-border-gray)',
+                          border: '1px solid #2A2A38',
                           borderRadius: '8px',
                           fontSize: '1rem'
                         }}
@@ -507,10 +512,10 @@ export default function ProductsPage() {
                         style={{
                           width: '100%',
                           padding: '0.75rem',
-                          border: '1px solid var(--zander-border-gray)',
+                          border: '1px solid #2A2A38',
                           borderRadius: '8px',
                           fontSize: '1rem',
-                          background: 'white'
+                          background: '#1C1C26'
                         }}
                       >
                         {unitTypes.map(unit => (
@@ -531,10 +536,11 @@ export default function ProductsPage() {
                         style={{
                           width: '100%',
                           padding: '0.75rem',
-                          border: '1px solid var(--zander-border-gray)',
+                          border: '1px solid #2A2A38',
                           borderRadius: '8px',
                           fontSize: '1rem',
-                          background: 'white'
+                          background: '#1C1C26',
+                          color: '#F0F0F5'
                         }}
                       >
                         {productTypes.map(type => (
@@ -553,7 +559,7 @@ export default function ProductsPage() {
                         style={{
                           width: '100%',
                           padding: '0.75rem',
-                          border: '1px solid var(--zander-border-gray)',
+                          border: '1px solid #2A2A38',
                           borderRadius: '8px',
                           fontSize: '1rem'
                         }}
@@ -571,7 +577,7 @@ export default function ProductsPage() {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: 'var(--zander-blue)',
+                      color: '#00CCEE',
                       cursor: 'pointer',
                       fontWeight: '500',
                       display: 'flex',
@@ -583,7 +589,7 @@ export default function ProductsPage() {
                   </button>
 
                   {showAdvanced && (
-                    <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px' }}>
+                    <div style={{ marginTop: '1rem', padding: '1rem', background: '#13131A', borderRadius: '8px' }}>
                       <div style={{ marginBottom: '1rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
                           Description
@@ -595,7 +601,7 @@ export default function ProductsPage() {
                           style={{
                             width: '100%',
                             padding: '0.75rem',
-                            border: '1px solid var(--zander-border-gray)',
+                            border: '1px solid #2A2A38',
                             borderRadius: '8px',
                             fontSize: '1rem',
                             resize: 'vertical'
@@ -616,7 +622,7 @@ export default function ProductsPage() {
                             style={{
                               width: '100%',
                               padding: '0.75rem',
-                              border: '1px solid var(--zander-border-gray)',
+                              border: '1px solid #2A2A38',
                               borderRadius: '8px',
                               fontSize: '1rem'
                             }}
@@ -633,10 +639,10 @@ export default function ProductsPage() {
                             style={{
                               width: '100%',
                               padding: '0.75rem',
-                              border: '1px solid var(--zander-border-gray)',
+                              border: '1px solid #2A2A38',
                               borderRadius: '8px',
                               fontSize: '1rem',
-                              background: 'white'
+                              background: '#1C1C26'
                             }}
                           >
                             <option value="ACTIVE">Active</option>
@@ -659,7 +665,7 @@ export default function ProductsPage() {
                             style={{
                               width: '100%',
                               padding: '0.75rem',
-                              border: '1px solid var(--zander-border-gray)',
+                              border: '1px solid #2A2A38',
                               borderRadius: '8px',
                               fontSize: '1rem'
                             }}
@@ -678,7 +684,7 @@ export default function ProductsPage() {
                             style={{
                               width: '100%',
                               padding: '0.75rem',
-                              border: '1px solid var(--zander-border-gray)',
+                              border: '1px solid #2A2A38',
                               borderRadius: '8px',
                               fontSize: '1rem'
                             }}
@@ -715,9 +721,9 @@ export default function ProductsPage() {
                     onClick={resetForm}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      background: 'white',
-                      color: 'var(--zander-gray)',
-                      border: '1px solid var(--zander-border-gray)',
+                      background: '#13131A',
+                      color: '#8888A0',
+                      border: '1px solid #2A2A38',
                       borderRadius: '8px',
                       fontWeight: '600',
                       cursor: 'pointer'

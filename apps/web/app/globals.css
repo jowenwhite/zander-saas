@@ -1,19 +1,420 @@
-:root {
-  /* Zander Rebrand — Light Mode */
-  --zander-red: #BF0A30;
-  --zander-navy: #0C2340;
-  --zander-gold: #F0B323;
-  --zander-white: #FFFFFF;
-  --zander-off-white: #F8F9FA;
-  --zander-light-gray: #E9ECEF;
-  --zander-border-gray: #DEE2E6;
-  --zander-gray: #6C757D;
-  --zander-dark-gray: #343A40;
-  --zander-black: #212529;
+/* ==========================================================================
+   ZANDER DARK THEME — GLOBALS.CSS
+   Comprehensive rebrand — February 2026
+   ========================================================================== */
 
-  /* NEW BRAND TOKENS */
+/* --------------------------------------------------------------------------
+   BASE STYLES
+   -------------------------------------------------------------------------- */
+html, body {
+  background-color: #09090F !important;
+  color: #F0F0F5 !important;
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --------------------------------------------------------------------------
+   TYPOGRAPHY SCALE
+   -------------------------------------------------------------------------- */
+h1, h2, h3, h4 {
+  font-family: var(--font-sora), 'Sora', system-ui, sans-serif !important;
+  font-weight: 600 !important;
+  color: #F0F0F5 !important;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+h1 { font-size: 2rem !important; line-height: 1.2; }
+h2 { font-size: 1.5rem !important; line-height: 1.25; }
+h3 { font-size: 1.25rem !important; line-height: 1.3; }
+h4 { font-size: 1rem !important; line-height: 1.4; }
+
+p, span, div, label {
+  font-size: 0.95rem;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   FORCE DARK ON ALL CONTAINERS
+   -------------------------------------------------------------------------- */
+main, section, article, aside, footer,
+[class*="wrapper"], [class*="Wrapper"],
+[class*="container"], [class*="Container"],
+[class*="content"], [class*="Content"],
+[class*="page"], [class*="Page"],
+[class*="layout"], [class*="Layout"] {
+  background-color: #09090F !important;
+  color: #F0F0F5 !important;
+}
+
+/* --------------------------------------------------------------------------
+   CARDS
+   -------------------------------------------------------------------------- */
+[class*="card"], [class*="Card"],
+[class*="panel"], [class*="Panel"],
+[class*="box"], [class*="Box"] {
+  background-color: #1C1C26 !important;
+  border: 1px solid #2A2A38 !important;
+  border-radius: 8px;
+  color: #F0F0F5 !important;
+}
+
+/* --------------------------------------------------------------------------
+   TABLES
+   -------------------------------------------------------------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: #13131A !important;
+  color: #8888A0 !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #2A2A38;
+}
+
+td {
+  background-color: #1C1C26 !important;
+  color: #F0F0F5 !important;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #2A2A38;
+}
+
+tr:hover td {
+  background-color: #252530 !important;
+}
+
+/* --------------------------------------------------------------------------
+   INPUTS
+   -------------------------------------------------------------------------- */
+input, textarea, select {
+  background-color: #1C1C26 !important;
+  border: 1px solid #2A2A38 !important;
+  border-radius: 6px;
+  color: #F0F0F5 !important;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #00CCEE !important;
+  box-shadow: 0 0 0 3px rgba(0, 204, 238, 0.15) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #55556A !important;
+}
+
+select option {
+  background-color: #1C1C26;
+  color: #F0F0F5;
+}
+
+/* --------------------------------------------------------------------------
+   BUTTONS
+   -------------------------------------------------------------------------- */
+button {
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Primary buttons - cyan */
+button[class*="primary"],
+[class*="btn-primary"],
+button[style*="background: #00CCEE"],
+button[style*="background:#00CCEE"] {
+  background-color: #00CCEE !important;
+  color: #000000 !important;
+  border: none !important;
+  font-weight: 600;
+}
+
+button[class*="primary"]:hover,
+[class*="btn-primary"]:hover {
+  background-color: #00B8D9 !important;
+}
+
+/* Secondary/ghost buttons */
+button[class*="secondary"],
+button[class*="ghost"],
+[class*="btn-secondary"] {
+  background-color: transparent !important;
+  border: 1px solid #2A2A38 !important;
+  color: #F0F0F5 !important;
+}
+
+button[class*="secondary"]:hover,
+button[class*="ghost"]:hover {
+  background-color: #1C1C26 !important;
+  border-color: #3A3A48 !important;
+}
+
+/* --------------------------------------------------------------------------
+   TABS
+   -------------------------------------------------------------------------- */
+[class*="tab"], [class*="Tab"],
+[role="tab"] {
+  background-color: transparent !important;
+  color: #8888A0 !important;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[class*="tab"]:hover, [class*="Tab"]:hover,
+[role="tab"]:hover {
+  color: #F0F0F5 !important;
+}
+
+[class*="tab"][class*="active"],
+[class*="Tab"][class*="active"],
+[role="tab"][aria-selected="true"] {
+  background-color: #00CCEE !important;
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   BADGES
+   -------------------------------------------------------------------------- */
+[class*="badge"], [class*="Badge"],
+[class*="tag"], [class*="Tag"],
+[class*="chip"], [class*="Chip"] {
+  background-color: rgba(0, 204, 238, 0.15) !important;
+  color: #00CCEE !important;
+  border: 1px solid rgba(0, 204, 238, 0.3) !important;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   PAGE HEADERS
+   -------------------------------------------------------------------------- */
+[class*="header"], [class*="Header"],
+[class*="banner"], [class*="Banner"],
+[class*="hero"], [class*="Hero"] {
+  background-color: #13131A !important;
+  border-bottom: 1px solid #2A2A38 !important;
+  color: #F0F0F5 !important;
+}
+
+/* --------------------------------------------------------------------------
+   MODALS / DIALOGS
+   -------------------------------------------------------------------------- */
+[class*="modal"], [class*="Modal"],
+[class*="dialog"], [class*="Dialog"],
+[class*="overlay"], [class*="Overlay"],
+[role="dialog"] {
+  background-color: #1C1C26 !important;
+  border: 1px solid #2A2A38 !important;
+  border-radius: 12px;
+  color: #F0F0F5 !important;
+}
+
+/* Modal backdrop */
+[class*="backdrop"], [class*="Backdrop"] {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* --------------------------------------------------------------------------
+   DROPDOWNS
+   -------------------------------------------------------------------------- */
+[class*="dropdown"], [class*="Dropdown"],
+[class*="menu"], [class*="Menu"],
+[class*="popover"], [class*="Popover"] {
+  background-color: #1C1C26 !important;
+  border: 1px solid #2A2A38 !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #F0F0F5 !important;
+}
+
+[class*="dropdown"] a, [class*="Dropdown"] a,
+[class*="menu"] a, [class*="Menu"] a,
+[class*="dropdown"] button, [class*="Dropdown"] button {
+  color: #F0F0F5 !important;
+}
+
+[class*="dropdown"] a:hover, [class*="Dropdown"] a:hover,
+[class*="menu"] a:hover, [class*="Menu"] a:hover {
+  background-color: #252530 !important;
+}
+
+/* --------------------------------------------------------------------------
+   PROGRESS BARS
+   -------------------------------------------------------------------------- */
+[class*="progress"], [class*="Progress"],
+progress {
+  background-color: #2A2A38 !important;
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+
+[class*="progress"] [class*="bar"],
+[class*="Progress"] [class*="Bar"],
+progress::-webkit-progress-value {
+  background-color: #00CCEE !important;
+  border-radius: 4px;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #2A2A38;
+  border-radius: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   SCROLLBARS
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #13131A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A2A38;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3A48;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2A2A38 #13131A;
+}
+
+/* --------------------------------------------------------------------------
+   NAVIGATION & SIDEBAR
+   -------------------------------------------------------------------------- */
+nav, [class*="nav"], [class*="Nav"],
+[class*="sidebar"], [class*="Sidebar"] {
+  background-color: #13131A !important;
+  border-color: #2A2A38 !important;
+  color: #F0F0F5 !important;
+}
+
+nav a, [class*="nav"] a, [class*="Nav"] a,
+[class*="sidebar"] a, [class*="Sidebar"] a {
+  color: #8888A0 !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+nav a:hover, [class*="nav"] a:hover,
+[class*="sidebar"] a:hover, [class*="Sidebar"] a:hover {
+  color: #F0F0F5 !important;
+}
+
+nav a[class*="active"], [class*="nav"] a[class*="active"],
+[class*="sidebar"] a[class*="active"] {
+  color: #00CCEE !important;
+}
+
+/* --------------------------------------------------------------------------
+   LINKS
+   -------------------------------------------------------------------------- */
+a {
+  color: #00CCEE;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #33D6F2;
+}
+
+/* --------------------------------------------------------------------------
+   TOOLTIPS
+   -------------------------------------------------------------------------- */
+[class*="tooltip"], [class*="Tooltip"],
+[role="tooltip"] {
+  background-color: #1C1C26 !important;
+  color: #F0F0F5 !important;
+  border: 1px solid #2A2A38 !important;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   DIVIDERS
+   -------------------------------------------------------------------------- */
+hr, [class*="divider"], [class*="Divider"] {
+  border: none;
+  border-top: 1px solid #2A2A38;
+  margin: 1rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   LOADING STATES
+   -------------------------------------------------------------------------- */
+[class*="loading"], [class*="Loading"],
+[class*="spinner"], [class*="Spinner"] {
+  color: #00CCEE !important;
+}
+
+/* --------------------------------------------------------------------------
+   EMPTY STATES
+   -------------------------------------------------------------------------- */
+[class*="empty"], [class*="Empty"],
+[class*="placeholder"], [class*="Placeholder"] {
+  color: #55556A !important;
+}
+
+/* --------------------------------------------------------------------------
+   ACCENT COLOR OVERRIDES
+   -------------------------------------------------------------------------- */
+[style*="background: #BF0A30"],
+[style*="background:#BF0A30"],
+[style*="background-color: #BF0A30"],
+[style*="background-color:#BF0A30"] {
+  background-color: #00CCEE !important;
+}
+
+[style*="color: #BF0A30"],
+[style*="color:#BF0A30"] {
+  color: #00CCEE !important;
+}
+
+[style*="border-color: #BF0A30"],
+[style*="border-color:#BF0A30"] {
+  border-color: #00CCEE !important;
+}
+
+/* --------------------------------------------------------------------------
+   FONT VARIABLES (for Next.js font loading)
+   -------------------------------------------------------------------------- */
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-sora: 'Sora', system-ui, sans-serif;
+
+  /* Color tokens for reference */
   --zander-cyan: #00CCEE;
-  --zander-cyan-glow: rgba(0, 204, 238, 0.15);
   --zander-bg-base: #09090F;
   --zander-bg-surface: #13131A;
   --zander-bg-elevated: #1C1C26;
@@ -21,139 +422,4 @@
   --zander-text-primary: #F0F0F5;
   --zander-text-secondary: #8888A0;
   --zander-text-muted: #55556A;
-
-  /* Font families */
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-sora), system-ui, sans-serif;
-
-  /* Light Mode Semantic (unchanged) */
-  --background: var(--zander-off-white);
-  --text-primary: var(--zander-dark-gray);
-  --text-secondary: var(--zander-gray);
-  --card-bg: var(--zander-white);
-  --card-border: var(--zander-border-gray);
-  --hover-bg: var(--zander-light-gray);
-
-  color-scheme: light;
-}
-
-[data-theme="dark"] {
-  --background: var(--zander-bg-base);
-  --text-primary: var(--zander-text-primary);
-  --text-secondary: var(--zander-text-secondary);
-  --card-bg: var(--zander-bg-surface);
-  --card-border: var(--zander-bg-border);
-  --hover-bg: var(--zander-bg-elevated);
-  --zander-red: #BF0A30;
-  --zander-navy: #0C2340;
-  --zander-gold: #F0B323;
-
-  color-scheme: dark;
-}
-
-/* Ensure smooth transition between themes */
-body {
-  background-color: var(--background);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.theme-toggle-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-}
-
-.theme-toggle {
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-}
-
-html[data-theme="dark"] {
-  background-color: var(--background);
-  color: var(--text-primary);
-}
-
-html[data-theme="dark"] body {
-  background-color: var(--background);
-  color: var(--text-primary);
-}
-
-html[data-theme="dark"] .theme-toggle {
-  background: var(--card-bg);
-  color: var(--text-primary);
-  border-color: var(--card-border);
-}
-
-/* REBRAND OVERRIDE — DARK MODE FORCED */
-body {
-  background-color: #09090F !important;
-  color: #F0F0F5 !important;
-}
-
-nav, header, [class*="nav"],
-[class*="header"], [class*="sidebar"],
-[class*="Sidebar"] {
-  background-color: #13131A !important;
-  border-color: #2A2A38 !important;
-  color: #F0F0F5 !important;
-}
-
-[class*="card"], [class*="Card"] {
-  background-color: #1C1C26 !important;
-  border-color: #2A2A38 !important;
-  color: #F0F0F5 !important;
-}
-
-/* Replace red with cyan on buttons
-   and accents */
-[class*="btn-primary"],
-[class*="bg-red"],
-button[class*="primary"] {
-  background-color: #00CCEE !important;
-  color: #000000 !important;
-  border-color: #00CCEE !important;
-}
-
-a { color: #00CCEE !important; }
-
-/* Sidebar and nav text */
-[class*="nav"] a,
-[class*="sidebar"] a,
-[class*="Sidebar"] a {
-  color: #8888A0 !important;
-}
-
-/* Sora headings with consistent sizing */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-sora), var(--font-display), system-ui, sans-serif !important;
-}
-
-h1 { font-size: 2rem !important; }
-h2 { font-size: 1.5rem !important; }
-h3 { font-size: 1.25rem !important; }
-
-body, p, span, div {
-  font-size: 0.95rem;
-}
-
-[class*="nav"] a:hover,
-[class*="sidebar"] a:hover {
-  color: #F0F0F5 !important;
 }

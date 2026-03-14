@@ -70,7 +70,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(12, 35, 64, 0.95)',
+      backgroundColor: 'rgba(9, 9, 15, 0.95)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -99,7 +99,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           <div style={{
             height: '100%',
             width: `${(step / totalSteps) * 100}%`,
-            background: 'linear-gradient(90deg, #BF0A30, #F0B323)',
+            background: 'linear-gradient(90deg, #00CCEE, #00DDFF)',
             transition: 'width 0.5s ease',
           }} />
         </div>
@@ -109,21 +109,21 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           {step === 1 && (
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>👋</div>
-              <h1 style={{ fontSize: '2rem', color: '#0C2340', marginBottom: '1rem' }}>
+              <h1 style={{ fontSize: '2rem', color: '#1C1C26', marginBottom: '1rem' }}>
                 Welcome to Zander, {userName}.
               </h1>
-              <p style={{ fontSize: '1.2rem', color: '#0C2340', marginBottom: '1.5rem' }}>
-                I'm <strong style={{ color: '#BF0A30' }}>Jordan</strong>, your Chief Revenue Officer.
+              <p style={{ fontSize: '1.2rem', color: '#1C1C26', marginBottom: '1.5rem' }}>
+                I'm <strong style={{ color: '#00CCEE' }}>Jordan</strong>, your Chief Revenue Officer.
               </p>
               <div style={{
                 background: 'linear-gradient(135deg, #F8F9FA, #EAE6DB)',
-                borderLeft: '4px solid #BF0A30',
+                borderLeft: '4px solid #00CCEE',
                 padding: '1.5rem',
                 borderRadius: '0 8px 8px 0',
                 marginBottom: '2rem',
                 textAlign: 'left',
               }}>
-                <p style={{ fontStyle: 'italic', color: '#0C2340', fontSize: '1.1rem', lineHeight: '1.7' }}>
+                <p style={{ fontStyle: 'italic', color: '#1C1C26', fontSize: '1.1rem', lineHeight: '1.7' }}>
                   "Every successful business - from a food truck to a Fortune 500 - operates through the same five elements. 
                   <strong> Complexity isn't sophistication. Simplicity is.</strong>"
                 </p>
@@ -132,7 +132,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                 Zander is built on this principle. Let me show you what I mean.
               </p>
               <button onClick={nextStep} style={{
-                background: 'linear-gradient(135deg, #BF0A30, #A00A28)',
+                background: 'linear-gradient(135deg, #00CCEE, #0099BB)',
                 color: 'white',
                 border: 'none',
                 padding: '1rem 3rem',
@@ -150,7 +150,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           {/* Step 2: Five Pillars */}
           {step === 2 && (
             <div style={{ textAlign: 'center' }}>
-              <h2 style={{ fontSize: '1.8rem', color: '#0C2340', marginBottom: '0.5rem' }}>
+              <h2 style={{ fontSize: '1.8rem', color: '#1C1C26', marginBottom: '0.5rem' }}>
                 The Five Pillars of Every Business
               </h2>
               <p style={{ color: '#666', marginBottom: '2rem' }}>
@@ -165,7 +165,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
               }}>
                 {PILLARS.map((pillar) => (
                   <div key={pillar.id} style={{
-                    background: '#0C2340',
+                    background: '#13131A',
                     color: 'white',
                     padding: '1.5rem 1rem',
                     borderRadius: '12px',
@@ -185,12 +185,12 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                 borderRadius: '8px',
                 marginBottom: '2rem',
               }}>
-                <p style={{ color: '#0C2340', margin: 0 }}>
+                <p style={{ color: '#1C1C26', margin: 0 }}>
                   <strong>Zander brings them together</strong> so you can finally see your whole business clearly.
                 </p>
               </div>
               <button onClick={nextStep} style={{
-                background: 'linear-gradient(135deg, #BF0A30, #A00A28)',
+                background: 'linear-gradient(135deg, #00CCEE, #0099BB)',
                 color: 'white',
                 border: 'none',
                 padding: '1rem 3rem',
@@ -207,7 +207,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           {/* Step 3: Pain Point Selection */}
           {step === 3 && (
             <div>
-              <h2 style={{ fontSize: '1.8rem', color: '#0C2340', marginBottom: '0.5rem', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.8rem', color: '#1C1C26', marginBottom: '0.5rem', textAlign: 'center' }}>
                 Where should we start?
               </h2>
               <p style={{ color: '#666', marginBottom: '2rem', textAlign: 'center' }}>
@@ -223,20 +223,20 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                       alignItems: 'center',
                       gap: '1rem',
                       padding: '1rem 1.5rem',
-                      border: focusArea === area.id ? '2px solid #BF0A30' : '2px solid #E5E7EB',
+                      border: focusArea === area.id ? '2px solid #00CCEE' : '2px solid #E5E7EB',
                       borderRadius: '8px',
-                      background: focusArea === area.id ? 'rgba(191, 10, 48, 0.05)' : 'white',
+                      background: focusArea === area.id ? 'rgba(0, 204, 238, 0.05)' : 'white',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.2s',
                     }}
                   >
                     <span style={{ fontSize: '1.5rem' }}>{area.icon}</span>
-                    <span style={{ color: '#0C2340', fontWeight: focusArea === area.id ? '600' : '400' }}>
+                    <span style={{ color: '#1C1C26', fontWeight: focusArea === area.id ? '600' : '400' }}>
                       {area.label}
                     </span>
                     {focusArea === area.id && (
-                      <span style={{ marginLeft: 'auto', color: '#BF0A30', fontWeight: 'bold' }}>✓</span>
+                      <span style={{ marginLeft: 'auto', color: '#00CCEE', fontWeight: 'bold' }}>✓</span>
                     )}
                   </button>
                 ))}
@@ -249,7 +249,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                   onClick={nextStep} 
                   disabled={!focusArea}
                   style={{
-                    background: focusArea ? 'linear-gradient(135deg, #BF0A30, #A00A28)' : '#E5E7EB',
+                    background: focusArea ? 'linear-gradient(135deg, #00CCEE, #0099BB)' : '#E5E7EB',
                     color: focusArea ? 'white' : '#888',
                     border: 'none',
                     padding: '1rem 3rem',
@@ -269,14 +269,14 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           {step === 4 && (
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎯</div>
-              <h2 style={{ fontSize: '1.8rem', color: '#0C2340', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.8rem', color: '#1C1C26', marginBottom: '1rem' }}>
                 Your First Win
               </h2>
               <p style={{ color: '#666', marginBottom: '2rem', fontSize: '1.1rem' }}>
-                Based on what you told me, let's start with your <strong style={{ color: '#BF0A30' }}>Pipeline</strong>.
+                Based on what you told me, let's start with your <strong style={{ color: '#00CCEE' }}>Pipeline</strong>.
               </p>
               <div style={{
-                background: '#0C2340',
+                background: '#13131A',
                 color: 'white',
                 padding: '2rem',
                 borderRadius: '12px',
@@ -284,7 +284,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                 textAlign: 'left',
               }}>
                 <p style={{ marginBottom: '1rem', opacity: 0.9 }}>
-                  <strong style={{ color: '#F0B323' }}>Jordan:</strong> "This is where every opportunity lives. 
+                  <strong style={{ color: '#00CCEE' }}>Jordan:</strong> "This is where every opportunity lives. 
                   No more sticky notes. No more forgotten follow-ups."
                 </p>
                 <p style={{ margin: 0, opacity: 0.8 }}>
@@ -295,7 +295,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                 In 30 days, you'll wonder how you ever ran your business without this view.
               </p>
               <button onClick={nextStep} style={{
-                background: 'linear-gradient(135deg, #BF0A30, #A00A28)',
+                background: 'linear-gradient(135deg, #00CCEE, #0099BB)',
                 color: 'white',
                 border: 'none',
                 padding: '1rem 3rem',
@@ -312,7 +312,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           {/* Step 5: Geography */}
           {step === 5 && (
             <div>
-              <h2 style={{ fontSize: '1.8rem', color: '#0C2340', marginBottom: '1.5rem', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.8rem', color: '#1C1C26', marginBottom: '1.5rem', textAlign: 'center' }}>
                 Your Zander Layout
               </h2>
               <div style={{
@@ -326,12 +326,12 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                 border: '2px solid #E5E7EB',
               }}>
                 <div style={{
-                  background: '#0C2340',
+                  background: '#13131A',
                   borderRadius: '8px',
                   padding: '1rem',
                   color: 'white',
                 }}>
-                  <div style={{ fontWeight: '600', marginBottom: '1rem', color: '#F0B323' }}>SIDEBAR</div>
+                  <div style={{ fontWeight: '600', marginBottom: '1rem', color: '#00CCEE' }}>SIDEBAR</div>
                   <div style={{ fontSize: '0.85rem', lineHeight: '1.8' }}>
                     <div>📊 Production</div>
                     <div>🎯 CRO</div>
@@ -346,18 +346,18 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                   padding: '1.5rem',
                   border: '1px solid #E5E7EB',
                 }}>
-                  <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: '#0C2340' }}>MAIN WORKSPACE</div>
+                  <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: '#1C1C26' }}>MAIN WORKSPACE</div>
                   <p style={{ color: '#666', fontSize: '0.95rem', margin: 0 }}>
                     Changes based on what you're working on. Click any sidebar item to switch views.
                   </p>
                   <div style={{
                     marginTop: '1rem',
                     padding: '1rem',
-                    background: 'rgba(191, 10, 48, 0.05)',
+                    background: 'rgba(0, 204, 238, 0.05)',
                     borderRadius: '6px',
-                    borderLeft: '3px solid #BF0A30',
+                    borderLeft: '3px solid #00CCEE',
                   }}>
-                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#0C2340' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#1C1C26' }}>
                       💬 <strong>Ask Jordan</strong> - bottom right, always available
                     </p>
                   </div>
@@ -368,7 +368,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
               </p>
               <div style={{ textAlign: 'center' }}>
                 <button onClick={nextStep} style={{
-                  background: 'linear-gradient(135deg, #BF0A30, #A00A28)',
+                  background: 'linear-gradient(135deg, #00CCEE, #0099BB)',
                   color: 'white',
                   border: 'none',
                   padding: '1rem 3rem',
@@ -386,7 +386,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           {/* Step 6: Getting Started Checklist */}
           {step === 6 && (
             <div>
-              <h2 style={{ fontSize: '1.8rem', color: '#0C2340', marginBottom: '0.5rem', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.8rem', color: '#1C1C26', marginBottom: '0.5rem', textAlign: 'center' }}>
                 Your Path to Operating Simply
               </h2>
               <p style={{ color: '#666', marginBottom: '2rem', textAlign: 'center' }}>
@@ -445,7 +445,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
               </p>
               <div style={{ textAlign: 'center' }}>
                 <button onClick={nextStep} style={{
-                  background: 'linear-gradient(135deg, #BF0A30, #A00A28)',
+                  background: 'linear-gradient(135deg, #00CCEE, #0099BB)',
                   color: 'white',
                   border: 'none',
                   padding: '1rem 3rem',
@@ -464,11 +464,11 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
           {step === 7 && (
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚀</div>
-              <h2 style={{ fontSize: '1.8rem', color: '#0C2340', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.8rem', color: '#1C1C26', marginBottom: '1rem' }}>
                 One More Thing...
               </h2>
               <div style={{
-                background: '#0C2340',
+                background: '#13131A',
                 color: 'white',
                 padding: '2rem',
                 borderRadius: '12px',
@@ -476,7 +476,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                 textAlign: 'left',
               }}>
                 <p style={{ marginBottom: '1rem' }}>
-                  <strong style={{ color: '#F0B323' }}>Jordan:</strong> "I'm not just a guide. I'm your CRO."
+                  <strong style={{ color: '#00CCEE' }}>Jordan:</strong> "I'm not just a guide. I'm your CRO."
                 </p>
                 <p style={{ marginBottom: '1rem', opacity: 0.9 }}>
                   Once you're settled in, I can:
@@ -501,11 +501,11 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                 gap: '0.5rem',
                 marginBottom: '2rem',
                 padding: '0.75rem 1.5rem',
-                background: 'rgba(191, 10, 48, 0.1)',
+                background: 'rgba(0, 204, 238, 0.1)',
                 borderRadius: '8px',
               }}>
                 <span>💬</span>
-                <span style={{ color: '#0C2340', fontWeight: '600' }}>Ask Jordan</span>
+                <span style={{ color: '#1C1C26', fontWeight: '600' }}>Ask Jordan</span>
                 <span style={{ color: '#666' }}>- bottom right</span>
               </div>
               <div>

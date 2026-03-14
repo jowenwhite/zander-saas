@@ -82,7 +82,7 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
       <div 
         onClick={() => setIsMinimized(false)}
         style={{
-          background: 'linear-gradient(135deg, #0C2340, #1a3a5c)',
+          background: 'linear-gradient(135deg, #13131A, #1C1C26)',
           borderRadius: '8px',
           padding: '0.75rem 1rem',
           margin: '0.5rem',
@@ -97,7 +97,7 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
           width: '32px',
           height: '32px',
           borderRadius: '50%',
-          background: `conic-gradient(#F0B323 ${progress}%, #374151 ${progress}%)`,
+          background: `conic-gradient(#00CCEE ${progress}%, #374151 ${progress}%)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -106,7 +106,7 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
             width: '24px',
             height: '24px',
             borderRadius: '50%',
-            background: '#0C2340',
+            background: '#13131A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -123,7 +123,7 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #0C2340, #1a3a5c)',
+      background: 'linear-gradient(135deg, #13131A, #1C1C26)',
       borderRadius: '8px',
       margin: '0.5rem',
       overflow: 'hidden',
@@ -137,7 +137,7 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
         justifyContent: 'space-between',
       }}>
         <div>
-          <h3 style={{ color: '#F0B323', margin: 0, fontSize: '0.95rem', fontWeight: '600' }}>
+          <h3 style={{ color: '#00CCEE', margin: 0, fontSize: '0.95rem', fontWeight: '600' }}>
             Getting Started
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.25rem 0 0', fontSize: '0.75rem' }}>
@@ -167,7 +167,7 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
         <div style={{
           height: '100%',
           width: `${progress}%`,
-          background: 'linear-gradient(90deg, #BF0A30, #F0B323)',
+          background: 'linear-gradient(90deg, #00CCEE, #00CCEE)',
           transition: 'width 0.3s ease',
         }} />
       </div>
@@ -240,7 +240,7 @@ export default function OnboardingChecklist({ onDismiss }: OnboardingChecklistPr
           borderTop: '1px solid rgba(255,255,255,0.1)',
           textAlign: 'center',
         }}>
-          <p style={{ color: '#F0B323', margin: '0 0 0.5rem', fontWeight: '600' }}>
+          <p style={{ color: '#00CCEE', margin: '0 0 0.5rem', fontWeight: '600' }}>
             🎉 You're all set!
           </p>
           <button
