@@ -66,7 +66,7 @@ export default function WorkflowListCard({
                 margin: 0,
                 fontSize: '1.125rem',
                 fontWeight: '700',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
               }}
             >
               {workflow.name}
@@ -161,7 +161,7 @@ export default function WorkflowListCard({
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              color: 'var(--zander-red)',
+              color: '#00CCEE',
               fontSize: '0.875rem',
             }}
           >
@@ -185,7 +185,7 @@ export default function WorkflowListCard({
           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
             TOTAL RUNS
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
             {formatNumber(workflow.entryCount)}
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function WorkflowListCard({
           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
             COMPLETED
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
             {formatNumber(workflow.completionCount)}
           </div>
         </div>

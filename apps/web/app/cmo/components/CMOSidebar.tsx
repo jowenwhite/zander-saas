@@ -53,7 +53,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
     padding: '0.75rem 1rem',
     borderRadius: '8px',
     textDecoration: 'none',
-    color: active ? '#F57C00' : 'var(--zander-navy)',
+    color: active ? '#F57C00' : '#13131A',
     background: active ? 'rgba(245,124,0,0.1)' : 'transparent',
     fontWeight: active ? '600' : '400',
     transition: 'all 0.2s ease'

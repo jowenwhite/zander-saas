@@ -106,7 +106,7 @@ export default function CalendarGrid({
                   color: day.isToday
                     ? 'white'
                     : day.isCurrentMonth
-                    ? 'var(--zander-navy)'
+                    ? '#13131A'
                     : 'var(--zander-gray)',
                   background: day.isToday ? '#F57C00' : 'transparent',
                   marginBottom: '0.5rem',

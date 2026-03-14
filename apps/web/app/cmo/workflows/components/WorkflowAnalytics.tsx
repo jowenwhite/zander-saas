@@ -30,7 +30,7 @@ export default function WorkflowAnalytics({
           margin: '0 0 1.5rem 0',
           fontSize: '1rem',
           fontWeight: '600',
-          color: 'var(--zander-navy)',
+          color: '#13131A',
         }}
       >
         Workflow Analytics
@@ -98,7 +98,7 @@ export default function WorkflowAnalytics({
             style={{
               fontSize: '1.75rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
             }}
           >
             {formatNumber(entryCount)}
@@ -130,7 +130,7 @@ export default function WorkflowAnalytics({
             style={{
               fontSize: '1.75rem',
               fontWeight: '700',
-              color: completionRate >= 50 ? '#27AE60' : completionRate >= 25 ? '#F57C00' : 'var(--zander-navy)',
+              color: completionRate >= 50 ? '#27AE60' : completionRate >= 25 ? '#F57C00' : '#13131A',
             }}
           >
             {formatPercentage(completionRate)}
@@ -233,7 +233,7 @@ export default function WorkflowAnalytics({
             borderLeft: '4px solid #F57C00',
           }}
         >
-          <div style={{ fontSize: '0.85rem', color: 'var(--zander-navy)', fontWeight: '500' }}>
+          <div style={{ fontSize: '0.85rem', color: '#13131A', fontWeight: '500' }}>
             No runs yet
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>

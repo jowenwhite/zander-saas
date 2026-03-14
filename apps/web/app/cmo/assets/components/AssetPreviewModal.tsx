@@ -224,7 +224,7 @@ const metadataTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '700',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   borderBottom: '1px solid var(--zander-border-gray)',
   paddingBottom: '0.5rem',
 };

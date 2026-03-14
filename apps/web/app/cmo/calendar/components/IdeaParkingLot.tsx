@@ -84,7 +84,7 @@ export default function IdeaParkingLot({
                 margin: 0,
                 fontSize: '1rem',
                 fontWeight: '700',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
               }}
             >
               Idea Parking Lot
@@ -259,7 +259,7 @@ export default function IdeaParkingLot({
                       <span
                         style={{
                           fontWeight: '600',
-                          color: 'var(--zander-navy)',
+                          color: '#13131A',
                           fontSize: '0.875rem',
                         }}
                       >

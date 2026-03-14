@@ -322,7 +322,7 @@ export default function CMOBrandPage() {
 
               {/* Typography Preview */}
               <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
-                <div style={{ fontFamily: brandProfile.fontPrimary || 'Inter', fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>
+                <div style={{ fontFamily: brandProfile.fontPrimary || 'Inter', fontSize: '1.5rem', fontWeight: '700', color: '#13131A', marginBottom: '0.5rem' }}>
                   Heading Text
                 </div>
                 <div style={{ fontFamily: brandProfile.fontSecondary || 'Inter', fontSize: '1rem', color: 'var(--zander-dark-gray)' }}>
@@ -434,7 +434,7 @@ export default function CMOBrandPage() {
             {assets.length === 0 ? (
               <div style={emptyStateStyle}>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
-                <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--zander-navy)' }}>No brand assets yet</h3>
+                <h3 style={{ margin: '0 0 0.5rem 0', color: '#13131A' }}>No brand assets yet</h3>
                 <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
                   Upload logos, images, and brand files to your library
                 </p>
@@ -453,7 +453,7 @@ export default function CMOBrandPage() {
                       )}
                     </div>
                     <div style={{ padding: '0.75rem' }}>
-                      <div style={{ fontWeight: '600', fontSize: '0.875rem', color: 'var(--zander-navy)', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontWeight: '600', fontSize: '0.875rem', color: '#13131A', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {asset.name}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
@@ -471,7 +471,7 @@ export default function CMOBrandPage() {
                       </a>
                       <button
                         onClick={() => handleDeleteAsset(asset.id)}
-                        style={{ ...assetActionStyle, color: 'var(--zander-red)', borderLeft: '1px solid var(--zander-border-gray)' }}
+                        style={{ ...assetActionStyle, color: '#00CCEE', borderLeft: '1px solid var(--zander-border-gray)' }}
                       >
                         Delete
                       </button>
@@ -626,7 +626,7 @@ const headerStyle: CSSProperties = {
 const titleStyle: CSSProperties = {
   fontSize: '2rem',
   fontWeight: '700',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   margin: 0,
   marginBottom: '0.25rem',
 };
@@ -662,14 +662,14 @@ const cardTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   marginBottom: '0.5rem',
 };
 

@@ -211,7 +211,7 @@ export default function ProductsPage() {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
               <div>
-                <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0 }}>
+                <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
                   Products
                 </h1>
                 <p style={{ color: 'var(--zander-gray)', margin: '0.5rem 0 0' }}>
@@ -219,12 +219,12 @@ export default function ProductsPage() {
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <a href="/products/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: 'var(--zander-navy)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
+                <a href="/products/import" style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '2px solid var(--zander-border-gray)', background: 'white', color: '#13131A', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📥 Import</a>
                 <button
                   onClick={() => setShowNewProductModal(true)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -303,7 +303,7 @@ export default function ProductsPage() {
                 border: '1px solid var(--zander-border-gray)'
               }}>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
-                <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No products yet</h3>
+                <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No products yet</h3>
                 <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>
                   Add your first product to get started
                 </p>
@@ -311,7 +311,7 @@ export default function ProductsPage() {
                   onClick={() => setShowNewProductModal(true)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -341,7 +341,7 @@ export default function ProductsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <span style={{ fontSize: '1.5rem' }}>{getTypeIcon(product.type)}</span>
                         <div>
-                          <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem', fontWeight: '600' }}>
+                          <h3 style={{ margin: 0, color: '#13131A', fontSize: '1.1rem', fontWeight: '600' }}>
                             {product.name}
                           </h3>
                           {product.sku && (
@@ -365,7 +365,7 @@ export default function ProductsPage() {
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>
                           {product.basePrice ? formatCurrency(product.basePrice) : '—'}
                         </div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
@@ -433,7 +433,7 @@ export default function ProductsPage() {
                 justifyContent: 'space-between',
                 alignItems: 'center'
               }}>
-                <h2 style={{ margin: 0, color: 'var(--zander-navy)' }}>
+                <h2 style={{ margin: 0, color: '#13131A' }}>
                   {editingProduct ? 'Edit Product' : 'New Product'}
                 </h2>
                 <button
@@ -453,7 +453,7 @@ export default function ProductsPage() {
               <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
                 {/* Level 1: Basic Info */}
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ margin: '0 0 1rem', color: 'var(--zander-navy)', fontSize: '1rem' }}>
+                  <h3 style={{ margin: '0 0 1rem', color: '#13131A', fontSize: '1rem' }}>
                     Basic Information
                   </h3>
                   
@@ -729,7 +729,7 @@ export default function ProductsPage() {
                     type="submit"
                     style={{
                       padding: '0.75rem 1.5rem',
-                      background: 'var(--zander-red)',
+                      background: '#00CCEE',
                       color: 'white',
                       border: 'none',
                       borderRadius: '8px',

@@ -162,7 +162,7 @@ const sectionTitleStyle: CSSProperties = {
   margin: '0 0 0.5rem 0',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   display: 'flex',
   alignItems: 'center',
   gap: '0.5rem',

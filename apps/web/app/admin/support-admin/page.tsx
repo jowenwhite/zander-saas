@@ -778,8 +778,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '600',
-                  background: activeTab === tab ? 'var(--zander-navy)' : 'transparent',
-                  color: activeTab === tab ? 'white' : 'var(--zander-navy)',
+                  background: activeTab === tab ? '#13131A' : 'transparent',
+                  color: activeTab === tab ? 'white' : '#13131A',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -846,7 +846,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                       borderRadius: '6px',
                       cursor: 'pointer',
                       fontWeight: '600',
-                      background: headwindFilter === f ? (f === 'all' ? 'var(--zander-navy)' : getPriorityColor(f)) : '#f5f5f5',
+                      background: headwindFilter === f ? (f === 'all' ? '#13131A' : getPriorityColor(f)) : '#f5f5f5',
                       color: headwindFilter === f ? 'white' : '#666'
                     }}>
                       {f === 'all' ? 'All' : f}
@@ -854,7 +854,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   ))}
                 </div>
                 <button onClick={() => { setEditingHeadwind(null); setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '', estimatedHours: '', dueDate: '' }); setShowHeadwindModal(true); }} style={{
-                  background: 'var(--zander-gold)',
+                  background: '#00CCEE',
                   color: '#F0F0F5',
                   border: 'none',
                   padding: '0.5rem 1rem',
@@ -940,7 +940,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                       <td style={{ padding: '1rem', fontWeight: '600', color: '#F0F0F5' }}>{t.companyName}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>{t._count?.users || t.users?.length || 0}</td>
                       <td style={{ padding: '1rem' }}>
-                        <span style={{ background: t.subscriptionTier === 'enterprise' ? 'var(--zander-gold)' : t.subscriptionTier === 'pro' ? 'var(--zander-navy)' : '#6c757d', color: t.subscriptionTier === 'enterprise' ? 'var(--zander-navy)' : 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>{t.subscriptionTier || 'starter'}</span>
+                        <span style={{ background: t.subscriptionTier === 'enterprise' ? '#00CCEE' : t.subscriptionTier === 'pro' ? '#13131A' : '#6c757d', color: t.subscriptionTier === 'enterprise' ? '#13131A' : 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>{t.subscriptionTier || 'starter'}</span>
                       </td>
                       <td style={{ padding: '1rem', color: '#8888A0' }}>{t.tenantType}</td>
                       <td style={{ padding: '1rem' }}>
@@ -968,7 +968,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                     setArticleForm({ title: '', slug: '', content: '', summary: '', category: 'PLATFORM_GUIDE', tags: '', searchTerms: '', isPublished: true });
                     setShowKnowledgeModal(true);
                   }}
-                  style={{ background: 'var(--zander-gold)', color: '#F0F0F5', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                  style={{ background: '#00CCEE', color: '#F0F0F5', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
                 >
                   + New Article
                 </button>
@@ -1218,7 +1218,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: 'var(--zander-gold)',
+                    background: '#00CCEE',
                     color: '#F0F0F5',
                     fontWeight: '600',
                     opacity: saving || !articleForm.title || !articleForm.content ? 0.5 : 1
@@ -1259,7 +1259,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
             onClick={() => setZanderOpen(!zanderOpen)}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--zander-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🤖</div>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#00CCEE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🤖</div>
               <div>
                 <span style={{ color: 'white', fontWeight: '600', fontSize: '1rem' }}>Zander</span>
                 <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginLeft: '0.5rem' }}>Your Operations AI</span>
@@ -1285,9 +1285,9 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               <button
                 onClick={(e) => { e.stopPropagation(); setZanderOpen(!zanderOpen); }}
                 style={{
-                  background: zanderOpen ? 'var(--zander-gold)' : 'rgba(255,255,255,0.2)',
+                  background: zanderOpen ? '#00CCEE' : 'rgba(255,255,255,0.2)',
                   border: 'none',
-                  color: zanderOpen ? 'var(--zander-navy)' : 'white',
+                  color: zanderOpen ? '#13131A' : 'white',
                   padding: '0.5rem 0.75rem',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -1308,8 +1308,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                 {zanderMessages.map((msg, idx) => (
                   <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
                     <div style={{
-                      background: msg.role === 'zander' ? '#f8f9fa' : 'var(--zander-navy)',
-                      color: msg.role === 'zander' ? 'var(--zander-navy)' : 'white',
+                      background: msg.role === 'zander' ? '#f8f9fa' : '#13131A',
+                      color: msg.role === 'zander' ? '#13131A' : 'white',
                       padding: '0.75rem 1rem',
                       borderRadius: '8px',
                       maxWidth: '80%',
@@ -1326,8 +1326,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                             key={actionIdx}
                             onClick={() => handleZanderAction(action)}
                             style={{
-                              background: action.action === 'dismiss' ? '#f5f5f5' : 'var(--zander-gold)',
-                              color: action.action === 'dismiss' ? '#666' : 'var(--zander-navy)',
+                              background: action.action === 'dismiss' ? '#f5f5f5' : '#00CCEE',
+                              color: action.action === 'dismiss' ? '#666' : '#13131A',
                               border: 'none',
                               padding: '0.4rem 0.75rem',
                               borderRadius: '4px',
@@ -1366,7 +1366,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   onClick={handleZanderSend}
                   disabled={zanderLoading || !zanderInput.trim()}
                   style={{
-                    background: zanderLoading ? '#999' : 'var(--zander-navy)',
+                    background: zanderLoading ? '#999' : '#13131A',
                     color: 'white',
                     border: 'none',
                     padding: '0.6rem 1.25rem',

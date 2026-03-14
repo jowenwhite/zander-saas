@@ -103,7 +103,7 @@ export default function Modal({
               margin: 0,
               fontSize: '1.5rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)'
+              color: '#13131A'
             }}>
               {title}
             </h2>

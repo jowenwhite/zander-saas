@@ -88,7 +88,7 @@ export default function FunnelModal({
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     fontSize: '0.875rem',
   };
 
@@ -136,7 +136,7 @@ export default function FunnelModal({
               margin: 0,
               fontSize: '1.25rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
             }}
           >
             {funnel ? 'Edit Funnel' : 'Create Funnel'}
@@ -235,7 +235,7 @@ export default function FunnelModal({
                   onClick={handleDelete}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
@@ -270,8 +270,8 @@ export default function FunnelModal({
                 style={{
                   padding: '0.5rem 1rem',
                   background: 'transparent',
-                  color: 'var(--zander-red)',
-                  border: '2px solid var(--zander-red)',
+                  color: '#00CCEE',
+                  border: '2px solid #00CCEE',
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '600',

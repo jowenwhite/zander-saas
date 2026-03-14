@@ -116,7 +116,7 @@ export default function TenantSwitcher() {
           cursor: 'pointer',
           fontSize: '0.875rem',
           fontWeight: '500',
-          color: 'var(--zander-navy)',
+          color: '#13131A',
           transition: 'all 0.2s ease'
         }}
       >
@@ -170,7 +170,7 @@ export default function TenantSwitcher() {
                   padding: '0.75rem 1rem',
                   background: activeTenant?.id === tenant.id ? 'rgba(191, 10, 48, 0.08)' : 'transparent',
                   border: 'none',
-                  borderLeft: activeTenant?.id === tenant.id ? '3px solid var(--zander-red)' : '3px solid transparent',
+                  borderLeft: activeTenant?.id === tenant.id ? '3px solid #00CCEE' : '3px solid transparent',
                   textAlign: 'left',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease'
@@ -190,7 +190,7 @@ export default function TenantSwitcher() {
                 <div>
                   <div style={{ 
                     fontWeight: activeTenant?.id === tenant.id ? '600' : '500', 
-                    color: 'var(--zander-navy)',
+                    color: '#13131A',
                     fontSize: '0.9rem'
                   }}>
                     {tenant.companyName}
@@ -204,7 +204,7 @@ export default function TenantSwitcher() {
                   </div>
                 </div>
                 {activeTenant?.id === tenant.id && (
-                  <span style={{ marginLeft: 'auto', color: 'var(--zander-red)' }}>✓</span>
+                  <span style={{ marginLeft: 'auto', color: '#00CCEE' }}>✓</span>
                 )}
               </button>
             ))}

@@ -140,9 +140,17 @@ a { color: #00CCEE !important; }
   color: #8888A0 !important;
 }
 
-/* Sora headings */
+/* Sora headings with consistent sizing */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-sora), var(--font-display), system-ui, sans-serif !important;
+}
+
+h1 { font-size: 2rem !important; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.25rem !important; }
+
+body, p, span, div {
+  font-size: 0.95rem;
 }
 
 [class*="nav"] a:hover,

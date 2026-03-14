@@ -146,7 +146,7 @@ Format your response clearly with category names and percentages.`
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Budget
             </h1>
             <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
@@ -193,10 +193,10 @@ Format your response clearly with category names and percentages.`
         {/* Annual Budget Input */}
         <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <label style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>Annual Budget Target:</label>
+            <label style={{ fontWeight: '600', color: '#13131A' }}>Annual Budget Target:</label>
             {editingBudget ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.25rem', color: 'var(--zander-navy)' }}>$</span>
+                <span style={{ fontSize: '1.25rem', color: '#13131A' }}>$</span>
                 <input
                   type="text"
                   value={tempBudget}
@@ -229,7 +229,7 @@ Format your response clearly with category names and percentages.`
                   setTempBudget(annualBudget.toString());
                   setEditingBudget(true);
                 }}
-                style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '6px', background: 'var(--zander-light-gray)' }}
+                style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '6px', background: 'var(--zander-light-gray)' }}
               >
                 {formatCurrency(annualBudget)}
               </div>
@@ -242,7 +242,7 @@ Format your response clearly with category names and percentages.`
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Total Budget</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{formatCurrency(annualBudget)}</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A' }}>{formatCurrency(annualBudget)}</div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Allocated</div>
@@ -256,7 +256,7 @@ Format your response clearly with category names and percentages.`
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Spent vs Planned</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{percentSpent.toFixed(1)}%</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A' }}>{percentSpent.toFixed(1)}%</div>
             <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{formatCurrency(totalActual)} spent</div>
           </div>
         </div>
@@ -266,17 +266,17 @@ Format your response clearly with category names and percentages.`
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: 'var(--zander-light-gray)' }}>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--zander-navy)', width: '30%' }}>Category</th>
-                <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)', width: '15%' }}>Planned</th>
-                <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--zander-navy)', width: '15%' }}>Actual</th>
-                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: 'var(--zander-navy)', width: '10%' }}>% of Total</th>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--zander-navy)', width: '30%' }}>Progress</th>
+                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#13131A', width: '30%' }}>Category</th>
+                <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#13131A', width: '15%' }}>Planned</th>
+                <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#13131A', width: '15%' }}>Actual</th>
+                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#13131A', width: '10%' }}>% of Total</th>
+                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#13131A', width: '30%' }}>Progress</th>
               </tr>
             </thead>
             <tbody>
               {lineItems.map((item, index) => (
                 <tr key={item.id} style={{ borderBottom: '1px solid var(--zander-border-gray)', background: index % 2 === 0 ? 'white' : 'var(--zander-off-white)' }}>
-                  <td style={{ padding: '1rem', fontWeight: '500', color: 'var(--zander-navy)' }}>{item.category}</td>
+                  <td style={{ padding: '1rem', fontWeight: '500', color: '#13131A' }}>{item.category}</td>
                   <td style={{ padding: '0.5rem 1rem' }}>
                     <input
                       type="number"
@@ -320,7 +320,7 @@ Format your response clearly with category names and percentages.`
               ))}
             </tbody>
             <tfoot>
-              <tr style={{ background: 'var(--zander-navy)' }}>
+              <tr style={{ background: '#13131A' }}>
                 <td style={{ padding: '1rem', fontWeight: '700', color: 'white' }}>TOTAL</td>
                 <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(totalPlanned)}</td>
                 <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(totalActual)}</td>
@@ -339,13 +339,13 @@ Format your response clearly with category names and percentages.`
             <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span style={{ fontSize: '1.5rem' }}>🤖</span>
-                <h2 style={{ margin: 0, color: 'var(--zander-navy)' }}>Ask Don for Budget Allocation</h2>
+                <h2 style={{ margin: 0, color: '#13131A' }}>Ask Don for Budget Allocation</h2>
               </div>
               <button onClick={() => setShowAiModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--zander-gray)' }}>×</button>
             </div>
             <div style={{ padding: '1.5rem' }}>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#13131A' }}>
                   What are your business and marketing goals for {fiscalYear}?
                 </label>
                 <textarea
@@ -391,9 +391,9 @@ Format your response clearly with category names and percentages.`
                 <div style={{ padding: '1.5rem', background: '#FFF3E0', borderRadius: '8px', border: '1px solid #F57C00' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                     <span style={{ fontSize: '1.25rem' }}>🤖</span>
-                    <strong style={{ color: 'var(--zander-navy)' }}>Don's Recommendation:</strong>
+                    <strong style={{ color: '#13131A' }}>Don's Recommendation:</strong>
                   </div>
-                  <div style={{ whiteSpace: 'pre-wrap', color: 'var(--zander-navy)', lineHeight: '1.6', fontSize: '0.95rem' }}>
+                  <div style={{ whiteSpace: 'pre-wrap', color: '#13131A', lineHeight: '1.6', fontSize: '0.95rem' }}>
                     {aiSuggestion}
                   </div>
                 </div>

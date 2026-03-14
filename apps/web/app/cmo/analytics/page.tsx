@@ -262,7 +262,7 @@ export default function CMOAnalyticsPage() {
                   <tr key={campaign.id}>
                     <td style={tdStyle}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+                        <span style={{ fontWeight: '600', color: '#13131A' }}>
                           {campaign.name}
                         </span>
                         {campaign.businessUnit && (
@@ -302,7 +302,7 @@ export default function CMOAnalyticsPage() {
             {data.emailPerformance.map((week, i) => (
               <div key={i} style={{ marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#13131A' }}>
                     {week.period}
                   </span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
@@ -378,7 +378,7 @@ export default function CMOAnalyticsPage() {
                   <div key={funnel.id} style={funnelCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#13131A' }}>
                           {funnel.name}
                         </h4>
                         <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
@@ -438,7 +438,7 @@ export default function CMOAnalyticsPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
                       <div>
                         <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Total Visits</span>
-                        <div style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--zander-navy)' }}>
+                        <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#13131A' }}>
                           {formatNumber(funnel.totalVisits)}
                         </div>
                       </div>
@@ -475,7 +475,7 @@ function KPICard({ label, value, subValue, icon, color }: {
           <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
             {label}
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A' }}>
             {value}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
@@ -526,7 +526,7 @@ const headerStyle: CSSProperties = {
 const titleStyle: CSSProperties = {
   fontSize: '2rem',
   fontWeight: '700',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   margin: 0,
   marginBottom: '0.25rem',
 };
@@ -565,7 +565,7 @@ const cardTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const tableStyle: CSSProperties = {

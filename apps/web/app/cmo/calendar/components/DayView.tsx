@@ -72,7 +72,7 @@ export default function DayView({
               width: '60px',
               height: '60px',
               borderRadius: '12px',
-              background: isToday() ? '#F57C00' : 'var(--zander-navy)',
+              background: isToday() ? '#F57C00' : '#13131A',
               color: 'white',
               display: 'flex',
               flexDirection: 'column',
@@ -86,7 +86,7 @@ export default function DayView({
             <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>{date.getDate()}</div>
           </div>
           <div>
-            <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+            <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
               {dayNames[date.getDay()]}
             </div>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
@@ -271,7 +271,7 @@ export default function DayView({
               margin: 0,
               fontSize: '1rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
             }}
           >
             Agenda
@@ -320,7 +320,7 @@ export default function DayView({
                       <span
                         style={{
                           fontWeight: '600',
-                          color: 'var(--zander-navy)',
+                          color: '#13131A',
                           fontSize: '0.875rem',
                         }}
                       >

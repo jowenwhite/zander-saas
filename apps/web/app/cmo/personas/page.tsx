@@ -182,7 +182,7 @@ const headerStyle: CSSProperties = {
 const titleStyle: CSSProperties = {
   fontSize: '2rem',
   fontWeight: '700',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   margin: 0,
   marginBottom: '0.25rem',
 };

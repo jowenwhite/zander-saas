@@ -510,7 +510,7 @@ export default function HeadquartersPage() {
           <span style={{ fontSize: '1.5rem' }}>🎯</span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>Vision</h3>
         </div>
-        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-off-white) 0%, #f8f6f3 100%)', borderRadius: '10px', borderLeft: '4px solid var(--zander-red)' }}>
+        <div style={{ padding: '1.5rem', background: '#1C1C26', borderRadius: '10px', borderLeft: '4px solid #00CCEE' }}>
           <p style={{ margin: 0, fontSize: '1.1rem', color: '#F0F0F5', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.vision}"</p>
         </div>
       </div>
@@ -521,7 +521,7 @@ export default function HeadquartersPage() {
           <span style={{ fontSize: '1.5rem' }}>🚀</span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>Mission</h3>
         </div>
-        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--zander-off-white) 0%, #f8f6f3 100%)', borderRadius: '10px', borderLeft: '4px solid var(--zander-navy)' }}>
+        <div style={{ padding: '1.5rem', background: '#1C1C26', borderRadius: '10px', borderLeft: '4px solid #00CCEE' }}>
           <p style={{ margin: 0, fontSize: '1.1rem', color: '#F0F0F5', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.mission}"</p>
         </div>
       </div>
@@ -534,7 +534,7 @@ export default function HeadquartersPage() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           {foundingPrinciples.values.map((value) => (
-            <div key={value.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', borderTop: '3px solid var(--zander-gold)' }}>
+            <div key={value.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', borderTop: '3px solid #00CCEE' }}>
               <div style={{ fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem', fontSize: '1rem' }}>{value.title}</div>
               <p style={{ margin: 0, fontSize: '0.9rem', color: '#8888A0', lineHeight: '1.5' }}>{value.description}</p>
             </div>

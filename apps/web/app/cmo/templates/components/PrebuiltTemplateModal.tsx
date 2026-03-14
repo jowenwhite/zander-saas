@@ -225,7 +225,7 @@ const templateNameStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const categoryBadgeStyle: CSSProperties = {
@@ -265,7 +265,7 @@ const previewContainerStyle: CSSProperties = {
 const previewLabelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const previewBoxStyle: CSSProperties = {
@@ -309,7 +309,7 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const inputStyle: CSSProperties = {
@@ -336,7 +336,7 @@ const infoTitleStyle: CSSProperties = {
   margin: '0 0 0.5rem 0',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const infoListStyle: CSSProperties = {

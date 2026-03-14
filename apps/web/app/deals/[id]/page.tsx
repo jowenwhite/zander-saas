@@ -287,7 +287,7 @@ async function saveNotes() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
           <div style={{ color: 'var(--zander-gray)' }}>Deal not found</div>
-          <button onClick={() => router.push('/projects')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: 'var(--zander-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+          <button onClick={() => router.push('/projects')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
             Back to Projects
           </button>
         </div>
@@ -332,11 +332,12 @@ async function saveNotes() {
           overflow: 'hidden',
           boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
         }}>
-          {/* Red Header */}
+          {/* Dark Header */}
           <div style={{
-            background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+            background: '#13131A',
             padding: '1.5rem 2rem',
             color: 'white',
+            border: '1px solid #2A2A38',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'start'
@@ -369,7 +370,7 @@ async function saveNotes() {
 
           {/* Tabs - Navy Background */}
           <div style={{
-            background: 'var(--zander-navy)',
+            background: '#13131A',
             display: 'flex'
           }}>
             {[
@@ -385,9 +386,9 @@ async function saveNotes() {
                   flex: 1,
                   padding: '1rem',
                   background: activeTab === tab.id ? 'white' : 'transparent',
-                  color: activeTab === tab.id ? 'var(--zander-navy)' : 'rgba(255,255,255,0.8)',
+                  color: activeTab === tab.id ? '#13131A' : 'rgba(255,255,255,0.8)',
                   border: 'none',
-                  borderBottom: activeTab === tab.id ? '3px solid var(--zander-red)' : '3px solid transparent',
+                  borderBottom: activeTab === tab.id ? '3px solid #00CCEE' : '3px solid transparent',
                   cursor: 'pointer',
                   fontWeight: '600',
                   fontSize: '0.875rem',
@@ -413,7 +414,7 @@ async function saveNotes() {
                   ].map((action) => (
                     <button key={action.label} style={{
                       padding: '1rem',
-                      background: 'var(--zander-navy)',
+                      background: '#13131A',
                       border: 'none',
                       borderRadius: '8px',
                       cursor: 'pointer',
@@ -432,26 +433,26 @@ async function saveNotes() {
 
                 {/* Contact Information */}
                 <div style={{ marginBottom: '2rem' }}>
-                  <h3 style={{ color: 'var(--zander-navy)', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600' }}>Contact Information</h3>
+                  <h3 style={{ color: '#13131A', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600' }}>Contact Information</h3>
                   {deal.contact ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#13131A', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                         <span style={{ color: 'var(--zander-gray)' }}>✉️</span>
                         <div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Email</div>
-                          <a href={`mailto:${deal.contact.email}`} style={{ color: 'var(--zander-red)', textDecoration: 'none', fontWeight: '500' }}>
+                          <a href={`mailto:${deal.contact.email}`} style={{ color: '#00CCEE', textDecoration: 'none', fontWeight: '500' }}>
                             {deal.contact.email}
                           </a>
                         </div>
                       </div>
                       {deal.contact.phone && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#13131A', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                           <span style={{ color: 'var(--zander-gray)' }}>📞</span>
                           <div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Phone</div>
-                            <a href={`tel:${deal.contact.phone}`} style={{ color: 'var(--zander-red)', textDecoration: 'none', fontWeight: '500' }}>
+                            <a href={`tel:${deal.contact.phone}`} style={{ color: '#00CCEE', textDecoration: 'none', fontWeight: '500' }}>
                               {deal.contact.phone}
                             </a>
                           </div>
@@ -465,42 +466,42 @@ async function saveNotes() {
 
                 {/* Deal Details */}
                 <div style={{ marginBottom: '2rem' }}>
-                  <h3 style={{ color: 'var(--zander-navy)', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600' }}>Deal Details</h3>
+                  <h3 style={{ color: '#13131A', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600' }}>Deal Details</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Deal Value</div>
-                      <div style={{ fontWeight: '600', color: 'var(--zander-red)', fontSize: '1.25rem' }}>{formatCurrency(deal.dealValue)}</div>
+                      <div style={{ fontWeight: '600', color: '#00CCEE', fontSize: '1.25rem' }}>{formatCurrency(deal.dealValue)}</div>
                     </div>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Probability</div>
-                      <div style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1.25rem' }}>{deal.probability}%</div>
+                      <div style={{ fontWeight: '600', color: '#13131A', fontSize: '1.25rem' }}>{deal.probability}%</div>
                     </div>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Expected Close</div>
-                      <div style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>
+                      <div style={{ fontWeight: '500', color: '#13131A' }}>
                         {deal.expectedCloseDate ? formatDate(deal.expectedCloseDate) : 'Not set'}
                       </div>
                     </div>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Days in Current Stage</div>
-                      <div style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>{daysInStage} days</div>
+                      <div style={{ fontWeight: '500', color: '#13131A' }}>{daysInStage} days</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Timeline */}
                 <div style={{ marginBottom: '2rem' }}>
-                  <h3 style={{ color: 'var(--zander-navy)', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600' }}>Timeline</h3>
+                  <h3 style={{ color: '#13131A', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600' }}>Timeline</h3>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0', borderBottom: '1px solid var(--zander-border-gray)' }}>
                     <span style={{ color: 'var(--zander-gray)' }}>Created:</span>
-                    <span style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>{formatDate(deal.createdAt)}</span>
+                    <span style={{ fontWeight: '500', color: '#13131A' }}>{formatDate(deal.createdAt)}</span>
                   </div>
                 </div>
 
                 {/* Notes */}
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 style={{ color: 'var(--zander-navy)', margin: 0, fontSize: '1rem', fontWeight: '600' }}>Notes</h3>
+                    <h3 style={{ color: '#13131A', margin: 0, fontSize: '1rem', fontWeight: '600' }}>Notes</h3>
                     {!isEditingNotes && (
                       <button onClick={() => setIsEditingNotes(true)} style={{
                         padding: '0.5rem 1rem',
@@ -533,7 +534,7 @@ async function saveNotes() {
                       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
                         <button onClick={saveNotes} style={{
                           padding: '0.5rem 1rem',
-                          background: 'var(--zander-red)',
+                          background: '#00CCEE',
                           color: 'white',
                           border: 'none',
                           borderRadius: '6px',
@@ -557,7 +558,7 @@ async function saveNotes() {
                       background: 'var(--zander-off-white)',
                       borderRadius: '8px',
                       minHeight: '80px',
-                      color: notes ? 'var(--zander-navy)' : 'var(--zander-gray)',
+                      color: notes ? '#13131A' : 'var(--zander-gray)',
                       fontStyle: notes ? 'normal' : 'italic',
                       whiteSpace: 'pre-wrap',
                       fontSize: '0.9rem',
@@ -584,12 +585,12 @@ async function saveNotes() {
                       borderBottom: '1px solid var(--zander-border-gray)'
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#13131A', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                         <span style={{ color: 'var(--zander-gray)' }}>📄</span>
-                        <span style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>{doc.name}</span>
+                        <span style={{ fontWeight: '500', color: '#13131A' }}>{doc.name}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#13131A', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
                         <span style={{
                           padding: '0.25rem 0.75rem',
                           background: status.bg,
@@ -602,7 +603,7 @@ async function saveNotes() {
                         </span>
                         <button style={{
                           padding: '0.5rem 1rem',
-                          background: 'var(--zander-navy)',
+                          background: '#13131A',
                           color: 'white',
                           border: 'none',
                           borderRadius: '6px',
@@ -613,7 +614,7 @@ async function saveNotes() {
                         <button style={{
                           padding: '0.5rem 1rem',
                           background: 'white',
-                          color: 'var(--zander-navy)',
+                          color: '#13131A',
                           border: '1px solid var(--zander-border-gray)',
                           borderRadius: '6px',
                           cursor: 'pointer',
@@ -641,7 +642,7 @@ async function saveNotes() {
                     borderRadius: '8px',
                     cursor: 'pointer',
                     fontWeight: '600',
-                    color: 'var(--zander-navy)'
+                    color: '#13131A'
                   }}>
                     ⬆️ Upload File
                   </button>
@@ -656,7 +657,7 @@ async function saveNotes() {
             {activeTab === 'communications' && (
               <div>
                 <div style={{
-                  background: 'var(--zander-navy)',
+                  background: '#13131A',
                   color: 'white',
                   padding: '1.5rem',
                   borderRadius: '8px',
@@ -684,7 +685,7 @@ async function saveNotes() {
                           borderRadius: '50%',
                           background: activity.type === 'call' ? '#27AE60' : activity.type === 'sms' ? '#9B59B6' 
                             : activity.type === 'email' ? '#3498DB'
-                            : 'var(--zander-navy)',
+                            : '#13131A',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -694,7 +695,7 @@ async function saveNotes() {
                           {activity.type === 'call' ? '📞' : activity.type === 'email' ? '✉️' : activity.type === 'sms' ? '💬' : activity.type === 'note' ? '📝' : '📊'}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{activity.direction === 'inbound' ? '📥 ' : activity.direction === 'outbound' ? '📤 ' : ''}{activity.title}</div>
+                          <div style={{ fontWeight: '600', color: '#13131A', marginBottom: '0.25rem' }}>{activity.direction === 'inbound' ? '📥 ' : activity.direction === 'outbound' ? '📤 ' : ''}{activity.title}</div>
                           <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>{activity.description}</div>
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
@@ -706,7 +707,7 @@ async function saveNotes() {
                 ) : (
                   <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>💬</div>
-                    <h4 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>Communication Timeline</h4>
+                    <h4 style={{ color: '#13131A', marginBottom: '0.5rem' }}>Communication Timeline</h4>
                     <p style={{ fontSize: '0.9rem' }}>Coming soon - View emails, calls, and scheduled follow-ups</p>
                   </div>
                 )}
@@ -717,7 +718,7 @@ async function saveNotes() {
             {activeTab === 'financial' && (
               <div>
                 <div style={{
-                  background: 'var(--zander-navy)',
+                  background: '#13131A',
                   color: 'white',
                   padding: '1.5rem',
                   borderRadius: '8px',
@@ -733,22 +734,22 @@ async function saveNotes() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
                   <div style={{ padding: '1.5rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Estimated Value</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-red)' }}>{formatCurrency(deal.dealValue)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#00CCEE' }}>{formatCurrency(deal.dealValue)}</div>
                   </div>
                   <div style={{ padding: '1.5rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Probability</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{deal.probability}%</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>{deal.probability}%</div>
                   </div>
                   <div style={{ padding: '1.5rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Weighted Value</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{formatCurrency(deal.dealValue * deal.probability / 100)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>{formatCurrency(deal.dealValue * deal.probability / 100)}</div>
                   </div>
                 </div>
 
                 {/* Coming Soon */}
                 <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
                   <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>💰</div>
-                  <h4 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>Financial Details</h4>
+                  <h4 style={{ color: '#13131A', marginBottom: '0.5rem' }}>Financial Details</h4>
                   <p style={{ fontSize: '0.9rem' }}>Coming soon - Proposals, payments, and invoices</p>
                 </div>
               </div>
@@ -775,7 +776,7 @@ async function saveNotes() {
                   borderRadius: '6px',
                   cursor: currentStageIndex === 0 ? 'not-allowed' : 'pointer',
                   fontWeight: '600',
-                  color: 'var(--zander-navy)',
+                  color: '#13131A',
                   opacity: currentStageIndex === 0 ? 0.5 : 1,
                   fontSize: '0.875rem'
                 }}
@@ -787,7 +788,7 @@ async function saveNotes() {
                 disabled={currentStageIndex >= STAGES.length - 2}
                 style={{
                   padding: '0.75rem 1.25rem',
-                  background: 'var(--zander-red)',
+                  background: '#00CCEE',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -804,7 +805,7 @@ async function saveNotes() {
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button style={{
                 padding: '0.75rem 1.25rem',
-                background: 'var(--zander-navy)',
+                background: '#13131A',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -819,11 +820,11 @@ async function saveNotes() {
                 style={{
                   padding: '0.75rem 1.25rem',
                   background: 'white',
-                  border: '1px solid var(--zander-red)',
+                  border: '1px solid #00CCEE',
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '600',
-                  color: 'var(--zander-red)',
+                  color: '#00CCEE',
                   fontSize: '0.875rem'
                 }}
               >
@@ -871,7 +872,7 @@ async function saveNotes() {
             width: '400px',
             maxWidth: '90%'
           }}>
-            <h3 style={{ marginBottom: '1rem', color: 'var(--zander-navy)' }}>Mark Project as Lost</h3>
+            <h3 style={{ marginBottom: '1rem', color: '#13131A' }}>Mark Project as Lost</h3>
             <p style={{ marginBottom: '1rem', color: '#666', fontSize: '0.9rem' }}>
               This will count towards your win/loss metrics. Select a reason:
             </p>
@@ -914,7 +915,7 @@ async function saveNotes() {
                 disabled={!lossReason}
                 style={{
                   padding: '0.75rem 1.25rem',
-                  background: lossReason ? 'var(--zander-red)' : '#ccc',
+                  background: lossReason ? '#00CCEE' : '#ccc',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -950,7 +951,7 @@ async function saveNotes() {
             width: '400px',
             maxWidth: '90%'
           }}>
-            <h3 style={{ marginBottom: '1rem', color: 'var(--zander-navy)' }}>Archive Project</h3>
+            <h3 style={{ marginBottom: '1rem', color: '#13131A' }}>Archive Project</h3>
             <p style={{ marginBottom: '1rem', color: '#666', fontSize: '0.9rem' }}>
               Archived projects are excluded from win/loss metrics. Optional reason:
             </p>

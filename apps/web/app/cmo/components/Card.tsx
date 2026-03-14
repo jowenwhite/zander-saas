@@ -69,7 +69,7 @@ export default function Card({
               <h3 style={{
                 fontSize: '1.25rem',
                 fontWeight: '700',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
                 margin: 0,
                 marginBottom: subtitle ? '0.25rem' : 0
               }}>

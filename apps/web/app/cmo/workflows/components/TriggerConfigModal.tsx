@@ -69,7 +69,7 @@ export default function TriggerConfigModal({
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     fontSize: '0.875rem',
   };
 
@@ -117,7 +117,7 @@ export default function TriggerConfigModal({
               margin: 0,
               fontSize: '1.25rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
             }}
           >
             Configure Trigger
@@ -173,7 +173,7 @@ export default function TriggerConfigModal({
                       style={{
                         fontSize: '0.65rem',
                         fontWeight: '500',
-                        color: isSelected ? '#F57C00' : 'var(--zander-navy)',
+                        color: isSelected ? '#F57C00' : '#13131A',
                       }}
                     >
                       {trigger.label}
@@ -264,7 +264,7 @@ export default function TriggerConfigModal({
             >
               <span style={{ fontSize: '1.5rem' }}>{selectedTriggerInfo.icon}</span>
               <div>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <div style={{ fontWeight: '600', color: '#13131A' }}>
                   Trigger
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>

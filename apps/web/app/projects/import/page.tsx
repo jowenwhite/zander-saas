@@ -107,7 +107,7 @@ export default function ImportDealsPage() {
 
         {/* Page Header */}
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)', margin: '0 0 0.5rem 0' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A', margin: '0 0 0.5rem 0' }}>
             Import Deals
           </h1>
           <p style={{ color: 'var(--zander-gray)', margin: 0, fontSize: '1rem' }}>
@@ -122,7 +122,7 @@ export default function ImportDealsPage() {
           onDrop={handleDrop}
           style={{
             background: dragOver ? 'rgba(191, 10, 48, 0.05)' : 'white',
-            border: dragOver ? '2px dashed var(--zander-red)' : '2px dashed var(--zander-border-gray)',
+            border: dragOver ? '2px dashed #00CCEE' : '2px dashed var(--zander-border-gray)',
             borderRadius: '12px',
             padding: '3rem',
             textAlign: 'center',
@@ -131,7 +131,7 @@ export default function ImportDealsPage() {
           }}
         >
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📥</div>
-          <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 0.5rem 0' }}>
+          <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
             Drag & Drop Your File
           </h3>
           <p style={{ color: 'var(--zander-gray)', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
@@ -148,7 +148,7 @@ export default function ImportDealsPage() {
             onClick={() => document.getElementById('csv-upload')?.click()}
             style={{
               padding: '0.75rem 1.5rem',
-              background: 'var(--zander-red)',
+              background: '#00CCEE',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -196,7 +196,7 @@ export default function ImportDealsPage() {
           padding: '1.5rem',
           marginBottom: '2rem'
         }}>
-          <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 1rem 0', fontSize: '1rem' }}>
+          <h3 style={{ color: '#13131A', margin: '0 0 1rem 0', fontSize: '1rem' }}>
             📋 Expected CSV Format
           </h3>
           <div style={{
@@ -224,7 +224,7 @@ export default function ImportDealsPage() {
               <h2 style={{
                 fontSize: '1rem',
                 fontWeight: '600',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
                 margin: '0 0 1rem 0',
                 display: 'flex',
                 alignItems: 'center',
@@ -271,7 +271,7 @@ export default function ImportDealsPage() {
                     <div style={{ flex: 1 }}>
                       <div style={{
                         fontWeight: '600',
-                        color: 'var(--zander-navy)',
+                        color: '#13131A',
                         marginBottom: '0.25rem',
                         display: 'flex',
                         alignItems: 'center',
@@ -304,7 +304,7 @@ export default function ImportDealsPage() {
 
         {/* Help Section */}
         <div style={{
-          background: 'var(--zander-navy)',
+          background: '#13131A',
           borderRadius: '12px',
           padding: '2rem',
           color: 'white',
@@ -317,8 +317,8 @@ export default function ImportDealsPage() {
           </p>
           <button style={{
             padding: '0.75rem 1.5rem',
-            background: 'var(--zander-gold)',
-            color: 'var(--zander-navy)',
+            background: '#00CCEE',
+            color: '#13131A',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',

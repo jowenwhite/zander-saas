@@ -109,7 +109,7 @@ export default function ThemeModal({
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     fontSize: '0.875rem',
   };
 
@@ -166,7 +166,7 @@ export default function ThemeModal({
               >
                 {monthName} {year}
               </div>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
                 {theme ? 'Edit Monthly Theme' : 'Set Monthly Theme'}
               </h2>
             </div>

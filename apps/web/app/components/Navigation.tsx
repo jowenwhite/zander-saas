@@ -54,10 +54,10 @@ export default function Navigation({ activePage }: NavigationProps) {
                 borderRadius: '6px',
                 border: 'none',
                 background: activeModule === module.toLowerCase() 
-                  ? module === 'CRO' ? 'var(--zander-red)' 
+                  ? module === 'CRO' ? '#00CCEE' 
                   : module === 'CFO' ? '#27AE60'
                   : module === 'COO' ? '#3498DB'
-                  : 'var(--zander-navy)'
+                  : '#13131A'
                   : 'transparent',
                 color: activeModule === module.toLowerCase() ? 'white' : 'var(--zander-gray)',
                 fontWeight: '600',
@@ -87,15 +87,15 @@ export default function Navigation({ activePage }: NavigationProps) {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
-              color: 'white',
+              background: 'linear-gradient(135deg, #00CCEE 0%, #00A0CC 100%)',
+              color: '#000000',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '600',
               fontSize: '0.875rem'
             }}>{userInitials}</div>
-            <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{userName}</span>
+            <span style={{ fontWeight: '600', color: '#13131A' }}>{userName}</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>▼</span>
           </div>
 

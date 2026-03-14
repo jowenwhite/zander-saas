@@ -168,7 +168,7 @@ const titleStyle: CSSProperties = {
   margin: '0 0 0.25rem 0',
   fontSize: '1.125rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const subtitleStyle: CSSProperties = {
@@ -185,7 +185,7 @@ const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   marginBottom: '0.5rem',
 };
 

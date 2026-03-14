@@ -77,7 +77,7 @@ export default function WeekView({
               style={{
                 fontSize: '1.25rem',
                 fontWeight: '700',
-                color: day.isToday ? '#F57C00' : 'var(--zander-navy)',
+                color: day.isToday ? '#F57C00' : '#13131A',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',

@@ -242,9 +242,9 @@ export default function FormCompletionModal({
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  border: value === rating ? '2px solid var(--zander-red)' : '2px solid var(--zander-border-gray)',
-                  background: value === rating ? 'var(--zander-red)' : 'white',
-                  color: value === rating ? 'white' : 'var(--zander-navy)',
+                  border: value === rating ? '2px solid #00CCEE' : '2px solid var(--zander-border-gray)',
+                  background: value === rating ? '#00CCEE' : 'white',
+                  color: value === rating ? 'white' : '#13131A',
                   fontSize: '1rem',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -343,9 +343,10 @@ export default function FormCompletionModal({
         {/* Header */}
         <div
           style={{
-            background: 'linear-gradient(135deg, var(--zander-red) 0%, #a00a28 100%)',
+            background: '#13131A',
             color: 'white',
             padding: '1.5rem',
+            borderBottom: '1px solid #2A2A38',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start'
@@ -450,11 +451,11 @@ export default function FormCompletionModal({
                       display: 'block',
                       marginBottom: '0.5rem',
                       fontWeight: '600',
-                      color: 'var(--zander-navy)'
+                      color: '#13131A'
                     }}
                   >
                     {field.label}
-                    {field.required && <span style={{ color: 'var(--zander-red)', marginLeft: '4px' }}>*</span>}
+                    {field.required && <span style={{ color: '#00CCEE', marginLeft: '4px' }}>*</span>}
                   </label>
                   {renderField(field)}
                 </div>
@@ -491,7 +492,7 @@ export default function FormCompletionModal({
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontWeight: '600',
-                color: 'var(--zander-navy)'
+                color: '#13131A'
               }}
             >
               Close
@@ -502,7 +503,7 @@ export default function FormCompletionModal({
               style={{
                 padding: '0.75rem 1.5rem',
                 border: 'none',
-                background: 'var(--zander-red)',
+                background: '#00CCEE',
                 color: 'white',
                 borderRadius: '6px',
                 cursor: saving ? 'not-allowed' : 'pointer',

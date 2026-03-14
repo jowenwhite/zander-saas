@@ -295,7 +295,7 @@ export default function AdminTreasuryPage() {
           <button
             onClick={handleCreateNew}
             style={{
-              background: 'var(--zander-gold)',
+              background: '#00CCEE',
               color: '#F0F0F5',
               border: 'none',
               padding: '0.75rem 1.5rem',
@@ -329,8 +329,8 @@ export default function AdminTreasuryPage() {
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontWeight: '600',
-                background: activeTab === type ? 'var(--zander-navy)' : 'transparent',
-                color: activeTab === type ? 'white' : 'var(--zander-navy)',
+                background: activeTab === type ? '#13131A' : 'transparent',
+                color: activeTab === type ? 'white' : '#13131A',
                 transition: 'all 0.2s ease'
               }}
             >
@@ -424,7 +424,7 @@ export default function AdminTreasuryPage() {
                     </td>
                     <td style={{ padding: '1rem', textAlign: 'center' }}>
                       <span style={{
-                        background: 'var(--zander-gold)',
+                        background: '#00CCEE',
                         color: '#F0F0F5',
                         padding: '0.25rem 0.75rem',
                         borderRadius: '12px',
@@ -459,7 +459,7 @@ export default function AdminTreasuryPage() {
                         style={{
                           background: 'transparent',
                           color: '#00CCEE',
-                          border: '1px solid var(--zander-red)',
+                          border: '1px solid #00CCEE',
                           padding: '0.5rem 1rem',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -663,7 +663,7 @@ export default function AdminTreasuryPage() {
                 {/* Form Fields Builder */}
                 {formData.type === 'form' && (
                   <div style={{ 
-                    border: '2px solid var(--zander-navy)', 
+                    border: '2px solid #13131A', 
                     borderRadius: '8px', 
                     padding: '1rem',
                     marginBottom: '1.5rem'
@@ -785,7 +785,7 @@ export default function AdminTreasuryPage() {
                               onClick={() => removeField(index)}
                               style={{
                                 background: 'none',
-                                border: '1px solid var(--zander-red)',
+                                border: '1px solid #00CCEE',
                                 color: '#00CCEE',
                                 padding: '0.25rem 0.5rem',
                                 borderRadius: '4px',
@@ -840,7 +840,7 @@ export default function AdminTreasuryPage() {
                 {/* Prompt Builder */}
                 {formData.type === 'prompt' && (
                   <div style={{
-                    border: '2px solid var(--zander-navy)',
+                    border: '2px solid #13131A',
                     borderRadius: '8px',
                     padding: '1rem',
                     marginBottom: '1.5rem'
@@ -879,9 +879,9 @@ export default function AdminTreasuryPage() {
                             style={{
                               padding: '0.35rem 0.75rem',
                               border: '1px solid',
-                              borderColor: (formData.content.tags || []).includes(tag) ? 'var(--zander-red)' : '#ddd',
+                              borderColor: (formData.content.tags || []).includes(tag) ? '#00CCEE' : '#ddd',
                               background: (formData.content.tags || []).includes(tag) ? 'rgba(191, 10, 48, 0.1)' : 'white',
-                              color: (formData.content.tags || []).includes(tag) ? 'var(--zander-red)' : '#666',
+                              color: (formData.content.tags || []).includes(tag) ? '#00CCEE' : '#666',
                               borderRadius: '16px',
                               fontSize: '0.8rem',
                               cursor: 'pointer',
@@ -946,7 +946,7 @@ Generate a personalized response that...`}
                     {(formData.content.variables || []).length > 0 && (
                       <div style={{
                         background: 'rgba(240, 179, 35, 0.1)',
-                        border: '1px solid var(--zander-gold)',
+                        border: '1px solid #00CCEE',
                         borderRadius: '6px',
                         padding: '1rem'
                       }}>
@@ -958,7 +958,7 @@ Generate a personalized response that...`}
                             <span
                               key={variable}
                               style={{
-                                background: 'var(--zander-gold)',
+                                background: '#00CCEE',
                                 color: '#F0F0F5',
                                 padding: '0.25rem 0.75rem',
                                 borderRadius: '4px',
@@ -1056,7 +1056,7 @@ Generate a personalized response that...`}
                   style={{
                     padding: '0.75rem 1.5rem',
                     border: 'none',
-                    background: saving ? '#ccc' : 'var(--zander-red)',
+                    background: saving ? '#ccc' : '#00CCEE',
                     color: 'white',
                     borderRadius: '6px',
                     cursor: saving ? 'default' : 'pointer',

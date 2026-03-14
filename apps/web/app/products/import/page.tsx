@@ -78,7 +78,7 @@ const styles: Record<string, CSSProperties> = {
   title: {
     fontSize: '2rem',
     fontWeight: '700',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     margin: '0 0 0.5rem 0',
   },
   subtitle: {
@@ -102,12 +102,12 @@ const styles: Record<string, CSSProperties> = {
     cursor: 'pointer',
   },
   dropzoneActive: {
-    border: '2px dashed var(--zander-red)',
+    border: '2px dashed #00CCEE',
     background: 'rgba(191, 10, 48, 0.05)',
   },
   primaryButton: {
     padding: '0.75rem 1.5rem',
-    background: 'var(--zander-red)',
+    background: '#00CCEE',
     color: 'white',
     border: 'none',
     borderRadius: '8px',
@@ -118,7 +118,7 @@ const styles: Record<string, CSSProperties> = {
   secondaryButton: {
     padding: '0.75rem 1.5rem',
     background: 'white',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     border: '1px solid var(--zander-border-gray)',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -146,7 +146,7 @@ const styles: Record<string, CSSProperties> = {
     borderBottom: '2px solid var(--zander-border-gray)',
     background: 'var(--zander-off-white)',
     fontWeight: '600',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
   },
   td: {
     padding: '0.75rem',
@@ -191,7 +191,7 @@ const styles: Record<string, CSSProperties> = {
   },
   progressBar: {
     height: '100%',
-    background: 'var(--zander-red)',
+    background: '#00CCEE',
     transition: 'width 0.3s ease',
   },
   summaryGrid: {
@@ -499,7 +499,7 @@ export default function ImportProductsPage() {
                 }}
               >
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
-                <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 0.5rem 0' }}>
+                <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
                   {isValidating ? 'Processing...' : 'Drag & Drop Your CSV File'}
                 </h3>
                 <p style={{ color: 'var(--zander-gray)', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
@@ -518,14 +518,14 @@ export default function ImportProductsPage() {
                   </button>
                 )}
                 {isValidating && (
-                  <div style={{ color: 'var(--zander-navy)' }}>Validating data...</div>
+                  <div style={{ color: '#13131A' }}>Validating data...</div>
                 )}
               </div>
 
               {/* Expected Format */}
               <div style={styles.card}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ color: 'var(--zander-navy)', margin: 0, fontSize: '1rem' }}>
+                  <h3 style={{ color: '#13131A', margin: 0, fontSize: '1rem' }}>
                     Expected CSV Format
                   </h3>
                   <button onClick={downloadTemplate} style={styles.secondaryButton}>
@@ -593,7 +593,7 @@ export default function ImportProductsPage() {
               {/* Duplicate Action */}
               {validationSummary.duplicates > 0 && (
                 <div style={styles.card}>
-                  <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 1rem 0', fontSize: '1rem' }}>
+                  <h3 style={{ color: '#13131A', margin: '0 0 1rem 0', fontSize: '1rem' }}>
                     Duplicate Handling
                   </h3>
                   <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem', fontSize: '0.9rem' }}>
@@ -626,7 +626,7 @@ export default function ImportProductsPage() {
 
               {/* Data Preview Table */}
               <div style={styles.card}>
-                <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 1rem 0', fontSize: '1rem' }}>
+                <h3 style={{ color: '#13131A', margin: '0 0 1rem 0', fontSize: '1rem' }}>
                   Data Preview
                 </h3>
                 <div style={{ overflowX: 'auto', maxHeight: '400px', overflowY: 'auto' }}>
@@ -713,7 +713,7 @@ export default function ImportProductsPage() {
             <div style={styles.card}>
               <div style={{ textAlign: 'center', padding: '2rem' }}>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-                <h3 style={{ color: 'var(--zander-navy)', marginBottom: '1rem' }}>
+                <h3 style={{ color: '#13131A', marginBottom: '1rem' }}>
                   Importing Products...
                 </h3>
                 <div style={styles.progressContainer}>
@@ -749,7 +749,7 @@ export default function ImportProductsPage() {
 
               {/* Import Details */}
               <div style={styles.card}>
-                <h3 style={{ color: 'var(--zander-navy)', margin: '0 0 1rem 0', fontSize: '1rem' }}>
+                <h3 style={{ color: '#13131A', margin: '0 0 1rem 0', fontSize: '1rem' }}>
                   Import Details
                 </h3>
                 <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
