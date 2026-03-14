@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import NavBar from '../components/NavBar';
 import Sidebar from '../components/Sidebar';
 import AuthGuard from '../components/AuthGuard';
+import { Building2, Rocket, Phone, Mail, Calendar, Star, Trash2, Video, Landmark, CheckSquare, MessageSquare, ListTodo, Clock, FileText, ArrowLeft, ArrowRight, Download, Mic, Bot, Users, Factory, Store, Smartphone, Check, X } from 'lucide-react';
 
 interface Template {
   id: string;
@@ -147,10 +148,20 @@ interface AccessibleTenant {
 
 // Tenant colors for multi-tenant view
 const TENANT_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
-  'mcf': { bg: '#BF0A30', text: 'white', icon: '🏭' },
-  '64w': { bg: '#0C2340', text: 'white', icon: '🏢' },
-  'zander': { bg: '#F0B323', text: '#0C2340', icon: '🚀' },
-  'default': { bg: '#6c757d', text: 'white', icon: '🏪' }
+  'mcf': { bg: '#BF0A30', text: 'white', icon: 'factory' },
+  '64w': { bg: '#0C2340', text: 'white', icon: 'building' },
+  'zander': { bg: '#F0B323', text: '#0C2340', icon: 'rocket' },
+  'default': { bg: '#6c757d', text: 'white', icon: 'store' }
+};
+
+const getTenantIcon = (iconKey: string, size: number = 14) => {
+  const icons: Record<string, React.ReactNode> = {
+    factory: <Factory size={size} />,
+    building: <Building2 size={size} />,
+    rocket: <Rocket size={size} />,
+    store: <Store size={size} />,
+  };
+  return icons[iconKey] || <Building2 size={size} />;
 };
 
 const getTenantColor = (subdomain: string) => {
@@ -863,7 +874,7 @@ export default function CommunicationsPage() {
                   gap: '0.5rem'
                 }}
               >
-                🏛️ The Treasury
+                <Landmark size={16} /> The Treasury
               </button>
               <button
                 onClick={() => { setEditingTemplate(null); setTemplateForm({ name: '', subject: '', body: '', type: 'email', category: '', stage: '', status: 'draft' }); setShowTemplateModal(true); }}
@@ -903,7 +914,7 @@ export default function CommunicationsPage() {
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              ⭐ Personal View:
+              <Star size={14} style={{ display: 'inline' }} /> Personal View:
             </span>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
@@ -971,7 +982,7 @@ export default function CommunicationsPage() {
                   gap: '0.5rem'
                 }}
               >
-                ⭐ All My Companies
+                <Star size={14} style={{ display: 'inline' }} /> All My Companies
               </button>
             </div>
           </div>
@@ -1398,7 +1409,7 @@ export default function CommunicationsPage() {
                               title="Delete"
                               style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: '#00CCEE' }}
                             >
-                              🗑️
+                              <Trash2 size={12} />
                             </button>
                           </div>
                         </div>
@@ -1454,7 +1465,7 @@ export default function CommunicationsPage() {
                                 onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
                                 onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
                               >
-                                🗑️
+                                <Trash2 size={12} />
                               </button>
                             </div>
                           </div>
@@ -1654,7 +1665,7 @@ export default function CommunicationsPage() {
                           onClick={() => handleDeleteEmail(selectedEmail.id)}
                           style={{ padding: "0.5rem 1rem", background: "transparent", color: "#00CCEE", border: "1px solid #00CCEE", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
-                          🗑️ Delete
+                          <Trash2 size={14} /> Delete
                         </button>
                       </div>
                     </div>
@@ -1703,7 +1714,7 @@ export default function CommunicationsPage() {
                         gap: '0.5rem'
                       }}
                     >
-                      🏛️ The Treasury
+                      <Landmark size={16} /> The Treasury
                     </button>
                     <button
                       onClick={() => setShowCampaignModal(true)}
@@ -1732,7 +1743,7 @@ export default function CommunicationsPage() {
                     <p style={{ color: '#8888A0', marginBottom: '1rem' }}>Create multi-step outreach campaigns or browse The Treasury for ready-made templates</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                       <button onClick={() => setShowTreasuryModal(true)} style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: '#F0F0F5', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
-                        🏛️ Browse Treasury
+                        <Landmark size={14} /> Browse Treasury
                       </button>
                       <button onClick={() => setShowCampaignModal(true)} style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
                         + Create Campaign
@@ -1755,7 +1766,7 @@ export default function CommunicationsPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                           <div>
                             <h4 style={{ margin: '0 0 0.25rem 0', color: '#F0F0F5' }}>{campaign.name}</h4>
-                            {campaign.isFromTreasury && <span style={{ fontSize: '0.65rem', color: '#00CCEE', fontWeight: '600' }}>🏛️ FROM TREASURY</span>}
+                            {campaign.isFromTreasury && <span style={{ fontSize: '0.65rem', color: '#00CCEE', fontWeight: '600' }}><Landmark size={10} /> FROM TREASURY</span>}
                           </div>
                           <span style={{
                             padding: '0.25rem 0.5rem',
@@ -1824,15 +1835,15 @@ export default function CommunicationsPage() {
                               onClick={() => handleDeleteCampaign(campaign.id)} 
                               style={{ 
                                 padding: '0.5rem 0.75rem', 
-                                background: 'transparent', 
-                                color: '#00CCEE', 
-                                border: '1px solid #00CCEE', 
-                                borderRadius: '6px', 
-                                fontSize: '0.75rem', 
-                                cursor: 'pointer' 
+                                background: 'transparent',
+                                color: '#00CCEE',
+                                border: '1px solid #00CCEE',
+                                borderRadius: '6px',
+                                fontSize: '0.75rem',
+                                cursor: 'pointer'
                               }}
                             >
-                              🗑️
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
@@ -2574,7 +2585,7 @@ export default function CommunicationsPage() {
                 }}
                 style={{ padding: '0.5rem 1.5rem', background: 'transparent', color: '#00CCEE', border: '1px solid #00CCEE', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}
               >
-                🗑️ Delete
+                <Trash2 size={14} /> Delete
               </button>
               <button onClick={() => setShowCallDetails(false)} style={{ padding: '0.5rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}>Close</button>
             </div>
@@ -2698,7 +2709,7 @@ export default function CommunicationsPage() {
             }}>
               <div>
                 <h2 style={{ margin: 0, color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🏛️ The Treasury
+                  <Landmark size={16} /> The Treasury
                 </h2>
                 <p style={{ margin: '0.25rem 0 0 0', color: '#F0F0F5', opacity: 0.8, fontSize: '0.9rem' }}>
                   Pre-built campaign templates ready to customize
