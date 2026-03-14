@@ -53,34 +53,34 @@ export default function AITeamButton() {
         onClick={() => setShowModal(true)}
         style={{
           position: 'fixed',
-          bottom: '2rem',
-          right: '2rem',
-          width: '56px',
-          height: '56px',
+          bottom: '24px',
+          right: '24px',
+          width: '64px',
+          height: '64px',
           borderRadius: '50%',
           background: 'var(--zander-red, #BF0A30)',
           color: 'white',
           border: 'none',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: '1.5rem',
-          zIndex: 1000,
+          zIndex: 9999,
           transition: 'transform 0.2s ease, box-shadow 0.2s ease'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.1)';
-          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+          e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.5)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+          e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
         }}
         title="Your AI Team"
       >
-        <Bot size={24} />
+        <Bot size={32} />
       </button>
 
       {/* Modal */}
