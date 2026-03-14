@@ -84,8 +84,8 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
     padding: '0.75rem 1rem',
     borderRadius: '8px',
     textDecoration: 'none',
-    color: active ? 'var(--zander-red)' : 'var(--zander-navy)',
-    background: active ? 'rgba(191,10,48,0.1)' : 'transparent',
+    color: active ? '#00CCEE' : '#F0F0F5',
+    background: active ? 'rgba(0,204,238,0.1)' : 'transparent',
     fontWeight: active ? '600' : '400',
     transition: 'all 0.2s ease'
   });
@@ -93,7 +93,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
   const sectionHeaderStyle = {
     fontSize: '0.75rem',
     fontWeight: '600' as const,
-    color: 'var(--zander-gray)',
+    color: '#55556A',
     textTransform: 'uppercase' as const,
     letterSpacing: '1px',
     marginBottom: '0.75rem',
@@ -103,8 +103,8 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
   return (
     <aside style={{
       width: collapsed ? '64px' : '240px',
-      background: 'white',
-      borderRight: '2px solid var(--zander-border-gray)',
+      background: '#09090F',
+      borderRight: '2px solid #2A2A38',
       height: 'calc(100vh - 64px)',
       position: 'fixed',
       top: '64px',
