@@ -96,11 +96,11 @@ export default function LoginPage() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '3rem',
+        padding: '40px 40px 20px 40px',
         color: 'white'
       }}>
         <div>
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: '16px' }}>
             <Image
               src="/images/zander-logo-white.svg"
               alt="Zander"
@@ -114,7 +114,7 @@ export default function LoginPage() {
               }}
             />
           </div>
-          <p style={{ fontSize: '1.5rem', fontWeight: '300', opacity: 0.9, margin: 0 }}>
+          <p style={{ fontSize: '1.4rem', fontWeight: '600', color: '#F0F0F5', margin: 0, marginTop: '16px' }}>
             Your AI-Powered Executive Team
           </p>
         </div>
@@ -123,20 +123,20 @@ export default function LoginPage() {
         <div style={{ marginTop: 'auto' }}>
           <blockquote style={{
             fontStyle: 'italic',
-            fontSize: '1.125rem',
-            opacity: 0.8,
+            fontSize: '1.05rem',
+            color: '#8888A0',
             marginBottom: '1.5rem',
-            lineHeight: 1.6,
-            borderLeft: '3px solid #F0B323',
+            lineHeight: 1.7,
+            borderLeft: '3px solid #00CCEE',
             paddingLeft: '1rem'
           }}>
             "The true direction of commerce is not just the exchange of goods, but the expansion of human potential through strategic innovation."
           </blockquote>
-          <p style={{ fontWeight: '600', margin: 0, color: '#F0B323' }}>— Alexander Hamilton</p>
+          <p style={{ fontWeight: '600', margin: 0, fontSize: '1rem', color: '#00CCEE' }}>— Alexander Hamilton</p>
         </div>
 
         {/* 64 West Branding */}
-        <div style={{ fontSize: '0.875rem', opacity: 0.7, marginTop: '2rem' }}>
+        <div style={{ fontSize: '0.9rem', color: '#55556A', marginTop: '2rem' }}>
           © 2026 Zander Technologies LLC
         </div>
       </div>
