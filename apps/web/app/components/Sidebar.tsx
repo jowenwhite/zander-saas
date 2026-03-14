@@ -129,7 +129,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
         }}>
           <a href="/" style={{ display: 'block', textDecoration: 'none' }}>
             <Image
-              src="/images/zander-logo-white.svg"
+              src="/images/zander-logo.svg"
               alt="Zander"
               width={160}
               height={40}
