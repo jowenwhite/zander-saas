@@ -707,11 +707,11 @@ export default function SchedulePage() {
                   }}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: viewMode === 'single' ? '#13131A' : 'transparent',
-                    color: viewMode === 'single' ? 'white' : '#13131A',
-                    border: viewMode === 'single' ? 'none' : '1px solid #2A2A38',
+                    background: viewMode === 'single' ? 'rgba(0,204,238,0.15)' : '#1C1C26',
+                    color: viewMode === 'single' ? '#00CCEE' : '#8888A0',
+                    border: viewMode === 'single' ? '1px solid #00CCEE' : '1px solid #2A2A38',
                     borderRadius: '6px',
-                    fontWeight: '600',
+                    fontWeight: viewMode === 'single' ? '600' : '500',
                     cursor: 'pointer',
                     fontSize: '0.9rem'
                   }}
@@ -730,8 +730,8 @@ export default function SchedulePage() {
                       }}
                       style={{
                         padding: '0.5rem 1rem',
-                        background: isSelected ? colors.bg : 'transparent',
-                        color: isSelected ? colors.text : '#13131A',
+                        background: isSelected ? colors.bg : '#1C1C26',
+                        color: isSelected ? colors.text : '#8888A0',
                         border: isSelected ? 'none' : '1px solid #2A2A38',
                         borderRadius: '6px',
                         fontWeight: '600',
@@ -753,11 +753,11 @@ export default function SchedulePage() {
                   }}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#00CCEE' : 'transparent',
-                    color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#13131A' : '#13131A',
-                    border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid #2A2A38',
+                    background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'rgba(0,204,238,0.15)' : '#1C1C26',
+                    color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#00CCEE' : '#8888A0',
+                    border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '1px solid #00CCEE' : '1px solid #2A2A38',
                     borderRadius: '6px',
-                    fontWeight: '700',
+                    fontWeight: '600',
                     cursor: 'pointer',
                     fontSize: '0.9rem',
                     display: 'flex',
@@ -794,11 +794,11 @@ export default function SchedulePage() {
                   onClick={() => setView(tab.id as any)}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: view === tab.id ? '#13131A' : 'transparent',
-                    color: view === tab.id ? 'white' : '#13131A',
-                    border: view === tab.id ? 'none' : '1px solid #2A2A38',
+                    background: view === tab.id ? 'rgba(0,204,238,0.15)' : '#1C1C26',
+                    color: view === tab.id ? '#00CCEE' : '#8888A0',
+                    border: view === tab.id ? '1px solid #00CCEE' : '1px solid #2A2A38',
                     borderRadius: '6px',
-                    fontWeight: '600',
+                    fontWeight: view === tab.id ? '600' : '500',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
