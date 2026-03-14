@@ -46,7 +46,7 @@ export default function DataTable<T extends Record<string, unknown>>({
     textAlign: align as 'left' | 'center' | 'right',
     fontWeight: '600',
     color: '#13131A',
-    background: 'var(--zander-off-white)',
+    background: '#1C1C26',
     borderBottom: '2px solid var(--zander-border-gray)',
   });
 
@@ -67,7 +67,7 @@ export default function DataTable<T extends Record<string, unknown>>({
       <div style={{
         padding: '3rem',
         textAlign: 'center',
-        color: 'var(--zander-gray)'
+        color: '#8888A0'
       }}>
         <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>
           <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>
@@ -84,7 +84,7 @@ export default function DataTable<T extends Record<string, unknown>>({
       <div style={{
         padding: '3rem',
         textAlign: 'center',
-        color: 'var(--zander-gray)'
+        color: '#8888A0'
       }}>
         <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>📭</div>
         <div>{emptyMessage}</div>
@@ -147,7 +147,7 @@ export default function DataTable<T extends Record<string, unknown>>({
           padding: '1rem',
           borderTop: '1px solid var(--zander-border-gray)',
         }}>
-          <div style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>
+          <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>
             Showing {data.length} of {pagination.total} results
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>

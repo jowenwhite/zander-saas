@@ -80,7 +80,7 @@ export default function ImportDealsPage() {
 
   return (
     <AuthGuard>
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ minHeight: '100vh', background: '#09090F' }}>
       {/* Top Navigation */}
       <NavBar activeModule="cro" />
 
@@ -96,7 +96,7 @@ export default function ImportDealsPage() {
             gap: '0.5rem',
             background: 'none',
             border: 'none',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
             cursor: 'pointer',
             marginBottom: '1rem',
             fontSize: '0.875rem'
@@ -110,7 +110,7 @@ export default function ImportDealsPage() {
           <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A', margin: '0 0 0.5rem 0' }}>
             Import Deals
           </h1>
-          <p style={{ color: 'var(--zander-gray)', margin: 0, fontSize: '1rem' }}>
+          <p style={{ color: '#8888A0', margin: 0, fontSize: '1rem' }}>
             Migrate your existing deals and opportunities into Zander
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function ImportDealsPage() {
           <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
             Drag & Drop Your File
           </h3>
-          <p style={{ color: 'var(--zander-gray)', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
+          <p style={{ color: '#8888A0', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
             Drop a CSV or Excel file with your deals data
           </p>
           <input
@@ -200,7 +200,7 @@ export default function ImportDealsPage() {
             📋 Expected CSV Format
           </h3>
           <div style={{
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             padding: '1rem',
             borderRadius: '8px',
             fontFamily: 'monospace',
@@ -211,7 +211,7 @@ export default function ImportDealsPage() {
             "Website Redesign", 25000, "PROSPECT", 25, "john@example.com", "2025-02-15"<br/>
             "Marketing Campaign", 15000, "QUALIFIED", 50, "jane@example.com", "2025-03-01"
           </div>
-          <p style={{ color: 'var(--zander-gray)', margin: '1rem 0 0 0', fontSize: '0.8rem' }}>
+          <p style={{ color: '#8888A0', margin: '1rem 0 0 0', fontSize: '0.8rem' }}>
             <strong>Stages:</strong> PROSPECT, QUALIFIED, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST
           </p>
         </div>
@@ -260,7 +260,7 @@ export default function ImportDealsPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '10px',
-                      background: 'var(--zander-off-white)',
+                      background: '#1C1C26',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -290,11 +290,11 @@ export default function ImportDealsPage() {
                           }}>Soon</span>
                         )}
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                      <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
                         {source.description}
                       </div>
                     </div>
-                    <div style={{ color: 'var(--zander-gray)', fontSize: '1.25rem' }}>→</div>
+                    <div style={{ color: '#8888A0', fontSize: '1.25rem' }}>→</div>
                   </button>
                 ))}
               </div>

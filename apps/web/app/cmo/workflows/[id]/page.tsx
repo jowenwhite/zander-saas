@@ -332,7 +332,7 @@ export default function WorkflowBuilderPage() {
               justifyContent: 'center',
               alignItems: 'center',
               padding: '4rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
             }}
           >
             <div
@@ -376,7 +376,7 @@ export default function WorkflowBuilderPage() {
             <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
               {error === 'Workflow not found' ? 'Workflow Not Found' : 'Error Loading Workflow'}
             </h3>
-            <p style={{ color: 'var(--zander-gray)', margin: '0 0 1.5rem 0' }}>{error}</p>
+            <p style={{ color: '#8888A0', margin: '0 0 1.5rem 0' }}>{error}</p>
             <Button variant="secondary" onClick={() => router.push('/cmo/workflows')}>
               Back to Workflows
             </Button>
@@ -413,7 +413,7 @@ export default function WorkflowBuilderPage() {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 cursor: 'pointer',
                 padding: '0.25rem',
                 fontSize: '1rem',
@@ -462,7 +462,7 @@ export default function WorkflowBuilderPage() {
             )}
           </div>
           {workflow.description && (
-            <p style={{ color: 'var(--zander-gray)', margin: '0.5rem 0 0 0' }}>
+            <p style={{ color: '#8888A0', margin: '0.5rem 0 0 0' }}>
               {workflow.description}
             </p>
           )}

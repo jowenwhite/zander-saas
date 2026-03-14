@@ -138,7 +138,7 @@ const cardStyle: CSSProperties = {
 
 const previewStyle: CSSProperties = {
   height: '140px',
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -154,7 +154,7 @@ const previewContentStyle: CSSProperties = {
 
 const blockCountStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   fontWeight: '500',
 };
 
@@ -182,7 +182,7 @@ const menuButtonStyle: CSSProperties = {
   background: 'none',
   border: 'none',
   fontSize: '1.25rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   cursor: 'pointer',
   padding: '0.25rem 0.5rem',
   borderRadius: '4px',
@@ -216,7 +216,7 @@ const menuItemStyle: CSSProperties = {
 const subjectStyle: CSSProperties = {
   margin: 0,
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -239,10 +239,10 @@ const statusBadgeStyle: CSSProperties = {
 
 const categoryStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const dateStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };

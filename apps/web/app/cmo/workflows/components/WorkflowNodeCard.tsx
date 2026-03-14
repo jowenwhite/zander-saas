@@ -109,7 +109,7 @@ export default function WorkflowNodeCard({
         <div
           style={{
             fontSize: '0.75rem',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
             marginTop: '0.25rem',
           }}
         >
@@ -126,11 +126,11 @@ export default function WorkflowNodeCard({
           }}
           style={{
             padding: '0.375rem 0.625rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
             fontSize: '0.75rem',
             fontWeight: '500',
             transition: 'all 0.2s ease',
@@ -140,8 +140,8 @@ export default function WorkflowNodeCard({
             e.currentTarget.style.color = 'white';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--zander-off-white)';
-            e.currentTarget.style.color = 'var(--zander-gray)';
+            e.currentTarget.style.background = '#1C1C26';
+            e.currentTarget.style.color = '#8888A0';
           }}
         >
           Edit
@@ -153,7 +153,7 @@ export default function WorkflowNodeCard({
           }}
           style={{
             padding: '0.375rem 0.625rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
@@ -167,7 +167,7 @@ export default function WorkflowNodeCard({
             e.currentTarget.style.color = 'white';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--zander-off-white)';
+            e.currentTarget.style.background = '#1C1C26';
             e.currentTarget.style.color = '#00CCEE';
           }}
         >

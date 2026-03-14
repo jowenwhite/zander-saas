@@ -65,7 +65,7 @@ export default function CMOFormsPage() {
             <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Forms
             </h1>
-            <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+            <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
               Lead capture forms and marketing surveys
             </p>
           </div>
@@ -99,27 +99,27 @@ export default function CMOFormsPage() {
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Total Forms</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total Forms</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>{forms.length}</div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Active Forms</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Active Forms</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#28a745' }}>{forms.filter(f => f.status === 'active').length}</div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Total Submissions</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total Submissions</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F57C00' }}>{forms.reduce((sum, f) => sum + (f._count?.submissions || 0), 0)}</div>
           </div>
         </div>
 
         {/* Forms Grid */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>Loading forms...</div>
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading forms...</div>
         ) : filteredForms.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📝</div>
             <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No forms yet</h3>
-            <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>Create forms to capture leads and gather feedback</p>
+            <p style={{ color: '#8888A0', marginBottom: '1.5rem' }}>Create forms to capture leads and gather feedback</p>
             <button onClick={() => router.push('/forms')} style={{ padding: '0.75rem 1.5rem', background: '#F57C00', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
               Create Form
             </button>
@@ -135,7 +135,7 @@ export default function CMOFormsPage() {
                   <div style={{ flex: 1 }}>
                     <h3 style={{ margin: 0, color: '#13131A', fontSize: '1.1rem', fontWeight: '600' }}>{form.name}</h3>
                     {form.description && (
-                      <p style={{ margin: '0.5rem 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                      <p style={{ margin: '0.5rem 0 0', color: '#8888A0', fontSize: '0.9rem', lineHeight: '1.4' }}>
                         {form.description.substring(0, 100)}{form.description.length > 100 ? '...' : ''}
                       </p>
                     )}
@@ -151,11 +151,11 @@ export default function CMOFormsPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
                   <div style={{ display: 'flex', gap: '1.5rem' }}>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Fields</div>
+                      <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Fields</div>
                       <div style={{ fontWeight: '600', color: '#13131A' }}>{form.fields?.length || 0}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Submissions</div>
+                      <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Submissions</div>
                       <div style={{ fontWeight: '600', color: '#13131A' }}>{form._count?.submissions || 0}</div>
                     </div>
                   </div>

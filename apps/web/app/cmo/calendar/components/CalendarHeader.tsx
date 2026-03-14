@@ -126,7 +126,7 @@ export default function CalendarHeader({
         <div
           style={{
             display: 'flex',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             borderRadius: '8px',
             padding: '4px',
           }}
@@ -138,7 +138,7 @@ export default function CalendarHeader({
               style={{
                 padding: '0.5rem 1rem',
                 background: view === btn.value ? '#F57C00' : 'transparent',
-                color: view === btn.value ? 'white' : 'var(--zander-gray)',
+                color: view === btn.value ? 'white' : '#8888A0',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',

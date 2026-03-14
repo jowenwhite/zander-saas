@@ -20,7 +20,7 @@ export default function CROPage() {
     }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>💼</div>
-        <p style={{ color: 'var(--zander-gray)' }}>Loading CRO Dashboard...</p>
+        <p style={{ color: '#8888A0' }}>Loading CRO Dashboard...</p>
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ export default function DonRecommendationsCard({
   if (loading) {
     return (
       <Card title="Don's Recommendations">
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🤖</div>
           <div>Don is analyzing your marketing data...</div>
         </div>
@@ -44,7 +44,7 @@ export default function DonRecommendationsCard({
       }
     >
       {recommendations.length === 0 ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✨</div>
           <div>No recommendations right now</div>
           <div style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
@@ -58,7 +58,7 @@ export default function DonRecommendationsCard({
               key={rec.id}
               style={{
                 padding: '1rem',
-                background: typeStyles[rec.type]?.bg || 'var(--zander-off-white)',
+                background: typeStyles[rec.type]?.bg || '#1C1C26',
                 borderRadius: '8px',
                 borderLeft: `4px solid ${typeStyles[rec.type]?.borderColor || '#F57C00'}`,
               }}
@@ -83,7 +83,7 @@ export default function DonRecommendationsCard({
                     <span
                       style={{
                         fontWeight: '600',
-                        color: '#13131A',
+                        color: '#F0F0F5',
                         fontSize: '0.875rem',
                       }}
                     >
@@ -105,7 +105,7 @@ export default function DonRecommendationsCard({
                   <div
                     style={{
                       fontSize: '0.8rem',
-                      color: 'var(--zander-gray)',
+                      color: '#8888A0',
                       marginBottom: rec.actionUrl ? '0.75rem' : 0,
                     }}
                   >
@@ -118,9 +118,9 @@ export default function DonRecommendationsCard({
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '0.25rem',
-                        padding: '0.375rem 0.75rem',
-                        background: '#F57C00',
-                        color: 'white',
+                        padding: '0.4rem 0.8rem',
+                        background: '#00CCEE',
+                        color: '#000000',
                         borderRadius: '6px',
                         textDecoration: 'none',
                         fontSize: '0.75rem',

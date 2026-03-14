@@ -139,7 +139,7 @@ const thumbnailContainerStyle: CSSProperties = {
   position: 'relative',
   width: '100%',
   paddingTop: '75%', // 4:3 aspect ratio
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   overflow: 'hidden',
 };
 
@@ -228,10 +228,10 @@ const folderBadgeStyle: CSSProperties = {
 
 const sizeStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const dateStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };

@@ -146,7 +146,7 @@ export default function CMOPlanPage() {
             <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Plan
             </h1>
-            <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+            <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
               Your strategic marketing roadmap
             </p>
           </div>
@@ -191,17 +191,17 @@ export default function CMOPlanPage() {
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
             <div style={{ padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Status</div>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.25rem' }}>Status</div>
               <div style={{ fontWeight: '700', color: getStatusColor(plan.status), textTransform: 'capitalize' }}>{plan.status}</div>
             </div>
             <div style={{ padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Sections Complete</div>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.25rem' }}>Sections Complete</div>
               <div style={{ fontWeight: '700', color: '#13131A' }}>
                 {[plan.mission, plan.vision, plan.goals.filter(g => g).length > 0, plan.swot.strengths.length > 0].filter(Boolean).length}/4
               </div>
             </div>
             <div style={{ padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Monthly Themes Set</div>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.25rem' }}>Monthly Themes Set</div>
               <div style={{ fontWeight: '700', color: '#13131A' }}>
                 {plan.monthlyThemes.filter(t => t).length}/12
               </div>
@@ -360,7 +360,7 @@ export default function CMOPlanPage() {
             <div style={{ fontSize: '2rem' }}>👥</div>
             <div>
               <h3 style={{ margin: 0, color: '#13131A', fontSize: '1rem' }}>Target Personas</h3>
-              <p style={{ margin: '0.25rem 0 0', color: 'var(--zander-gray)', fontSize: '0.85rem' }}>View customer personas</p>
+              <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.85rem' }}>View customer personas</p>
             </div>
             <span style={{ marginLeft: 'auto', color: '#F57C00' }}>→</span>
           </div>
@@ -379,7 +379,7 @@ export default function CMOPlanPage() {
             <div style={{ fontSize: '2rem' }}>💰</div>
             <div>
               <h3 style={{ margin: 0, color: '#13131A', fontSize: '1rem' }}>Budget</h3>
-              <p style={{ margin: '0.25rem 0 0', color: 'var(--zander-gray)', fontSize: '0.85rem' }}>Manage marketing budget</p>
+              <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.85rem' }}>Manage marketing budget</p>
             </div>
             <span style={{ marginLeft: 'auto', color: '#F57C00' }}>→</span>
           </div>
@@ -398,7 +398,7 @@ export default function CMOPlanPage() {
             <div style={{ fontSize: '2rem' }}>📊</div>
             <div>
               <h3 style={{ margin: 0, color: '#13131A', fontSize: '1rem' }}>KPIs & Analytics</h3>
-              <p style={{ margin: '0.25rem 0 0', color: 'var(--zander-gray)', fontSize: '0.85rem' }}>Track performance</p>
+              <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.85rem' }}>Track performance</p>
             </div>
             <span style={{ marginLeft: 'auto', color: '#F57C00' }}>→</span>
           </div>

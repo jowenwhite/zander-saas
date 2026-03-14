@@ -122,7 +122,7 @@ const clearButtonStyle: CSSProperties = {
   border: 'none',
   padding: '4px 8px',
   cursor: 'pointer',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   fontSize: '0.75rem',
 };
 
@@ -134,7 +134,7 @@ const filterGroupStyle: CSSProperties = {
 
 const filterLabelStyle: CSSProperties = {
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   fontWeight: '500',
 };
 

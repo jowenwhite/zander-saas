@@ -164,7 +164,7 @@ export default function WorkflowModal({
               background: 'none',
               border: 'none',
               fontSize: '1.5rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               cursor: 'pointer',
             }}
           >
@@ -244,7 +244,7 @@ export default function WorkflowModal({
               style={{
                 margin: '0.5rem 0 0 0',
                 fontSize: '0.8rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
               }}
             >
               {selectedTriggerInfo.description}
@@ -256,7 +256,7 @@ export default function WorkflowModal({
             <div
               style={{
                 padding: '1rem',
-                background: 'var(--zander-off-white)',
+                background: '#1C1C26',
                 borderRadius: '8px',
                 marginBottom: '1rem',
               }}
@@ -313,7 +313,7 @@ export default function WorkflowModal({
           style={{
             padding: '1rem 1.5rem',
             borderTop: '1px solid var(--zander-border-gray)',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -322,7 +322,7 @@ export default function WorkflowModal({
           {workflow && onDelete ? (
             showDeleteConfirm ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+                <span style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                   Delete this workflow?
                 </span>
                 <button
@@ -347,7 +347,7 @@ export default function WorkflowModal({
                   style={{
                     padding: '0.5rem 1rem',
                     background: 'transparent',
-                    color: 'var(--zander-gray)',
+                    color: '#8888A0',
                     border: '2px solid var(--zander-border-gray)',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -387,7 +387,7 @@ export default function WorkflowModal({
               style={{
                 padding: '0.75rem 1.5rem',
                 background: 'transparent',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 border: '2px solid var(--zander-border-gray)',
                 borderRadius: '8px',
                 cursor: 'pointer',

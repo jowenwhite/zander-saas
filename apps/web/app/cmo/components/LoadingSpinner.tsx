@@ -16,7 +16,7 @@ export default function LoadingSpinner({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'var(--zander-off-white)',
+        background: '#1C1C26',
       }
     : {
         display: 'flex',
@@ -48,7 +48,7 @@ export default function LoadingSpinner({
       <div style={containerStyle}>
         <div style={{ textAlign: 'center' }}>
           <div style={spinnerStyle} />
-          <div style={{ color: 'var(--zander-gray)', fontSize: '1rem' }}>
+          <div style={{ color: '#8888A0', fontSize: '1rem' }}>
             {message}
           </div>
         </div>

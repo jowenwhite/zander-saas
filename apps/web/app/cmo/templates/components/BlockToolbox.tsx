@@ -88,7 +88,7 @@ const categoryTitleStyle: CSSProperties = {
   margin: '0 0 0.5rem 0',
   fontSize: '0.75rem',
   fontWeight: '500',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   textTransform: 'uppercase',
 };
 
@@ -97,7 +97,7 @@ const blockItemStyle: CSSProperties = {
   alignItems: 'center',
   gap: '0.5rem',
   padding: '0.5rem',
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   borderRadius: '6px',
   marginBottom: '0.5rem',
   cursor: 'grab',

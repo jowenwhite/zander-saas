@@ -264,7 +264,7 @@ async function saveNotes() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1C1C26' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ marginBottom: '1rem' }}>
             <Image
@@ -275,7 +275,7 @@ async function saveNotes() {
               priority
             />
           </div>
-          <div style={{ color: 'var(--zander-gray)' }}>Loading Deal...</div>
+          <div style={{ color: '#8888A0' }}>Loading Deal...</div>
         </div>
       </div>
     );
@@ -283,10 +283,10 @@ async function saveNotes() {
 
   if (!deal) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1C1C26' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
-          <div style={{ color: 'var(--zander-gray)' }}>Deal not found</div>
+          <div style={{ color: '#8888A0' }}>Deal not found</div>
           <button onClick={() => router.push('/projects')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
             Back to Projects
           </button>
@@ -301,7 +301,7 @@ async function saveNotes() {
 
   return (
     <AuthGuard>
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ minHeight: '100vh', background: '#1C1C26' }}>
       <NavBar activeModule="cro" />
 
 
@@ -316,7 +316,7 @@ async function saveNotes() {
             gap: '0.5rem',
             background: 'none',
             border: 'none',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
             cursor: 'pointer',
             marginBottom: '1rem',
             fontSize: '0.875rem'
@@ -461,7 +461,7 @@ async function saveNotes() {
                       )}
                     </div>
                   ) : (
-                    <div style={{ color: 'var(--zander-gray)', fontStyle: 'italic' }}>No contact assigned</div>
+                    <div style={{ color: '#8888A0', fontStyle: 'italic' }}>No contact assigned</div>
                   )}
                 </div>
 

@@ -128,7 +128,7 @@ export default function TriggerConfigModal({
               background: 'none',
               border: 'none',
               fontSize: '1.5rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               cursor: 'pointer',
             }}
           >
@@ -186,7 +186,7 @@ export default function TriggerConfigModal({
               style={{
                 margin: '0.5rem 0 0 0',
                 fontSize: '0.8rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
               }}
             >
               {selectedTriggerInfo.description}
@@ -198,7 +198,7 @@ export default function TriggerConfigModal({
             <div
               style={{
                 padding: '1rem',
-                background: 'var(--zander-off-white)',
+                background: '#1C1C26',
                 borderRadius: '8px',
               }}
             >
@@ -267,7 +267,7 @@ export default function TriggerConfigModal({
                 <div style={{ fontWeight: '600', color: '#13131A' }}>
                   Trigger
                 </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
                   {selectedTriggerInfo.label}
                 </div>
               </div>
@@ -280,7 +280,7 @@ export default function TriggerConfigModal({
           style={{
             padding: '1rem 1.5rem',
             borderTop: '1px solid var(--zander-border-gray)',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: '0.75rem',
@@ -292,7 +292,7 @@ export default function TriggerConfigModal({
             style={{
               padding: '0.75rem 1.5rem',
               background: 'transparent',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               border: '2px solid var(--zander-border-gray)',
               borderRadius: '8px',
               cursor: 'pointer',

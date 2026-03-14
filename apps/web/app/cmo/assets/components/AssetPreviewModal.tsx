@@ -107,7 +107,7 @@ export default function AssetPreviewModal({
           ) : (
             <div style={previewPlaceholderStyle}>
               <span style={{ fontSize: '5rem' }}>{getFileIcon()}</span>
-              <p style={{ margin: '1rem 0 0', color: 'var(--zander-gray)' }}>
+              <p style={{ margin: '1rem 0 0', color: '#8888A0' }}>
                 Preview not available
               </p>
             </div>
@@ -237,7 +237,7 @@ const metadataRowStyle: CSSProperties = {
 
 const metadataLabelStyle: CSSProperties = {
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   fontWeight: '500',
 };
 
@@ -268,7 +268,7 @@ const urlInputStyle: CSSProperties = {
   borderRadius: '6px',
   border: '1px solid var(--zander-border-gray)',
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
-  background: 'var(--zander-off-white)',
+  color: '#8888A0',
+  background: '#1C1C26',
   marginTop: '0.25rem',
 };

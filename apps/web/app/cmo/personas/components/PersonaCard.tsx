@@ -153,7 +153,7 @@ const defaultBadgeStyle: CSSProperties = {
 const taglineStyle: CSSProperties = {
   margin: '0.25rem 0 0 0',
   fontSize: '0.8rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -166,7 +166,7 @@ const sectionStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.7rem',
   fontWeight: '600',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
   display: 'block',
@@ -194,7 +194,7 @@ const tagStyle: CSSProperties = {
 const moreStyle: CSSProperties = {
   fontSize: '0.7rem',
   padding: '0.2rem 0.4rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const footerStyle: CSSProperties = {
@@ -205,5 +205,5 @@ const footerStyle: CSSProperties = {
 
 const contactCountStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };

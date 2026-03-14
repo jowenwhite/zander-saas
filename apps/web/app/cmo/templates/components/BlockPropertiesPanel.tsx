@@ -249,7 +249,7 @@ const emptyStyle: CSSProperties = {
 const emptyTextStyle: CSSProperties = {
   margin: '1rem 0 0 0',
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const headerStyle: CSSProperties = {
@@ -280,7 +280,7 @@ const sectionTitleStyle: CSSProperties = {
   margin: '0 0 0.75rem 0',
   fontSize: '0.75rem',
   fontWeight: '600',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   textTransform: 'uppercase',
 };
 
@@ -361,7 +361,7 @@ const paddingInputStyle: CSSProperties = {
 
 const paddingLabelStyle: CSSProperties = {
   fontSize: '0.7rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const deleteContainerStyle: CSSProperties = {

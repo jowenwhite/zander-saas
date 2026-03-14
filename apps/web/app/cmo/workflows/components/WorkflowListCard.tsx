@@ -114,7 +114,7 @@ export default function WorkflowListCard({
             <span
               style={{
                 fontSize: '0.75rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
               }}
             >
               {workflow.nodes.length} node{workflow.nodes.length !== 1 ? 's' : ''}
@@ -126,7 +126,7 @@ export default function WorkflowListCard({
               style={{
                 margin: '0.5rem 0 0 0',
                 fontSize: '0.875rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 lineHeight: 1.4,
               }}
             >
@@ -143,11 +143,11 @@ export default function WorkflowListCard({
             onClick={onEdit}
             style={{
               padding: '0.5rem 0.75rem',
-              background: 'var(--zander-off-white)',
+              background: '#1C1C26',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               fontSize: '0.875rem',
             }}
           >
@@ -157,7 +157,7 @@ export default function WorkflowListCard({
             onClick={onDelete}
             style={{
               padding: '0.5rem 0.75rem',
-              background: 'var(--zander-off-white)',
+              background: '#1C1C26',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
@@ -177,12 +177,12 @@ export default function WorkflowListCard({
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '1rem',
           padding: '1rem',
-          background: 'var(--zander-off-white)',
+          background: '#1C1C26',
           borderRadius: '8px',
         }}
       >
         <div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
+          <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             TOTAL RUNS
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
@@ -190,7 +190,7 @@ export default function WorkflowListCard({
           </div>
         </div>
         <div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
+          <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             COMPLETED
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
@@ -198,7 +198,7 @@ export default function WorkflowListCard({
           </div>
         </div>
         <div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
+          <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             SUCCESS RATE
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#27AE60' }}>

@@ -79,7 +79,7 @@ const labelStyle: CSSProperties = {
 
 const valueStyle: CSSProperties = {
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const warningStyle: CSSProperties = {
@@ -103,6 +103,6 @@ const barFillStyle: CSSProperties = {
 
 const percentStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   textAlign: 'right',
 };

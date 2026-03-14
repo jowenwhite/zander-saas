@@ -132,7 +132,7 @@ const controlsStyle: CSSProperties = {
 
 const viewToggleStyle: CSSProperties = {
   display: 'flex',
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   borderRadius: '8px',
   padding: '4px',
 };
@@ -145,7 +145,7 @@ const toggleButtonStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '500',
   cursor: 'pointer',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   transition: 'all 0.15s ease',
 };
 
@@ -176,7 +176,7 @@ const previewFrameStyle: CSSProperties = {
 const emptyPreviewStyle: CSSProperties = {
   padding: '3rem',
   textAlign: 'center',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const emailInputStyle: CSSProperties = {

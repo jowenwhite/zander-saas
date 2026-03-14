@@ -340,7 +340,7 @@ const titleStyle: CSSProperties = {
 };
 
 const subtitleStyle: CSSProperties = {
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   margin: 0,
 };
 

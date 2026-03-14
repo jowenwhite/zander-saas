@@ -644,7 +644,7 @@ export default function AIAssistantPage() {
                   disabled={!inputValue.trim() || isTyping}
                   style={{
                     padding: '1rem 1.5rem',
-                    background: inputValue.trim() && !isTyping ? selectedExecutive.color : 'var(--zander-gray)',
+                    background: inputValue.trim() && !isTyping ? selectedExecutive.color : '#8888A0',
                     color: 'white',
                     border: 'none',
                     borderRadius: '12px',
@@ -876,7 +876,7 @@ export default function AIAssistantPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '50%',
-                      background: exec.status === 'active' ? exec.color : 'var(--zander-gray)',
+                      background: exec.status === 'active' ? exec.color : '#8888A0',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

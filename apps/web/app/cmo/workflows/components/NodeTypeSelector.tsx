@@ -24,7 +24,7 @@ export default function NodeTypeSelector({ selected, onChange }: NodeTypeSelecto
             style={{
               fontSize: '0.7rem',
               fontWeight: '600',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               textTransform: 'uppercase',
               marginBottom: '0.75rem',
             }}
@@ -83,7 +83,7 @@ export default function NodeTypeSelector({ selected, onChange }: NodeTypeSelecto
                       <div
                         style={{
                           fontSize: '0.65rem',
-                          color: 'var(--zander-gray)',
+                          color: '#8888A0',
                           marginTop: '0.125rem',
                         }}
                       >

@@ -318,7 +318,7 @@ export default function CMOCalendarPage() {
           >
             Marketing Calendar
           </h1>
-          <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
+          <p style={{ color: '#8888A0', margin: 0 }}>
             Plan and schedule your marketing activities
           </p>
         </div>

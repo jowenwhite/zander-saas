@@ -295,7 +295,7 @@ export default function FormSubmitPage() {
           <NavBar />
           <main className="print-area" style={{ padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>
                 Loading form...
               </div>
             ) : submission?.form ? (
@@ -385,7 +385,7 @@ export default function FormSubmitPage() {
                       style={{
                         marginBottom: '2rem',
                         padding: '1rem',
-                        background: 'var(--zander-off-white)',
+                        background: '#1C1C26',
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
@@ -397,7 +397,7 @@ export default function FormSubmitPage() {
                         <div style={{ fontWeight: '600', color: '#13131A' }}>
                           {submission.contact.firstName} {submission.contact.lastName}
                         </div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>
+                        <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>
                           {submission.contact.email}
                         </div>
                       </div>
@@ -436,7 +436,7 @@ export default function FormSubmitPage() {
                       alignItems: 'center'
                     }}
                   >
-                    <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>
                       {hasUnsavedChanges && <span style={{ color: '#856404' }}>● Unsaved changes</span>}
                     </div>
                     <div style={{ display: 'flex', gap: '1rem' }}>
@@ -477,7 +477,7 @@ export default function FormSubmitPage() {
                 </div>
               </>
             ) : (
-              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>
                 Form not found or missing event ID
               </div>
             )}

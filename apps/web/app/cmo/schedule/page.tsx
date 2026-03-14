@@ -103,7 +103,7 @@ export default function CMOSchedulePage() {
             <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Schedule
             </h1>
-            <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+            <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
               Team availability and marketing meetings
             </p>
           </div>
@@ -158,7 +158,7 @@ export default function CMOSchedulePage() {
 
         {/* Events List */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>Loading schedule...</div>
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading schedule...</div>
         ) : filteredEvents.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
@@ -182,15 +182,15 @@ export default function CMOSchedulePage() {
                   <div>
                     <h3 style={{ margin: '0 0 0.5rem', color: '#13131A', fontWeight: '600' }}>{event.title}</h3>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>
+                      <span style={{ fontSize: '0.9rem', color: '#8888A0' }}>
                         {view === 'week' && `${formatDate(event.startTime)} • `}
                         {event.allDay ? 'All Day' : `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`}
                       </span>
                       {event.location && (
-                        <span style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>📍 {event.location}</span>
+                        <span style={{ fontSize: '0.9rem', color: '#8888A0' }}>📍 {event.location}</span>
                       )}
                       {event.contact && (
-                        <span style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>
+                        <span style={{ fontSize: '0.9rem', color: '#8888A0' }}>
                           👤 {event.contact.firstName} {event.contact.lastName}
                         </span>
                       )}
@@ -209,7 +209,7 @@ export default function CMOSchedulePage() {
                   </span>
                 </div>
                 {event.description && (
-                  <p style={{ margin: '1rem 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>{event.description}</p>
+                  <p style={{ margin: '1rem 0 0', color: '#8888A0', fontSize: '0.9rem' }}>{event.description}</p>
                 )}
                 {event.meetingUrl && (
                   <a

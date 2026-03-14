@@ -23,7 +23,7 @@ export default function TopContentCard({
   if (loading) {
     return (
       <Card title="Top Performing Content">
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           Loading content...
         </div>
       </Card>
@@ -36,7 +36,7 @@ export default function TopContentCard({
       subtitle={isPlaceholder ? 'Sample data - create campaigns to see real metrics' : 'Last 30 days'}
     >
       {items.length === 0 ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📊</div>
           <div>No content performance data yet</div>
         </div>
@@ -50,7 +50,8 @@ export default function TopContentCard({
                 alignItems: 'center',
                 gap: '0.75rem',
                 padding: '0.75rem',
-                background: 'var(--zander-off-white)',
+                background: '#1C1C26',
+                border: '1px solid #2A2A38',
                 borderRadius: '8px',
               }}
             >
@@ -70,7 +71,7 @@ export default function TopContentCard({
                   justifyContent: 'center',
                   fontSize: '0.875rem',
                   fontWeight: '700',
-                  color: 'white',
+                  color: '#F0F0F5',
                 }}
               >
                 {index + 1}
@@ -80,13 +81,13 @@ export default function TopContentCard({
                 <div
                   style={{
                     fontWeight: '600',
-                    color: '#13131A',
+                    color: '#F0F0F5',
                     fontSize: '0.875rem',
                   }}
                 >
                   {item.name}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{item.metric}</div>
+                <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{item.metric}</div>
               </div>
               <span
                 style={{

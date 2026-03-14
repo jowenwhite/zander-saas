@@ -147,5 +147,5 @@ const selectStyle: CSSProperties = {
 
 const hintStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };

@@ -30,7 +30,7 @@ export default function CalendarGrid({
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
-          background: 'var(--zander-off-white)',
+          background: '#1C1C26',
           borderBottom: '2px solid var(--zander-border-gray)',
         }}
       >
@@ -41,7 +41,7 @@ export default function CalendarGrid({
               padding: '0.75rem',
               textAlign: 'center',
               fontWeight: '600',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               fontSize: '0.875rem',
             }}
           >
@@ -75,7 +75,7 @@ export default function CalendarGrid({
                   ? 'rgba(245, 124, 0, 0.05)'
                   : day.isCurrentMonth
                   ? 'white'
-                  : 'var(--zander-off-white)',
+                  : '#1C1C26',
                 minHeight: '100px',
                 transition: 'background 0.2s ease',
               }}
@@ -88,7 +88,7 @@ export default function CalendarGrid({
                 if (!day.isToday) {
                   e.currentTarget.style.background = day.isCurrentMonth
                     ? 'white'
-                    : 'var(--zander-off-white)';
+                    : '#1C1C26';
                 }
               }}
             >
@@ -107,7 +107,7 @@ export default function CalendarGrid({
                     ? 'white'
                     : day.isCurrentMonth
                     ? '#13131A'
-                    : 'var(--zander-gray)',
+                    : '#8888A0',
                   background: day.isToday ? '#F57C00' : 'transparent',
                   marginBottom: '0.5rem',
                 }}
@@ -151,7 +151,7 @@ export default function CalendarGrid({
                     style={{
                       padding: '2px 6px',
                       fontSize: '0.7rem',
-                      color: 'var(--zander-gray)',
+                      color: '#8888A0',
                       fontWeight: '500',
                     }}
                   >

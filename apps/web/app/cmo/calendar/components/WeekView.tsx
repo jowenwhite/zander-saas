@@ -48,7 +48,7 @@ export default function WeekView({
         <div
           style={{
             padding: '0.75rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             borderRight: '1px solid var(--zander-border-gray)',
           }}
         />
@@ -60,14 +60,14 @@ export default function WeekView({
             style={{
               padding: '0.75rem',
               textAlign: 'center',
-              background: day.isToday ? 'rgba(245, 124, 0, 0.1)' : 'var(--zander-off-white)',
+              background: day.isToday ? 'rgba(245, 124, 0, 0.1)' : '#1C1C26',
               borderRight: '1px solid var(--zander-border-gray)',
             }}
           >
             <div
               style={{
                 fontSize: '0.75rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 fontWeight: '500',
               }}
             >
@@ -101,7 +101,7 @@ export default function WeekView({
             <div
               style={{
                 fontSize: '0.65rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
               }}
             >
               {getShortMonthName(day.date.getMonth())}
@@ -123,8 +123,8 @@ export default function WeekView({
           style={{
             padding: '0.5rem',
             fontSize: '0.65rem',
-            color: 'var(--zander-gray)',
-            background: 'var(--zander-off-white)',
+            color: '#8888A0',
+            background: '#1C1C26',
             borderRight: '1px solid var(--zander-border-gray)',
             display: 'flex',
             alignItems: 'center',
@@ -188,8 +188,8 @@ export default function WeekView({
               style={{
                 padding: '0.5rem',
                 fontSize: '0.75rem',
-                color: 'var(--zander-gray)',
-                background: 'var(--zander-off-white)',
+                color: '#8888A0',
+                background: '#1C1C26',
                 borderRight: '1px solid var(--zander-border-gray)',
                 textAlign: 'right',
               }}

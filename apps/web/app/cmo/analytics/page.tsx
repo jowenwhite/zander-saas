@@ -168,7 +168,7 @@ export default function CMOAnalyticsPage() {
     return (
       <CMOLayout>
         <Card>
-          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+          <div style={{ padding: '3rem', textAlign: 'center', color: '#8888A0' }}>
             Failed to load analytics data. Please try again.
           </div>
         </Card>
@@ -195,7 +195,7 @@ export default function CMOAnalyticsPage() {
                 borderColor: dateRange === range ? '#F57C00' : 'var(--zander-border-gray)',
                 borderRadius: '8px',
                 background: dateRange === range ? 'rgba(245, 124, 0, 0.1)' : 'white',
-                color: dateRange === range ? '#F57C00' : 'var(--zander-gray)',
+                color: dateRange === range ? '#F57C00' : '#8888A0',
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontSize: '0.875rem',
@@ -305,7 +305,7 @@ export default function CMOAnalyticsPage() {
                   <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#13131A' }}>
                     {week.period}
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                     {week.sent} sent
                   </span>
                 </div>
@@ -369,7 +369,7 @@ export default function CMOAnalyticsPage() {
           </div>
           <div style={{ padding: '1rem' }}>
             {data.funnels.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
                 No funnels found. Create a funnel to track conversions.
               </div>
             ) : (
@@ -381,7 +381,7 @@ export default function CMOAnalyticsPage() {
                         <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#13131A' }}>
                           {funnel.name}
                         </h4>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                           {funnel.stages.length} stages
                         </span>
                       </div>
@@ -389,7 +389,7 @@ export default function CMOAnalyticsPage() {
                         <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#27AE60' }}>
                           {funnel.conversionRate.toFixed(1)}%
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                        <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                           conversion rate
                         </div>
                       </div>
@@ -437,13 +437,13 @@ export default function CMOAnalyticsPage() {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
                       <div>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Total Visits</span>
+                        <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>Total Visits</span>
                         <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#13131A' }}>
                           {formatNumber(funnel.totalVisits)}
                         </div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Conversions</span>
+                        <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>Conversions</span>
                         <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#27AE60' }}>
                           {formatNumber(funnel.totalConversions)}
                         </div>
@@ -472,13 +472,13 @@ function KPICard({ label, value, subValue, icon, color }: {
     <div style={kpiCardStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             {label}
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A' }}>
             {value}
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>
             {subValue}
           </div>
         </div>
@@ -532,7 +532,7 @@ const titleStyle: CSSProperties = {
 };
 
 const subtitleStyle: CSSProperties = {
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   margin: 0,
 };
 
@@ -578,7 +578,7 @@ const thStyle: CSSProperties = {
   textAlign: 'left',
   fontSize: '0.75rem',
   fontWeight: '600',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   textTransform: 'uppercase',
   borderBottom: '1px solid var(--zander-border-gray)',
 };
@@ -601,7 +601,7 @@ const businessUnitBadgeStyle: CSSProperties = {
 };
 
 const funnelCardStyle: CSSProperties = {
-  background: 'var(--zander-off-white)',
+  background: '#1C1C26',
   borderRadius: '8px',
   padding: '1.25rem',
 };
