@@ -19,6 +19,7 @@ import {
   FunnelOverview,
   RecommendationsResponse,
 } from './types/dashboard';
+import { Users, Mail, Target, DollarSign, Calendar, BarChart3, Palette, Megaphone } from 'lucide-react';
 
 export default function CMODashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -219,11 +220,11 @@ export default function CMODashboardPage() {
           }}
         >
           {[
-            { icon: '📧', label: 'Create Email Campaign', href: '/cmo/workflows' },
-            { icon: '🎯', label: 'Set Up New Funnel', href: '/cmo/funnels' },
-            { icon: '📅', label: 'Schedule Content', href: '/cmo/calendar' },
-            { icon: '📊', label: 'View Analytics', href: '/cmo/analytics' },
-            { icon: '🎨', label: 'Manage Brand Assets', href: '/cmo/brand' },
+            { icon: <Mail size={28} />, label: 'Create Email Campaign', href: '/cmo/workflows' },
+            { icon: <Target size={28} />, label: 'Set Up New Funnel', href: '/cmo/funnels' },
+            { icon: <Calendar size={28} />, label: 'Schedule Content', href: '/cmo/calendar' },
+            { icon: <BarChart3 size={28} />, label: 'View Analytics', href: '/cmo/analytics' },
+            { icon: <Palette size={28} />, label: 'Manage Brand Assets', href: '/cmo/brand' },
           ].map((action) => (
             <a
               key={action.label}
@@ -250,7 +251,7 @@ export default function CMODashboardPage() {
                 e.currentTarget.style.color = '#F0F0F5';
               }}
             >
-              <span style={{ fontSize: '1.75rem' }}>{action.icon}</span>
+              <span style={{ color: '#00CCEE' }}>{action.icon}</span>
               <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>{action.label}</span>
             </a>
           ))}
@@ -305,7 +306,7 @@ export default function CMODashboardPage() {
               gap: '1rem',
             }}
           >
-            <span style={{ fontSize: '1.5rem' }}>📣</span>
+            <Megaphone size={28} style={{ color: '#00CCEE' }} />
             <div>
               <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {metrics.summary.activeCampaigns}
@@ -326,7 +327,7 @@ export default function CMODashboardPage() {
               gap: '1rem',
             }}
           >
-            <span style={{ fontSize: '1.5rem' }}>👥</span>
+            <Users size={28} style={{ color: '#00CCEE' }} />
             <div>
               <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {metrics.summary.totalContacts.toLocaleString()}

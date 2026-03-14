@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { logout, getUser } from '../utils/auth';
 import ThemeToggle from './ThemeToggle';
 import TenantSwitcher from './TenantSwitcher';
+import { Building2, Settings, User, CreditCard, LogOut } from 'lucide-react';
 
 interface NavBarProps {
   activeModule?: string;
@@ -130,7 +131,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
             transition: 'all 0.2s ease'
           }}
         >
-          🏛️ HQ
+          <Building2 size={16} /> HQ
         </a>
 
         {/* User Menu */}
@@ -230,7 +231,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                   onMouseOver={(e) => e.currentTarget.style.background = '#1C1C26'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  <span>⚙️</span>
+                  <Settings size={18} />
                   <span>Settings</span>
                 </a>
 
@@ -248,7 +249,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                   onMouseOver={(e) => e.currentTarget.style.background = '#1C1C26'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  <span>👤</span>
+                  <User size={18} />
                   <span>My Profile</span>
                 </a>
 
@@ -266,7 +267,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                   onMouseOver={(e) => e.currentTarget.style.background = '#1C1C26'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  <span>💳</span>
+                  <CreditCard size={18} />
                   <span>Billing</span>
                 </a>
               </div>
@@ -293,7 +294,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
                   onMouseOver={(e) => e.currentTarget.style.background = 'rgba(191, 10, 48, 0.05)'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  <span>🚪</span>
+                  <LogOut size={18} />
                   <span>Logout</span>
                 </button>
               </div>
