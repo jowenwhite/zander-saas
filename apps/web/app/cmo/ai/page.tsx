@@ -127,14 +127,14 @@ export default function AskDonPage() {
             style={{
               fontSize: '2rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)',
+              color: '#F0F0F5',
               margin: 0,
               marginBottom: '0.25rem',
             }}
           >
             Ask Don
           </h1>
-          <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
+          <p style={{ color: '#8888A0', margin: 0 }}>
             Your AI Chief Marketing Officer - bold ideas, timeless wisdom
           </p>
         </div>
@@ -143,10 +143,10 @@ export default function AskDonPage() {
             onClick={handleClearChat}
             style={{
               padding: '0.5rem 1rem',
-              background: 'var(--zander-off-white)',
-              border: '1px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '1px solid #2A2A38',
               borderRadius: '6px',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               cursor: 'pointer',
               fontSize: '0.875rem',
             }}
@@ -162,9 +162,9 @@ export default function AskDonPage() {
           height: 'calc(100vh - 240px)',
           display: 'flex',
           flexDirection: 'column',
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
-          border: '1px solid var(--zander-border-gray)',
+          border: '1px solid #2A2A38',
           overflow: 'hidden',
         }}
       >
@@ -183,7 +183,7 @@ export default function AskDonPage() {
                   width: '80px',
                   height: '80px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #F57C00 0%, #E65100 100%)',
+                  background: 'linear-gradient(135deg, #00CCEE 0%, #E65100 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -197,7 +197,7 @@ export default function AskDonPage() {
                 style={{
                   fontSize: '1.5rem',
                   fontWeight: '600',
-                  color: 'var(--zander-navy)',
+                  color: '#F0F0F5',
                   marginBottom: '0.5rem',
                 }}
               >
@@ -205,7 +205,7 @@ export default function AskDonPage() {
               </h2>
               <p
                 style={{
-                  color: 'var(--zander-gray)',
+                  color: '#8888A0',
                   maxWidth: '500px',
                   margin: '0 auto 2rem',
                   lineHeight: '1.6',
@@ -233,20 +233,20 @@ export default function AskDonPage() {
                     onClick={() => handlePromptClick(prompt)}
                     style={{
                       padding: '0.625rem 1rem',
-                      background: 'white',
-                      border: '1px solid var(--zander-border-gray)',
+                      background: '#1C1C26',
+                      border: '1px solid #2A2A38',
                       borderRadius: '20px',
-                      color: 'var(--zander-navy)',
+                      color: '#F0F0F5',
                       fontSize: '0.875rem',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#F57C00';
+                      e.currentTarget.style.borderColor = '#00CCEE';
                       e.currentTarget.style.background = 'rgba(245, 124, 0, 0.05)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+                      e.currentTarget.style.borderColor = '#2A2A38';
                       e.currentTarget.style.background = 'white';
                     }}
                   >
@@ -272,9 +272,9 @@ export default function AskDonPage() {
                       borderRadius: message.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                       background:
                         message.role === 'user'
-                          ? 'var(--zander-navy)'
+                          ? '#13131A'
                           : 'rgba(245, 124, 0, 0.1)',
-                      color: message.role === 'user' ? 'white' : 'var(--zander-navy)',
+                      color: message.role === 'user' ? 'white' : '#F0F0F5',
                     }}
                   >
                     {message.role === 'assistant' && (
@@ -286,7 +286,7 @@ export default function AskDonPage() {
                           marginBottom: '0.5rem',
                           fontSize: '0.8rem',
                           fontWeight: '600',
-                          color: '#F57C00',
+                          color: '#00CCEE',
                         }}
                       >
                         <span>🎨</span> Don
@@ -323,7 +323,7 @@ export default function AskDonPage() {
                         marginBottom: '0.5rem',
                         fontSize: '0.8rem',
                         fontWeight: '600',
-                        color: '#F57C00',
+                        color: '#00CCEE',
                       }}
                     >
                       <span>🎨</span> Don
@@ -336,7 +336,7 @@ export default function AskDonPage() {
                             width: '8px',
                             height: '8px',
                             borderRadius: '50%',
-                            background: '#F57C00',
+                            background: '#00CCEE',
                             animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite`,
                           }}
                         />
@@ -354,9 +354,9 @@ export default function AskDonPage() {
         {/* Input Area */}
         <div
           style={{
-            borderTop: '1px solid var(--zander-border-gray)',
+            borderTop: '1px solid #2A2A38',
             padding: '1rem 1.5rem',
-            background: 'white',
+            background: '#1C1C26',
           }}
         >
           {/* Quick prompts when in conversation */}
@@ -376,10 +376,10 @@ export default function AskDonPage() {
                   onClick={() => handlePromptClick(prompt)}
                   style={{
                     padding: '0.375rem 0.75rem',
-                    background: 'var(--zander-off-white)',
-                    border: '1px solid var(--zander-border-gray)',
+                    background: '#1C1C26',
+                    border: '1px solid #2A2A38',
                     borderRadius: '16px',
-                    color: 'var(--zander-gray)',
+                    color: '#8888A0',
                     fontSize: '0.75rem',
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
@@ -404,21 +404,21 @@ export default function AskDonPage() {
               style={{
                 flex: 1,
                 padding: '0.875rem 1rem',
-                border: '2px solid var(--zander-border-gray)',
+                border: '2px solid #2A2A38',
                 borderRadius: '10px',
                 fontSize: '1rem',
                 outline: 'none',
                 transition: 'border-color 0.2s ease',
               }}
-              onFocus={(e) => (e.target.style.borderColor = '#F57C00')}
-              onBlur={(e) => (e.target.style.borderColor = 'var(--zander-border-gray)')}
+              onFocus={(e) => (e.target.style.borderColor = '#00CCEE')}
+              onBlur={(e) => (e.target.style.borderColor = '#2A2A38')}
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
               style={{
                 padding: '0.875rem 1.5rem',
-                background: input.trim() && !isLoading ? '#F57C00' : 'var(--zander-border-gray)',
+                background: input.trim() && !isLoading ? '#00CCEE' : '#2A2A38',
                 color: 'white',
                 border: 'none',
                 borderRadius: '10px',

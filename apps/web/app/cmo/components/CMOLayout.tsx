@@ -11,7 +11,7 @@ interface CMOLayoutProps {
 export default function CMOLayout({ children }: CMOLayoutProps) {
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', background: '#09090F' }}>
         <NavBar activeModule="cmo" />
         <CMOSidebar />
         <main style={{

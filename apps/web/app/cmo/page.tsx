@@ -242,8 +242,8 @@ export default function CMODashboardPage() {
                 textAlign: 'center',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(245, 124, 0, 0.1)';
-                e.currentTarget.style.color = '#F57C00';
+                e.currentTarget.style.background = 'rgba(0, 204, 238, 0.1)';
+                e.currentTarget.style.color = '#00CCEE';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = '#1C1C26';
