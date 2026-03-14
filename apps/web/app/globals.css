@@ -100,3 +100,47 @@ html[data-theme="dark"] .theme-toggle {
   color: var(--text-primary);
   border-color: var(--card-border);
 }
+
+/* REBRAND OVERRIDE — DARK MODE FORCED */
+body {
+  background-color: #09090F !important;
+  color: #F0F0F5 !important;
+}
+
+nav, header, [class*="nav"],
+[class*="header"], [class*="sidebar"],
+[class*="Sidebar"] {
+  background-color: #13131A !important;
+  border-color: #2A2A38 !important;
+  color: #F0F0F5 !important;
+}
+
+[class*="card"], [class*="Card"] {
+  background-color: #1C1C26 !important;
+  border-color: #2A2A38 !important;
+  color: #F0F0F5 !important;
+}
+
+/* Replace red with cyan on buttons
+   and accents */
+[class*="btn-primary"],
+[class*="bg-red"],
+button[class*="primary"] {
+  background-color: #00CCEE !important;
+  color: #000000 !important;
+  border-color: #00CCEE !important;
+}
+
+a { color: #00CCEE !important; }
+
+/* Sidebar and nav text */
+[class*="nav"] a,
+[class*="sidebar"] a,
+[class*="Sidebar"] a {
+  color: #8888A0 !important;
+}
+
+[class*="nav"] a:hover,
+[class*="sidebar"] a:hover {
+  color: #F0F0F5 !important;
+}
