@@ -539,7 +539,7 @@ export default function ProductionPage() {
                 e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+                e.currentTarget.style.borderColor = '#2A2A38';
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = 'none';
               }}>
@@ -1213,7 +1213,7 @@ export default function ProductionPage() {
                   const totalPipeline = deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0);
                   const stageLabels: Record<string, string> = { 'LEAD': 'Lead', 'PROSPECT': 'Prospect', 'QUALIFIED': 'Qualified', 'PROPOSAL': 'Proposal', 'NEGOTIATION': 'Negotiation', 'CLOSED_WON': 'Closed Won' };
                   return (
-                    <tr key={stage} style={{ borderBottom: '1px solid var(--zander-border-gray)' }}>
+                    <tr key={stage} style={{ borderBottom: '1px solid #2A2A38' }}>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                           <div style={{
