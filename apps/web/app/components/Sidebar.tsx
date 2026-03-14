@@ -125,7 +125,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
             {salesRevenueItems.map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={linkStyle(isActive(item.href))}>
-                  <item.icon size={18} strokeWidth={2} />
+                  <item.icon size={20} strokeWidth={2} />
                   {!collapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -141,7 +141,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
             {processItems.map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={linkStyle(isActive(item.href))}>
-                  <item.icon size={18} strokeWidth={2} />
+                  <item.icon size={20} strokeWidth={2} />
                   {!collapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -158,13 +158,13 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               <li style={{ marginBottom: '0.25rem' }}>
                 <a href="/admin/treasury" style={linkStyle(isActive('/admin/treasury'))}>
-                  <Landmark size={18} strokeWidth={2} />
+                  <Landmark size={20} strokeWidth={2} />
                   {!collapsed && <span>Treasury Admin</span>}
                 </a>
               </li>
               <li style={{ marginBottom: '0.25rem' }}>
                 <a href="/admin/support-admin" style={linkStyle(isActive('/admin/support-admin'))}>
-                  <Shield size={18} strokeWidth={2} />
+                  <Shield size={20} strokeWidth={2} />
                   {!collapsed && <span>Support Admin</span>}
                 </a>
               </li>

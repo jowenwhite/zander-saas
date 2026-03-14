@@ -132,7 +132,7 @@ export default function LoginPage() {
 
         {/* 64 West Branding */}
         <div style={{ fontSize: '0.875rem', opacity: 0.7, marginTop: '2rem' }}>
-          By 64 West Capital Partners
+          © 2026 Zander Technologies LLC
         </div>
       </div>
 
@@ -341,8 +341,8 @@ export default function LoginPage() {
               style={{
                 width: '100%',
                 padding: '0.875rem 1rem',
-                background: (loading || (requires2FA && twoFactorCode.length !== 6)) ? '#ccc' : 'linear-gradient(135deg, #BF0A30 0%, #A00A28 100%)',
-                color: 'white',
+                background: (loading || (requires2FA && twoFactorCode.length !== 6)) ? '#555' : '#00CCEE',
+                color: '#000000',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '1rem',
@@ -354,12 +354,12 @@ export default function LoginPage() {
               onMouseOver={(e) => {
                 if (!loading && !(requires2FA && twoFactorCode.length !== 6)) {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 8px rgba(191, 10, 48, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 6px 8px rgba(0, 204, 238, 0.3)';
                 }
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 6px rgba(191, 10, 48, 0.2)';
+                e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 204, 238, 0.2)';
               }}
             >
               {loading ? 'Verifying...' : (requires2FA ? 'Verify Code' : 'Sign In')}

@@ -6,6 +6,7 @@ import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { logout } from '../utils/auth';
+import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Building2, Swords, Wind, FileText, Trophy, BookOpen, Calendar, Target, Rocket, Star, Map, Sparkles, Check, Scale } from 'lucide-react';
 
 export default function HeadquartersPage() {
   const [activeModule, setActiveModule] = useState('cro');
@@ -13,25 +14,77 @@ export default function HeadquartersPage() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('upcoming');
 
+  // ============ ICON MAPPING ============
+  const iconMap: Record<string, React.ReactNode> = {
+    briefcase: <Briefcase size={20} />,
+    barChart: <BarChart3 size={20} />,
+    settings: <Settings size={20} />,
+    palette: <Palette size={20} />,
+    users: <Users size={20} />,
+    monitor: <Monitor size={20} />,
+    clipboard: <ClipboardList size={20} />,
+    building: <Building2 size={20} />,
+    swords: <Swords size={20} />,
+    wind: <Wind size={20} />,
+    fileText: <FileText size={20} />,
+    trophy: <Trophy size={20} />,
+    bookOpen: <BookOpen size={20} />,
+    calendar: <Calendar size={20} />,
+    target: <Target size={20} />,
+    rocket: <Rocket size={20} />,
+    star: <Star size={20} />,
+    map: <Map size={20} />,
+    sparkles: <Sparkles size={20} />,
+    check: <Check size={20} />,
+    scale: <Scale size={20} />,
+  };
+
+  const getIcon = (key: string, size: number = 20) => {
+    const icons: Record<string, React.ReactNode> = {
+      briefcase: <Briefcase size={size} />,
+      barChart: <BarChart3 size={size} />,
+      settings: <Settings size={size} />,
+      palette: <Palette size={size} />,
+      users: <Users size={size} />,
+      monitor: <Monitor size={size} />,
+      clipboard: <ClipboardList size={size} />,
+      building: <Building2 size={size} />,
+      swords: <Swords size={size} />,
+      wind: <Wind size={size} />,
+      fileText: <FileText size={size} />,
+      trophy: <Trophy size={size} />,
+      bookOpen: <BookOpen size={size} />,
+      calendar: <Calendar size={size} />,
+      target: <Target size={size} />,
+      rocket: <Rocket size={size} />,
+      star: <Star size={size} />,
+      map: <Map size={size} />,
+      sparkles: <Sparkles size={size} />,
+      check: <Check size={size} />,
+      scale: <Scale size={size} />,
+    };
+    return icons[key] || <Briefcase size={size} />;
+  };
+
   // ============ DATA ============
 
   const keystoneMetrics = [
-    { id: 'cro', icon: '💼', label: 'Pipeline Value', value: '$139,000', trend: 'up', trendValue: '12%', module: 'CRO', color: '#00CCEE' },
-    { id: 'cfo', icon: '📊', label: 'Cash on Hand', value: '$47,500', trend: 'down', trendValue: '3%', module: 'CFO', color: '#2E7D32' },
-    { id: 'coo', icon: '⚙️', label: 'On-Time Delivery', value: '94%', trend: 'flat', trendValue: '', module: 'COO', color: '#5E35B1' },
-    { id: 'cmo', icon: '🎨', label: 'Leads This Month', value: '12', trend: 'up', trendValue: '8%', module: 'CMO', color: '#F57C00' },
-    { id: 'cpo', icon: '🤝', label: 'Team Satisfaction', value: '4.2/5', trend: 'up', trendValue: '0.3', module: 'CPO', color: '#0288D1' },
-    { id: 'cio', icon: '🖥️', label: 'System Uptime', value: '99.9%', trend: 'flat', trendValue: '', module: 'CIO', color: '#455A64' },
-    { id: 'ea', icon: '📋', label: 'Tasks Completed', value: '23/28', trend: 'up', trendValue: '82%', module: 'EA', color: '#C2185B' },
+    { id: 'cro', icon: 'briefcase', label: 'Pipeline Value', value: '$139,000', trend: 'up', trendValue: '12%', module: 'CRO', color: '#00CCEE' },
+    { id: 'cfo', icon: 'barChart', label: 'Cash on Hand', value: '$47,500', trend: 'down', trendValue: '3%', module: 'CFO', color: '#2E7D32' },
+    { id: 'coo', icon: 'settings', label: 'On-Time Delivery', value: '94%', trend: 'flat', trendValue: '', module: 'COO', color: '#5E35B1' },
+    { id: 'cmo', icon: 'palette', label: 'Leads This Month', value: '12', trend: 'up', trendValue: '8%', module: 'CMO', color: '#F57C00' },
+    { id: 'cpo', icon: 'users', label: 'Team Satisfaction', value: '4.2/5', trend: 'up', trendValue: '0.3', module: 'CPO', color: '#0288D1' },
+    { id: 'cio', icon: 'monitor', label: 'System Uptime', value: '99.9%', trend: 'flat', trendValue: '', module: 'CIO', color: '#455A64' },
+    { id: 'ea', icon: 'clipboard', label: 'Tasks Completed', value: '23/28', trend: 'up', trendValue: '82%', module: 'EA', color: '#C2185B' },
   ];
 
   const quickNavButtons = [
-    { id: 'assembly', icon: '🏛️', label: 'Assembly', description: 'Meetings & Agendas' },
-    { id: 'campaigns', icon: '⚔️', label: 'Campaigns', description: 'Goals & Priorities' },
-    { id: 'headwinds', icon: '🌀', label: 'Headwinds', description: 'Challenges & Issues' },
-    { id: 'founding', icon: '📜', label: 'Founding Principles', description: 'Vision & Values' },
-    { id: 'legacy', icon: '🏆', label: 'The Legacy', description: '3-5 Year Vision' },
-    { id: 'ledger', icon: '📒', label: 'The Ledger', description: 'Metrics & Scores' },
+    { id: 'assembly', icon: 'building', label: 'Assembly', description: 'Meetings & Agendas' },
+    { id: 'campaigns', icon: 'swords', label: 'Campaigns', description: 'Goals & Priorities' },
+    { id: 'headwinds', icon: 'wind', label: 'Headwinds', description: 'Challenges & Issues' },
+    { id: 'founding', icon: 'fileText', label: 'Founding Principles', description: 'Vision & Values' },
+    { id: 'legacy', icon: 'trophy', label: 'The Legacy', description: '3-5 Year Vision' },
+    { id: 'ledger', icon: 'bookOpen', label: 'The Ledger', description: 'Metrics & Scores' },
   ];
 
   const todayAssembly = {
@@ -95,10 +148,10 @@ export default function HeadquartersPage() {
   ];
 
   const meetingTemplates = [
-    { id: 'weekly', name: 'Weekly Assembly', duration: '60 min', icon: '📅', description: 'Standard weekly team alignment' },
-    { id: 'quarterly', name: 'Quarterly Briefing', duration: '2 hours', icon: '📊', description: 'Quarterly planning and review' },
-    { id: 'annual', name: 'Annual Congress', duration: '4 hours', icon: '🏛️', description: 'Annual strategy and goal setting' },
-    { id: '1on1', name: '1:1 Meeting', duration: '30 min', icon: '👥', description: 'Individual check-in template' },
+    { id: 'weekly', name: 'Weekly Assembly', duration: '60 min', icon: 'calendar', description: 'Standard weekly team alignment' },
+    { id: 'quarterly', name: 'Quarterly Briefing', duration: '2 hours', icon: 'barChart', description: 'Quarterly planning and review' },
+    { id: 'annual', name: 'Annual Congress', duration: '4 hours', icon: 'building', description: 'Annual strategy and goal setting' },
+    { id: '1on1', name: '1:1 Meeting', duration: '30 min', icon: 'users', description: 'Individual check-in template' },
   ];
 
   const foundingPrinciples = {
@@ -245,7 +298,7 @@ export default function HeadquartersPage() {
           {pastMeetings.map((meeting) => (
             <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
               <div style={{ width: '50px', height: '50px', background: '#1C1C26', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #2A2A38' }}>
-                <span style={{ fontSize: '1.25rem' }}>📋</span>
+                <ClipboardList size={24} style={{ color: '#00CCEE' }} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{meeting.title}</div>
@@ -267,7 +320,7 @@ export default function HeadquartersPage() {
             {meetingTemplates.map((template) => (
               <div key={template.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', border: '2px solid #2A2A38' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                  <span style={{ fontSize: '1.5rem' }}>{template.icon}</span>
+                  <span style={{ color: '#00CCEE' }}>{getIcon(template.icon, 28)}</span>
                   <div>
                     <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{template.name}</div>
                     <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{template.duration}</div>
@@ -452,7 +505,7 @@ export default function HeadquartersPage() {
                   <span style={{ fontSize: '0.65rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: priorityStyle.bg, color: priorityStyle.color }}>{priorityStyle.label}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
-                  <button style={{ padding: '0.4rem 0.75rem', background: '#28A745', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>✓ Mark Resolved</button>
+                  <button style={{ padding: '0.4rem 0.75rem', background: '#28A745', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Mark Resolved</button>
                   <button style={{ padding: '0.4rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Discuss in Assembly</button>
                 </div>
               </div>
@@ -464,10 +517,10 @@ export default function HeadquartersPage() {
       {/* Victories */}
       {activeTab === 'victories' && (
         <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>🏆 Victories - Resolved Headwinds</h3>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Trophy size={20} style={{ color: '#00CCEE' }} /> Victories - Resolved Headwinds</h3>
           {victories.map((item) => (
             <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: '4px solid #28A745' }}>
-              <span style={{ color: '#28A745', fontSize: '1.25rem' }}>✓</span>
+              <Check size={20} style={{ color: '#28A745' }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
                 <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Resolved: {item.date} • By: {item.resolvedBy} • Took {item.daysToResolve} days</div>
@@ -489,7 +542,7 @@ export default function HeadquartersPage() {
           </div>
           {horizonItems.map((item) => (
             <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <span style={{ fontSize: '1.25rem', opacity: 0.5 }}>🔮</span>
+              <Sparkles size={20} style={{ color: '#8888A0' }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
                 <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Added: {item.addedDate} • Category: {item.category}</div>
@@ -507,7 +560,7 @@ export default function HeadquartersPage() {
       {/* Vision */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>🎯</span>
+          <span style={{ color: '#00CCEE' }}><Target size={28} /></span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>Vision</h3>
         </div>
         <div style={{ padding: '1.5rem', background: '#1C1C26', borderRadius: '10px', borderLeft: '4px solid #00CCEE' }}>
@@ -518,7 +571,7 @@ export default function HeadquartersPage() {
       {/* Mission */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>🚀</span>
+          <span style={{ color: '#00CCEE' }}><Rocket size={28} /></span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>Mission</h3>
         </div>
         <div style={{ padding: '1.5rem', background: '#1C1C26', borderRadius: '10px', borderLeft: '4px solid #00CCEE' }}>
@@ -529,7 +582,7 @@ export default function HeadquartersPage() {
       {/* Core Values */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>⚖️</span>
+          <span style={{ color: '#00CCEE' }}><Scale size={28} /></span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>Core Values</h3>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -545,7 +598,7 @@ export default function HeadquartersPage() {
       {/* Our Story */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>📖</span>
+          <span style={{ color: '#00CCEE' }}><BookOpen size={28} /></span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>Our Story</h3>
         </div>
         <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '10px', color: 'white' }}>
@@ -560,7 +613,7 @@ export default function HeadquartersPage() {
       {/* Legacy Vision */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>🌟</span>
+          <span style={{ color: '#00CCEE' }}><Star size={28} /></span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>The Legacy We're Building</h3>
         </div>
         <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '10px', color: 'white' }}>
@@ -571,7 +624,7 @@ export default function HeadquartersPage() {
       {/* 3-5 Year Roadmap */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>🗺️</span>
+          <span style={{ color: '#00CCEE' }}><Map size={28} /></span>
           <h3 style={{ margin: 0, color: '#F0F0F5' }}>3-5 Year Roadmap</h3>
         </div>
         <div style={{ position: 'relative' }}>
@@ -734,7 +787,7 @@ export default function HeadquartersPage() {
           {/* Page Header */}
           <div style={{ background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ fontSize: '2.5rem' }}>🏛️</span>
+              <span style={{ color: '#00CCEE' }}><Building2 size={48} /></span>
               <div>
                 <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: '700' }}>Headquarters</h1>
                 <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9 }}>Your command center for alignment, accountability, and action</p>
@@ -745,14 +798,14 @@ export default function HeadquartersPage() {
           {/* Keystones Row */}
           <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', border: '2px solid #2A2A38' }}>
             <h2 style={{ margin: '0 0 1rem 0', fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              📊 Keystones
+              <BarChart3 size={20} style={{ color: '#00CCEE' }} /> Keystones
               <span style={{ fontSize: '0.75rem', fontWeight: '400', color: '#8888A0' }}>Your vital signs at a glance</span>
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1rem' }}>
               {keystoneMetrics.map((metric) => (
                 <a key={metric.id} href={metric.module === 'CRO' ? '/' : '/' + metric.module.toLowerCase()} style={{ background: '#09090F', borderRadius: '10px', padding: '1rem', textDecoration: 'none', borderLeft: '4px solid ' + metric.color, transition: 'all 0.2s ease' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
-                    <span style={{ fontSize: '1rem' }}>{metric.icon}</span>
+                    <span style={{ color: metric.color }}>{getIcon(metric.icon, 18)}</span>
                     <span style={{ fontSize: '0.65rem', fontWeight: '700', color: metric.color }}>{metric.module}</span>
                   </div>
                   <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.15rem' }}>{metric.value}</div>
@@ -783,7 +836,7 @@ export default function HeadquartersPage() {
                 onMouseOver={(e) => { e.currentTarget.style.borderColor = '#00CCEE'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                 onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.transform = 'translateY(0)'; }}
               >
-                <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>{btn.icon}</span>
+                <span style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem', color: '#00CCEE' }}>{getIcon(btn.icon, 32)}</span>
                 <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#F0F0F5', display: 'block' }}>{btn.label}</span>
                 <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>{btn.description}</span>
               </button>
@@ -796,13 +849,13 @@ export default function HeadquartersPage() {
             <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  📅 Today's Assembly
+                  <Calendar size={18} style={{ color: '#00CCEE' }} /> Today's Assembly
                 </h3>
                 <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>@ {todayAssembly.time}</span>
               </div>
               <div style={{ background: '#09090F', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
                 <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>{todayAssembly.title}</div>
-                <div style={{ fontSize: '0.8rem', color: '#8888A0', marginBottom: '0.75rem' }}>👥 {todayAssembly.attendees} attendees</div>
+                <div style={{ fontSize: '0.8rem', color: '#8888A0', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Users size={14} /> {todayAssembly.attendees} attendees</div>
                 <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                   <strong>Agenda:</strong>
                   <ul style={{ margin: '0.5rem 0 0 1rem', padding: 0 }}>
@@ -822,7 +875,7 @@ export default function HeadquartersPage() {
             <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🌀 Active Headwinds
+                  <Wind size={18} style={{ color: '#00CCEE' }} /> Active Headwinds
                   <span style={{ background: '#00CCEE', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>{activeHeadwinds.length}</span>
                 </h3>
                 <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
@@ -845,7 +898,7 @@ export default function HeadquartersPage() {
             <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🎯 My Campaign Progress
+                  <Target size={18} style={{ color: '#00CCEE' }} /> My Campaign Progress
                 </h3>
                 <button onClick={() => handleModalOpen('campaigns')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
@@ -866,13 +919,13 @@ export default function HeadquartersPage() {
             <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🏆 Recent Victories
+                  <Trophy size={18} style={{ color: '#00CCEE' }} /> Recent Victories
                 </h3>
                 <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
               {victories.slice(0, 3).map((item) => (
                 <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.75rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid #28A745' }}>
-                  <span style={{ color: '#28A745', fontSize: '1rem' }}>✓</span>
+                  <Check size={16} style={{ color: '#28A745' }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</div>
                     <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>{item.date}</div>
@@ -916,13 +969,13 @@ export default function HeadquartersPage() {
                 alignItems: 'center'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ fontSize: '1.75rem' }}>
-                    {activeModal === 'assembly' && '🏛️'}
-                    {activeModal === 'campaigns' && '⚔️'}
-                    {activeModal === 'headwinds' && '🌀'}
-                    {activeModal === 'founding' && '📜'}
-                    {activeModal === 'legacy' && '🏆'}
-                    {activeModal === 'ledger' && '📒'}
+                  <span style={{ color: '#00CCEE' }}>
+                    {activeModal === 'assembly' && <Building2 size={32} />}
+                    {activeModal === 'campaigns' && <Swords size={32} />}
+                    {activeModal === 'headwinds' && <Wind size={32} />}
+                    {activeModal === 'founding' && <FileText size={32} />}
+                    {activeModal === 'legacy' && <Trophy size={32} />}
+                    {activeModal === 'ledger' && <BookOpen size={32} />}
                   </span>
                   <div>
                     <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>
