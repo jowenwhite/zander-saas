@@ -1,24 +1,38 @@
 'use client';
 import { useState } from 'react';
+import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Bot, X } from 'lucide-react';
 
 interface Executive {
   id: string;
   name: string;
   role: string;
   fullTitle: string;
-  avatar: string;
+  icon: string;
   color: string;
   status: 'active' | 'coming_soon';
 }
 
+const getExecutiveIcon = (iconKey: string, size: number = 24): React.ReactNode => {
+  const icons: Record<string, React.ReactNode> = {
+    briefcase: <Briefcase size={size} />,
+    chart: <BarChart3 size={size} />,
+    settings: <Settings size={size} />,
+    palette: <Palette size={size} />,
+    users: <Users size={size} />,
+    monitor: <Monitor size={size} />,
+    clipboard: <ClipboardList size={size} />,
+  };
+  return icons[iconKey] || <Briefcase size={size} />;
+};
+
 const executives: Executive[] = [
-  { id: 'cro', name: 'Jordan', role: 'CRO', fullTitle: 'Chief Revenue Officer', avatar: '💼', color: '#BF0A30', status: 'active' },
-  { id: 'cfo', name: 'Ben', role: 'CFO', fullTitle: 'Chief Financial Officer', avatar: '📊', color: '#2E7D32', status: 'coming_soon' },
-  { id: 'coo', name: 'Miranda', role: 'COO', fullTitle: 'Chief Operations Officer', avatar: '⚙️', color: '#5E35B1', status: 'coming_soon' },
-  { id: 'cmo', name: 'Don', role: 'CMO', fullTitle: 'Chief Marketing Officer', avatar: '🎨', color: '#F57C00', status: 'coming_soon' },
-  { id: 'cpo', name: 'Ted', role: 'CPO', fullTitle: 'Chief People Officer', avatar: '👥', color: '#0288D1', status: 'coming_soon' },
-  { id: 'cio', name: 'Jarvis', role: 'CIO', fullTitle: 'Chief Information Officer', avatar: '💻', color: '#455A64', status: 'coming_soon' },
-  { id: 'ea', name: 'Pam', role: 'EA', fullTitle: 'Executive Assistant', avatar: '📋', color: '#C2185B', status: 'coming_soon' },
+  { id: 'cro', name: 'Jordan', role: 'CRO', fullTitle: 'Chief Revenue Officer', icon: 'briefcase', color: '#BF0A30', status: 'active' },
+  { id: 'cfo', name: 'Ben', role: 'CFO', fullTitle: 'Chief Financial Officer', icon: 'chart', color: '#2E7D32', status: 'coming_soon' },
+  { id: 'coo', name: 'Miranda', role: 'COO', fullTitle: 'Chief Operations Officer', icon: 'settings', color: '#5E35B1', status: 'coming_soon' },
+  { id: 'cmo', name: 'Don', role: 'CMO', fullTitle: 'Chief Marketing Officer', icon: 'palette', color: '#F57C00', status: 'coming_soon' },
+  { id: 'cpo', name: 'Ted', role: 'CPO', fullTitle: 'Chief People Officer', icon: 'users', color: '#0288D1', status: 'coming_soon' },
+  { id: 'cio', name: 'Jarvis', role: 'CIO', fullTitle: 'Chief Information Officer', icon: 'monitor', color: '#455A64', status: 'coming_soon' },
+  { id: 'ea', name: 'Pam', role: 'EA', fullTitle: 'Executive Assistant', icon: 'clipboard', color: '#C2185B', status: 'coming_soon' },
 ];
 
 export default function AITeamButton() {
@@ -66,7 +80,7 @@ export default function AITeamButton() {
         }}
         title="Your AI Team"
       >
-        🤖
+        <Bot size={24} />
       </button>
 
       {/* Modal */}
@@ -111,12 +125,12 @@ export default function AITeamButton() {
                 style={{
                   background: 'none',
                   border: 'none',
-                  fontSize: '1.5rem',
                   cursor: 'pointer',
-                  color: 'var(--zander-gray, #6c757d)'
+                  color: 'var(--zander-gray, #6c757d)',
+                  padding: '0.25rem'
                 }}
               >
-                ✕
+                <X size={24} />
               </button>
             </div>
 
@@ -148,9 +162,9 @@ export default function AITeamButton() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '1.5rem'
+                    color: 'white'
                   }}>
-                    {exec.avatar}
+                    {getExecutiveIcon(exec.icon)}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
