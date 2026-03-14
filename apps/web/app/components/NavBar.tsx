@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { logout, getUser } from '../utils/auth';
 import ThemeToggle from './ThemeToggle';
-import TenantSwitcher from './TenantSwitcher';
 import { Building2, Settings, User, CreditCard, LogOut } from 'lucide-react';
 
 interface NavBarProps {
@@ -53,37 +51,10 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
       justifyContent: 'space-between',
       position: 'fixed',
       top: 0,
-      left: 0,
+      left: '240px',
       right: 0,
       zIndex: 1000
     }}>
-      {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            minWidth: '200px'
-          }}>
-            <Image
-              src="/images/zander-logo.svg"
-              alt="Zander"
-              width={200}
-              height={50}
-              priority
-              style={{
-                height: '50px',
-                width: 'auto',
-                maxWidth: '220px',
-                objectFit: 'contain',
-                display: 'block'
-              }}
-            />
-          </div>
-        </a>
-        <TenantSwitcher />
-      </div>
-
       {/* Module Switcher */}
       <div style={{ display: 'flex', gap: '0.25rem' }}>
         {[

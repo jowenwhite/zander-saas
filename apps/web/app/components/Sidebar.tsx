@@ -1,7 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import OnboardingChecklist from './OnboardingChecklist';
+import TenantSwitcher from './TenantSwitcher';
 import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck } from 'lucide-react';
 
 interface SidebarProps {
@@ -106,16 +108,43 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
       width: collapsed ? '64px' : '240px',
       background: '#09090F',
       borderRight: '2px solid #2A2A38',
-      height: 'calc(100vh - 64px)',
+      height: '100vh',
       position: 'fixed',
-      top: '64px',
+      top: 0,
       left: 0,
       overflowY: 'auto',
-      zIndex: 900,
+      zIndex: 950,
       transition: 'width 0.3s ease',
       display: 'flex',
       flexDirection: 'column',
     }}>
+      {/* Logo and Tenant Switcher */}
+      {!collapsed && (
+        <div style={{
+          padding: '16px 20px',
+          borderBottom: '1px solid #2A2A38',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          <a href="/" style={{ display: 'block', textDecoration: 'none' }}>
+            <Image
+              src="/images/zander-logo-white.svg"
+              alt="Zander"
+              width={160}
+              height={40}
+              priority
+              style={{
+                height: '40px',
+                width: 'auto',
+                objectFit: 'contain'
+              }}
+            />
+          </a>
+          <TenantSwitcher />
+        </div>
+      )}
+
       <div style={{ flex: 1 }}>
         <div style={{ padding: '1.5rem 1rem 1rem' }}>
           <div style={sectionHeaderStyle}>
