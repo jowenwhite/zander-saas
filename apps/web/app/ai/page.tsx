@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
+import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Bot, Ticket, Video, AlertTriangle, Lightbulb, FolderOpen, Package, Mail, Calendar } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -11,6 +12,19 @@ interface Message {
   timestamp: Date;
 }
 
+const getExecutiveIcon = (iconKey: string, size: number = 18): React.ReactNode => {
+  const icons: Record<string, React.ReactNode> = {
+    briefcase: <Briefcase size={size} />,
+    chart: <BarChart3 size={size} />,
+    settings: <Settings size={size} />,
+    palette: <Palette size={size} />,
+    users: <Users size={size} />,
+    monitor: <Monitor size={size} />,
+    clipboard: <ClipboardList size={size} />,
+  };
+  return icons[iconKey] || <Briefcase size={size} />;
+};
+
 interface Executive {
   id: string;
   name: string;
@@ -18,7 +32,7 @@ interface Executive {
   fullTitle: string;
   reference: string;
   personality: string;
-  avatar: string;
+  icon: string;
   color: string;
   status: 'active' | 'coming_soon';
   suggestedPrompts: string[];
@@ -32,7 +46,7 @@ const executives: Executive[] = [
     fullTitle: 'Chief Revenue Officer',
     reference: 'Sales & Revenue Expert',
     personality: 'Enthusiastic, warm, and persuasive. Jordan is your dedicated sales coach who gets genuinely excited about helping you close deals and build lasting client relationships. Always encouraging and action-oriented, Jordan focuses on practical strategies that drive real results. Expects you to pick up the phone and make things happen!',
-    avatar: '💼',
+    icon: 'briefcase',
     color: '#00CCEE',
     status: 'active',
     suggestedPrompts: [
@@ -51,7 +65,7 @@ const executives: Executive[] = [
     fullTitle: 'Chief Financial Officer',
     reference: 'Finance & Numbers Expert',
     personality: 'Analytical, practical, and refreshingly cautious. Ben genuinely loves spreadsheets and gets a little too excited about balanced budgets. He gives careful, well-reasoned financial advice and always wants to see the numbers before making any decision. Will occasionally make accounting jokes that only he finds funny. Your voice of fiscal responsibility.',
-    avatar: '📊',
+    icon: 'chart',
     color: '#2E7D32',
     status: 'coming_soon',
     suggestedPrompts: [
@@ -70,7 +84,7 @@ const executives: Executive[] = [
     fullTitle: 'Chief Operations Officer',
     reference: 'Operations & Efficiency Expert',
     personality: "Efficient, detail-oriented, and refreshingly direct. Miranda has zero tolerance for inefficiency and can spot a bottleneck from a mile away. She ensures everything runs like a well-oiled machine and isn't afraid to tell you when something isn't working. Delivers actionable advice without sugarcoating. Your operations will never be the same.",
-    avatar: '⚙️',
+    icon: 'settings',
     color: '#5E35B1',
     status: 'coming_soon',
     suggestedPrompts: [
@@ -89,7 +103,7 @@ const executives: Executive[] = [
     fullTitle: 'Chief Marketing Officer',
     reference: 'Marketing & Brand Expert',
     personality: "Creative, confident, and a master storyteller. Don sees the deeper narrative behind every brand and knows exactly how to make people feel something. He thinks in campaigns and speaks in headlines. Bold ideas come naturally, but always grounded in what actually moves the needle. Will push you to be braver with your marketing than you've ever been.",
-    avatar: '🎨',
+    icon: 'palette',
     color: '#F57C00',
     status: 'coming_soon',
     suggestedPrompts: [
@@ -108,7 +122,7 @@ const executives: Executive[] = [
     fullTitle: 'Chief People Officer',
     reference: 'Team & Culture Expert',
     personality: "Warm, insightful, and deeply invested in people. Ted believes the best business results come from teams that genuinely thrive. He helps you build culture, navigate tricky conversations, and become the leader your team needs. Never preachy, always practical. Will remind you that your people are your greatest asset.",
-    avatar: '👥',
+    icon: 'users',
     color: '#0288D1',
     status: 'coming_soon',
     suggestedPrompts: [
@@ -127,7 +141,7 @@ const executives: Executive[] = [
     fullTitle: 'Chief Information Officer',
     reference: 'Technology & Systems Expert',
     personality: "Logical, forward-thinking, and surprisingly patient with non-tech folks. Jarvis makes technology feel approachable and helps you leverage the right tools without overcomplicating things. He sees technology as a means to an end, not an end itself. Will save you from bad software decisions and help you work smarter.",
-    avatar: '💻',
+    icon: 'monitor',
     color: '#455A64',
     status: 'coming_soon',
     suggestedPrompts: [
@@ -146,7 +160,7 @@ const executives: Executive[] = [
     fullTitle: 'Executive Assistant',
     reference: 'Organization & Productivity Expert',
     personality: "Organized, proactive, and three steps ahead. Pam keeps everything running smoothly and ensures nothing falls through the cracks. She manages your time like it's precious (because it is) and has an uncanny ability to anticipate what you need before you ask. Your secret weapon for staying sane.",
-    avatar: '📋',
+    icon: 'clipboard',
     color: '#C2185B',
     status: 'coming_soon',
     suggestedPrompts: [
@@ -316,19 +330,19 @@ export default function AIAssistantPage() {
   };
 
 
-  // Standard sidebar items
+  // Standard sidebar items - using Lucide icons as React nodes
   const salesRevenueItems = [
-    { icon: '📊', label: 'Production', href: '/production' },
-    { icon: '📁', label: 'Projects', href: '/projects' },
-    { icon: '👥', label: 'People', href: '/people' },
-    { icon: '📦', label: 'Products', href: '/products' },
+    { icon: <BarChart3 size={18} />, label: 'Production', href: '/production' },
+    { icon: <FolderOpen size={18} />, label: 'Projects', href: '/projects' },
+    { icon: <Users size={18} />, label: 'People', href: '/people' },
+    { icon: <Package size={18} />, label: 'Products', href: '/products' },
   ];
 
   const toolsItems = [
-    { icon: '📧', label: 'Communication', href: '/communication' },
-    { icon: '📅', label: 'Schedule', href: '/schedule' },
-    { icon: '📋', label: 'Forms', href: '/forms' },
-    { icon: '🤖', label: `Ask ${selectedExecutive.name} (${selectedExecutive.role})`, href: '/ai', active: true },
+    { icon: <Mail size={18} />, label: 'Communication', href: '/communication' },
+    { icon: <Calendar size={18} />, label: 'Schedule', href: '/schedule' },
+    { icon: <ClipboardList size={18} />, label: 'Forms', href: '/forms' },
+    { icon: <Bot size={18} />, label: `Ask ${selectedExecutive.name} (${selectedExecutive.role})`, href: '/ai', active: true },
   ];
 
   return (
@@ -517,9 +531,10 @@ export default function AIAssistantPage() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           marginRight: '0.75rem',
-                          flexShrink: 0
+                          flexShrink: 0,
+                          color: 'white'
                         }}>
-                          {selectedExecutive.avatar}
+                          {getExecutiveIcon(selectedExecutive.icon)}
                         </div>
                       )}
                       <div style={{
@@ -552,7 +567,7 @@ export default function AIAssistantPage() {
                             onMouseOver={(e) => { e.currentTarget.style.background = '#f5f5f5'; e.currentTarget.style.borderColor = '#00CCEE'; }}
                             onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#ddd'; }}
                           >
-                            🎫 Need more help? Create Support Ticket
+                            <Ticket size={12} /> Need more help? Create Support Ticket
                           </button>
                         )}
                       </div>
@@ -567,9 +582,10 @@ export default function AIAssistantPage() {
                         background: selectedExecutive.color,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        color: 'white'
                       }}>
-                        {selectedExecutive.avatar}
+                        {getExecutiveIcon(selectedExecutive.icon)}
                       </div>
                       <div style={{
                         padding: '1rem 1.25rem',
@@ -655,17 +671,17 @@ export default function AIAssistantPage() {
                 color: '#8888A0'
               }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <span>🤖</span> Powered by Claude AI
+                  <Bot size={12} /> Powered by Claude AI
                 </span>
                 <span>•</span>
                 <span>Press Enter to send</span>
                 <span>•</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <span>📹</span> Meeting transcription coming soon
+                  <Video size={12} /> Meeting transcription coming soon
                 </span>
               </div>
-              <p style={{ textAlign: 'center', margin: '0.5rem 0 0 0', fontSize: '0.65rem', color: '#8888A0', opacity: 0.8 }}>
-                ⚠️ AI can make mistakes. Please verify important information before taking action.
+              <p style={{ textAlign: 'center', margin: '0.5rem 0 0 0', fontSize: '0.65rem', color: '#8888A0', opacity: 0.8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                <AlertTriangle size={12} /> AI can make mistakes. Please verify important information before taking action.
               </p>
             </div>
           </main>
@@ -698,7 +714,7 @@ export default function AIAssistantPage() {
             }}>
               <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: '#13131A', borderRadius: '12px 12px 0 0' }}>
                 <h2 style={{ margin: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🎫 Create Support Ticket
+                  <Ticket size={20} /> Create Support Ticket
                 </h2>
                 <p style={{ margin: '0.5rem 0 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
                   Escalate this conversation to human support
@@ -752,8 +768,8 @@ export default function AIAssistantPage() {
                     placeholder="Describe your issue or question in detail..."
                   />
                 </div>
-                <div style={{ background: '#13131A', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#8888A0' }}>
-                  <strong>💡 Tip:</strong> Include specific details about what you were trying to do and any error messages you encountered.
+                <div style={{ background: '#13131A', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#8888A0', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                  <Lightbulb size={14} style={{ flexShrink: 0, marginTop: '2px' }} /> <span><strong>Tip:</strong> Include specific details about what you were trying to do and any error messages you encountered.</span>
                 </div>
               </div>
               <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
@@ -864,9 +880,9 @@ export default function AIAssistantPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '1.5rem'
+                      color: 'white'
                     }}>
-                      {exec.avatar}
+                      {getExecutiveIcon(exec.icon, 24)}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
