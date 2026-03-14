@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { logout, getUser } from '../utils/auth';
-import ThemeToggle from './ThemeToggle';
 import { Building2, Settings, User, CreditCard, LogOut } from 'lucide-react';
 
 interface NavBarProps {
@@ -285,9 +284,6 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
             </div>
           )}
         </div>
-
-        {/* Theme Toggle */}
-        <ThemeToggle />
       </div>
     </nav>
   );
