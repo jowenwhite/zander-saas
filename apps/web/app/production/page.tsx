@@ -434,7 +434,7 @@ export default function ProductionPage() {
               width: '56px',
               height: '56px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+              background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
               color: 'white',
               display: 'flex',
               alignItems: 'center',
@@ -969,7 +969,7 @@ export default function ProductionPage() {
                   width: '48px',
                   height: '48px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+                  background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1088,7 +1088,7 @@ export default function ProductionPage() {
                         <div style={{
                           width: `${(stageValue / maxValue) * 100}%`,
                           height: '100%',
-                          background: stage === 'CLOSED_WON' ? 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' : 'linear-gradient(135deg, var(--zander-red) 0%, #A00A28 100%)',
+                          background: stage === 'CLOSED_WON' ? 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' : 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
                           borderRadius: '6px',
                           display: 'flex',
                           alignItems: 'center',
@@ -1220,7 +1220,7 @@ export default function ProductionPage() {
                             width: '12px',
                             height: '12px',
                             borderRadius: '50%',
-                            background: stage === 'CLOSED_WON' ? '#27AE60' : 'var(--zander-red)'
+                            background: stage === 'CLOSED_WON' ? '#27AE60' : '#00CCEE'
                           }}></div>
                           <span style={{ fontWeight: '500', color: '#F0F0F5' }}>{stageLabels[stage] || stage}</span>
                         </div>
@@ -1238,7 +1238,7 @@ export default function ProductionPage() {
                 })}
               </tbody>
               <tfoot>
-                <tr style={{ background: 'var(--zander-navy)' }}>
+                <tr style={{ background: '#13131A' }}>
                   <td style={{ padding: '1rem', fontWeight: '700', color: 'white' }}>Total</td>
                   <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{deals.filter(d => d.stage !== 'CLOSED_LOST').length}</td>
                   <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}</td>
@@ -1589,7 +1589,7 @@ export default function ProductionPage() {
           }} onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+              background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
               color: 'white',
               padding: '1.5rem 2rem',
               display: 'flex',
@@ -1689,7 +1689,7 @@ export default function ProductionPage() {
                         padding: '0.75rem',
                         borderRadius: '8px',
                         background: isSelected ? 'rgba(191, 10, 48, 0.1)' : 'transparent',
-                        border: isSelected ? '2px solid var(--zander-red)' : '2px solid transparent'
+                        border: isSelected ? '2px solid #00CCEE' : '2px solid transparent'
                       }}>
                         <div style={{
                           width: '32px',

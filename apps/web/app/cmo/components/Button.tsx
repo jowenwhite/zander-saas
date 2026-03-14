@@ -47,22 +47,22 @@ export default function Button({
 
   const variantStyles: Record<ButtonVariant, CSSProperties> = {
     primary: {
-      background: '#F57C00',
-      color: 'white',
+      background: '#00CCEE',
+      color: '#09090F',
     },
     secondary: {
-      background: 'white',
-      color: 'var(--zander-navy)',
-      border: '2px solid var(--zander-navy)',
+      background: '#1C1C26',
+      color: '#F0F0F5',
+      border: '2px solid #2A2A38',
     },
     danger: {
-      background: 'var(--zander-red)',
+      background: '#dc3545',
       color: 'white',
     },
     ghost: {
       background: 'transparent',
-      color: 'var(--zander-gray)',
-      border: '2px solid var(--zander-border-gray)',
+      color: '#8888A0',
+      border: '2px solid #2A2A38',
     },
   };
 

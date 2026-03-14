@@ -11,7 +11,7 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
   if (loading) {
     return (
       <Card title="Marketing Funnel">
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           Loading funnel data...
         </div>
       </Card>
@@ -21,7 +21,7 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
   if (!funnel) {
     return (
       <Card title="Marketing Funnel">
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
           <div>No funnel data available</div>
         </div>
@@ -30,7 +30,7 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
   }
 
   const stages = [
-    { key: 'visitors', label: 'Visitors', data: funnel.visitors, color: '#F57C00' },
+    { key: 'visitors', label: 'Visitors', data: funnel.visitors, color: '#00CCEE' },
     { key: 'leads', label: 'Leads', data: funnel.leads, color: '#3498DB' },
     { key: 'mqls', label: 'MQLs', data: funnel.mqls, color: '#9B59B6' },
     { key: 'croHandoff', label: 'CRO Handoff', data: funnel.croHandoff, color: '#27AE60' },
@@ -57,10 +57,10 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
                 marginBottom: '0.5rem',
               }}
             >
-              <span style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.875rem' }}>
+              <span style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.875rem' }}>
                 {stage.label}
               </span>
-              <span style={{ color: 'var(--zander-gray)', fontSize: '0.875rem' }}>
+              <span style={{ color: '#8888A0', fontSize: '0.875rem' }}>
                 {formatNumber(stage.data.count)}
                 {index > 0 && (
                   <span style={{ marginLeft: '0.5rem', color: stage.color, fontWeight: '600' }}>
@@ -72,7 +72,7 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
             <div
               style={{
                 height: '24px',
-                background: 'var(--zander-off-white)',
+                background: '#1C1C26',
                 borderRadius: '6px',
                 overflow: 'hidden',
               }}
@@ -99,7 +99,7 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
           justifyContent: 'space-around',
           marginTop: '1.5rem',
           padding: '1rem',
-          background: 'var(--zander-off-white)',
+          background: '#1C1C26',
           borderRadius: '8px',
         }}
       >
@@ -108,7 +108,7 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
             <div style={{ fontSize: '1.25rem', fontWeight: '700', color: stage.color }}>
               {stage.data.percentage}%
             </div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)' }}>
+            <div style={{ fontSize: '0.7rem', color: '#8888A0' }}>
               {stages[index].label} → {stage.label}
             </div>
           </div>
