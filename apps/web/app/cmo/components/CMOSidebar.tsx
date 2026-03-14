@@ -45,7 +45,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
     { icon: '📄', label: 'Templates', href: '/cmo/templates' },
   ];
 
-  // CMO uses orange accent color
+  // CMO uses cyan accent color on dark theme
   const linkStyle = (active: boolean) => ({
     display: 'flex',
     alignItems: 'center',
@@ -53,8 +53,9 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
     padding: '0.75rem 1rem',
     borderRadius: '8px',
     textDecoration: 'none',
-    color: active ? '#F57C00' : '#13131A',
-    background: active ? 'rgba(245,124,0,0.1)' : 'transparent',
+    color: active ? '#F0F0F5' : '#8888A0',
+    background: active ? 'rgba(0, 204, 238, 0.1)' : 'transparent',
+    borderLeft: active ? '2px solid #00CCEE' : '2px solid transparent',
     fontWeight: active ? '600' : '400',
     transition: 'all 0.2s ease'
   });
@@ -62,7 +63,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
   const sectionHeaderStyle = {
     fontSize: '0.75rem',
     fontWeight: '600' as const,
-    color: 'var(--zander-gray)',
+    color: '#55556A',
     textTransform: 'uppercase' as const,
     letterSpacing: '1px',
     marginBottom: '0.75rem',
@@ -90,8 +91,8 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
   return (
     <aside style={{
       width: collapsed ? '64px' : '240px',
-      background: 'white',
-      borderRight: '2px solid var(--zander-border-gray)',
+      background: '#13131A',
+      borderRight: '2px solid #2A2A38',
       height: 'calc(100vh - 64px)',
       position: 'fixed',
       top: '64px',

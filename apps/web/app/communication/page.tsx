@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import NavBar from '../components/NavBar';
 import Sidebar from '../components/Sidebar';
 import AuthGuard from '../components/AuthGuard';
-import { Building2, Rocket, Phone, Mail, Calendar, Star, Trash2, Video, Landmark, CheckSquare, MessageSquare, ListTodo, Clock, FileText, ArrowLeft, ArrowRight, Download, Mic, Bot, Users, Factory, Store, Smartphone, Check, X } from 'lucide-react';
+import { Building2, Rocket, Phone, Mail, Calendar, Star, Trash2, Video, Landmark, CheckSquare, MessageSquare, ListTodo, Clock, FileText, ArrowLeft, ArrowRight, Download, Mic, Bot, Users, Factory, Store, Smartphone, Check, X, Inbox, Send, Package, ClipboardList, AlertTriangle, Circle, Link2, Voicemail, Upload, MailOpen, List, Headphones, Layers, ExternalLink, MailX, XCircle, PhoneOff, Share2 } from 'lucide-react';
 
 interface Template {
   id: string;
@@ -808,12 +808,12 @@ export default function CommunicationsPage() {
     }
   };
 
-  const getTypeIcon = (type: string) => {
+  const getTypeIcon = (type: string, size: number = 16): React.ReactNode => {
     switch (type) {
-      case 'email': return '✉️';
-      case 'sms': return '💬';
-      case 'call': return '📞';
-      default: return '📄';
+      case 'email': return <Mail size={size} />;
+      case 'sms': return <MessageSquare size={size} />;
+      case 'call': return <Phone size={size} />;
+      default: return <FileText size={size} />;
     }
   };
 
@@ -1025,9 +1025,9 @@ export default function CommunicationsPage() {
         }}>
           <div style={{ display: 'flex', borderBottom: '2px solid #2A2A38' }}>
             {[
-              { id: 'inbox', label: 'Inbox', icon: '📥' },
-              { id: 'campaigns', label: 'Campaigns', icon: '🚀' },
-              { id: 'scheduled', label: 'Scheduled', icon: '📅' },
+              { id: 'inbox', label: 'Inbox', icon: <Inbox size={16} /> },
+              { id: 'campaigns', label: 'Campaigns', icon: <Rocket size={16} /> },
+              { id: 'scheduled', label: 'Scheduled', icon: <Calendar size={16} /> },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -1069,7 +1069,7 @@ export default function CommunicationsPage() {
                               fontWeight: callsFilter === f ? '600' : '400'
                             }}
                           >
-                            {f === 'all' ? '📞 All Calls' : f === 'scheduled' ? '📅 Scheduled' : '✅ Completed'}
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>{f === 'all' ? <><Phone size={14} /> All Calls</> : f === 'scheduled' ? <><Calendar size={14} /> Scheduled</> : <><CheckSquare size={14} /> Completed</>}</span>
                           </button>
                         ))}
                       </>
@@ -1089,7 +1089,7 @@ export default function CommunicationsPage() {
                               fontWeight: inboxFilter === f ? '600' : '400'
                             }}
                           >
-                            {f === 'all' ? '📬 All' : f === 'inbound' ? `📥 Received${unreadCount > 0 ? ` (${unreadCount})` : ``}` : '📤 Sent'}
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>{f === 'all' ? <><Inbox size={14} /> All</> : f === 'inbound' ? <><ArrowLeft size={14} /> Received{unreadCount > 0 ? ` (${unreadCount})` : ''}</> : <><ArrowRight size={14} /> Sent</>}</span>
                           </button>
                         ))}
                       </>
@@ -1109,7 +1109,7 @@ export default function CommunicationsPage() {
                           boxShadow: messageType === 'email' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
                         }}
                       >
-                        📧 Email
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> Email</span>
                       </button>
                       <button
                         onClick={() => setMessageType('sms')}
@@ -1124,7 +1124,7 @@ export default function CommunicationsPage() {
                           boxShadow: messageType === 'sms' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
                         }}
                       >
-                        💬 SMS
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><MessageSquare size={14} /> SMS</span>
                       </button>
                       <button
                         onClick={() => setMessageType('calls')}
@@ -1139,7 +1139,7 @@ export default function CommunicationsPage() {
                           boxShadow: messageType === 'calls' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
                         }}
                       >
-                        📞 Calls
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> Calls</span>
                       </button>
                     </div>
                   </div>
@@ -1155,7 +1155,7 @@ export default function CommunicationsPage() {
                       cursor: 'pointer'
                     }}
                   >
-                    {messageType === 'email' ? '✉️ Compose Email' : messageType === 'sms' ? '💬 Compose SMS' : '📞 Log Call'}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>{messageType === 'email' ? <><Mail size={14} /> Compose Email</> : messageType === 'sms' ? <><MessageSquare size={14} /> Compose SMS</> : <><Phone size={14} /> Log Call</>}</span>
                   </button>
                   {messageType === 'calls' && (
                     <button
@@ -1171,7 +1171,7 @@ export default function CommunicationsPage() {
                         marginLeft: '0.5rem'
                       }}
                     >
-                      🎥 Schedule Assembly
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Video size={14} /> Schedule Assembly</span>
                     </button>
                   )}
                 </div>
@@ -1193,7 +1193,7 @@ export default function CommunicationsPage() {
                           boxShadow: inboxView === 'list' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
                         }}
                       >
-                        📋 List
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><List size={14} /> List</span>
                       </button>
                       <button
                         onClick={() => setInboxView('threads')}
@@ -1209,7 +1209,7 @@ export default function CommunicationsPage() {
                           boxShadow: inboxView === 'threads' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
                         }}
                       >
-                        🧵 Threads
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Layers size={14} /> Threads</span>
                       </button>
                     </div>
                     {unreadCount > 0 && (
@@ -1237,7 +1237,7 @@ export default function CommunicationsPage() {
                     {messageType === 'email' ? (
                       emails.filter(e => inboxFilter === 'all' || e.direction === inboxFilter).length === 0 ? (
                         <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
-                          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📭</div>
+                          <div style={{ marginBottom: '0.5rem' }}><MailOpen size={32} /></div>
                           <p>No emails yet</p>
                         </div>
                       ) : inboxView === 'threads' ? (
@@ -1259,8 +1259,8 @@ export default function CommunicationsPage() {
                                   }}
                                 >
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                                    <span style={{ fontWeight: thread.unreadCount > 0 ? '700' : '500', fontSize: '0.85rem', color: '#F0F0F5' }}>
-                                      🧵 {thread.latestEmail.subject}
+                                    <span style={{ fontWeight: thread.unreadCount > 0 ? '700' : '500', fontSize: '0.85rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                      <Layers size={14} /> {thread.latestEmail.subject}
                                     </span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                       {thread.unreadCount > 0 && (
@@ -1305,7 +1305,7 @@ export default function CommunicationsPage() {
                                   </div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
-                                      {email.direction === 'inbound' ? '📥' : '📤'}
+                                      {email.direction === 'inbound' ? <Download size={12} /> : <Upload size={12} />}
                                     </span>
                                     <span style={{ fontSize: '0.8rem', fontWeight: !email.isRead && email.direction === 'inbound' ? '600' : '400', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                       {email.subject}
@@ -1352,13 +1352,13 @@ export default function CommunicationsPage() {
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
-                              {email.direction === 'inbound' ? '📥' : '📤'}
+                              {email.direction === 'inbound' ? <Download size={12} /> : <Upload size={12} />}
                             </span>
                             <span style={{ fontSize: '0.8rem', fontWeight: !email.isRead && email.direction === 'inbound' ? '600' : '400', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                               {email.subject}
                             </span>
                             {email.threadId && (
-                              <span style={{ fontSize: '0.6rem', color: '#666', background: '#f0f0f0', padding: '0.1rem 0.3rem', borderRadius: '3px' }}>🧵</span>
+                              <span style={{ fontSize: '0.6rem', color: '#666', background: '#f0f0f0', padding: '0.1rem 0.3rem', borderRadius: '3px', display: 'inline-flex', alignItems: 'center' }}><Layers size={10} /></span>
                             )}
                           </div>
                           {/* Quick Actions */}
@@ -1400,9 +1400,9 @@ export default function CommunicationsPage() {
                             <button
                               onClick={() => handleArchiveEmail(email.id)}
                               title="Archive"
-                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', display: 'flex', alignItems: 'center' }}
                             >
-                              📦
+                              <Package size={12} />
                             </button>
                             <button
                               onClick={() => handleDeleteEmail(email.id)}
@@ -1419,7 +1419,7 @@ export default function CommunicationsPage() {
                       /* SMS Messages */
                       smsMessages.filter(s => inboxFilter === 'all' || s.direction === inboxFilter).length === 0 ? (
                         <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
-                          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</div>
+                          <div style={{ marginBottom: '0.5rem' }}><MessageSquare size={32} /></div>
                           <p>No SMS messages yet</p>
                           <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Configure Twilio to send SMS</p>
                         </div>
@@ -1444,7 +1444,7 @@ export default function CommunicationsPage() {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: sms.direction === 'inbound' ? '#e8f5e9' : '#fff3e0', color: sms.direction === 'inbound' ? '#2e7d32' : '#f57c00' }}>
-                                {sms.direction === 'inbound' ? '📥' : '📤'}
+                                {sms.direction === 'inbound' ? <Download size={12} /> : <Upload size={12} />}
                               </span>
                               <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                                 {sms.body.substring(0, 50)}{sms.body.length > 50 ? '...' : ''}
@@ -1475,7 +1475,7 @@ export default function CommunicationsPage() {
                       /* Call Logs */
                       callLogs.filter(c => callsFilter === 'all' || (callsFilter === 'scheduled' ? c.status === 'scheduled' : c.status !== 'scheduled')).length === 0 ? (
                         <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
-                          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📞</div>
+                          <div style={{ marginBottom: '0.5rem' }}><Phone size={32} /></div>
                           <p>No call logs yet</p>
                           <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Log your first call to get started</p>
                         </div>
@@ -1502,14 +1502,14 @@ export default function CommunicationsPage() {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: call.type === 'online_meeting' ? '#e3f2fd' : call.type === 'voicemail_drop' ? '#fff3e0' : '#f3e5f5', color: call.type === 'online_meeting' ? '#1976d2' : call.type === 'voicemail_drop' ? '#f57c00' : '#7b1fa2' }}>
-                                {call.type === 'online_meeting' ? '🎥' : call.type === 'voicemail_drop' ? '📱' : '📞'}
+                                {call.type === 'online_meeting' ? <Video size={12} /> : call.type === 'voicemail_drop' ? <Voicemail size={12} /> : <Phone size={12} />}
                               </span>
                               <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: call.direction === 'inbound' ? '#e8f5e9' : '#fce4ec', color: call.direction === 'inbound' ? '#2e7d32' : '#c2185b' }}>
-                                {call.direction === 'inbound' ? '📥' : '📤'}
+                                {call.direction === 'inbound' ? <Download size={12} /> : <Upload size={12} />}
                               </span>
                               {call.status === 'scheduled' ? (
-                                <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', borderRadius: '3px', background: '#e3f2fd', color: '#1976d2', fontWeight: '600' }}>
-                                  📅 SCHEDULED
+                                <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', borderRadius: '3px', background: '#e3f2fd', color: '#1976d2', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                  <Calendar size={10} /> SCHEDULED
                                 </span>
                               ) : (
                                 <span style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -1525,7 +1525,7 @@ export default function CommunicationsPage() {
                                   onClick={(e) => e.stopPropagation()}
                                   style={{ marginLeft: 'auto', padding: '0.25rem 0.75rem', background: 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)', color: 'white', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', textDecoration: 'none' }}
                                 >
-                                  🚀 Join
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><ExternalLink size={12} /> Join</span>
                                 </a>
                               )}
                             </div>
@@ -1536,7 +1536,7 @@ export default function CommunicationsPage() {
                             )}
                             {call.platform && call.type === 'online_meeting' && (
                               <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>
-                                via {call.platform === 'zoom' ? '📹 Zoom' : call.platform === 'google_meet' ? '🎦 Google Meet' : call.platform === 'teams' ? '👥 Teams' : call.platform}
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>via {call.platform === 'zoom' ? <><Video size={12} /> Zoom</> : call.platform === 'google_meet' ? <><Video size={12} /> Google Meet</> : call.platform === 'teams' ? <><Users size={12} /> Teams</> : call.platform}</span>
                               </div>
                             )}
                           </div>
@@ -1548,8 +1548,8 @@ export default function CommunicationsPage() {
                   {selectedThread && threadEmails.length > 0 && !selectedEmail && (
                     <div style={{ border: '1px solid #2A2A38', borderRadius: '8px', overflow: 'hidden' }}>
                       <div style={{ padding: '1rem', background: '#09090F', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#F0F0F5', margin: 0 }}>
-                          🧵 {threadEmails[0]?.subject} ({threadEmails.length} messages)
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#F0F0F5', margin: 0, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                          <Layers size={16} /> {threadEmails[0]?.subject} ({threadEmails.length} messages)
                         </h3>
                         <button onClick={() => { setSelectedThread(null); setThreadEmails([]); }} style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
                       </div>
@@ -1562,7 +1562,7 @@ export default function CommunicationsPage() {
                                   {email.direction === 'inbound' ? email.fromAddress : `To: ${email.toAddress}`}
                                 </span>
                                 <span style={{ marginLeft: '0.5rem', fontSize: '0.65rem', padding: '0.1rem 0.3rem', borderRadius: '3px', background: email.direction === 'inbound' ? '#e3f2fd' : '#fce4ec', color: email.direction === 'inbound' ? '#1976d2' : '#c2185b' }}>
-                                  {email.direction === 'inbound' ? '📥' : '📤'}
+                                  {email.direction === 'inbound' ? <Download size={12} /> : <Upload size={12} />}
                                 </span>
                               </div>
                               <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{new Date(email.sentAt).toLocaleString()}</span>
@@ -1585,7 +1585,7 @@ export default function CommunicationsPage() {
                           }}
                           style={{ padding: "0.5rem 1rem", background: "#13131A", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
-                          ↩️ Reply to Thread
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><ArrowLeft size={14} /> Reply to Thread</span>
                         </button>
                       </div>
                     </div>
@@ -1619,7 +1619,7 @@ export default function CommunicationsPage() {
                               onClick={() => { loadThread(selectedEmail.threadId!); setSelectedEmail(null); }}
                               style={{ padding: '0.25rem 0.5rem', background: '#f0f0f0', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', color: '#666' }}
                             >
-                              🧵 View full thread
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Layers size={12} /> View full thread</span>
                             </button>
                           </p>
                         )}
@@ -1639,7 +1639,7 @@ export default function CommunicationsPage() {
                           }}
                           style={{ padding: "0.5rem 1rem", background: "#13131A", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
-                          ↩️ Reply
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><ArrowLeft size={14} /> Reply</span>
                         </button>
                         <button
                           onClick={() => {
@@ -1653,13 +1653,13 @@ export default function CommunicationsPage() {
                           }}
                           style={{ padding: "0.5rem 1rem", background: "#005687", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
-                          ➡️ Forward
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><ArrowRight size={14} /> Forward</span>
                         </button>
                         <button
                           onClick={() => handleArchiveEmail(selectedEmail.id)}
                           style={{ padding: "0.5rem 1rem", background: "#00CCEE", color: "#F0F0F5", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}
                         >
-                          📦 Archive
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><Package size={14} /> Archive</span>
                         </button>
                         <button
                           onClick={() => handleDeleteEmail(selectedEmail.id)}
@@ -1738,7 +1738,7 @@ export default function CommunicationsPage() {
                   <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>Loading campaigns...</div>
                 ) : filteredCampaigns.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚀</div>
+                    <div style={{ marginBottom: '1rem' }}><Rocket size={48} /></div>
                     <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Campaigns Yet</h3>
                     <p style={{ color: '#8888A0', marginBottom: '1rem' }}>Create multi-step outreach campaigns or browse The Treasury for ready-made templates</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -1790,18 +1790,18 @@ export default function CommunicationsPage() {
                         {/* Channel Indicators */}
                         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                           {campaign.channels.includes('email') && (
-                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(0, 204, 238, 0.1)', color: '#00CCEE', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
-                              📧 Email
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(0, 204, 238, 0.1)', color: '#00CCEE', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                              <Mail size={12} /> Email
                             </span>
                           )}
                           {campaign.channels.includes('sms') && (
-                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(39, 174, 96, 0.1)', color: '#27AE60', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
-                              💬 SMS
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(39, 174, 96, 0.1)', color: '#27AE60', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                              <MessageSquare size={12} /> SMS
                             </span>
                           )}
                           {campaign.channels.includes('phone') && (
-                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(12, 35, 64, 0.1)', color: '#F0F0F5', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
-                              📞 Phone
+                            <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(12, 35, 64, 0.1)', color: '#F0F0F5', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                              <Phone size={12} /> Phone
                             </span>
                           )}
                         </div>
@@ -1879,7 +1879,7 @@ export default function CommunicationsPage() {
                   <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>Loading...</div>
                 ) : filteredComms.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
+                    <div style={{ marginBottom: '1rem' }}><Calendar size={48} /></div>
                     <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Scheduled Communications</h3>
                     <p style={{ color: '#8888A0' }}>Scheduled emails and messages will appear here</p>
                   </div>
@@ -1916,8 +1916,8 @@ export default function CommunicationsPage() {
                           <td style={{ padding: '1rem', textAlign: 'center' }}>
                             {comm.status === 'pending' && (
                               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                                <button onClick={() => handleApproveCommunication(comm.id)} style={{ padding: '0.5rem 0.75rem', background: '#27AE60', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>✓</button>
-                                <button onClick={() => handleCancelCommunication(comm.id)} style={{ padding: '0.5rem 0.75rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>✕</button>
+                                <button onClick={() => handleApproveCommunication(comm.id)} style={{ padding: '0.5rem 0.75rem', background: '#27AE60', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><Check size={14} /></button>
+                                <button onClick={() => handleCancelCommunication(comm.id)} style={{ padding: '0.5rem 0.75rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><X size={14} /></button>
                               </div>
                             )}
                           </td>
@@ -2035,7 +2035,7 @@ export default function CommunicationsPage() {
       {showSendModal && sendingTemplate && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#1C1C26', borderRadius: '16px', padding: '2rem', width: '500px', maxWidth: '90%' }}>
-            <h2 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>📤 Send Email</h2>
+            <h2 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Upload size={20} /> Send Email</h2>
             <div style={{ background: '#09090F', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
               <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>{sendingTemplate.name}</div>
               <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>{sendingTemplate.subject}</div>
@@ -2051,7 +2051,7 @@ export default function CommunicationsPage() {
             </div>
             {sendResult && (
               <div style={{ padding: '1rem', borderRadius: '8px', marginBottom: '1rem', background: sendResult.success ? 'rgba(39,174,96,0.1)' : 'rgba(191,10,48,0.1)', color: sendResult.success ? '#27AE60' : '#00CCEE' }}>
-                {sendResult.success ? '✅' : '❌'} {sendResult.message}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>{sendResult.success ? <Check size={16} /> : <X size={16} />} {sendResult.message}</span>
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
@@ -2104,7 +2104,7 @@ export default function CommunicationsPage() {
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowComposeModal(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={sending} style={{ padding: '0.75rem 1.5rem', background: sending ? '#8888A0' : 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sending ? 'not-allowed' : 'pointer' }}>{sending ? 'Sending...' : '📤 Send Email'}</button>
+                <button type="submit" disabled={sending} style={{ padding: '0.75rem 1.5rem', background: sending ? '#8888A0' : 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sending ? 'not-allowed' : 'pointer' }}>{sending ? 'Sending...' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Upload size={14} /> Send Email</span>}</button>
               </div>
             </form>
           </div>
@@ -2115,7 +2115,7 @@ export default function CommunicationsPage() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#1C1C26', borderRadius: '12px', width: '500px', maxHeight: '80vh', overflow: 'auto' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5' }}>💬 New SMS</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MessageSquare size={20} /> New SMS</h2>
               <button onClick={() => setShowSmsCompose(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSendSms} style={{ padding: '1.5rem' }}>
@@ -2164,7 +2164,7 @@ export default function CommunicationsPage() {
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowSmsCompose(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={sendingSms || !smsForm.to || !smsForm.body} style={{ padding: '0.75rem 1.5rem', background: sendingSms || !smsForm.to || !smsForm.body ? '#8888A0' : 'linear-gradient(135deg, #27AE60 0%, #219a52 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: sendingSms || !smsForm.to || !smsForm.body ? 'not-allowed' : 'pointer' }}>
-                  {sendingSms ? 'Sending...' : '💬 Send SMS'}
+                  {sendingSms ? 'Sending...' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MessageSquare size={14} /> Send SMS</span>}
                 </button>
               </div>
             </form>
@@ -2176,7 +2176,7 @@ export default function CommunicationsPage() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#1C1C26', borderRadius: '12px', width: '550px', maxHeight: '85vh', overflow: 'auto' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5' }}>📞 Log Call</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Phone size={20} /> Log Call</h2>
               <button onClick={() => setShowLogCall(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleLogCall} style={{ padding: '1.5rem' }}>
@@ -2290,7 +2290,7 @@ export default function CommunicationsPage() {
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowLogCall(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={savingCall || !callForm.type} style={{ padding: '0.75rem 1.5rem', background: savingCall || !callForm.type ? '#8888A0' : 'linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingCall || !callForm.type ? 'not-allowed' : 'pointer' }}>
-                  {savingCall ? 'Saving...' : '📞 Log Call'}
+                  {savingCall ? 'Saving...' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> Log Call</span>}
                 </button>
               </div>
             </form>
@@ -2303,7 +2303,7 @@ export default function CommunicationsPage() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#1C1C26', borderRadius: '12px', width: '500px', maxHeight: '85vh', overflow: 'auto' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px 12px 0 0' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'white' }}>🎥 Schedule Assembly</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Video size={20} /> Schedule Assembly</h2>
               <button onClick={() => setShowScheduleMeeting(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'white' }}>×</button>
             </div>
             <form onSubmit={handleScheduleMeeting} style={{ padding: '1.5rem' }}>
@@ -2368,7 +2368,7 @@ export default function CommunicationsPage() {
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowScheduleMeeting(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={savingMeeting} style={{ padding: '0.75rem 1.5rem', background: savingMeeting ? '#8888A0' : 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingMeeting ? 'not-allowed' : 'pointer' }}>
-                  {savingMeeting ? 'Scheduling...' : '🎥 Schedule Assembly'}
+                  {savingMeeting ? 'Scheduling...' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Video size={14} /> Schedule Assembly</span>}
                 </button>
               </div>
             </form>
@@ -2382,7 +2382,7 @@ export default function CommunicationsPage() {
           <div style={{ background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px 12px 0 0' }}>
               <div>
-                <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem' }}>📞 Call Details</h2>
+                <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Phone size={20} /> Call Details</h2>
                 <p style={{ margin: '0.25rem 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
                   {selectedCall.contact ? selectedCall.contact.firstName + ' ' + selectedCall.contact.lastName : 'Unknown Contact'}
                 </p>
@@ -2395,7 +2395,7 @@ export default function CommunicationsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
                 <div>
                   <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Type</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.type === 'online_meeting' ? '🎥 Online Meeting' : selectedCall.type === 'voicemail_drop' ? '📱 Voicemail' : '📞 Phone Call'}</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>{selectedCall.type === 'online_meeting' ? <><Video size={14} /> Online Meeting</> : selectedCall.type === 'voicemail_drop' ? <><Voicemail size={14} /> Voicemail</> : <><Phone size={14} /> Phone Call</>}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Duration</div>
@@ -2407,7 +2407,7 @@ export default function CommunicationsPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Direction</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{selectedCall.direction === 'inbound' ? '📥 Inbound' : '📤 Outbound'}</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>{selectedCall.direction === 'inbound' ? <><Download size={14} /> Inbound</> : <><Upload size={14} /> Outbound</>}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.7rem', color: '#8888A0', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Outcome</div>
@@ -2422,7 +2422,7 @@ export default function CommunicationsPage() {
               {/* Notes */}
               {selectedCall.notes && (
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem' }}>📝 Notes</h3>
+                  <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}><FileText size={14} /> Notes</h3>
                   <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px', fontSize: '0.9rem', lineHeight: '1.6' }}>{selectedCall.notes}</div>
                 </div>
               )}
@@ -2431,7 +2431,7 @@ export default function CommunicationsPage() {
               {selectedCall.recordingUrl && (
                 <div style={{ marginBottom: '1.5rem' }}>
                   <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    🎧 Call Recording
+                    <Headphones size={16} /> Call Recording
                     <span style={{ background: '#e8f5e9', color: '#2e7d32', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>AUDIO</span>
                   </h3>
                   <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', borderRadius: '12px' }}>
@@ -2445,7 +2445,7 @@ export default function CommunicationsPage() {
                     </audio>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)' }}>
                       <span>Duration: {selectedCall.duration ? Math.floor(selectedCall.duration / 60) + ':' + String(selectedCall.duration % 60).padStart(2, '0') : 'Unknown'}</span>
-                      <a href={selectedCall.recordingUrl} download style={{ color: '#90caf9', textDecoration: 'none' }}>⬇️ Download</a>
+                      <a href={selectedCall.recordingUrl} download style={{ color: '#90caf9', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><Download size={12} /> Download</a>
                     </div>
                     {/* Transcribe Button */}
                     <button
@@ -2493,14 +2493,14 @@ export default function CommunicationsPage() {
                       disabled={transcribingAudio}
                       style={{ width: '100%', marginTop: '0.75rem', padding: '0.6rem', background: transcribingAudio ? '#555' : 'linear-gradient(135deg, #00b894 0%, #00a085 100%)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.9rem', fontWeight: '600', cursor: transcribingAudio ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                     >
-                      {transcribingAudio ? '🎙️ Transcribing...' : generatingSummary ? '🤖 Generating Summary...' : '🎙️ Transcribe & Summarize'}
+                      {transcribingAudio ? <><Mic size={14} /> Transcribing...</> : generatingSummary ? <><Bot size={14} /> Generating Summary...</> : <><Mic size={14} /> Transcribe & Summarize</>}
                     </button>
                   </div>
                 </div>
               )}
               {/* Transcript Section */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem' }}>📝 Transcript / Meeting Notes</h3>
+                <h3 style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}><FileText size={14} /> Transcript / Meeting Notes</h3>
                 <textarea
                   value={transcriptText}
                   onChange={(e) => setTranscriptText(e.target.value)}
@@ -2544,7 +2544,7 @@ export default function CommunicationsPage() {
                 disabled={generatingSummary || !transcriptText.trim()}
                 style={{ width: '100%', padding: '0.75rem', background: generatingSummary ? '#ccc' : 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: generatingSummary ? 'not-allowed' : 'pointer', marginBottom: '1.5rem' }}
               >
-                {generatingSummary ? '🤖 Generating Summary...' : '🤖 Generate AI Summary'}
+                {generatingSummary ? <><Bot size={14} /> Generating Summary...</> : <><Bot size={14} /> Generate AI Summary</>}
               </button>
 
               {/* AI Summary Display */}
@@ -2562,7 +2562,7 @@ export default function CommunicationsPage() {
                     onClick={() => setShowShareModal(true)}
                     style={{ marginTop: '1rem', padding: '0.6rem 1.2rem', background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                   >
-                    📧 Share Summary
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Share2 size={14} /> Share Summary</span>
                   </button>
                 </div>
               )}
@@ -2598,7 +2598,7 @@ export default function CommunicationsPage() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
           <div style={{ background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '500px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', borderRadius: '12px 12px 0 0' }}>
-              <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem' }}>📧 Share Call Summary</h2>
+              <h2 style={{ margin: 0, color: 'white', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Share2 size={20} /> Share Call Summary</h2>
               <p style={{ margin: '0.25rem 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
                 {selectedCall.contact ? selectedCall.contact.firstName + ' ' + selectedCall.contact.lastName : 'Unknown Contact'} - {new Date(selectedCall.createdAt).toLocaleDateString()}
               </p>
@@ -2668,7 +2668,7 @@ export default function CommunicationsPage() {
                 disabled={sendingSummary || sharingEmails.length === 0}
                 style={{ padding: '0.5rem 1.5rem', background: sendingSummary ? '#ccc' : 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', color: 'white', border: 'none', borderRadius: '6px', cursor: sendingSummary ? 'not-allowed' : 'pointer', fontWeight: '600' }}
               >
-                {sendingSummary ? 'Sending...' : '📧 Send Summary'}
+                {sendingSummary ? 'Sending...' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> Send Summary</span>}
               </button>
             </div>
           </div>
@@ -2803,7 +2803,7 @@ export default function CommunicationsPage() {
                           fontSize: '0.8rem'
                         }}
                       >
-                        {ch === 'email' ? '📧' : ch === 'sms' ? '💬' : '📞'} {ch}
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>{ch === 'email' ? <Mail size={12} /> : ch === 'sms' ? <MessageSquare size={12} /> : <Phone size={12} />} {ch}</span>
                       </button>
                     ))}
                   </div>
@@ -2819,7 +2819,7 @@ export default function CommunicationsPage() {
                 </div>
               ) : treasuryItems.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '3rem' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
+                  <div style={{ marginBottom: '1rem' }}><Landmark size={48} /></div>
                   <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Templates Found</h3>
                   <p style={{ color: '#8888A0' }}>
                     {treasuryFilter.category || treasuryFilter.executive || treasuryFilter.industry || treasuryFilter.channels.length > 0
@@ -2885,7 +2885,7 @@ export default function CommunicationsPage() {
                               fontWeight: '600'
                             }}
                           >
-                            {ch === 'email' ? '📧' : ch === 'sms' ? '💬' : '📞'} {ch}
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>{ch === 'email' ? <Mail size={12} /> : ch === 'sms' ? <MessageSquare size={12} /> : <Phone size={12} />} {ch}</span>
                           </span>
                         ))}
                       </div>

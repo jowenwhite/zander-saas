@@ -25,8 +25,8 @@ export default function KPICard({
   onClick
 }: KPICardProps) {
   const cardStyle: CSSProperties = {
-    background: 'white',
-    border: '2px solid var(--zander-border-gray)',
+    background: '#1C1C26',
+    border: '2px solid #2A2A38',
     borderRadius: '12px',
     padding: '1.5rem',
     cursor: onClick ? 'pointer' : 'default',
@@ -56,7 +56,7 @@ export default function KPICard({
         e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+        e.currentTarget.style.borderColor = '#2A2A38';
         e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = 'none';
       }}
@@ -79,20 +79,20 @@ export default function KPICard({
       <div style={{
         fontSize: '2rem',
         fontWeight: '700',
-        color: '#13131A',
+        color: '#F0F0F5',
         marginBottom: '0.25rem'
       }}>
         {value}
       </div>
       <div style={{
         fontSize: '0.875rem',
-        color: 'var(--zander-gray)',
+        color: '#8888A0',
         marginBottom: detail ? '0.5rem' : 0
       }}>
         {title}
       </div>
       {detail && (
-        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+        <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
           {detail}
         </div>
       )}
