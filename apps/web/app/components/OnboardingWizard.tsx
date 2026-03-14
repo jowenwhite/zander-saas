@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Target, BarChart3, Mail, Users, Building2, ClipboardList, Package, Settings } from 'lucide-react';
 
 interface OnboardingWizardProps {
   isOpen: boolean;
@@ -9,20 +10,42 @@ interface OnboardingWizardProps {
   companyName: string;
 }
 
+const getFocusIcon = (iconKey: string, size: number = 24): React.ReactNode => {
+  const icons: Record<string, React.ReactNode> = {
+    target: <Target size={size} />,
+    chart: <BarChart3 size={size} />,
+    mail: <Mail size={size} />,
+    users: <Users size={size} />,
+    building: <Building2 size={size} />,
+  };
+  return icons[iconKey] || <Target size={size} />;
+};
+
+const getPillarIcon = (iconKey: string, size: number = 24): React.ReactNode => {
+  const icons: Record<string, React.ReactNode> = {
+    users: <Users size={size} />,
+    clipboard: <ClipboardList size={size} />,
+    package: <Package size={size} />,
+    settings: <Settings size={size} />,
+    chart: <BarChart3 size={size} />,
+  };
+  return icons[iconKey] || <Users size={size} />;
+};
+
 const FOCUS_AREAS = [
-  { id: 'leads_slipping', label: 'Leads and deals are slipping through cracks', icon: '🎯' },
-  { id: 'pipeline_visibility', label: "I can't see my pipeline or revenue clearly", icon: '📊' },
-  { id: 'communication_scattered', label: 'Follow-ups and communication are scattered', icon: '📧' },
-  { id: 'team_processes', label: 'My team needs consistent processes', icon: '👥' },
-  { id: 'need_structure', label: 'Everything feels chaotic - I need structure', icon: '🏗️' },
+  { id: 'leads_slipping', label: 'Leads and deals are slipping through cracks', icon: 'target' },
+  { id: 'pipeline_visibility', label: "I can't see my pipeline or revenue clearly", icon: 'chart' },
+  { id: 'communication_scattered', label: 'Follow-ups and communication are scattered', icon: 'mail' },
+  { id: 'team_processes', label: 'My team needs consistent processes', icon: 'users' },
+  { id: 'need_structure', label: 'Everything feels chaotic - I need structure', icon: 'building' },
 ];
 
 const PILLARS = [
-  { id: 'people', name: 'People', icon: '👥', description: 'Everyone in your business ecosystem' },
-  { id: 'projects', name: 'Projects', icon: '📋', description: 'How you deliver value' },
-  { id: 'products', name: 'Products', icon: '📦', description: 'What you sell or deliver' },
-  { id: 'process', name: 'Process', icon: '⚙️', description: 'How work gets done' },
-  { id: 'production', name: 'Production', icon: '📊', description: 'The daily reality' },
+  { id: 'people', name: 'People', icon: 'users', description: 'Everyone in your business ecosystem' },
+  { id: 'projects', name: 'Projects', icon: 'clipboard', description: 'How you deliver value' },
+  { id: 'products', name: 'Products', icon: 'package', description: 'What you sell or deliver' },
+  { id: 'process', name: 'Process', icon: 'settings', description: 'How work gets done' },
+  { id: 'production', name: 'Production', icon: 'chart', description: 'The daily reality' },
 ];
 
 export default function OnboardingWizard({ isOpen, onComplete, userName, companyName }: OnboardingWizardProps) {
@@ -173,7 +196,7 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                     textAlign: 'center',
                     transition: 'transform 0.2s',
                   }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{pillar.icon}</div>
+                    <div style={{ marginBottom: '0.5rem', color: '#00CCEE' }}>{getPillarIcon(pillar.icon, 28)}</div>
                     <div style={{ fontWeight: '600', fontSize: '0.9rem', marginBottom: '0.25rem' }}>{pillar.name}</div>
                     <div style={{ fontSize: '0.7rem', opacity: 0.8 }}>{pillar.description}</div>
                   </div>
@@ -231,12 +254,12 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
                       transition: 'all 0.2s',
                     }}
                   >
-                    <span style={{ fontSize: '1.5rem' }}>{area.icon}</span>
+                    <span style={{ color: focusArea === area.id ? '#00CCEE' : '#8888A0' }}>{getFocusIcon(area.icon, 20)}</span>
                     <span style={{ color: '#1C1C26', fontWeight: focusArea === area.id ? '600' : '400' }}>
                       {area.label}
                     </span>
                     {focusArea === area.id && (
-                      <span style={{ marginLeft: 'auto', color: '#00CCEE', fontWeight: 'bold' }}>✓</span>
+                      <span style={{ marginLeft: 'auto', color: '#00CCEE' }}><Target size={16} /></span>
                     )}
                   </button>
                 ))}
