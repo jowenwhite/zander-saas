@@ -110,13 +110,13 @@ export default function TenantSwitcher() {
           alignItems: 'center',
           gap: '0.5rem',
           padding: '0.5rem 0.75rem',
-          background: 'var(--zander-off-white)',
-          border: '1px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '1px solid #2A2A38',
           borderRadius: '6px',
           cursor: 'pointer',
           fontSize: '0.875rem',
           fontWeight: '500',
-          color: '#13131A',
+          color: '#F0F0F5',
           transition: 'all 0.2s ease'
         }}
       >
@@ -137,21 +137,21 @@ export default function TenantSwitcher() {
           top: '100%',
           left: 0,
           marginTop: '0.5rem',
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '2px solid #2A2A38',
           borderRadius: '10px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           minWidth: '220px',
           overflow: 'hidden',
           zIndex: 1002
         }}>
           <div style={{
             padding: '0.75rem 1rem',
-            borderBottom: '1px solid var(--zander-border-gray)',
-            background: 'var(--zander-off-white)',
+            borderBottom: '1px solid #2A2A38',
+            background: '#13131A',
             fontSize: '0.75rem',
             fontWeight: '600',
-            color: 'var(--zander-gray)',
+            color: '#55556A',
             textTransform: 'uppercase',
             letterSpacing: '0.5px'
           }}>
@@ -168,7 +168,7 @@ export default function TenantSwitcher() {
                   alignItems: 'center',
                   gap: '0.75rem',
                   padding: '0.75rem 1rem',
-                  background: activeTenant?.id === tenant.id ? 'rgba(191, 10, 48, 0.08)' : 'transparent',
+                  background: activeTenant?.id === tenant.id ? 'rgba(0, 204, 238, 0.1)' : 'transparent',
                   border: 'none',
                   borderLeft: activeTenant?.id === tenant.id ? '3px solid #00CCEE' : '3px solid transparent',
                   textAlign: 'left',
@@ -177,7 +177,7 @@ export default function TenantSwitcher() {
                 }}
                 onMouseOver={(e) => {
                   if (activeTenant?.id !== tenant.id) {
-                    e.currentTarget.style.background = 'var(--zander-off-white)';
+                    e.currentTarget.style.background = '#2A2A38';
                   }
                 }}
                 onMouseOut={(e) => {
@@ -188,16 +188,16 @@ export default function TenantSwitcher() {
               >
                 <span style={{ fontSize: '1.1rem' }}>{getTenantIcon(tenant.tenantType)}</span>
                 <div>
-                  <div style={{ 
-                    fontWeight: activeTenant?.id === tenant.id ? '600' : '500', 
-                    color: '#13131A',
+                  <div style={{
+                    fontWeight: activeTenant?.id === tenant.id ? '600' : '500',
+                    color: activeTenant?.id === tenant.id ? '#00CCEE' : '#F0F0F5',
                     fontSize: '0.9rem'
                   }}>
                     {tenant.companyName}
                   </div>
-                  <div style={{ 
-                    fontSize: '0.7rem', 
-                    color: 'var(--zander-gray)',
+                  <div style={{
+                    fontSize: '0.7rem',
+                    color: '#8888A0',
                     textTransform: 'capitalize'
                   }}>
                     {tenant.tenantType}

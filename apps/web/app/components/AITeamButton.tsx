@@ -102,21 +102,22 @@ export default function AITeamButton() {
         >
           <div
             style={{
-              background: 'white',
+              background: '#1C1C26',
               borderRadius: '16px',
               padding: '2rem',
               maxWidth: '500px',
               width: '90%',
               maxHeight: '80vh',
               overflowY: 'auto',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+              boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+              border: '2px solid #2A2A38'
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <div>
-                <h2 style={{ margin: 0, color: 'var(--zander-navy, #0C2340)', fontSize: '1.5rem' }}>Your AI Team</h2>
-                <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-gray, #6c757d)', fontSize: '0.9rem' }}>
+                <h2 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.5rem' }}>Your AI Team</h2>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
                   Meet your virtual executives
                 </p>
               </div>
@@ -126,7 +127,7 @@ export default function AITeamButton() {
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: 'var(--zander-gray, #6c757d)',
+                  color: '#8888A0',
                   padding: '0.25rem'
                 }}
               >
@@ -145,8 +146,8 @@ export default function AITeamButton() {
                     alignItems: 'center',
                     gap: '1rem',
                     padding: '1rem',
-                    background: exec.status === 'active' ? `${exec.color}15` : 'var(--zander-off-white, #f8f9fa)',
-                    border: exec.status === 'active' ? `2px solid ${exec.color}` : '2px solid transparent',
+                    background: exec.status === 'active' ? `${exec.color}15` : '#13131A',
+                    border: exec.status === 'active' ? `2px solid ${exec.color}` : '2px solid #2A2A38',
                     borderRadius: '12px',
                     cursor: exec.status === 'active' ? 'pointer' : 'default',
                     textAlign: 'left',
@@ -158,7 +159,7 @@ export default function AITeamButton() {
                     width: '48px',
                     height: '48px',
                     borderRadius: '50%',
-                    background: exec.status === 'active' ? exec.color : 'var(--zander-gray, #6c757d)',
+                    background: exec.status === 'active' ? exec.color : '#55556A',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -168,20 +169,20 @@ export default function AITeamButton() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ fontWeight: '600', color: 'var(--zander-navy, #0C2340)', fontSize: '1rem' }}>{exec.name}</span>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray, #6c757d)' }}>({exec.role})</span>
+                      <span style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem' }}>{exec.name}</span>
+                      <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>({exec.role})</span>
                       {exec.status === 'coming_soon' && (
                         <span style={{
                           padding: '0.125rem 0.5rem',
                           background: 'rgba(240, 179, 35, 0.2)',
-                          color: '#B8860B',
+                          color: '#F0B323',
                           borderRadius: '4px',
                           fontSize: '0.65rem',
                           fontWeight: '600'
                         }}>SOON</span>
                       )}
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray, #6c757d)' }}>{exec.fullTitle}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{exec.fullTitle}</div>
                   </div>
                 </button>
               ))}

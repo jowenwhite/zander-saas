@@ -76,7 +76,7 @@ export default function CMOSchedulePage() {
   const tabStyle = (active: boolean): React.CSSProperties => ({
     padding: '0.75rem 1.5rem',
     background: active ? '#F57C00' : 'transparent',
-    color: active ? 'white' : 'var(--zander-gray)',
+    color: active ? '#000000' : '#8888A0',
     border: 'none',
     borderRadius: '8px',
     fontWeight: '600',
@@ -120,27 +120,27 @@ export default function CMOSchedulePage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'var(--zander-light-gray)', padding: '0.5rem', borderRadius: '12px', width: 'fit-content' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: '#1C1C26', padding: '0.5rem', borderRadius: '12px', width: 'fit-content', border: '1px solid #2A2A38' }}>
           <button onClick={() => setView('today')} style={tabStyle(view === 'today')}>Today</button>
           <button onClick={() => setView('week')} style={tabStyle(view === 'week')}>This Week</button>
         </div>
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Today's Events</div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Today's Events</div>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5' }}>
               {events.filter(e => isToday(e.startTime)).length}
             </div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>This Week</div>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>This Week</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F57C00' }}>
               {events.filter(e => isThisWeek(e.startTime)).length}
             </div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Meetings</div>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Meetings</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#28a745' }}>
               {events.filter(e => e.eventType === 'meeting').length}
             </div>
@@ -148,10 +148,10 @@ export default function CMOSchedulePage() {
         </div>
 
         {/* Marketing Calendar Link */}
-        <div style={{ background: '#FFF3E0', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ background: 'rgba(245, 124, 0, 0.1)', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(245, 124, 0, 0.3)' }}>
           <div>
-            <span style={{ fontWeight: '600', color: '#13131A' }}>Marketing Content Calendar</span>
-            <span style={{ color: 'var(--zander-gray)', marginLeft: '0.5rem' }}>Plan campaigns, social posts, and content</span>
+            <span style={{ fontWeight: '600', color: '#F0F0F5' }}>Marketing Content Calendar</span>
+            <span style={{ color: '#8888A0', marginLeft: '0.5rem' }}>Plan campaigns, social posts, and content</span>
           </div>
           <a href="/cmo/calendar" style={{ color: '#F57C00', fontWeight: '600', textDecoration: 'none' }}>Open Calendar</a>
         </div>
@@ -160,10 +160,10 @@ export default function CMOSchedulePage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>Loading schedule...</div>
         ) : filteredEvents.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
-            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No events {view === 'today' ? 'today' : 'this week'}</h3>
-            <p style={{ color: 'var(--zander-gray)' }}>Your schedule is clear</p>
+            <h3 style={{ color: '#F0F0F5', marginBottom: '0.5rem' }}>No events {view === 'today' ? 'today' : 'this week'}</h3>
+            <p style={{ color: '#8888A0' }}>Your schedule is clear</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -171,9 +171,9 @@ export default function CMOSchedulePage() {
               <div
                 key={event.id}
                 style={{
-                  background: 'white',
+                  background: '#1C1C26',
                   borderRadius: '12px',
-                  border: '1px solid var(--zander-border-gray)',
+                  border: '1px solid #2A2A38',
                   padding: '1.5rem',
                   borderLeft: `4px solid ${getEventTypeColor(event.eventType)}`
                 }}

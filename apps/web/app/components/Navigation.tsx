@@ -39,9 +39,10 @@ export default function Navigation({ activePage }: NavigationProps) {
           <Image
             src="/images/zander-logo.svg"
             alt="Zander"
-            width={120}
-            height={30}
+            width={200}
+            height={50}
             priority
+            style={{ height: '50px', width: 'auto', minWidth: '160px' }}
           />
         </a>
 

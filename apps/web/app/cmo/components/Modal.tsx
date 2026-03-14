@@ -60,7 +60,7 @@ export default function Modal({
   };
 
   const modalStyle: CSSProperties = {
-    background: 'white',
+    background: '#1C1C26',
     borderRadius: '12px',
     maxWidth: sizeWidths[size],
     width: '90%',
@@ -68,12 +68,12 @@ export default function Modal({
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+    boxShadow: '0 25px 50px rgba(0,0,0,0.4)',
   };
 
   const headerStyle: CSSProperties = {
     padding: '1.5rem 2rem',
-    borderBottom: '1px solid var(--zander-border-gray)',
+    borderBottom: '1px solid #2A2A38',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -87,11 +87,11 @@ export default function Modal({
 
   const footerStyle: CSSProperties = {
     padding: '1rem 2rem',
-    borderTop: '1px solid var(--zander-border-gray)',
+    borderTop: '1px solid #2A2A38',
     display: 'flex',
     justifyContent: 'flex-end',
     gap: '1rem',
-    background: 'var(--zander-off-white)',
+    background: '#13131A',
   };
 
   return (
@@ -103,7 +103,7 @@ export default function Modal({
               margin: 0,
               fontSize: '1.5rem',
               fontWeight: '700',
-              color: '#13131A'
+              color: '#F0F0F5'
             }}>
               {title}
             </h2>
@@ -111,7 +111,7 @@ export default function Modal({
               <p style={{
                 margin: '0.25rem 0 0 0',
                 fontSize: '0.875rem',
-                color: 'var(--zander-gray)'
+                color: '#8888A0'
               }}>
                 {subtitle}
               </p>
@@ -123,7 +123,7 @@ export default function Modal({
               background: 'none',
               border: 'none',
               fontSize: '1.5rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               cursor: 'pointer',
               padding: '0.25rem',
               lineHeight: 1,

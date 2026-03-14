@@ -28,8 +28,8 @@ export default function Card({
   };
 
   const cardStyle: CSSProperties = {
-    background: 'white',
-    border: '2px solid var(--zander-border-gray)',
+    background: '#1C1C26',
+    border: '2px solid #2A2A38',
     borderRadius: '12px',
     padding: paddingValues[padding],
     transition: 'all 0.2s ease',
@@ -56,7 +56,7 @@ export default function Card({
       }}
       onMouseLeave={(e) => {
         if (hover || onClick) {
-          e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+          e.currentTarget.style.borderColor = '#2A2A38';
           e.currentTarget.style.transform = 'translateY(0)';
           e.currentTarget.style.boxShadow = 'none';
         }
@@ -69,7 +69,7 @@ export default function Card({
               <h3 style={{
                 fontSize: '1.25rem',
                 fontWeight: '700',
-                color: '#13131A',
+                color: '#F0F0F5',
                 margin: 0,
                 marginBottom: subtitle ? '0.25rem' : 0
               }}>
@@ -79,7 +79,7 @@ export default function Card({
             {subtitle && (
               <p style={{
                 fontSize: '0.875rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 margin: 0
               }}>
                 {subtitle}
