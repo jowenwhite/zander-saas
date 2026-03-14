@@ -8,7 +8,7 @@ import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import { logout } from '../utils/auth';
 import Sidebar from '../components/Sidebar';
-import { DollarSign, BarChart3, ClipboardList, Target, Settings, Phone, Mail, Calendar, RefreshCw, FileEdit, CheckSquare, TrendingUp, Gem, Sprout, FileText, TrendingDown, Handshake } from 'lucide-react';
+import { DollarSign, BarChart3, ClipboardList, Target, Settings, Phone, Mail, Calendar, RefreshCw, FileEdit, CheckSquare, TrendingUp, Gem, Sprout, FileText, TrendingDown, Handshake, Clock } from 'lucide-react';
 import OnboardingWizard from '../components/OnboardingWizard';
 
 interface Contact {
@@ -857,7 +857,7 @@ export default function ProductionPage() {
                     fontSize: '0.75rem',
                     color: '#8888A0'
                   }}>
-                    <span>📋 {task.detail}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><ClipboardList size={12} /> {task.detail}</span>
                     {task.priority === 'high' && (
                       <span style={{
                         padding: '0.125rem 0.5rem',
@@ -872,7 +872,7 @@ export default function ProductionPage() {
               </div>
             )) : (
               <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
+                <div style={{ marginBottom: '0.5rem', color: '#00CCEE' }}><CheckSquare size={32} /></div>
                 <div>No action required</div>
                 <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>All deals are progressing smoothly</div>
               </div>
@@ -927,8 +927,8 @@ export default function ProductionPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  fontSize: '1rem'
-                }}>📅</div>
+                  color: '#9b59b6'
+                }}><Calendar size={20} /></div>
                 <div style={{ flex: 1 }}>
                   <div style={{
                     fontWeight: '600',
@@ -941,7 +941,7 @@ export default function ProductionPage() {
                     fontSize: '0.75rem',
                     color: '#8888A0'
                   }}>
-                    <span>🕐 {new Date(assembly.startTime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(assembly.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Clock size={12} /> {new Date(assembly.startTime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(assembly.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
                     {assembly.eventType && (
                       <span style={{
                         padding: '0.125rem 0.5rem',
@@ -957,7 +957,7 @@ export default function ProductionPage() {
               </div>
             )) : (
               <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
+                <div style={{ marginBottom: '0.5rem', color: '#9b59b6' }}><Calendar size={32} /></div>
                 <div>No upcoming assemblies scheduled</div>
               </div>
             )}
@@ -965,8 +965,8 @@ export default function ProductionPage() {
         </div>
         {/* Analytics Section */}
         <div style={{ marginTop: '3rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '1.5rem' }}>
-            📊 Analytics
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <BarChart3 size={24} /> Analytics
           </h2>
           
           {/* Analytics Metrics Row */}
@@ -991,8 +991,8 @@ export default function ProductionPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem'
-                }}>💰</div>
+                  color: 'white'
+                }}><DollarSign size={24} /></div>
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {formatCurrency(deals.reduce((sum, d) => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST' ? sum + d.dealValue : sum, 0))}
@@ -1015,8 +1015,8 @@ export default function ProductionPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem'
-                }}>🎯</div>
+                  color: 'white'
+                }}><Target size={24} /></div>
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {formatCurrency(deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + (d.dealValue * d.probability / 100), 0))}
@@ -1039,8 +1039,8 @@ export default function ProductionPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem'
-                }}>📊</div>
+                  color: 'white'
+                }}><BarChart3 size={24} /></div>
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {(() => {
@@ -1067,8 +1067,8 @@ export default function ProductionPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem'
-                }}>📈</div>
+                  color: 'white'
+                }}><TrendingUp size={24} /></div>
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                 {(() => {
@@ -1644,8 +1644,8 @@ export default function ProductionPage() {
               
               {/* Current Widget Slots */}
               <div style={{ marginBottom: '2rem' }}>
-                <h3 style={{ color: '#F0F0F5', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
-                  📊 Your Dashboard Widgets
+                <h3 style={{ color: '#F0F0F5', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <BarChart3 size={18} /> Your Dashboard Widgets
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
                   {[0, 1, 2, 3].map((slotIndex) => {
@@ -1693,8 +1693,8 @@ export default function ProductionPage() {
               
               {/* Available KPIs Reference */}
               <div>
-                <h3 style={{ color: '#F0F0F5', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600' }}>
-                  📋 Available KPIs
+                <h3 style={{ color: '#F0F0F5', fontSize: '1rem', marginBottom: '1rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ClipboardList size={18} /> Available KPIs
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
                   {kpiLibrary.map((kpi) => {
