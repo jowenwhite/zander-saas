@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { isAuthenticated } from '../utils/auth';
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,15 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         background: 'var(--zander-off-white)' 
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
+          <div style={{ marginBottom: '1rem' }}>
+            <Image
+              src="/images/zander-icon.svg"
+              alt="Zander"
+              width={48}
+              height={48}
+              priority
+            />
+          </div>
           <div style={{ color: 'var(--zander-gray)' }}>Loading...</div>
         </div>
       </div>

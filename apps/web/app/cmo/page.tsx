@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import {
   CMOLayout,
   Card,
@@ -277,7 +278,13 @@ export default function CMODashboardPage() {
               gap: '1rem',
             }}
           >
-            <span style={{ fontSize: '1.5rem' }}>⚡</span>
+            <Image
+              src="/images/zander-icon.svg"
+              alt="Zander"
+              width={24}
+              height={24}
+              priority
+            />
             <div>
               <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
                 {metrics.summary.activeWorkflows}

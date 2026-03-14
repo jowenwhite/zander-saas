@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import TermsModal from '../components/TermsModal';
 
 export default function LoginPage() {
@@ -99,9 +100,14 @@ export default function LoginPage() {
         color: 'white'
       }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <span style={{ fontSize: '2.5rem' }}>⚡</span>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: '700', margin: 0, letterSpacing: '-1px' }}>ZANDER</h1>
+          <div style={{ marginBottom: '1rem' }}>
+            <Image
+              src="/images/zander-logo-white.svg"
+              alt="Zander"
+              width={200}
+              height={50}
+              priority
+            />
           </div>
           <p style={{ fontSize: '1.5rem', fontWeight: '300', opacity: 0.9, margin: 0 }}>
             Your AI-Powered Executive Team

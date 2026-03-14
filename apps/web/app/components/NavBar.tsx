@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { logout, getUser } from '../utils/auth';
 import ThemeToggle from './ThemeToggle';
 import TenantSwitcher from './TenantSwitcher';
@@ -57,9 +58,14 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
     }}>
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-          <span style={{ fontSize: '1.5rem' }}>⚡</span>
-          <span style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)', letterSpacing: '-0.5px' }}>ZANDER</span>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <Image
+            src="/images/zander-logo.svg"
+            alt="Zander"
+            width={120}
+            height={30}
+            priority
+          />
         </a>
         <TenantSwitcher />
       </div>
