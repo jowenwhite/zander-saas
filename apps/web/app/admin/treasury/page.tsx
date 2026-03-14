@@ -260,11 +260,11 @@ export default function AdminTreasuryPage() {
 
   if (!isSuperAdmin) {
     return (
-      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: '#09090F' }}>
         <Sidebar />
         <main style={{ flex: 1, padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{ color: 'var(--zander-red)' }}>Access Denied</h1>
+            <h1 style={{ color: '#00CCEE' }}>Access Denied</h1>
             <p>SuperAdmin access required</p>
           </div>
         </main>
@@ -273,12 +273,12 @@ export default function AdminTreasuryPage() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#09090F' }}>
       <Sidebar />
       <main style={{ flex: 1, padding: '2rem', marginLeft: '240px' }}>
         {/* Header */}
         <div style={{ 
-          background: 'linear-gradient(135deg, var(--zander-red) 0%, #a00a28 100%)',
+          background: 'linear-gradient(135deg, #00CCEE 0%, #00A8C6 100%)',
           borderRadius: '12px',
           padding: '1.5rem 2rem',
           marginBottom: '1.5rem',
@@ -296,7 +296,7 @@ export default function AdminTreasuryPage() {
             onClick={handleCreateNew}
             style={{
               background: 'var(--zander-gold)',
-              color: 'var(--zander-navy)',
+              color: '#F0F0F5',
               border: 'none',
               padding: '0.75rem 1.5rem',
               borderRadius: '8px',
@@ -314,7 +314,7 @@ export default function AdminTreasuryPage() {
           display: 'flex', 
           gap: '0.5rem', 
           marginBottom: '1.5rem',
-          background: 'white',
+          background: '#1C1C26',
           padding: '0.5rem',
           borderRadius: '8px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
@@ -342,21 +342,21 @@ export default function AdminTreasuryPage() {
 
         {/* Items List */}
         <div style={{ 
-          background: 'white', 
+          background: '#1C1C26', 
           borderRadius: '12px', 
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           overflow: 'hidden'
         }}>
           {loading ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>Loading...</div>
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#8888A0' }}>Loading...</div>
           ) : filteredItems.length === 0 ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#8888A0' }}>
               No {activeTab}s found. Click "New {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}" to create one.
             </div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: 'var(--zander-navy)', color: 'white' }}>
+                <tr style={{ background: '#13131A', color: 'white' }}>
                   <th style={{ padding: '1rem', textAlign: 'left' }}>Name</th>
                   <th style={{ padding: '1rem', textAlign: 'left' }}>Category</th>
                   <th style={{ padding: '1rem', textAlign: 'left' }}>Executive</th>
@@ -369,11 +369,11 @@ export default function AdminTreasuryPage() {
               </thead>
               <tbody>
                 {filteredItems.map((item, index) => (
-                  <tr key={item.id} style={{ borderBottom: '1px solid #eee', background: index % 2 === 0 ? 'white' : '#fafafa' }}>
+                  <tr key={item.id} style={{ borderBottom: '1px solid #2A2A38', background: index % 2 === 0 ? 'white' : '#fafafa' }}>
                     <td style={{ padding: '1rem' }}>
-                      <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{item.name}</div>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{item.name}</div>
                       {item.description && (
-                        <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.25rem' }}>{item.description}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#8888A0', marginTop: '0.25rem' }}>{item.description}</div>
                       )}
                       {item.type === 'prompt' && item.content?.tags && item.content.tags.length > 0 && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.35rem' }}>
@@ -381,8 +381,8 @@ export default function AdminTreasuryPage() {
                             <span
                               key={tag}
                               style={{
-                                background: 'rgba(12, 35, 64, 0.1)',
-                                color: 'var(--zander-navy)',
+                                background: 'rgba(28, 28, 38, 0.5)',
+                                color: '#F0F0F5',
                                 padding: '0.1rem 0.4rem',
                                 borderRadius: '3px',
                                 fontSize: '0.7rem'
@@ -392,15 +392,15 @@ export default function AdminTreasuryPage() {
                             </span>
                           ))}
                           {item.content.tags.length > 3 && (
-                            <span style={{ fontSize: '0.7rem', color: '#666' }}>+{item.content.tags.length - 3}</span>
+                            <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>+{item.content.tags.length - 3}</span>
                           )}
                         </div>
                       )}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <span style={{ 
-                        background: 'rgba(191, 10, 48, 0.1)', 
-                        color: 'var(--zander-red)',
+                        background: 'rgba(0, 204, 238, 0.1)', 
+                        color: '#00CCEE',
                         padding: '0.25rem 0.5rem',
                         borderRadius: '4px',
                         fontSize: '0.85rem'
@@ -410,8 +410,8 @@ export default function AdminTreasuryPage() {
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <span style={{ 
-                        background: 'rgba(12, 35, 64, 0.1)', 
-                        color: 'var(--zander-navy)',
+                        background: 'rgba(28, 28, 38, 0.5)', 
+                        color: '#F0F0F5',
                         padding: '0.25rem 0.5rem',
                         borderRadius: '4px',
                         fontSize: '0.85rem'
@@ -419,13 +419,13 @@ export default function AdminTreasuryPage() {
                         {item.executive || 'N/A'}
                       </span>
                     </td>
-                    <td style={{ padding: '1rem', fontSize: '0.9rem', color: '#666' }}>
+                    <td style={{ padding: '1rem', fontSize: '0.9rem', color: '#8888A0' }}>
                       {item.industry || 'general'}
                     </td>
                     <td style={{ padding: '1rem', textAlign: 'center' }}>
                       <span style={{
                         background: 'var(--zander-gold)',
-                        color: 'var(--zander-navy)',
+                        color: '#F0F0F5',
                         padding: '0.25rem 0.75rem',
                         borderRadius: '12px',
                         fontWeight: '600',
@@ -442,7 +442,7 @@ export default function AdminTreasuryPage() {
                       <button
                         onClick={() => handleEdit(item)}
                         style={{
-                          background: 'var(--zander-navy)',
+                          background: '#13131A',
                           color: 'white',
                           border: 'none',
                           padding: '0.5rem 1rem',
@@ -458,7 +458,7 @@ export default function AdminTreasuryPage() {
                         onClick={() => handleDelete(item.id)}
                         style={{
                           background: 'transparent',
-                          color: 'var(--zander-red)',
+                          color: '#00CCEE',
                           border: '1px solid var(--zander-red)',
                           padding: '0.5rem 1rem',
                           borderRadius: '4px',
@@ -491,7 +491,7 @@ export default function AdminTreasuryPage() {
             zIndex: 1000
           }}>
             <div style={{
-              background: 'white',
+              background: '#1C1C26',
               borderRadius: '12px',
               width: '90%',
               maxWidth: '800px',
@@ -500,7 +500,7 @@ export default function AdminTreasuryPage() {
             }}>
               {/* Modal Header */}
               <div style={{
-                background: 'var(--zander-navy)',
+                background: '#13131A',
                 color: 'white',
                 padding: '1.25rem 1.5rem',
                 display: 'flex',
@@ -525,8 +525,8 @@ export default function AdminTreasuryPage() {
               <div style={{ padding: '1.5rem' }}>
                 {error && (
                   <div style={{
-                    background: 'rgba(191, 10, 48, 0.1)',
-                    color: 'var(--zander-red)',
+                    background: 'rgba(0, 204, 238, 0.1)',
+                    color: '#00CCEE',
                     padding: '1rem',
                     borderRadius: '6px',
                     marginBottom: '1rem'
@@ -538,7 +538,7 @@ export default function AdminTreasuryPage() {
                 {/* Basic Info */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Name *
                     </label>
                     <input
@@ -548,7 +548,7 @@ export default function AdminTreasuryPage() {
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '2px solid #ddd',
+                        border: '2px solid #2A2A38',
                         borderRadius: '6px',
                         fontSize: '1rem'
                       }}
@@ -556,7 +556,7 @@ export default function AdminTreasuryPage() {
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Type
                     </label>
                     <select
@@ -565,7 +565,7 @@ export default function AdminTreasuryPage() {
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '2px solid #ddd',
+                        border: '2px solid #2A2A38',
                         borderRadius: '6px',
                         fontSize: '1rem'
                       }}
@@ -578,7 +578,7 @@ export default function AdminTreasuryPage() {
                 </div>
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                     Description
                   </label>
                   <textarea
@@ -587,7 +587,7 @@ export default function AdminTreasuryPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '2px solid #ddd',
+                      border: '2px solid #2A2A38',
                       borderRadius: '6px',
                       fontSize: '1rem',
                       minHeight: '80px',
@@ -599,7 +599,7 @@ export default function AdminTreasuryPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Category
                     </label>
                     <select
@@ -608,7 +608,7 @@ export default function AdminTreasuryPage() {
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '2px solid #ddd',
+                        border: '2px solid #2A2A38',
                         borderRadius: '6px',
                         fontSize: '1rem'
                       }}
@@ -619,7 +619,7 @@ export default function AdminTreasuryPage() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Executive
                     </label>
                     <select
@@ -628,7 +628,7 @@ export default function AdminTreasuryPage() {
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '2px solid #ddd',
+                        border: '2px solid #2A2A38',
                         borderRadius: '6px',
                         fontSize: '1rem'
                       }}
@@ -639,7 +639,7 @@ export default function AdminTreasuryPage() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Industry
                     </label>
                     <select
@@ -648,7 +648,7 @@ export default function AdminTreasuryPage() {
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '2px solid #ddd',
+                        border: '2px solid #2A2A38',
                         borderRadius: '6px',
                         fontSize: '1rem'
                       }}
@@ -674,13 +674,13 @@ export default function AdminTreasuryPage() {
                       alignItems: 'center',
                       marginBottom: '1rem'
                     }}>
-                      <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>
+                      <h3 style={{ margin: 0, color: '#F0F0F5' }}>
                         📋 Form Fields ({formData.content.fields?.length || 0})
                       </h3>
                       <button
                         onClick={addField}
                         style={{
-                          background: 'var(--zander-red)',
+                          background: '#00CCEE',
                           color: 'white',
                           border: 'none',
                           padding: '0.5rem 1rem',
@@ -697,8 +697,8 @@ export default function AdminTreasuryPage() {
                       <div style={{ 
                         textAlign: 'center', 
                         padding: '2rem', 
-                        color: '#666',
-                        background: '#f9f9f9',
+                        color: '#8888A0',
+                        background: '#13131A',
                         borderRadius: '6px'
                       }}>
                         No fields yet. Click "Add Field" to start building your form.
@@ -714,9 +714,9 @@ export default function AdminTreasuryPage() {
                               gap: '0.5rem',
                               alignItems: 'center',
                               padding: '0.75rem',
-                              background: '#f9f9f9',
+                              background: '#13131A',
                               borderRadius: '6px',
-                              border: '1px solid #eee'
+                              border: '1px solid #2A2A38'
                             }}
                           >
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -754,7 +754,7 @@ export default function AdminTreasuryPage() {
                               placeholder="Field label"
                               style={{
                                 padding: '0.5rem',
-                                border: '1px solid #ddd',
+                                border: '1px solid #2A2A38',
                                 borderRadius: '4px',
                                 fontSize: '0.9rem'
                               }}
@@ -764,7 +764,7 @@ export default function AdminTreasuryPage() {
                               onChange={(e) => updateField(index, { type: e.target.value })}
                               style={{
                                 padding: '0.5rem',
-                                border: '1px solid #ddd',
+                                border: '1px solid #2A2A38',
                                 borderRadius: '4px',
                                 fontSize: '0.9rem'
                               }}
@@ -786,7 +786,7 @@ export default function AdminTreasuryPage() {
                               style={{
                                 background: 'none',
                                 border: '1px solid var(--zander-red)',
-                                color: 'var(--zander-red)',
+                                color: '#00CCEE',
                                 padding: '0.25rem 0.5rem',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
@@ -802,11 +802,11 @@ export default function AdminTreasuryPage() {
 
                     {/* Options for select fields */}
                     {formData.content.fields?.some((f: FormField) => f.type === 'select') && (
-                      <div style={{ marginTop: '1rem', padding: '1rem', background: '#fff8e6', borderRadius: '6px' }}>
-                        <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                      <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(240, 179, 35, 0.1)', borderRadius: '6px' }}>
+                        <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5', fontSize: '0.9rem' }}>
                           ⚠️ Select Field Options
                         </h4>
-                        <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: '#8888A0' }}>
                           For select fields, add options in the format below (comma-separated):
                         </p>
                         {formData.content.fields.map((field: FormField, index: number) => 
@@ -823,7 +823,7 @@ export default function AdminTreasuryPage() {
                                 style={{
                                   width: '100%',
                                   padding: '0.5rem',
-                                  border: '1px solid #ddd',
+                                  border: '1px solid #2A2A38',
                                   borderRadius: '4px',
                                   fontSize: '0.85rem',
                                   marginTop: '0.25rem'
@@ -851,14 +851,14 @@ export default function AdminTreasuryPage() {
                       alignItems: 'center',
                       marginBottom: '1rem'
                     }}>
-                      <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>
+                      <h3 style={{ margin: 0, color: '#F0F0F5' }}>
                         🤖 AI Prompt Content
                       </h3>
                     </div>
 
                     {/* Prompt Tags */}
                     <div style={{ marginBottom: '1rem' }}>
-                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5', fontSize: '0.9rem' }}>
                         Tags
                       </label>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -896,10 +896,10 @@ export default function AdminTreasuryPage() {
 
                     {/* Prompt Content */}
                     <div style={{ marginBottom: '1rem' }}>
-                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5', fontSize: '0.9rem' }}>
                         Prompt Content *
                       </label>
-                      <p style={{ fontSize: '0.8rem', color: '#666', margin: '0 0 0.5rem' }}>
+                      <p style={{ fontSize: '0.8rem', color: '#8888A0', margin: '0 0 0.5rem' }}>
                         Use {'{{variable_name}}'} syntax for placeholders (e.g., {'{{company_name}}'}, {'{{customer_email}}'})
                       </p>
                       <textarea
@@ -920,7 +920,7 @@ export default function AdminTreasuryPage() {
                         style={{
                           width: '100%',
                           padding: '0.75rem',
-                          border: '2px solid #ddd',
+                          border: '2px solid #2A2A38',
                           borderRadius: '6px',
                           fontSize: '0.95rem',
                           minHeight: '200px',
@@ -950,7 +950,7 @@ Generate a personalized response that...`}
                         borderRadius: '6px',
                         padding: '1rem'
                       }}>
-                        <h4 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                        <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5', fontSize: '0.9rem' }}>
                           📌 Detected Variables ({formData.content.variables?.length || 0})
                         </h4>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -959,7 +959,7 @@ Generate a personalized response that...`}
                               key={variable}
                               style={{
                                 background: 'var(--zander-gold)',
-                                color: 'var(--zander-navy)',
+                                color: '#F0F0F5',
                                 padding: '0.25rem 0.75rem',
                                 borderRadius: '4px',
                                 fontSize: '0.85rem',
@@ -971,7 +971,7 @@ Generate a personalized response that...`}
                             </span>
                           ))}
                         </div>
-                        <p style={{ fontSize: '0.8rem', color: '#666', margin: '0.5rem 0 0' }}>
+                        <p style={{ fontSize: '0.8rem', color: '#8888A0', margin: '0.5rem 0 0' }}>
                           These variables will need to be filled in when using this prompt.
                         </p>
                       </div>
@@ -979,7 +979,7 @@ Generate a personalized response that...`}
 
                     {/* Example Output (Optional) */}
                     <div style={{ marginTop: '1rem' }}>
-                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                      <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5', fontSize: '0.9rem' }}>
                         Example Output (Optional)
                       </label>
                       <textarea
@@ -991,7 +991,7 @@ Generate a personalized response that...`}
                         style={{
                           width: '100%',
                           padding: '0.75rem',
-                          border: '2px solid #ddd',
+                          border: '2px solid #2A2A38',
                           borderRadius: '6px',
                           fontSize: '0.9rem',
                           minHeight: '100px',
@@ -1006,7 +1006,7 @@ Generate a personalized response that...`}
                 {/* Duration for campaigns/assemblies */}
                 {(formData.type === 'campaign' || formData.type === 'assembly') && (
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--zander-navy)' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
                       Duration
                     </label>
                     <input
@@ -1016,7 +1016,7 @@ Generate a personalized response that...`}
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '2px solid #ddd',
+                        border: '2px solid #2A2A38',
                         borderRadius: '6px',
                         fontSize: '1rem'
                       }}
@@ -1029,20 +1029,20 @@ Generate a personalized response that...`}
               {/* Modal Footer */}
               <div style={{
                 padding: '1rem 1.5rem',
-                borderTop: '1px solid #eee',
+                borderTop: '1px solid #2A2A38',
                 display: 'flex',
                 justifyContent: 'flex-end',
                 gap: '1rem',
                 position: 'sticky',
                 bottom: 0,
-                background: 'white'
+                background: '#1C1C26'
               }}>
                 <button
                   onClick={() => setShowModal(false)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    border: '2px solid #ddd',
-                    background: 'white',
+                    border: '2px solid #2A2A38',
+                    background: '#1C1C26',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontWeight: '600'

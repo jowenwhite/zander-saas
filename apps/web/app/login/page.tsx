@@ -92,7 +92,7 @@ export default function LoginPage() {
       {/* Navy Sidebar */}
       <div style={{
         width: '33.333%',
-        background: 'linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%)',
+        background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -139,7 +139,7 @@ export default function LoginPage() {
       {/* Login Form */}
       <div style={{
         width: '66.667%',
-        background: 'white',
+        background: '#09090F',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -151,9 +151,9 @@ export default function LoginPage() {
                 fontSize: '2rem',
                 fontWeight: '700',
                 marginBottom: '0.5rem',
-                color: '#0C2340'
+                color: '#F0F0F5'
               }}>Welcome Back</h2>
-              <p style={{ marginBottom: '2rem', color: '#6C757D' }}>
+              <p style={{ marginBottom: '2rem', color: '#8888A0' }}>
                 Sign in to access your Zander dashboard
               </p>
             </>
@@ -163,9 +163,9 @@ export default function LoginPage() {
                 fontSize: '2rem',
                 fontWeight: '700',
                 marginBottom: '0.5rem',
-                color: '#0C2340'
+                color: '#F0F0F5'
               }}>Two-Factor Authentication</h2>
-              <p style={{ marginBottom: '2rem', color: '#6C757D' }}>
+              <p style={{ marginBottom: '2rem', color: '#8888A0' }}>
                 Enter the 6-digit code from your authenticator app
               </p>
             </>
@@ -173,9 +173,9 @@ export default function LoginPage() {
 
           {error && (
             <div style={{
-              background: 'rgba(191, 10, 48, 0.1)',
-              border: '1px solid #BF0A30',
-              color: '#BF0A30',
+              background: 'rgba(0, 204, 238, 0.1)',
+              border: '1px solid #00CCEE',
+              color: '#00CCEE',
               padding: '0.75rem 1rem',
               borderRadius: '8px',
               marginBottom: '1.5rem',
@@ -193,7 +193,7 @@ export default function LoginPage() {
                     display: 'block',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: '#343A40',
+                    color: '#F0F0F5',
                     marginBottom: '0.5rem'
                   }}>
                     Email Address
@@ -207,15 +207,15 @@ export default function LoginPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      border: '2px solid #DEE2E6',
+                      border: '2px solid #2A2A38',
                       borderRadius: '8px',
                       fontSize: '1rem',
                       outline: 'none',
                       transition: 'border-color 0.2s ease',
                       boxSizing: 'border-box'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = '#BF0A30'}
-                    onBlur={(e) => e.target.style.borderColor = '#DEE2E6'}
+                    onFocus={(e) => e.target.style.borderColor = '#00CCEE'}
+                    onBlur={(e) => e.target.style.borderColor = '#2A2A38'}
                   />
                 </div>
 
@@ -224,7 +224,7 @@ export default function LoginPage() {
                     display: 'block',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: '#343A40',
+                    color: '#F0F0F5',
                     marginBottom: '0.5rem'
                   }}>
                     Password
@@ -238,15 +238,15 @@ export default function LoginPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      border: '2px solid #DEE2E6',
+                      border: '2px solid #2A2A38',
                       borderRadius: '8px',
                       fontSize: '1rem',
                       outline: 'none',
                       transition: 'border-color 0.2s ease',
                       boxSizing: 'border-box'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = '#BF0A30'}
-                    onBlur={(e) => e.target.style.borderColor = '#DEE2E6'}
+                    onFocus={(e) => e.target.style.borderColor = '#00CCEE'}
+                    onBlur={(e) => e.target.style.borderColor = '#2A2A38'}
                   />
                 </div>
 
@@ -260,15 +260,15 @@ export default function LoginPage() {
                     <input
                       type="checkbox"
                       id="remember"
-                      style={{ width: '16px', height: '16px', accentColor: '#BF0A30' }}
+                      style={{ width: '16px', height: '16px', accentColor: '#00CCEE' }}
                     />
-                    <label htmlFor="remember" style={{ fontSize: '0.875rem', color: '#343A40' }}>
+                    <label htmlFor="remember" style={{ fontSize: '0.875rem', color: '#F0F0F5' }}>
                       Remember me
                     </label>
                   </div>
                   <a href="/forgot-password" style={{
                     fontSize: '0.875rem',
-                    color: '#BF0A30',
+                    color: '#00CCEE',
                     textDecoration: 'none',
                     fontWeight: '500'
                   }}>
@@ -283,7 +283,7 @@ export default function LoginPage() {
                     display: 'block',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: '#343A40',
+                    color: '#F0F0F5',
                     marginBottom: '0.5rem'
                   }}>
                     Authentication Code
@@ -299,7 +299,7 @@ export default function LoginPage() {
                     style={{
                       width: '100%',
                       padding: '1rem',
-                      border: '2px solid #DEE2E6',
+                      border: '2px solid #2A2A38',
                       borderRadius: '8px',
                       fontSize: '1.5rem',
                       textAlign: 'center',
@@ -309,8 +309,8 @@ export default function LoginPage() {
                       transition: 'border-color 0.2s ease',
                       boxSizing: 'border-box'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = '#BF0A30'}
-                    onBlur={(e) => e.target.style.borderColor = '#DEE2E6'}
+                    onFocus={(e) => e.target.style.borderColor = '#00CCEE'}
+                    onBlur={(e) => e.target.style.borderColor = '#2A2A38'}
                   />
                 </div>
 
@@ -321,8 +321,8 @@ export default function LoginPage() {
                     width: '100%',
                     padding: '0.75rem 1rem',
                     background: 'transparent',
-                    color: '#6C757D',
-                    border: '2px solid #DEE2E6',
+                    color: '#8888A0',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '0.875rem',
                     fontWeight: '600',
@@ -349,7 +349,7 @@ export default function LoginPage() {
                 fontWeight: '600',
                 cursor: (loading || (requires2FA && twoFactorCode.length !== 6)) ? 'not-allowed' : 'pointer',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                boxShadow: '0 4px 6px rgba(191, 10, 48, 0.2)'
+                boxShadow: '0 4px 6px rgba(0, 204, 238, 0.2)'
               }}
               onMouseOver={(e) => {
                 if (!loading && !(requires2FA && twoFactorCode.length !== 6)) {
@@ -368,9 +368,9 @@ export default function LoginPage() {
 
           {!requires2FA && (
             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              <p style={{ fontSize: '0.875rem', color: '#6C757D' }}>
+              <p style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                 Don't have an account?{' '}
-                <a href="/signup" style={{ color: '#BF0A30', textDecoration: 'none', fontWeight: '600' }}>
+                <a href="/signup" style={{ color: '#00CCEE', textDecoration: 'none', fontWeight: '600' }}>
                   Sign up
                 </a>
               </p>

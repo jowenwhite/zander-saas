@@ -668,7 +668,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: '#09090F' }}>
         <Sidebar />
         <main style={{ flex: 1, padding: '2rem', marginLeft: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div>Loading...</div>
@@ -679,10 +679,10 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
 
   if (!isSuperAdmin) {
     return (
-      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: '#09090F' }}>
         <Sidebar />
         <main style={{ flex: 1, padding: '2rem', marginLeft: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center', color: '#666' }}>
+          <div style={{ textAlign: 'center', color: '#8888A0' }}>
             <h2>Access Denied</h2>
             <p>This page is only accessible to SuperAdmins.</p>
           </div>
@@ -692,14 +692,14 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#09090F' }}>
       <Sidebar />
       <div style={{ flex: 1, marginLeft: '240px', display: 'flex', flexDirection: 'column', height: '100vh' }}>
         {/* Main Content Area - Scrollable */}
         <main style={{ flex: 1, padding: '2rem', overflow: 'auto', paddingBottom: zanderHeight }}>
           {/* Header */}
           <div style={{
-            background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+            background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
             borderRadius: '12px',
             padding: '1.5rem 2rem',
             marginBottom: '1.5rem',
@@ -717,42 +717,42 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
 
           {/* System Pulse Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#666', fontSize: '0.9rem' }}>API Status</span>
+                <span style={{ color: '#8888A0', fontSize: '0.9rem' }}>API Status</span>
                 <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: getStatusColor(health.api) }}></span>
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {health.api === 'healthy' ? '✓ Healthy' : health.api === 'degraded' ? '⚠ Degraded' : '✕ Down'}
               </div>
             </div>
             
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#666', fontSize: '0.9rem' }}>Database</span>
+                <span style={{ color: '#8888A0', fontSize: '0.9rem' }}>Database</span>
                 <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: getStatusColor(health.database) }}></span>
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {health.database === 'healthy' ? '✓ Healthy' : health.database === 'degraded' ? '⚠ Degraded' : '✕ Down'}
               </div>
             </div>
             
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#666', fontSize: '0.9rem' }}>Active Users</span>
+                <span style={{ color: '#8888A0', fontSize: '0.9rem' }}>Active Users</span>
                 <span style={{ fontSize: '0.8rem', color: '#28a745' }}>↑ 12%</span>
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>35</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>35</div>
             </div>
             
-            <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#666', fontSize: '0.9rem' }}>Open Tickets</span>
+                <span style={{ color: '#8888A0', fontSize: '0.9rem' }}>Open Tickets</span>
                 <span style={{ fontSize: '0.8rem', color: tickets.filter(t => t.status === 'NEW' || t.status === 'PENDING_REVIEW').length > 0 ? '#dc3545' : '#28a745' }}>
                   {tickets.filter(t => t.status === 'NEW').length} new
                 </span>
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {tickets.filter(t => !['RESOLVED', 'CLOSED', 'AI_RESOLVED'].includes(t.status)).length}
               </div>
             </div>
@@ -763,7 +763,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
             display: 'flex',
             gap: '0.5rem',
             marginBottom: '1.5rem',
-            background: 'white',
+            background: '#1C1C26',
             padding: '0.5rem',
             borderRadius: '8px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
@@ -795,18 +795,18 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           {activeTab === 'overview' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
               {/* Recent Headwinds */}
-              <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-                <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>🔴 Active Headwinds</h3>
-                  <button onClick={() => setActiveTab('headwinds')} style={{ background: 'none', border: 'none', color: 'var(--zander-red)', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
+              <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+                <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ margin: 0, color: '#F0F0F5' }}>🔴 Active Headwinds</h3>
+                  <button onClick={() => setActiveTab('headwinds')} style={{ background: 'none', border: 'none', color: '#00CCEE', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
                 </div>
                 <div style={{ maxHeight: '300px', overflow: 'auto' }}>
                   {headwinds.filter(h => h.status !== 'CLOSED' && h.status !== 'DEPLOYED').slice(0, 5).map(h => (
-                    <div key={h.id} style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #f5f5f5', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div key={h.id} style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <span style={{ background: getPriorityColor(h.priority), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}>{h.priority}</span>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{h.title}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{h.status} • {formatTimeAgo(h.updatedAt)}</div>
+                        <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{h.title}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{h.status} • {formatTimeAgo(h.updatedAt)}</div>
                       </div>
                     </div>
                   ))}
@@ -814,18 +814,18 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               </div>
 
               {/* Recent Tickets */}
-              <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-                <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>🎫 Recent Tickets</h3>
-                  <button onClick={() => setActiveTab('tickets')} style={{ background: 'none', border: 'none', color: 'var(--zander-red)', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
+              <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+                <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ margin: 0, color: '#F0F0F5' }}>🎫 Recent Tickets</h3>
+                  <button onClick={() => setActiveTab('tickets')} style={{ background: 'none', border: 'none', color: '#00CCEE', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
                 </div>
                 <div style={{ maxHeight: '300px', overflow: 'auto' }}>
                   {tickets.slice(0, 5).map(t => (
-                    <div key={t.id} style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #f5f5f5', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div key={t.id} style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <span style={{ fontSize: '1.25rem' }}>{t.status === 'AI_RESOLVED' ? '🤖' : t.status === 'NEW' ? '🆕' : '👤'}</span>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{t.subject}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown'} • {t.tenant?.companyName || 'Unknown'} • {formatTimeAgo(t.createdAt)}</div>
+                        <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{t.subject}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown'} • {t.tenant?.companyName || 'Unknown'} • {formatTimeAgo(t.createdAt)}</div>
                       </div>
                       <span style={{ background: getStatusColor(t.status), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>{t.status.replace('_', ' ')}</span>
                     </div>
@@ -836,8 +836,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           )}
 
           {activeTab === 'headwinds' && (
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   {(['all', 'P1', 'P2', 'P3'] as const).map(f => (
                     <button key={f} onClick={() => setHeadwindFilter(f)} style={{
@@ -855,7 +855,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                 </div>
                 <button onClick={() => { setEditingHeadwind(null); setHeadwindForm({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '', estimatedHours: '', dueDate: '' }); setShowHeadwindModal(true); }} style={{
                   background: 'var(--zander-gold)',
-                  color: 'var(--zander-navy)',
+                  color: '#F0F0F5',
                   border: 'none',
                   padding: '0.5rem 1rem',
                   borderRadius: '6px',
@@ -867,34 +867,34 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f8f9fa' }}>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Priority</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Title</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Category</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Status</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Est. Hrs</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Due Date</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Updated</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Actions</th>
+                  <tr style={{ background: '#13131A' }}>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Priority</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Title</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Category</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Status</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Est. Hrs</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Due Date</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Updated</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredHeadwinds.map(h => (
-                    <tr key={h.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                    <tr key={h.id} style={{ borderBottom: '1px solid #2A2A38' }}>
                       <td style={{ padding: '1rem' }}>
                         <span style={{ background: getPriorityColor(h.priority), color: 'white', padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '700' }}>{h.priority}</span>
                       </td>
                       <td style={{ padding: '1rem' }}>
-                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{h.title}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{h.description}</div>
+                        <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{h.title}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{h.description}</div>
                       </td>
-                      <td style={{ padding: '1rem', color: '#666' }}>{h.category.replace('_', ' ')}</td>
+                      <td style={{ padding: '1rem', color: '#8888A0' }}>{h.category.replace('_', ' ')}</td>
                       <td style={{ padding: '1rem' }}>
                         <span style={{ background: getStatusColor(h.status), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{h.status.replace('_', ' ')}</span>
                       </td>
-                      <td style={{ padding: '1rem', textAlign: 'center', color: '#666' }}>{h.estimatedHours ? h.estimatedHours + 'h' : '-'}</td>
+                      <td style={{ padding: '1rem', textAlign: 'center', color: '#8888A0' }}>{h.estimatedHours ? h.estimatedHours + 'h' : '-'}</td>
                       <td style={{ padding: '1rem', color: h.dueDate && new Date(h.dueDate) < new Date() ? '#dc2626' : '#666' }}>{h.dueDate ? new Date(h.dueDate).toLocaleDateString() : '-'}</td>
-                      <td style={{ padding: '1rem', color: '#666' }}>{formatTimeAgo(h.updatedAt)}</td>
+                      <td style={{ padding: '1rem', color: '#8888A0' }}>{formatTimeAgo(h.updatedAt)}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
                         <button onClick={() => { setEditingHeadwind(h); setHeadwindForm({ title: h.title, description: h.description || '', priority: h.priority, category: h.category, status: h.status, gitBranch: h.gitBranch || '', estimatedHours: h.estimatedHours ? String(h.estimatedHours) : '', dueDate: h.dueDate ? h.dueDate.split('T')[0] : '' }); setShowHeadwindModal(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>✏️</button>
                         <button onClick={() => deleteHeadwind(h.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginLeft: '0.5rem' }}>🗑️</button>
@@ -907,8 +907,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           )}
 
           {activeTab === 'tenants' && (
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #eee' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38' }}>
                 <input
                   type="text"
                   placeholder="Search tenants..."
@@ -917,7 +917,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
-                    border: '2px solid #eee',
+                    border: '2px solid #2A2A38',
                     borderRadius: '8px',
                     fontSize: '1rem'
                   }}
@@ -925,30 +925,30 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f8f9fa' }}>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Tenant</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Users</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Plan</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Last Active</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Status</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Actions</th>
+                  <tr style={{ background: '#13131A' }}>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Tenant</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Users</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Plan</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Last Active</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Status</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredTenants.map(t => (
-                    <tr key={t.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                      <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{t.companyName}</td>
+                    <tr key={t.id} style={{ borderBottom: '1px solid #2A2A38' }}>
+                      <td style={{ padding: '1rem', fontWeight: '600', color: '#F0F0F5' }}>{t.companyName}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>{t._count?.users || t.users?.length || 0}</td>
                       <td style={{ padding: '1rem' }}>
                         <span style={{ background: t.subscriptionTier === 'enterprise' ? 'var(--zander-gold)' : t.subscriptionTier === 'pro' ? 'var(--zander-navy)' : '#6c757d', color: t.subscriptionTier === 'enterprise' ? 'var(--zander-navy)' : 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>{t.subscriptionTier || 'starter'}</span>
                       </td>
-                      <td style={{ padding: '1rem', color: '#666' }}>{t.tenantType}</td>
+                      <td style={{ padding: '1rem', color: '#8888A0' }}>{t.tenantType}</td>
                       <td style={{ padding: '1rem' }}>
                         <span style={{ background: getStatusColor(t.subscriptionStatus || 'active'), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{t.subscriptionStatus || 'active'}</span>
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <button style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem', fontSize: '0.8rem' }}>View As</button>
-                        <button style={{ background: '#f5f5f5', color: '#666', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Details</button>
+                        <button style={{ background: '#13131A', color: 'white', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem', fontSize: '0.8rem' }}>View As</button>
+                        <button style={{ background: '#13131A', color: '#8888A0', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Details</button>
                       </td>
                     </tr>
                   ))}
@@ -959,45 +959,45 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
 
           
           {activeTab === 'knowledge' && (
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>📚 Knowledge Base ({knowledgeArticles.length} articles)</h3>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, color: '#F0F0F5' }}>📚 Knowledge Base ({knowledgeArticles.length} articles)</h3>
                 <button
                   onClick={() => {
                     setEditingArticle(null);
                     setArticleForm({ title: '', slug: '', content: '', summary: '', category: 'PLATFORM_GUIDE', tags: '', searchTerms: '', isPublished: true });
                     setShowKnowledgeModal(true);
                   }}
-                  style={{ background: 'var(--zander-gold)', color: 'var(--zander-navy)', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                  style={{ background: 'var(--zander-gold)', color: '#F0F0F5', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
                 >
                   + New Article
                 </button>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f8f9fa' }}>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Title</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Category</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Tags</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Status</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Views</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Actions</th>
+                  <tr style={{ background: '#13131A' }}>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Title</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Category</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Tags</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Status</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Views</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {knowledgeArticles.length === 0 ? (
                     <tr>
-                      <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>
+                      <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#8888A0' }}>
                         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
                         <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>No articles yet</div>
                         <div>Create your first knowledge base article to help AI executives assist users.</div>
                       </td>
                     </tr>
                   ) : knowledgeArticles.map(article => (
-                    <tr key={article.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                    <tr key={article.id} style={{ borderBottom: '1px solid #2A2A38' }}>
                       <td style={{ padding: '1rem' }}>
-                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{article.title}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{article.slug}</div>
+                        <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{article.title}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{article.slug}</div>
                       </td>
                       <td style={{ padding: '1rem' }}>
                         <span style={{
@@ -1014,9 +1014,9 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
                           {article.tags.slice(0, 3).map(tag => (
-                            <span key={tag} style={{ background: '#f5f5f5', padding: '0.15rem 0.4rem', borderRadius: '3px', fontSize: '0.7rem', color: '#666' }}>{tag}</span>
+                            <span key={tag} style={{ background: '#13131A', padding: '0.15rem 0.4rem', borderRadius: '3px', fontSize: '0.7rem', color: '#8888A0' }}>{tag}</span>
                           ))}
-                          {article.tags.length > 3 && <span style={{ fontSize: '0.7rem', color: '#999' }}>+{article.tags.length - 3}</span>}
+                          {article.tags.length > 3 && <span style={{ fontSize: '0.7rem', color: '#55556A' }}>+{article.tags.length - 3}</span>}
                         </div>
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
@@ -1031,7 +1031,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                           {article.isPublished ? 'Published' : 'Draft'}
                         </span>
                       </td>
-                      <td style={{ padding: '1rem', textAlign: 'center', color: '#666' }}>{article.viewCount}</td>
+                      <td style={{ padding: '1rem', textAlign: 'center', color: '#8888A0' }}>{article.viewCount}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
                         <button
                           onClick={() => {
@@ -1048,7 +1048,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                             });
                             setShowKnowledgeModal(true);
                           }}
-                          style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.4rem 0.6rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', marginRight: '0.5rem' }}
+                          style={{ background: '#13131A', color: 'white', border: 'none', padding: '0.4rem 0.6rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', marginRight: '0.5rem' }}
                         >
                           Edit
                         </button>
@@ -1067,35 +1067,35 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           )}
 
           {activeTab === 'tickets' && (
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f8f9fa' }}>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Ticket</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Subject</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>User</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Via</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Status</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#666' }}>Created</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#666' }}>Actions</th>
+                  <tr style={{ background: '#13131A' }}>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Ticket</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Subject</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>User</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Via</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Status</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Created</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tickets.map(t => (
-                    <tr key={t.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                      <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--zander-navy)' }}>{t.ticketNumber}</td>
+                    <tr key={t.id} style={{ borderBottom: '1px solid #2A2A38' }}>
+                      <td style={{ padding: '1rem', fontWeight: '600', color: '#F0F0F5' }}>{t.ticketNumber}</td>
                       <td style={{ padding: '1rem' }}>{t.subject}</td>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ fontWeight: '500' }}>{t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown'}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#666' }}>{t.tenant?.companyName || 'Unknown'}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{t.tenant?.companyName || 'Unknown'}</div>
                       </td>
-                      <td style={{ padding: '1rem', color: '#666' }}>{t.createdVia}</td>
+                      <td style={{ padding: '1rem', color: '#8888A0' }}>{t.createdVia}</td>
                       <td style={{ padding: '1rem' }}>
                         <span style={{ background: getStatusColor(t.status), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{t.status.replace('_', ' ')}</span>
                       </td>
-                      <td style={{ padding: '1rem', color: '#666' }}>{formatTimeAgo(t.createdAt)}</td>
+                      <td style={{ padding: '1rem', color: '#8888A0' }}>{formatTimeAgo(t.createdAt)}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <button style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Open</button>
+                        <button style={{ background: '#13131A', color: 'white', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Open</button>
                       </td>
                     </tr>
                   ))}
@@ -1109,40 +1109,40 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
         {/* Knowledge Article Modal */}
         {showKnowledgeModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-            <div style={{ background: 'white', borderRadius: '12px', width: '700px', maxHeight: '90vh', overflow: 'auto' }}>
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee' }}>
-                <h2 style={{ margin: 0, color: 'var(--zander-navy)' }}>{editingArticle ? 'Edit Article' : 'New Knowledge Article'}</h2>
+            <div style={{ background: '#1C1C26', borderRadius: '12px', width: '700px', maxHeight: '90vh', overflow: 'auto' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38' }}>
+                <h2 style={{ margin: 0, color: '#F0F0F5' }}>{editingArticle ? 'Edit Article' : 'New Knowledge Article'}</h2>
               </div>
               <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Title *</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Title *</label>
                   <input
                     type="text"
                     value={articleForm.title}
                     onChange={(e) => {
                       setArticleForm({ ...articleForm, title: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') });
                     }}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     placeholder="How to add a new pipeline stage"
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Slug</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Slug</label>
                   <input
                     type="text"
                     value={articleForm.slug}
                     onChange={(e) => setArticleForm({ ...articleForm, slug: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', color: '#666' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', color: '#8888A0' }}
                     placeholder="how-to-add-pipeline-stage"
                   />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Category</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Category</label>
                     <select
                       value={articleForm.category}
                       onChange={(e) => setArticleForm({ ...articleForm, category: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     >
                       <option value="PLATFORM_GUIDE">Platform Guide</option>
                       <option value="FAQ">FAQ</option>
@@ -1152,11 +1152,11 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Status</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Status</label>
                     <select
                       value={articleForm.isPublished ? 'published' : 'draft'}
                       onChange={(e) => setArticleForm({ ...articleForm, isPublished: e.target.value === 'published' })}
-                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     >
                       <option value="published">Published</option>
                       <option value="draft">Draft</option>
@@ -1164,49 +1164,49 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   </div>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Summary</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Summary</label>
                   <input
                     type="text"
                     value={articleForm.summary}
                     onChange={(e) => setArticleForm({ ...articleForm, summary: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     placeholder="Brief description for article lists"
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Content *</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Content *</label>
                   <textarea
                     value={articleForm.content}
                     onChange={(e) => setArticleForm({ ...articleForm, content: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', minHeight: '200px', fontFamily: 'inherit' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', minHeight: '200px', fontFamily: 'inherit' }}
                     placeholder="Full article content. Markdown supported."
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Tags (comma-separated)</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Tags (comma-separated)</label>
                   <input
                     type="text"
                     value={articleForm.tags}
                     onChange={(e) => setArticleForm({ ...articleForm, tags: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     placeholder="pipeline, crm, deals, stages"
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>AI Search Terms</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>AI Search Terms</label>
                   <input
                     type="text"
                     value={articleForm.searchTerms}
                     onChange={(e) => setArticleForm({ ...articleForm, searchTerms: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     placeholder="Keywords AI executives should match: add stage, create pipeline, new column"
                   />
                 </div>
               </div>
-              <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <div style={{ padding: '1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 <button
                   onClick={() => { setShowKnowledgeModal(false); setEditingArticle(null); }}
-                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', cursor: 'pointer', background: 'white' }}
+                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer', background: '#1C1C26' }}
                 >
                   Cancel
                 </button>
@@ -1219,7 +1219,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                     borderRadius: '6px',
                     cursor: 'pointer',
                     background: 'var(--zander-gold)',
-                    color: 'var(--zander-navy)',
+                    color: '#F0F0F5',
                     fontWeight: '600',
                     opacity: saving || !articleForm.title || !articleForm.content ? 0.5 : 1
                   }}
@@ -1238,8 +1238,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           left: '240px',
           right: 0,
           height: zanderHeight,
-          background: 'white',
-          borderTop: '2px solid var(--zander-navy)',
+          background: '#1C1C26',
+          borderTop: '2px solid #00CCEE',
           boxShadow: '0 -4px 20px rgba(0,0,0,0.1)',
           transition: 'height 0.3s ease',
           display: 'flex',
@@ -1249,7 +1249,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           {/* Zander Header Bar */}
           <div 
             style={{
-              background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+              background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
               padding: '0.75rem 1.5rem',
               display: 'flex',
               alignItems: 'center',
@@ -1347,7 +1347,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               </div>
 
               {/* Input */}
-              <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid #eee', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid #2A2A38', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                 <input
                   type="text"
                   value={zanderInput}
@@ -1357,7 +1357,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   style={{
                     flex: 1,
                     padding: '0.6rem 1rem',
-                    border: '2px solid #eee',
+                    border: '2px solid #2A2A38',
                     borderRadius: '6px',
                     fontSize: '0.9rem'
                   }}
@@ -1379,7 +1379,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                 >
                   {zanderLoading ? '...' : 'Send'}
                 </button>
-                <span style={{ fontSize: '0.75rem', color: '#999', marginLeft: '0.5rem' }}>Powered by Claude</span>
+                <span style={{ fontSize: '0.75rem', color: '#55556A', marginLeft: '0.5rem' }}>Powered by Claude</span>
               </div>
             </div>
           )}
@@ -1401,28 +1401,28 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           zIndex: 2000
         }}>
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
             padding: '2rem',
             width: '500px',
             maxHeight: '80vh',
             overflow: 'auto'
           }}>
-            <h2 style={{ margin: '0 0 1.5rem', color: 'var(--zander-navy)' }}>
+            <h2 style={{ margin: '0 0 1.5rem', color: '#F0F0F5' }}>
               {editingHeadwind ? 'Edit Headwind' : 'New Headwind'}
             </h2>
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Title</label>
-              <input type="text" value={headwindForm.title} onChange={(e) => setHeadwindForm(prev => ({ ...prev, title: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }} />
+              <input type="text" value={headwindForm.title} onChange={(e) => setHeadwindForm(prev => ({ ...prev, title: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px' }} />
             </div>
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Description</label>
-              <textarea value={headwindForm.description} onChange={(e) => setHeadwindForm(prev => ({ ...prev, description: e.target.value }))} rows={3} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px', resize: 'vertical' }} />
+              <textarea value={headwindForm.description} onChange={(e) => setHeadwindForm(prev => ({ ...prev, description: e.target.value }))} rows={3} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', resize: 'vertical' }} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Priority</label>
-                <select value={headwindForm.priority} onChange={(e) => setHeadwindForm(prev => ({ ...prev, priority: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
+                <select value={headwindForm.priority} onChange={(e) => setHeadwindForm(prev => ({ ...prev, priority: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px' }}>
                   <option value="P1">P1 - Critical</option>
                   <option value="P2">P2 - Important</option>
                   <option value="P3">P3 - Nice to Have</option>
@@ -1430,7 +1430,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Category</label>
-                <select value={headwindForm.category} onChange={(e) => setHeadwindForm(prev => ({ ...prev, category: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
+                <select value={headwindForm.category} onChange={(e) => setHeadwindForm(prev => ({ ...prev, category: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px' }}>
                   <option value="BUG">Bug</option>
                   <option value="REBUILD">Rebuild</option>
                   <option value="NEW_BUILD">New Build</option>
@@ -1442,16 +1442,16 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Est. Hours</label>
-                <input type="number" step="0.5" min="0" value={headwindForm.estimatedHours} onChange={(e) => setHeadwindForm(prev => ({ ...prev, estimatedHours: e.target.value }))} placeholder="e.g. 4" style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }} />
+                <input type="number" step="0.5" min="0" value={headwindForm.estimatedHours} onChange={(e) => setHeadwindForm(prev => ({ ...prev, estimatedHours: e.target.value }))} placeholder="e.g. 4" style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px' }} />
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Due Date</label>
-                <input type="date" value={headwindForm.dueDate} onChange={(e) => setHeadwindForm(prev => ({ ...prev, dueDate: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }} />
+                <input type="date" value={headwindForm.dueDate} onChange={(e) => setHeadwindForm(prev => ({ ...prev, dueDate: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px' }} />
               </div>
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Status</label>
-              <select value={headwindForm.status} onChange={(e) => setHeadwindForm(prev => ({ ...prev, status: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #eee', borderRadius: '6px' }}>
+              <select value={headwindForm.status} onChange={(e) => setHeadwindForm(prev => ({ ...prev, status: e.target.value }))} style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px' }}>
                 <option value="OPEN">Open</option>
                 <option value="IN_PROGRESS">In Progress</option>
                 <option value="TESTING">Testing</option>
@@ -1460,8 +1460,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               </select>
             </div>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowHeadwindModal(false)} style={{ background: '#f5f5f5', color: '#666', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
-              <button onClick={saveHeadwind} disabled={saving} style={{ background: 'var(--zander-navy)', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', opacity: saving ? 0.7 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+              <button onClick={() => setShowHeadwindModal(false)} style={{ background: '#13131A', color: '#8888A0', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
+              <button onClick={saveHeadwind} disabled={saving} style={{ background: '#13131A', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', opacity: saving ? 0.7 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
         </div>

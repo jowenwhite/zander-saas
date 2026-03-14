@@ -100,14 +100,14 @@ export default function CMODashboardPage() {
             style={{
               fontSize: '2rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)',
+              color: '#F0F0F5',
               margin: 0,
               marginBottom: '0.25rem',
             }}
           >
             Marketing Dashboard
           </h1>
-          <p style={{ color: 'var(--zander-gray)', margin: 0 }}>Your marketing command center</p>
+          <p style={{ color: '#8888A0', margin: 0 }}>Your marketing command center</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <Button variant="secondary" onClick={() => (window.location.href = '/cmo/reports')}>
@@ -234,10 +234,10 @@ export default function CMODashboardPage() {
                 alignItems: 'center',
                 gap: '0.5rem',
                 padding: '1.25rem',
-                background: 'var(--zander-off-white)',
+                background: '#13131A',
                 borderRadius: '8px',
                 textDecoration: 'none',
-                color: 'var(--zander-navy)',
+                color: '#F0F0F5',
                 transition: 'all 0.2s ease',
                 textAlign: 'center',
               }}
@@ -246,8 +246,8 @@ export default function CMODashboardPage() {
                 e.currentTarget.style.color = '#F57C00';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'var(--zander-off-white)';
-                e.currentTarget.style.color = 'var(--zander-navy)';
+                e.currentTarget.style.background = '#1C1C26';
+                e.currentTarget.style.color = '#F0F0F5';
               }}
             >
               <span style={{ fontSize: '1.75rem' }}>{action.icon}</span>
@@ -270,8 +270,8 @@ export default function CMODashboardPage() {
           <div
             style={{
               padding: '1rem 1.5rem',
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -286,10 +286,10 @@ export default function CMODashboardPage() {
               priority
             />
             <div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {metrics.summary.activeWorkflows}
               </div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                 Active Workflows
               </div>
             </div>
@@ -297,8 +297,8 @@ export default function CMODashboardPage() {
           <div
             style={{
               padding: '1rem 1.5rem',
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -307,10 +307,10 @@ export default function CMODashboardPage() {
           >
             <span style={{ fontSize: '1.5rem' }}>📣</span>
             <div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {metrics.summary.activeCampaigns}
               </div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                 Active Campaigns
               </div>
             </div>
@@ -318,8 +318,8 @@ export default function CMODashboardPage() {
           <div
             style={{
               padding: '1rem 1.5rem',
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -328,10 +328,10 @@ export default function CMODashboardPage() {
           >
             <span style={{ fontSize: '1.5rem' }}>👥</span>
             <div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {metrics.summary.totalContacts.toLocaleString()}
               </div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>Total Contacts</div>
+              <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>Total Contacts</div>
             </div>
           </div>
         </div>
