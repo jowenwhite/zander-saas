@@ -89,7 +89,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
               borderRadius: '6px',
               textDecoration: 'none',
               background: currentModule === module.code.toLowerCase() ? moduleColors[module.code.toLowerCase()] : 'transparent',
-              color: currentModule === module.code.toLowerCase() ? 'white' : 'var(--zander-gray)',
+              color: currentModule === module.code.toLowerCase() ? '#000000' : '#8888A0',
               fontWeight: '600',
               fontSize: '0.875rem',
               cursor: 'pointer',
@@ -165,7 +165,7 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
             <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{userName}</span>
             <span style={{ 
               fontSize: '0.6rem', 
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               transform: showUserMenu ? 'rotate(180deg)' : 'rotate(0deg)',
               transition: 'transform 0.2s ease'
             }}>▼</span>

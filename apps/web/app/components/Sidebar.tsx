@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import OnboardingChecklist from './OnboardingChecklist';
+import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck } from 'lucide-react';
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -64,17 +65,17 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   const salesRevenueItems = [
-    { icon: '📊', label: 'Production', href: '/production' },
-    { icon: '📁', label: 'Projects', href: '/projects' },
-    { icon: '👥', label: 'People', href: '/people' },
-    { icon: '📦', label: 'Products', href: '/products' },
+    { icon: LayoutDashboard, label: 'Production', href: '/production' },
+    { icon: FolderKanban, label: 'Projects', href: '/projects' },
+    { icon: Users, label: 'People', href: '/people' },
+    { icon: Package, label: 'Products', href: '/products' },
   ];
 
   const processItems = [
-    { icon: '📧', label: 'Communication', href: '/communication' },
-    { icon: '📅', label: 'Schedule', href: '/schedule' },
-    { icon: '📋', label: 'Forms', href: '/forms' },
-    { icon: '🤖', label: 'Ask Jordan (CRO)', href: '/ai' },
+    { icon: Mail, label: 'Communication', href: '/communication' },
+    { icon: Calendar, label: 'Schedule', href: '/schedule' },
+    { icon: ClipboardList, label: 'Forms', href: '/forms' },
+    { icon: Bot, label: 'Ask Jordan (CRO)', href: '/ai' },
   ];
 
   const linkStyle = (active: boolean) => ({
@@ -124,7 +125,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
             {salesRevenueItems.map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={linkStyle(isActive(item.href))}>
-                  <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+                  <item.icon size={18} strokeWidth={2} />
                   {!collapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -140,7 +141,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
             {processItems.map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={linkStyle(isActive(item.href))}>
-                  <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+                  <item.icon size={18} strokeWidth={2} />
                   {!collapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -150,20 +151,20 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
 
         {/* Admin Section - SuperAdmin Only */}
         {isSuperAdmin && (
-          <div style={{ padding: '1rem', borderTop: '2px solid var(--zander-border-gray)', marginTop: '1rem' }}>
+          <div style={{ padding: '1rem', borderTop: '2px solid #2A2A38', marginTop: '1rem' }}>
             <div style={sectionHeaderStyle}>
               Admin
             </div>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               <li style={{ marginBottom: '0.25rem' }}>
                 <a href="/admin/treasury" style={linkStyle(isActive('/admin/treasury'))}>
-                  <span style={{ fontSize: '1.1rem' }}>🏛️</span>
+                  <Landmark size={18} strokeWidth={2} />
                   {!collapsed && <span>Treasury Admin</span>}
                 </a>
               </li>
               <li style={{ marginBottom: '0.25rem' }}>
                 <a href="/admin/support-admin" style={linkStyle(isActive('/admin/support-admin'))}>
-                  <span style={{ fontSize: '1.1rem' }}>🛡️</span>
+                  <Shield size={18} strokeWidth={2} />
                   {!collapsed && <span>Support Admin</span>}
                 </a>
               </li>
@@ -174,7 +175,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
 
       {/* Onboarding Checklist or Show Button */}
       {!collapsed && (
-        <div style={{ borderTop: '2px solid var(--zander-border-gray)' }}>
+        <div style={{ borderTop: '2px solid #2A2A38' }}>
           {showOnboardingChecklist ? (
             <OnboardingChecklist onDismiss={dismissChecklist} />
           ) : checklistDismissed && (
@@ -185,7 +186,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
                 padding: '0.75rem 1rem',
                 background: 'transparent',
                 border: 'none',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 fontSize: '0.85rem',
                 cursor: 'pointer',
                 display: 'flex',
@@ -195,15 +196,15 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
                 transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(191,10,48,0.05)';
+                e.currentTarget.style.background = 'rgba(0,204,238,0.05)';
                 e.currentTarget.style.color = '#00CCEE';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = 'var(--zander-gray)';
+                e.currentTarget.style.color = '#8888A0';
               }}
             >
-              <span>📋</span>
+              <ClipboardCheck size={16} strokeWidth={2} />
               <span>Show Getting Started</span>
             </button>
           )}

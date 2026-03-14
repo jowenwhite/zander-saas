@@ -278,7 +278,8 @@ export default function AdminTreasuryPage() {
       <main style={{ flex: 1, padding: '2rem', marginLeft: '240px' }}>
         {/* Header */}
         <div style={{ 
-          background: 'linear-gradient(135deg, #00CCEE 0%, #00A8C6 100%)',
+          background: '#13131A',
+          border: '1px solid #2A2A38',
           borderRadius: '12px',
           padding: '1.5rem 2rem',
           marginBottom: '1.5rem',
@@ -287,8 +288,8 @@ export default function AdminTreasuryPage() {
           alignItems: 'center'
         }}>
           <div>
-            <h1 style={{ color: 'white', margin: 0, fontSize: '1.75rem' }}>🏛️ Treasury Admin</h1>
-            <p style={{ color: 'rgba(255,255,255,0.9)', margin: '0.25rem 0 0' }}>
+            <h1 style={{ color: '#F0F0F5', margin: 0, fontSize: '1.75rem' }}>🏛️ Treasury Admin</h1>
+            <p style={{ color: '#8888A0', margin: '0.25rem 0 0' }}>
               Manage global templates • SuperAdmin Only
             </p>
           </div>
@@ -330,7 +331,7 @@ export default function AdminTreasuryPage() {
                 cursor: 'pointer',
                 fontWeight: '600',
                 background: activeTab === type ? '#13131A' : 'transparent',
-                color: activeTab === type ? 'white' : '#13131A',
+                color: activeTab === type ? '#F0F0F5' : '#8888A0',
                 transition: 'all 0.2s ease'
               }}
             >
@@ -369,7 +370,7 @@ export default function AdminTreasuryPage() {
               </thead>
               <tbody>
                 {filteredItems.map((item, index) => (
-                  <tr key={item.id} style={{ borderBottom: '1px solid #2A2A38', background: index % 2 === 0 ? 'white' : '#fafafa' }}>
+                  <tr key={item.id} style={{ borderBottom: '1px solid #2A2A38', background: index % 2 === 0 ? '#1C1C26' : '#252530' }}>
                     <td style={{ padding: '1rem' }}>
                       <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{item.name}</div>
                       {item.description && (

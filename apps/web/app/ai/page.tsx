@@ -33,7 +33,7 @@ const executives: Executive[] = [
     reference: 'Sales & Revenue Expert',
     personality: 'Enthusiastic, warm, and persuasive. Jordan is your dedicated sales coach who gets genuinely excited about helping you close deals and build lasting client relationships. Always encouraging and action-oriented, Jordan focuses on practical strategies that drive real results. Expects you to pick up the phone and make things happen!',
     avatar: '💼',
-    color: '#BF0A30',
+    color: '#00CCEE',
     status: 'active',
     suggestedPrompts: [
       'What deals should I focus on this week?',
@@ -333,7 +333,7 @@ export default function AIAssistantPage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', background: '#09090F' }}>
         <NavBar activeModule="cro" />
 
         {/* Main Layout with Standard Sidebar */}
@@ -343,7 +343,7 @@ export default function AIAssistantPage() {
           <Sidebar collapsed={sidebarCollapsed} />
 
           {/* Chat Area - with margin for sidebar */}
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--zander-off-white)', marginLeft: '240px' }}>
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#09090F', marginLeft: '240px' }}>
             {/* Page Header - Matching Forms/Schedule/Communication */}
             <div style={{
               background: '#13131A',
@@ -404,8 +404,8 @@ export default function AIAssistantPage() {
 
             {/* Jordan Overview Box */}
             <div style={{
-              background: 'white',
-              border: '2px solid var(--zander-border-gray)',
+              background: '#1C1C26',
+              border: '1px solid #2A2A38',
               borderRadius: '12px',
               padding: '1.5rem',
               margin: '2rem',
@@ -414,11 +414,11 @@ export default function AIAssistantPage() {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ flex: 1 }}>
-                  <p style={{ 
-                    margin: 0, 
-                    fontSize: '1.1rem', 
-                    lineHeight: 1.7, 
-                    color: '#13131A',
+                  <p style={{
+                    margin: 0,
+                    fontSize: '1.1rem',
+                    lineHeight: 1.7,
+                    color: '#F0F0F5',
                     maxWidth: '800px'
                   }}>
                     {selectedExecutive.personality}
@@ -429,9 +429,9 @@ export default function AIAssistantPage() {
                     onClick={handleClearChat}
                     style={{
                       padding: '0.5rem 1rem',
-                      background: 'var(--zander-off-white)',
-                      color: 'var(--zander-gray)',
-                      border: '2px solid var(--zander-border-gray)',
+                      background: '#13131A',
+                      color: '#8888A0',
+                      border: '1px solid #2A2A38',
                       borderRadius: '6px',
                       fontSize: '0.8rem',
                       cursor: 'pointer',
@@ -452,7 +452,7 @@ export default function AIAssistantPage() {
                 <div>
                   <div style={{
                     textAlign: 'center',
-                    color: 'var(--zander-gray)',
+                    color: '#8888A0',
                     marginBottom: '2rem'
                   }}>
                     <p style={{ fontSize: '1rem', margin: 0 }}>
@@ -462,7 +462,7 @@ export default function AIAssistantPage() {
 
                   {/* Suggested Prompts */}
                   <div>
-                    <h3 style={{ color: '#13131A', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '600' }}>
+                    <h3 style={{ color: '#F0F0F5', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '600' }}>
                       Suggested questions to get started:
                     </h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
@@ -472,22 +472,22 @@ export default function AIAssistantPage() {
                           onClick={() => handlePromptClick(prompt)}
                           style={{
                             padding: '1rem',
-                            background: 'white',
-                            border: '2px solid var(--zander-border-gray)',
+                            background: '#1C1C26',
+                            border: '1px solid #2A2A38',
                             borderRadius: '8px',
                             textAlign: 'left',
                             cursor: 'pointer',
-                            color: '#13131A',
+                            color: '#F0F0F5',
                             fontSize: '0.9rem',
                             transition: 'all 0.2s ease'
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.borderColor = selectedExecutive.color;
-                            e.currentTarget.style.background = `${selectedExecutive.color}08`;
+                            e.currentTarget.style.background = `${selectedExecutive.color}15`;
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
-                            e.currentTarget.style.background = 'white';
+                            e.currentTarget.style.borderColor = '#2A2A38';
+                            e.currentTarget.style.background = '#1C1C26';
                           }}
                         >
                           {prompt}
@@ -526,8 +526,8 @@ export default function AIAssistantPage() {
                         maxWidth: '70%',
                         padding: '1rem 1.25rem',
                         borderRadius: message.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                        background: message.role === 'user' ? '#13131A' : 'white',
-                        color: message.role === 'user' ? 'white' : '#13131A',
+                        background: message.role === 'user' ? '#00CCEE' : '#1C1C26',
+                        color: message.role === 'user' ? '#000000' : '#F0F0F5',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                         whiteSpace: 'pre-wrap',
                         lineHeight: 1.6
@@ -540,10 +540,10 @@ export default function AIAssistantPage() {
                               marginTop: '0.75rem',
                               padding: '0.5rem 0.75rem',
                               background: 'transparent',
-                              border: '1px solid #ddd',
+                              border: '1px solid #2A2A38',
                               borderRadius: '6px',
                               fontSize: '0.75rem',
-                              color: '#666',
+                              color: '#8888A0',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
@@ -573,9 +573,9 @@ export default function AIAssistantPage() {
                       </div>
                       <div style={{
                         padding: '1rem 1.25rem',
-                        background: 'white',
+                        background: '#1C1C26',
                         borderRadius: '16px 16px 16px 4px',
-                        color: 'var(--zander-gray)'
+                        color: '#8888A0'
                       }}>
                         <span style={{ display: 'inline-block', animation: 'pulse 1.5s infinite' }}>
                           {selectedExecutive.name} is thinking...
@@ -591,8 +591,8 @@ export default function AIAssistantPage() {
             {/* Input Area */}
             <div style={{
               padding: '1rem 2rem 1.5rem',
-              background: 'white',
-              borderTop: '2px solid var(--zander-border-gray)'
+              background: '#1C1C26',
+              borderTop: '1px solid #2A2A38'
             }}>
               <div style={{
                 display: 'flex',
@@ -611,15 +611,17 @@ export default function AIAssistantPage() {
                   style={{
                     flex: 1,
                     padding: '1rem 1.25rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '1px solid #2A2A38',
                     borderRadius: '12px',
                     fontSize: '1rem',
                     outline: 'none',
                     transition: 'border-color 0.2s ease',
-                    opacity: isTyping ? 0.7 : 1
+                    opacity: isTyping ? 0.7 : 1,
+                    background: '#13131A',
+                    color: '#F0F0F5'
                   }}
                   onFocus={(e) => e.target.style.borderColor = selectedExecutive.color}
-                  onBlur={(e) => e.target.style.borderColor = 'var(--zander-border-gray)'}
+                  onBlur={(e) => e.target.style.borderColor = '#2A2A38'}
                 />
                 <button
                   onClick={handleSend}
@@ -650,7 +652,7 @@ export default function AIAssistantPage() {
                 gap: '1.5rem',
                 margin: '0.75rem 0 0 0',
                 fontSize: '0.7rem',
-                color: 'var(--zander-gray)'
+                color: '#8888A0'
               }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                   <span>🤖</span> Powered by Claude AI
@@ -662,7 +664,7 @@ export default function AIAssistantPage() {
                   <span>📹</span> Meeting transcription coming soon
                 </span>
               </div>
-              <p style={{ textAlign: 'center', margin: '0.5rem 0 0 0', fontSize: '0.65rem', color: 'var(--zander-gray)', opacity: 0.8 }}>
+              <p style={{ textAlign: 'center', margin: '0.5rem 0 0 0', fontSize: '0.65rem', color: '#8888A0', opacity: 0.8 }}>
                 ⚠️ AI can make mistakes. Please verify important information before taking action.
               </p>
             </div>
@@ -686,12 +688,13 @@ export default function AIAssistantPage() {
             zIndex: 1000
           }}>
             <div style={{
-              background: 'white',
+              background: '#1C1C26',
               borderRadius: '12px',
               width: '500px',
               maxHeight: '90vh',
               overflow: 'auto',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              border: '1px solid #2A2A38'
             }}>
               <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: '#13131A', borderRadius: '12px 12px 0 0' }}>
                 <h2 style={{ margin: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -703,21 +706,21 @@ export default function AIAssistantPage() {
               </div>
               <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Subject</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Subject</label>
                   <input
                     type="text"
                     value={ticketForm.subject}
                     onChange={(e) => setTicketForm({ ...ticketForm, subject: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                   />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Category</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Category</label>
                     <select
                       value={ticketForm.category}
                       onChange={(e) => setTicketForm({ ...ticketForm, category: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     >
                       <option value="HOW_TO">How To</option>
                       <option value="BUG">Bug Report</option>
@@ -728,11 +731,11 @@ export default function AIAssistantPage() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Priority</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Priority</label>
                     <select
                       value={ticketForm.priority}
                       onChange={(e) => setTicketForm({ ...ticketForm, priority: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
                     >
                       <option value="P3">Low</option>
                       <option value="P2">Medium</option>
@@ -741,22 +744,22 @@ export default function AIAssistantPage() {
                   </div>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#333' }}>Description</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>Description</label>
                   <textarea
                     value={ticketForm.description}
                     onChange={(e) => setTicketForm({ ...ticketForm, description: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', minHeight: '150px', fontFamily: 'inherit' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', minHeight: '150px', fontFamily: 'inherit' }}
                     placeholder="Describe your issue or question in detail..."
                   />
                 </div>
-                <div style={{ background: '#f8f9fa', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#666' }}>
+                <div style={{ background: '#13131A', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#8888A0' }}>
                   <strong>💡 Tip:</strong> Include specific details about what you were trying to do and any error messages you encountered.
                 </div>
               </div>
               <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 <button
                   onClick={() => { setShowTicketModal(false); setTicketContext(null); }}
-                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', cursor: 'pointer', background: 'white' }}
+                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer', background: '#13131A', color: '#8888A0' }}
                 >
                   Cancel
                 </button>
@@ -800,21 +803,22 @@ export default function AIAssistantPage() {
           >
             <div
               style={{
-                background: 'white',
+                background: '#1C1C26',
                 borderRadius: '16px',
                 padding: '2rem',
                 maxWidth: '500px',
                 width: '90%',
                 maxHeight: '80vh',
                 overflowY: 'auto',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                border: '1px solid #2A2A38'
               }}
               onClick={(e) => e.stopPropagation()}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <div>
-                  <h2 style={{ margin: 0, color: '#13131A', fontSize: '1.5rem' }}>Your AI Team</h2>
-                  <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+                  <h2 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.5rem' }}>Your AI Team</h2>
+                  <p style={{ margin: '0.25rem 0 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
                     Meet your virtual executives
                   </p>
                 </div>
@@ -825,7 +829,7 @@ export default function AIAssistantPage() {
                     border: 'none',
                     fontSize: '1.5rem',
                     cursor: 'pointer',
-                    color: 'var(--zander-gray)'
+                    color: '#8888A0'
                   }}
                 >
                   ✕
@@ -843,7 +847,7 @@ export default function AIAssistantPage() {
                       alignItems: 'center',
                       gap: '1rem',
                       padding: '1rem',
-                      background: selectedExecutive.id === exec.id ? `${exec.color}15` : 'var(--zander-off-white)',
+                      background: selectedExecutive.id === exec.id ? `${exec.color}15` : '#13131A',
                       border: selectedExecutive.id === exec.id ? `2px solid ${exec.color}` : '2px solid transparent',
                       borderRadius: '12px',
                       cursor: exec.status === 'active' ? 'pointer' : 'default',
@@ -866,8 +870,8 @@ export default function AIAssistantPage() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: '600', color: '#13131A', fontSize: '1rem' }}>{exec.name}</span>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>({exec.role})</span>
+                        <span style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem' }}>{exec.name}</span>
+                        <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>({exec.role})</span>
                         {exec.status === 'coming_soon' && (
                           <span style={{
                             padding: '0.125rem 0.5rem',
@@ -879,7 +883,7 @@ export default function AIAssistantPage() {
                           }}>SOON</span>
                         )}
                       </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>{exec.fullTitle}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{exec.fullTitle}</div>
                     </div>
                   </button>
                 ))}

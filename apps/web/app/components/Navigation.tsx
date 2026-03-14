@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { logout, getUser } from '../utils/auth';
 import ThemeToggle from './ThemeToggle';
+import { LayoutDashboard, TrendingUp, Users, BarChart3, Mail, FileText, Bot, Settings, User, LogOut } from 'lucide-react';
 
 interface NavigationProps {
   activePage: 'dashboard' | 'pipeline' | 'contacts' | 'analytics';
@@ -59,7 +60,7 @@ export default function Navigation({ activePage }: NavigationProps) {
                   : module === 'COO' ? '#3498DB'
                   : '#13131A'
                   : 'transparent',
-                color: activeModule === module.toLowerCase() ? 'white' : 'var(--zander-gray)',
+                color: activeModule === module.toLowerCase() ? '#000000' : '#8888A0',
                 fontWeight: '600',
                 fontSize: '0.875rem',
                 cursor: 'pointer'
@@ -95,8 +96,8 @@ export default function Navigation({ activePage }: NavigationProps) {
               fontWeight: '600',
               fontSize: '0.875rem'
             }}>{userInitials}</div>
-            <span style={{ fontWeight: '600', color: '#13131A' }}>{userName}</span>
-            <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>▼</span>
+            <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{userName}</span>
+            <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>▼</span>
           </div>
 
           {/* User Dropdown Menu */}
@@ -119,22 +120,26 @@ export default function Navigation({ activePage }: NavigationProps) {
                 <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>{user?.email || 'user@example.com'}</div>
               </div>
               <a href="#" style={{
-                display: 'block',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
                 padding: '0.75rem 1rem',
                 color: '#F0F0F5',
                 textDecoration: 'none',
                 transition: 'background 0.2s ease'
               }}>
-                ⚙️ Settings
+                <Settings size={16} /> Settings
               </a>
               <a href="#" style={{
-                display: 'block',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
                 padding: '0.75rem 1rem',
                 color: '#F0F0F5',
                 textDecoration: 'none',
                 transition: 'background 0.2s ease'
               }}>
-                👤 Profile
+                <User size={16} /> Profile
               </a>
               <div style={{ borderTop: '1px solid #2A2A38' }}>
                 <button
@@ -148,10 +153,13 @@ export default function Navigation({ activePage }: NavigationProps) {
                     color: '#00CCEE',
                     cursor: 'pointer',
                     fontWeight: '600',
-                    fontSize: '1rem'
+                    fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
                   }}
                 >
-                  🚪 Logout
+                  <LogOut size={16} /> Logout
                 </button>
               </div>
             </div>
@@ -180,10 +188,10 @@ export default function Navigation({ activePage }: NavigationProps) {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📊', label: 'Dashboard', href: '/', id: 'dashboard' },
-              { icon: '📈', label: 'Pipeline', href: '/pipeline', id: 'pipeline' },
-              { icon: '👥', label: 'Contacts', href: '/contacts', id: 'contacts' },
-              { icon: '📉', label: 'Analytics', href: '/analytics', id: 'analytics' },
+              { icon: LayoutDashboard, label: 'Dashboard', href: '/', id: 'dashboard' },
+              { icon: TrendingUp, label: 'Pipeline', href: '/pipeline', id: 'pipeline' },
+              { icon: Users, label: 'Contacts', href: '/contacts', id: 'contacts' },
+              { icon: BarChart3, label: 'Analytics', href: '/analytics', id: 'analytics' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href={item.href} style={{
@@ -197,7 +205,7 @@ export default function Navigation({ activePage }: NavigationProps) {
                   background: activePage === item.id ? 'rgba(0, 204, 238, 0.1)' : 'transparent',
                   fontWeight: activePage === item.id ? '600' : '400'
                 }}>
-                  <span>{item.icon}</span>
+                  <item.icon size={18} strokeWidth={2} />
                   <span>{item.label}</span>
                 </a>
               </li>
@@ -211,9 +219,9 @@ export default function Navigation({ activePage }: NavigationProps) {
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {[
-              { icon: '📧', label: 'Communications' },
-              { icon: '📄', label: 'Proposals' },
-              { icon: '🤖', label: 'AI Assistant' },
+              { icon: Mail, label: 'Communications' },
+              { icon: FileText, label: 'Proposals' },
+              { icon: Bot, label: 'AI Assistant' },
             ].map((item) => (
               <li key={item.label} style={{ marginBottom: '0.25rem' }}>
                 <a href="#" style={{
@@ -225,7 +233,7 @@ export default function Navigation({ activePage }: NavigationProps) {
                   textDecoration: 'none',
                   color: '#F0F0F5'
                 }}>
-                  <span>{item.icon}</span>
+                  <item.icon size={18} strokeWidth={2} />
                   <span>{item.label}</span>
                 </a>
               </li>

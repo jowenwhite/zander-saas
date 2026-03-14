@@ -483,10 +483,11 @@ export default function FormsPage() {
       <main style={{ marginLeft: '240px', marginTop: '64px', padding: '2rem' }}>
         {/* Page Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #00CCEE 0%, #00A8C6 100%)',
+          background: '#13131A',
+          border: '1px solid #2A2A38',
           borderRadius: '12px',
           padding: '2rem',
-          color: 'white',
+          color: '#F0F0F5',
           marginBottom: '2rem'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
@@ -568,9 +569,9 @@ export default function FormsPage() {
 
         {/* Main Tabs */}
         <div style={{
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
-          border: '2px solid #2A2A38',
+          border: '1px solid #2A2A38',
           overflow: 'hidden'
         }}>
           {/* Tab Headers */}
@@ -586,12 +587,12 @@ export default function FormsPage() {
                 style={{
                   flex: 1,
                   padding: '1rem',
-                  background: activeTab === tab.id ? 'var(--zander-off-white)' : 'white',
+                  background: activeTab === tab.id ? '#252530' : 'transparent',
                   border: 'none',
                   borderBottom: activeTab === tab.id ? '3px solid #00CCEE' : '3px solid transparent',
                   cursor: 'pointer',
                   fontWeight: '600',
-                  color: activeTab === tab.id ? '#00CCEE' : 'var(--zander-gray)',
+                  color: activeTab === tab.id ? '#00CCEE' : '#8888A0',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -669,8 +670,8 @@ export default function FormsPage() {
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             padding: '1rem 1.25rem',
-                            background: expandedCategory === category ? 'var(--zander-off-white)' : 'white',
-                            border: '2px solid #2A2A38',
+                            background: expandedCategory === category ? '#252530' : '#1C1C26',
+                            border: '1px solid #2A2A38',
                             borderRadius: expandedCategory === category ? '8px 8px 0 0' : '8px',
                             cursor: 'pointer',
                             textAlign: 'left'
@@ -714,8 +715,8 @@ export default function FormsPage() {
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   padding: '1rem 1.25rem',
-                                  background: index % 2 === 0 ? 'white' : 'var(--zander-off-white)',
-                                  borderBottom: index < groupedForms[category].length - 1 ? '1px solid var(--zander-border-gray)' : 'none'
+                                  background: index % 2 === 0 ? '#1C1C26' : '#252530',
+                                  borderBottom: index < groupedForms[category].length - 1 ? '1px solid #2A2A38' : 'none'
                                 }}
                               >
                                 <div>
@@ -730,7 +731,7 @@ export default function FormsPage() {
                                     style={{
                                       padding: '0.25rem 0.5rem',
                                       background: form.status === 'active' ? 'rgba(39, 174, 96, 0.1)' : 'rgba(108, 117, 125, 0.1)',
-                                      color: form.status === 'active' ? '#27AE60' : 'var(--zander-gray)',
+                                      color: form.status === 'active' ? '#27AE60' : '#8888A0',
                                       borderRadius: '4px',
                                       fontSize: '0.65rem',
                                       fontWeight: '600',
@@ -825,7 +826,7 @@ export default function FormsPage() {
                     </thead>
                     <tbody>
                       {submissions.map((submission: any, index) => (
-                        <tr key={submission.id} style={{ background: index % 2 === 0 ? 'white' : 'var(--zander-off-white)', borderBottom: '1px solid #2A2A38' }}>
+                        <tr key={submission.id} style={{ background: index % 2 === 0 ? '#1C1C26' : '#252530', borderBottom: '1px solid #2A2A38' }}>
                           <td style={{ padding: '1rem', color: '#F0F0F5', fontWeight: '500' }}>{submission.formName || 'Unknown Form'}</td>
                           <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#8888A0' }}>{formatDate(submission.createdAt)}</td>
                           <td style={{ padding: '1rem', fontSize: '0.8rem', color: '#8888A0', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -913,8 +914,8 @@ export default function FormsPage() {
                       <div
                         key={sop.id}
                         style={{
-                          background: 'white',
-                          border: '2px solid #2A2A38',
+                          background: '#1C1C26',
+                          border: '1px solid #2A2A38',
                           borderRadius: '8px',
                           padding: '1.25rem',
                           cursor: 'pointer',
@@ -959,7 +960,7 @@ export default function FormsPage() {
           background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }}>
           <div style={{
-            background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
+            background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
           }}>
             <div style={{ background: '#13131A', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
               <h2 style={{ margin: 0 }}>{viewingForm.name}</h2>
@@ -993,7 +994,7 @@ export default function FormsPage() {
                         <select
                           value={formData[field.id] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                          style={{ width: '100%', padding: '0.75rem', border: '2px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', background: 'white' }}
+                          style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', background: '#1C1C26', color: '#F0F0F5' }}
                         >
                           <option value="">Select...</option>
                           {field.options?.map((opt: any) => (
@@ -1019,7 +1020,7 @@ export default function FormsPage() {
             <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => { setViewingForm(null); setFormData({}); }}
-                style={{ padding: '0.75rem 1.5rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                style={{ padding: '0.75rem 1.5rem', background: '#13131A', color: '#8888A0', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
               >
                 Cancel
               </button>
@@ -1042,7 +1043,7 @@ export default function FormsPage() {
           background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }}>
           <div style={{
-            background: 'white', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
+            background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto'
           }}>
             <div style={{ background: '#13131A', color: 'white', padding: '1.5rem', borderRadius: '12px 12px 0 0' }}>
               <h2 style={{ margin: 0 }}>Submission Details</h2>
@@ -1065,7 +1066,7 @@ export default function FormsPage() {
                     <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem', textTransform: 'capitalize' }}>
                       {key.replace(/_/g, ' ')}
                     </div>
-                    <div style={{ color: '#333' }}>{String(value) || '-'}</div>
+                    <div style={{ color: '#8888A0' }}>{String(value) || '-'}</div>
                   </div>
                 ))}
               </div>
@@ -1097,12 +1098,13 @@ export default function FormsPage() {
           zIndex: 1000
         }}>
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
             padding: '2rem',
             width: '100%',
             maxWidth: '500px',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            border: '1px solid #2A2A38'
           }}>
             <h2 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5' }}>Create New Form</h2>
             
@@ -1213,7 +1215,7 @@ export default function FormsPage() {
                 disabled={saving || !newForm.name.trim()}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  background: saving || !newForm.name.trim() ? 'var(--zander-gray)' : '#00CCEE',
+                  background: saving || !newForm.name.trim() ? '#55556A' : '#00CCEE',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -1243,14 +1245,15 @@ export default function FormsPage() {
           zIndex: 1000
         }}>
           <div style={{
-            background: 'white',
+            background: '#1C1C26',
             borderRadius: '12px',
             width: '90%',
             maxWidth: '900px',
             maxHeight: '85vh',
             overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            border: '1px solid #2A2A38'
           }}>
             {/* Header */}
             <div style={{
@@ -1291,7 +1294,7 @@ export default function FormsPage() {
               <select
                 value={treasuryFilter.type}
                 onChange={(e) => setTreasuryFilter({ ...treasuryFilter, type: e.target.value as 'form' | 'sop' | 'all' })}
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #2A2A38' }}
               >
                 <option value="all">All Types</option>
                 <option value="form">Forms</option>
@@ -1300,7 +1303,7 @@ export default function FormsPage() {
               <select
                 value={treasuryFilter.category}
                 onChange={(e) => setTreasuryFilter({ ...treasuryFilter, category: e.target.value })}
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #2A2A38' }}
               >
                 <option value="">All Categories</option>
                 <option value="sales">Sales</option>
@@ -1311,7 +1314,7 @@ export default function FormsPage() {
               <select
                 value={treasuryFilter.executive}
                 onChange={(e) => setTreasuryFilter({ ...treasuryFilter, executive: e.target.value })}
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #2A2A38' }}
               >
                 <option value="">All Executives</option>
                 <option value="CRO">CRO</option>
@@ -1322,7 +1325,7 @@ export default function FormsPage() {
               <select
                 value={treasuryFilter.industry}
                 onChange={(e) => setTreasuryFilter({ ...treasuryFilter, industry: e.target.value })}
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--zander-border-gray)' }}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #2A2A38' }}
               >
                 <option value="">All Industries</option>
                 <option value="general">General</option>
@@ -1357,13 +1360,13 @@ export default function FormsPage() {
                         cursor: 'pointer'
                       }}
                       onMouseOver={(e) => { e.currentTarget.style.borderColor = '#00CCEE'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.borderColor = '#2A2A38'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                         <span style={{ fontSize: '1.5rem' }}>{item.type === 'form' ? '📋' : '📑'}</span>
                         <span style={{
                           background: item.type === 'form' ? 'rgba(0, 86, 135, 0.1)' : 'rgba(191, 10, 48, 0.1)',
-                          color: item.type === 'form' ? 'var(--zander-blue)' : '#00CCEE',
+                          color: item.type === 'form' ? '#00CCEE' : '#00CCEE',
                           padding: '0.25rem 0.5rem',
                           borderRadius: '4px',
                           fontSize: '0.7rem',
