@@ -8,6 +8,7 @@ import NavBar from '../components/NavBar';
 import { logout } from '../utils/auth';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
+import { Users, Building2, Mail, Phone, Landmark, Smartphone } from 'lucide-react';
 
 interface Person {
   id: string;
@@ -204,9 +205,8 @@ export default function PeoplePage() {
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 1rem',
-              fontSize: '1.5rem',
               color: 'white'
-            }}>👥</div>
+            }}><Users size={24} /></div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem' }}>
               {totalPeople}
             </div>
@@ -254,9 +254,8 @@ export default function PeoplePage() {
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 1rem',
-              fontSize: '1.5rem',
               color: 'white'
-            }}>🏢</div>
+            }}><Building2 size={24} /></div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem' }}>
               {uniqueCompanies}
             </div>
@@ -390,7 +389,7 @@ export default function PeoplePage() {
             padding: '4rem',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>👥</div>
+            <div style={{ marginBottom: '1rem', opacity: 0.5, color: '#00CCEE' }}><Users size={48} /></div>
             <h3 style={{ color: '#F0F0F5', marginBottom: '0.5rem' }}>No people found</h3>
             <p style={{ color: '#8888A0' }}>Try adjusting your search or filters</p>
           </div>
@@ -452,12 +451,12 @@ export default function PeoplePage() {
 
                   <div style={{ marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.875rem', color: '#8888A0' }}>
-                      <span>📧</span>
+                      <Mail size={14} />
                       <span>{person.email}</span>
                     </div>
                     {person.phone && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: '#8888A0' }}>
-                        <span>📱</span>
+                        <Smartphone size={14} />
                         <span>{person.phone}</span>
                       </div>
                     )}
@@ -493,14 +492,14 @@ export default function PeoplePage() {
                         border: '1px solid #2A2A38',
                         borderRadius: '6px',
                         cursor: 'pointer'
-                      }}>📧</button>
+                      }}><Mail size={14} /></button>
                       <button style={{
                         padding: '0.5rem',
                         background: '#09090F',
                         border: '1px solid #2A2A38',
                         borderRadius: '6px',
                         cursor: 'pointer'
-                      }}>📞</button>
+                      }}><Phone size={14} /></button>
                     </div>
                   </div>
                 </div>
@@ -535,7 +534,7 @@ export default function PeoplePage() {
                     <tr key={person.id} onClick={() => router.push("/people/" + person.id)} style={{ borderBottom: '1px solid #2A2A38', cursor: 'pointer' }}>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#13131A', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}>🏛️ HQ</a>
+          <a href="/headquarters" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#13131A', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.875rem' }}><Landmark size={14} /> HQ</a>
                           <div style={{
                             width: '36px',
                             height: '36px',
