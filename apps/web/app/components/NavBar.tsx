@@ -60,14 +60,26 @@ export default function NavBar({ activeModule = 'cro' }: NavBarProps) {
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <Image
-            src="/images/zander-logo.svg"
-            alt="Zander"
-            width={200}
-            height={50}
-            priority
-            style={{ height: '50px', width: 'auto', minWidth: '160px' }}
-          />
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            minWidth: '200px'
+          }}>
+            <Image
+              src="/images/zander-logo.svg"
+              alt="Zander"
+              width={200}
+              height={50}
+              priority
+              style={{
+                height: '50px',
+                width: 'auto',
+                maxWidth: '220px',
+                objectFit: 'contain',
+                display: 'block'
+              }}
+            />
+          </div>
         </a>
         <TenantSwitcher />
       </div>

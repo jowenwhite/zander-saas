@@ -104,9 +104,14 @@ export default function LoginPage() {
             <Image
               src="/images/zander-logo-white.svg"
               alt="Zander"
-              width={200}
-              height={50}
+              width={280}
+              height={70}
               priority
+              style={{
+                height: '70px',
+                width: 'auto',
+                objectFit: 'contain'
+              }}
             />
           </div>
           <p style={{ fontSize: '1.5rem', fontWeight: '300', opacity: 0.9, margin: 0 }}>
