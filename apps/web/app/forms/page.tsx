@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
+import { Briefcase, FileEdit, DollarSign, Star, ClipboardList, Landmark, Clock, FileText } from 'lucide-react';
 
 interface Form {
   id: string;
@@ -515,7 +516,7 @@ export default function FormsPage() {
                   gap: '0.5rem'
                 }}
               >
-                🏛️ The Treasury
+                <Landmark size={16} /> The Treasury
               </button>
               <button
                 onClick={() => setShowCreateModal(true)}
@@ -624,7 +625,7 @@ export default function FormsPage() {
                   </div>
                 ) : forms.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
+                    <div style={{ marginBottom: '1rem', color: '#00CCEE' }}><ClipboardList size={48} /></div>
                     <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Forms Yet</h3>
                     <p style={{ color: '#8888A0', marginBottom: '1rem' }}>Get started by activating an Industry Pack or creating a custom form</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -640,7 +641,7 @@ export default function FormsPage() {
                           cursor: 'pointer'
                         }}
                       >
-                        🏛️ Browse Treasury
+                        <Landmark size={14} /> Browse Treasury
                       </button>
                       <button
                         onClick={() => setShowCreateModal(true)}
@@ -890,7 +891,7 @@ export default function FormsPage() {
                           cursor: 'pointer'
                         }}
                       >
-                        🏛️ Browse Treasury
+                        <Landmark size={14} /> Browse Treasury
                       </button>
                       <button
                         onClick={() => setShowCreateModal(true)}
@@ -1265,7 +1266,7 @@ export default function FormsPage() {
             }}>
               <div>
                 <h2 style={{ margin: 0, color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🏛️ The Treasury
+                  <Landmark size={16} /> The Treasury
                 </h2>
                 <p style={{ margin: '0.25rem 0 0 0', color: '#F0F0F5', opacity: 0.8, fontSize: '0.9rem' }}>
                   Pre-built form and SOP templates ready to customize
@@ -1338,12 +1339,12 @@ export default function FormsPage() {
             <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
               {treasuryLoading ? (
                 <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+                  <div style={{ marginBottom: '1rem', color: '#00CCEE' }}><Clock size={32} /></div>
                   <p>Loading templates...</p>
                 </div>
               ) : treasuryItems.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
+                  <div style={{ marginBottom: '1rem', color: '#00CCEE' }}><Landmark size={48} /></div>
                   <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Templates Found</h3>
                   <p style={{ margin: 0 }}>Try adjusting your filters or check back later for new templates.</p>
                 </div>
@@ -1363,7 +1364,7 @@ export default function FormsPage() {
                       onMouseOut={(e) => { e.currentTarget.style.borderColor = '#2A2A38'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
-                        <span style={{ fontSize: '1.5rem' }}>{item.type === 'form' ? '📋' : '📑'}</span>
+                        {item.type === 'form' ? <ClipboardList size={24} style={{ color: '#00CCEE' }} /> : <FileText size={24} style={{ color: '#00CCEE' }} />}
                         <span style={{
                           background: item.type === 'form' ? 'rgba(0, 86, 135, 0.1)' : 'rgba(191, 10, 48, 0.1)',
                           color: item.type === 'form' ? '#00CCEE' : '#00CCEE',
