@@ -132,7 +132,7 @@ export default function CMODashboardPage() {
         <KPICard
           title="New Leads"
           value={metrics?.newLeads?.count?.toString() || '0'}
-          icon="👥"
+          icon={<Users size={24} />}
           trend={metrics?.newLeads?.trend ? `${metrics.newLeads.trend > 0 ? '+' : ''}${metrics.newLeads.trend}%` : undefined}
           trendUp={metrics?.newLeads?.trendUp ?? true}
           detail={metrics?.newLeads?.detail || 'This month'}
@@ -141,7 +141,7 @@ export default function CMODashboardPage() {
         <KPICard
           title="Email Open Rate"
           value={`${metrics?.emailOpenRate?.rate?.toFixed(1) || '0'}%`}
-          icon="📧"
+          icon={<Mail size={24} />}
           trend={metrics?.emailOpenRate?.trend ? `+${metrics.emailOpenRate.trend}%` : undefined}
           trendUp={metrics?.emailOpenRate?.trendUp ?? true}
           detail={metrics?.emailOpenRate?.detail || 'Last 30 days'}
@@ -150,7 +150,7 @@ export default function CMODashboardPage() {
         <KPICard
           title="Conversion Rate"
           value={`${metrics?.conversionRate?.rate?.toFixed(1) || '0'}%`}
-          icon="🎯"
+          icon={<Target size={24} />}
           trend={
             metrics?.conversionRate?.trend
               ? `+${metrics.conversionRate.trend}%`
@@ -163,7 +163,7 @@ export default function CMODashboardPage() {
         <KPICard
           title="Pipeline Value"
           value={formatCurrency(metrics?.pipelineValue?.amount || 0)}
-          icon="💰"
+          icon={<DollarSign size={24} />}
           trend={metrics?.pipelineValue?.trend ? `+${metrics.pipelineValue.trend}%` : undefined}
           trendUp={metrics?.pipelineValue?.trendUp ?? true}
           detail={metrics?.pipelineValue?.detail || 'Active deals'}

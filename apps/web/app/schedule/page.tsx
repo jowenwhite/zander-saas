@@ -4,6 +4,7 @@ import NavBar from '../components/NavBar';
 import Sidebar from '../components/Sidebar';
 import AuthGuard from '../components/AuthGuard';
 import FormCompletionModal from '../components/FormCompletionModal';
+import { Factory, Building2, Rocket, Store, ClipboardList, Mail, Calendar, Users, CheckSquare, Bell, Briefcase, User, FileText, Trash2, Landmark, Phone, MapPin, CalendarDays, AlertTriangle, Paperclip, Clock, FileEdit, Star, Video, Film, Ban, File, Circle, Check, ListTodo } from 'lucide-react';
 
 interface CalendarEvent {
   id: string;
@@ -77,10 +78,20 @@ interface AccessibleTenant {
 
 // Tenant colors for multi-tenant view
 const TENANT_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
-  'mcf': { bg: '#BF0A30', text: 'white', icon: '🏭' },
-  '64w': { bg: '#0C2340', text: 'white', icon: '🏢' },
-  'zander': { bg: '#F0B323', text: '#0C2340', icon: '🚀' },
-  'default': { bg: '#6c757d', text: 'white', icon: '🏪' }
+  'mcf': { bg: '#BF0A30', text: 'white', icon: 'factory' },
+  '64w': { bg: '#0C2340', text: 'white', icon: 'building' },
+  'zander': { bg: '#F0B323', text: '#0C2340', icon: 'rocket' },
+  'default': { bg: '#6c757d', text: 'white', icon: 'store' }
+};
+
+const getTenantIcon = (iconKey: string, size: number = 14) => {
+  const icons: Record<string, React.ReactNode> = {
+    factory: <Factory size={size} />,
+    building: <Building2 size={size} />,
+    rocket: <Rocket size={size} />,
+    store: <Store size={size} />,
+  };
+  return icons[iconKey] || <Building2 size={size} />;
 };
 
 const getTenantColor = (subdomain: string) => {
@@ -258,11 +269,11 @@ export default function SchedulePage() {
   // Helper to get icon for treasury item type
   const getTreasuryTypeIcon = (type: string) => {
     switch (type) {
-      case 'form': return '📋';
-      case 'sop': return '📑';
-      case 'campaign': return '📧';
-      case 'assembly': return '📅';
-      default: return '📄';
+      case 'form': return <ClipboardList size={14} />;
+      case 'sop': return <FileText size={14} />;
+      case 'campaign': return <Mail size={14} />;
+      case 'assembly': return <Calendar size={14} />;
+      default: return <File size={14} />;
     }
   };
 
@@ -550,24 +561,24 @@ export default function SchedulePage() {
 
   const getEventTypeIcon = (type: string) => {
     switch (type) {
-      case 'meeting': return '👥';
-      case 'call': return '📞';
-      case 'task': return '✅';
-      case 'reminder': return '🔔';
-      case 'block': return '🚫';
-      case 'shift': return '⏰';
-      default: return '📅';
+      case 'meeting': return <Users size={14} />;
+      case 'call': return <Phone size={14} />;
+      case 'task': return <CheckSquare size={14} />;
+      case 'reminder': return <Bell size={14} />;
+      case 'block': return <Ban size={14} />;
+      case 'shift': return <Clock size={14} />;
+      default: return <Calendar size={14} />;
     }
   };
 
   const getPlatformIcon = (platform?: string) => {
     switch (platform) {
-      case 'zoom': return '📹 Zoom';
-      case 'google_meet': return '🎥 Google Meet';
-      case 'teams': return '💼 Teams';
-      case 'phone': return '📞 Phone';
-      case 'in_person': return '🏢 In Person';
-      default: return '';
+      case 'zoom': return <><Video size={14} /> Zoom</>;
+      case 'google_meet': return <><Film size={14} /> Google Meet</>;
+      case 'teams': return <><Briefcase size={14} /> Teams</>;
+      case 'phone': return <><Phone size={14} /> Phone</>;
+      case 'in_person': return <><Building2 size={14} /> In Person</>;
+      default: return null;
     }
   };
 
@@ -601,7 +612,7 @@ export default function SchedulePage() {
   const upcomingCount = events.filter(e => new Date(e.startTime) > today).length;
 
   // Recording disclosure text
-  const RECORDING_DISCLOSURE = `📹 RECORDING NOTICE: This meeting may be recorded for quality assurance and internal purposes. By attending, you consent to being recorded. If you do not consent, please notify the organizer before the meeting begins.`;
+  const RECORDING_DISCLOSURE = `RECORDING NOTICE: This meeting may be recorded for quality assurance and internal purposes. By attending, you consent to being recorded. If you do not consent, please notify the organizer before the meeting begins.`;
 
   return (
     <AuthGuard>
@@ -643,7 +654,7 @@ export default function SchedulePage() {
                     gap: '0.5rem'
                   }}
                 >
-                  🏛️ The Treasury
+                  <Landmark size={16} /> The Treasury
                 </button>
                 <button
                   onClick={() => setShowCreateModal(true)}
@@ -686,7 +697,7 @@ export default function SchedulePage() {
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                ⭐ Personal View:
+                <Star size={14} style={{ display: 'inline' }} /> Personal View:
               </span>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <button
@@ -731,7 +742,7 @@ export default function SchedulePage() {
                         gap: '0.5rem'
                       }}
                     >
-                      {colors.icon} {tenant.companyName}
+                      {getTenantIcon(colors.icon, 14)} {tenant.companyName}
                     </button>
                   );
                 })}
@@ -754,7 +765,7 @@ export default function SchedulePage() {
                     gap: '0.5rem'
                   }}
                 >
-                  ⭐ All My Companies
+                  <Star size={14} style={{ display: 'inline' }} /> All My Companies
                 </button>
               </div>
             </div>
@@ -773,10 +784,10 @@ export default function SchedulePage() {
           }}>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {[
-                { id: 'today', label: 'Today', icon: '📍' },
-                { id: 'week', label: 'Week', icon: '📆' },
-                { id: 'month', label: 'Month', icon: '🗓️' },
-                { id: 'agenda', label: 'Agenda', icon: '📋' }
+                { id: 'today', label: 'Today', icon: <MapPin size={16} /> },
+                { id: 'week', label: 'Week', icon: <Calendar size={16} /> },
+                { id: 'month', label: 'Month', icon: <CalendarDays size={16} /> },
+                { id: 'agenda', label: 'Agenda', icon: <ListTodo size={16} /> }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -794,7 +805,7 @@ export default function SchedulePage() {
                     gap: '0.5rem'
                   }}
                 >
-                  <span>{tab.icon}</span>
+                  {tab.icon}
                   {tab.label}
                 </button>
               ))}
@@ -873,7 +884,7 @@ export default function SchedulePage() {
               </div>
             ) : events.length === 0 ? (
               <div style={{ padding: '3rem', textAlign: 'center' }}>
-                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📅</div>
+                <div style={{ marginBottom: '1rem', color: '#00CCEE' }}><Calendar size={64} /></div>
                 <h3 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>No Assemblies Scheduled</h3>
                 <p style={{ color: '#8888A0', marginBottom: '1.5rem' }}>
                   {view === 'today' ? "Your day is clear! Schedule something or enjoy the free time." : "No events found for this period."}
@@ -940,7 +951,7 @@ export default function SchedulePage() {
                                 alignItems: 'center',
                                 gap: '0.25rem'
                               }}>
-                                {getTenantColor((event as any).tenant.subdomain).icon} {(event as any).tenant.companyName}
+                                {getTenantIcon(getTenantColor((event as any).tenant.subdomain).icon, 12)} {(event as any).tenant.companyName}
                               </span>
                             )}
                             {event.willBeRecorded && (
@@ -952,7 +963,7 @@ export default function SchedulePage() {
                                 fontSize: '0.65rem',
                                 fontWeight: '700'
                               }}>
-                                🔴 RECORDING
+                                <Circle size={10} fill="#BF0A30" /> RECORDING
                               </span>
                             )}
                             {event.priority === 'urgent' && (
@@ -972,7 +983,7 @@ export default function SchedulePage() {
                             {event.contact && `${event.contact.firstName} ${event.contact.lastName}`}
                             {event.contact && event.meetingPlatform && ' • '}
                             {event.meetingPlatform && getPlatformIcon(event.meetingPlatform)}
-                            {event.location && !event.meetingPlatform && `📍 ${event.location}`}
+                            {event.location && !event.meetingPlatform && <><MapPin size={12} /> {event.location}</>}
                           </div>
                         </div>
                         {event.meetingUrl && (
@@ -994,7 +1005,7 @@ export default function SchedulePage() {
                               gap: '0.25rem'
                             }}
                           >
-                            🚀 Join
+                            <Rocket size={14} /> Join
                           </a>
                         )}
                       </div>
@@ -1046,7 +1057,7 @@ export default function SchedulePage() {
                                 alignItems: 'center',
                                 gap: '0.25rem'
                               }}>
-                                {getTenantColor((event as any).tenant.subdomain).icon} {(event as any).tenant.companyName}
+                                {getTenantIcon(getTenantColor((event as any).tenant.subdomain).icon, 12)} {(event as any).tenant.companyName}
                               </span>
                             )}
                             {event.willBeRecorded && (
@@ -1058,13 +1069,13 @@ export default function SchedulePage() {
                                 fontSize: '0.65rem',
                                 fontWeight: '700'
                               }}>
-                                🔴 REC
+                                <Circle size={8} fill="#BF0A30" style={{ display: 'inline' }} /> REC
                               </span>
                             )}
                           </div>
-                          <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
+                          <div style={{ fontSize: '0.875rem', color: '#8888A0', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             {event.contact && `${event.contact.firstName} ${event.contact.lastName}`}
-                            {event.meetingPlatform && ` • ${getPlatformIcon(event.meetingPlatform)}`}
+                            {event.meetingPlatform && <> • {getPlatformIcon(event.meetingPlatform)}</>}
                           </div>
                         </div>
                         <div style={{
@@ -1386,8 +1397,8 @@ export default function SchedulePage() {
                       style={{ width: '20px', height: '20px', accentColor: '#00CCEE' }}
                     />
                     <div>
-                      <div style={{ fontWeight: '600', color: '#F0F0F5' }}>
-                        🔴 This meeting will be recorded
+                      <div style={{ fontWeight: '600', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Circle size={12} fill="#BF0A30" /> This meeting will be recorded
                       </div>
                       <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
                         Recording disclosure will be automatically included in invitations
@@ -1404,7 +1415,7 @@ export default function SchedulePage() {
                       color: '#F0F0F5',
                       border: '1px solid #00CCEE'
                     }}>
-                      <strong>⚠️ Recording Disclosure (will be added to invite):</strong>
+                      <strong><AlertTriangle size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Recording Disclosure (will be added to invite):</strong>
                       <p style={{ margin: '0.5rem 0 0', lineHeight: '1.5' }}>{RECORDING_DISCLOSURE}</p>
                     </div>
                   )}
@@ -1429,7 +1440,7 @@ export default function SchedulePage() {
                 {/* Attach from Treasury */}
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>
-                    📎 Attached Items from Treasury
+                    <Paperclip size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Attached Items from Treasury
                   </label>
                   
                   {/* Attached Items List */}
@@ -1549,7 +1560,7 @@ export default function SchedulePage() {
                       fontSize: '0.75rem',
                       fontWeight: '700'
                     }}>
-                      🔴 RECORDING
+                      <Circle size={10} fill="#BF0A30" /> RECORDING
                     </span>
                   )}
                 </div>
@@ -1572,7 +1583,7 @@ export default function SchedulePage() {
                     )}
                     {selectedEvent.location && (
                       <div style={{ padding: '0.75rem 1rem', background: '#09090F', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span>📍</span>
+                        <MapPin size={14} />
                         <span>{selectedEvent.location}</span>
                       </div>
                     )}
@@ -1597,7 +1608,7 @@ export default function SchedulePage() {
                       marginBottom: '1rem'
                     }}
                   >
-                    🚀 Join Meeting
+                    <Rocket size={16} /> Join Meeting
                   </a>
                 )}
 
@@ -1610,14 +1621,14 @@ export default function SchedulePage() {
                     borderRadius: '8px',
                     marginBottom: '1rem'
                   }}>
-                    <div style={{ fontWeight: '600', color: '#00CCEE', marginBottom: '0.5rem' }}>
-                      🔴 Recording Notice
+                    <div style={{ fontWeight: '600', color: '#00CCEE', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Circle size={12} fill="#BF0A30" /> Recording Notice
                     </div>
                     <div style={{ fontSize: '0.875rem', color: '#F0F0F5', lineHeight: '1.5' }}>
                       {RECORDING_DISCLOSURE}
                     </div>
                     <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: '#8888A0' }}>
-                      Disclosure sent: {selectedEvent.recordingDisclosureSent ? '✅ Yes' : '⏳ Pending'}
+                      Disclosure sent: {selectedEvent.recordingDisclosureSent ? <><Check size={14} /> Yes</> : <><Clock size={14} /> Pending</>}
                       {selectedEvent.recordingConsentStatus && ` • Consent: ${selectedEvent.recordingConsentStatus}`}
                     </div>
                   </div>
@@ -1626,7 +1637,7 @@ export default function SchedulePage() {
                 {/* Agenda */}
                 {selectedEvent.agenda && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>📋 Agenda</h4>
+                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ClipboardList size={16} /> Agenda</h4>
                     <div style={{
                       padding: '1rem',
                       background: '#09090F',
@@ -1643,7 +1654,7 @@ export default function SchedulePage() {
                 {/* Attached Items */}
                 {selectedEvent.attachedItems && selectedEvent.attachedItems.length > 0 && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>📎 Attached Items</h4>
+                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Paperclip size={16} /> Attached Items</h4>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                       {selectedEvent.attachedItems.map((item: any, index: number) => (
                         <div
@@ -1677,9 +1688,9 @@ export default function SchedulePage() {
                               fontSize: '0.65rem',
                               fontWeight: '600'
                             }}>
-                              {formSubmissionStatuses[item.treasuryItemId].status === 'completed' 
-                                ? '✅ v' + formSubmissionStatuses[item.treasuryItemId].version
-                                : '📝 Draft'}
+                              {formSubmissionStatuses[item.treasuryItemId].status === 'completed'
+                                ? <><Check size={10} /> v{formSubmissionStatuses[item.treasuryItemId].version}</>
+                                : <><FileEdit size={10} /> Draft</>}
                             </span>
                           )}
                           {item.type === 'form' && !formSubmissionStatuses[item.treasuryItemId] && (
@@ -1715,7 +1726,7 @@ export default function SchedulePage() {
                 {/* Description */}
                 {selectedEvent.description && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>📝 Description</h4>
+                    <h4 style={{ margin: '0 0 0.5rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FileEdit size={16} /> Description</h4>
                     <p style={{ margin: 0, color: '#8888A0', lineHeight: '1.6' }}>
                       {selectedEvent.description}
                     </p>
@@ -1763,7 +1774,7 @@ export default function SchedulePage() {
                     cursor: 'pointer'
                   }}
                 >
-                  🗑️ Delete
+                  <Trash2 size={16} /> Delete
                 </button>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <button
@@ -1834,7 +1845,7 @@ export default function SchedulePage() {
               }}>
                 <div>
                   <h2 style={{ margin: 0, color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    🏛️ The Treasury
+                    <Landmark size={16} /> The Treasury
                   </h2>
                   <p style={{ margin: '0.25rem 0 0 0', color: '#F0F0F5', opacity: 0.8, fontSize: '0.9rem' }}>
                     Pre-built assembly templates ready to customize
@@ -1898,12 +1909,12 @@ export default function SchedulePage() {
               <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
                 {treasuryLoading ? (
                   <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+                    <div style={{ marginBottom: '1rem', color: '#00CCEE' }}><Clock size={32} /></div>
                     <p>Loading templates...</p>
                   </div>
                 ) : treasuryItems.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
+                    <div style={{ marginBottom: '1rem', color: '#00CCEE' }}><Landmark size={48} /></div>
                     <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No Templates Found</h3>
                     <p style={{ margin: 0 }}>Try adjusting your filters or check back later for new templates.</p>
                   </div>
@@ -1923,7 +1934,7 @@ export default function SchedulePage() {
                         onMouseOut={(e) => { e.currentTarget.style.borderColor = '#2A2A38'; e.currentTarget.style.boxShadow = 'none'; }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
-                          <span style={{ fontSize: '1.5rem' }}>📅</span>
+                          <Calendar size={24} style={{ color: '#00CCEE' }} />
                           {item.duration && (
                             <span style={{
                               background: 'rgba(0, 86, 135, 0.1)',
@@ -1988,7 +1999,7 @@ export default function SchedulePage() {
               background: '#1C1C26', borderRadius: '12px', width: '90%', maxWidth: '700px', maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column'
             }}>
               <div style={{ background: '#13131A', color: 'white', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0 }}>📎 Attach from Treasury</h3>
+                <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Paperclip size={18} /> Attach from Treasury</h3>
                 <button
                   onClick={() => setShowAttachTreasuryPicker(false)}
                   style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}
@@ -1999,7 +2010,7 @@ export default function SchedulePage() {
               <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
                 {allTreasuryItems.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+                    <div style={{ marginBottom: '1rem', color: '#00CCEE' }}><Clock size={32} /></div>
                     <p>Loading items...</p>
                   </div>
                 ) : (
