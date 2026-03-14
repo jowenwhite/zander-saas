@@ -227,8 +227,8 @@ export default function ContactDetailPage() {
   if (loading) {
     return (
       <AuthGuard>
-        <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p style={{ color: 'var(--zander-gray)' }}>Loading contact...</p>
+        <div style={{ minHeight: '100vh', background: '#1C1C26', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: '#8888A0' }}>Loading contact...</p>
         </div>
       </AuthGuard>
     );
@@ -237,7 +237,7 @@ export default function ContactDetailPage() {
   if (error || !contact) {
     return (
       <AuthGuard>
-        <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ minHeight: '100vh', background: '#1C1C26', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ textAlign: 'center' }}>
             <p style={{ color: '#00CCEE', marginBottom: '1rem' }}>{error || 'Contact not found'}</p>
             <button onClick={() => router.push('/people')} style={{ padding: '0.5rem 1rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
@@ -251,7 +251,7 @@ export default function ContactDetailPage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+      <div style={{ minHeight: '100vh', background: '#1C1C26' }}>
         {/* Top Navigation */}
         <NavBar activeModule="cro" />
 
@@ -266,7 +266,7 @@ export default function ContactDetailPage() {
               gap: '0.5rem',
               background: 'none',
               border: 'none',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               cursor: 'pointer',
               marginBottom: '1rem',
               fontSize: '0.875rem'
@@ -431,32 +431,32 @@ export default function ContactDetailPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                 <div>
                   <h3 style={{ margin: '0 0 1rem 0', color: '#13131A', fontSize: '1rem' }}>Contact Details</h3>
-                  <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem' }}>
+                  <div style={{ background: '#1C1C26', borderRadius: '8px', padding: '1rem' }}>
                     <div style={{ marginBottom: '1rem' }}>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Email</div>
+                      <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Email</div>
                       <div style={{ color: '#13131A' }}>{contact.email}</div>
                     </div>
                     {contact.phone && (
                       <div style={{ marginBottom: '1rem' }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Phone</div>
+                        <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Phone</div>
                         <div style={{ color: '#13131A' }}>{contact.phone}</div>
                       </div>
                     )}
                     {contact.company && (
                       <div style={{ marginBottom: '1rem' }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Company</div>
+                        <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Company</div>
                         <div style={{ color: '#13131A' }}>{contact.company}</div>
                       </div>
                     )}
                     {contact.title && (
                       <div style={{ marginBottom: '1rem' }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Title</div>
+                        <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Title</div>
                         <div style={{ color: '#13131A' }}>{contact.title}</div>
                       </div>
                     )}
                     {contact.source && (
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Source</div>
+                        <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Source</div>
                         <div style={{ color: '#13131A' }}>{contact.source}</div>
                       </div>
                     )}
@@ -552,11 +552,11 @@ export default function ContactDetailPage() {
                     />
                   ) : (
                     <div style={{
-                      background: 'var(--zander-off-white)',
+                      background: '#1C1C26',
                       borderRadius: '8px',
                       padding: '1rem',
                       minHeight: '120px',
-                      color: notes ? '#13131A' : 'var(--zander-gray)',
+                      color: notes ? '#13131A' : '#8888A0',
                       fontSize: '0.9rem',
                       lineHeight: 1.6
                     }}>
@@ -565,9 +565,9 @@ export default function ContactDetailPage() {
                   )}
 
                   <h3 style={{ margin: '1.5rem 0 1rem 0', color: '#13131A', fontSize: '1rem' }}>Recent Activity</h3>
-                  <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem' }}>
+                  <div style={{ background: '#1C1C26', borderRadius: '8px', padding: '1rem' }}>
                     {timeline.length === 0 ? (
-                      <p style={{ color: 'var(--zander-gray)', fontSize: '0.9rem' }}>No activity yet</p>
+                      <p style={{ color: '#8888A0', fontSize: '0.9rem' }}>No activity yet</p>
                     ) : timeline.slice(0, 3).map((activity, index) => (
                       <div key={activity.id} style={{
                         display: 'flex',
@@ -579,7 +579,7 @@ export default function ContactDetailPage() {
                         <span style={{ fontSize: '1rem' }}>{getActivityIcon(activity.type)}</span>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '0.85rem', color: '#13131A' }}>{activity.title || activity.description}</div>
-                          <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>
                             {formatDateTime(activity.date)}
                           </div>
                         </div>
@@ -606,11 +606,11 @@ export default function ContactDetailPage() {
                   <h3 style={{ margin: '0 0 1rem 0', color: '#13131A', fontSize: '1rem' }}>Timeline</h3>
                   <div style={{ display: 'flex', gap: '2rem' }}>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Created</div>
+                      <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Created</div>
                       <div style={{ fontWeight: '600', color: '#13131A' }}>{formatDate(contact.createdAt)}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Last Updated</div>
+                      <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Last Updated</div>
                       <div style={{ fontWeight: '600', color: '#13131A' }}>{formatDate(contact.updatedAt)}</div>
                     </div>
                   </div>
@@ -641,7 +641,7 @@ export default function ContactDetailPage() {
                 </div>
 
                 {deals.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+                  <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
                     <p style={{ fontSize: '1rem', marginBottom: '1rem' }}>No deals yet for this contact</p>
                     <button
                       onClick={() => alert('Create new deal - coming soon!')}
@@ -671,7 +671,7 @@ export default function ContactDetailPage() {
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             padding: '1rem 1.25rem',
-                            background: 'var(--zander-off-white)',
+                            background: '#1C1C26',
                             border: '2px solid var(--zander-border-gray)',
                             borderRadius: '8px',
                             cursor: 'pointer',
@@ -680,12 +680,12 @@ export default function ContactDetailPage() {
                         >
                           <div>
                             <div style={{ fontWeight: '600', color: '#13131A', marginBottom: '0.25rem' }}>{deal.name}</div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Created {formatDate(deal.createdAt)}</div>
+                            <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Created {formatDate(deal.createdAt)}</div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                             <div style={{ textAlign: 'right' }}>
                               <div style={{ fontWeight: '700', color: '#13131A' }}>{formatCurrency(deal.value)}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{deal.probability}% probability</div>
+                              <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{deal.probability}% probability</div>
                             </div>
                             <span style={{
                               padding: '0.375rem 0.75rem',
@@ -697,7 +697,7 @@ export default function ContactDetailPage() {
                             }}>
                               {getStageLabel(deal.stage)}
                             </span>
-                            <span style={{ color: 'var(--zander-gray)' }}>→</span>
+                            <span style={{ color: '#8888A0' }}>→</span>
                           </div>
                         </div>
                       );
@@ -731,7 +731,7 @@ export default function ContactDetailPage() {
                         display: 'flex',
                         gap: '1rem',
                         padding: '1rem',
-                        background: 'var(--zander-off-white)',
+                        background: '#1C1C26',
                         borderRadius: '8px',
                         border: '1px solid var(--zander-border-gray)'
                       }}
@@ -753,7 +753,7 @@ export default function ContactDetailPage() {
                         <div style={{ fontWeight: '500', color: '#13131A', marginBottom: '0.25rem' }}>
                           {activity.direction === 'inbound' ? '📥 ' : activity.direction === 'outbound' ? '📤 ' : ''}{activity.title || activity.description}
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#8888A0' }}>
                           <span>{formatDateTime(activity.date)}</span>
                           {activity.dealName && <span>• {activity.dealName}</span>}
                         </div>
@@ -809,7 +809,7 @@ export default function ContactDetailPage() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         padding: '1rem 1.25rem',
-                        background: 'var(--zander-off-white)',
+                        background: '#1C1C26',
                         border: '1px solid var(--zander-border-gray)',
                         borderRadius: '8px'
                       }}
@@ -818,7 +818,7 @@ export default function ContactDetailPage() {
                         <span style={{ fontSize: '1.5rem' }}>📋</span>
                         <div>
                           <div style={{ fontWeight: '600', color: '#13131A' }}>{form.formName}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                          <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                             {form.status === 'complete' && `Completed ${formatDateTime(form.submittedAt!)}`}
                             {form.status === 'sent' && `Sent ${formatDateTime(form.sentAt!)}`}
                             {form.status === 'partial' && `Started - sent ${formatDateTime(form.sentAt!)}`}
@@ -867,7 +867,7 @@ export default function ContactDetailPage() {
             alignItems: 'center',
             marginTop: '1.5rem',
             padding: '1rem 1.5rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             borderRadius: '8px'
           }}>
             <button

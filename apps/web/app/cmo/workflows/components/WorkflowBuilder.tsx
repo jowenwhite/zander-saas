@@ -172,7 +172,7 @@ export default function WorkflowBuilder({
   return (
     <div
       style={{
-        background: 'var(--zander-off-white)',
+        background: '#1C1C26',
         borderRadius: '12px',
         padding: '1.5rem',
         minHeight: '400px',
@@ -199,7 +199,7 @@ export default function WorkflowBuilder({
         <span
           style={{
             fontSize: '0.8rem',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
           }}
         >
           {nodes.length} node{nodes.length !== 1 ? 's' : ''}
@@ -270,7 +270,7 @@ export default function WorkflowBuilder({
           <div
             style={{
               fontSize: '0.75rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               marginTop: '0.25rem',
             }}
           >
@@ -347,7 +347,7 @@ export default function WorkflowBuilder({
             style={{
               margin: '0 0 1rem 0',
               fontSize: '0.85rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               maxWidth: '280px',
             }}
           >

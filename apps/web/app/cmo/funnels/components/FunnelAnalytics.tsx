@@ -50,8 +50,8 @@ export default function FunnelAnalytics({
           style={{
             padding: '0.375rem 0.75rem',
             borderRadius: '6px',
-            background: overallConversion >= 10 ? 'rgba(39, 174, 96, 0.1)' : 'var(--zander-off-white)',
-            color: overallConversion >= 10 ? '#27AE60' : 'var(--zander-gray)',
+            background: overallConversion >= 10 ? 'rgba(39, 174, 96, 0.1)' : '#1C1C26',
+            color: overallConversion >= 10 ? '#27AE60' : '#8888A0',
             fontSize: '0.8rem',
             fontWeight: '600',
           }}
@@ -68,12 +68,12 @@ export default function FunnelAnalytics({
           gap: '1rem',
           marginBottom: '1.5rem',
           padding: '1rem',
-          background: 'var(--zander-off-white)',
+          background: '#1C1C26',
           borderRadius: '8px',
         }}
       >
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
+          <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             TOTAL VISITS
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>
@@ -81,7 +81,7 @@ export default function FunnelAnalytics({
           </div>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
+          <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             CONVERSIONS
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#27AE60' }}>
@@ -89,7 +89,7 @@ export default function FunnelAnalytics({
           </div>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
+          <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             CONV. RATE
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F57C00' }}>
@@ -104,7 +104,7 @@ export default function FunnelAnalytics({
           style={{
             padding: '2rem',
             textAlign: 'center',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
             fontSize: '0.9rem',
           }}
         >
@@ -136,7 +136,7 @@ export default function FunnelAnalytics({
                     <div
                       style={{
                         fontSize: '0.7rem',
-                        color: dropOffRate > 50 ? '#00CCEE' : 'var(--zander-gray)',
+                        color: dropOffRate > 50 ? '#00CCEE' : '#8888A0',
                         fontWeight: '500',
                       }}
                     >
@@ -201,7 +201,7 @@ export default function FunnelAnalytics({
                     <div
                       style={{
                         height: '24px',
-                        background: 'var(--zander-off-white)',
+                        background: '#1C1C26',
                         borderRadius: '4px',
                         overflow: 'hidden',
                       }}
@@ -262,7 +262,7 @@ export default function FunnelAnalytics({
                   alignItems: 'center',
                   gap: '0.375rem',
                   fontSize: '0.7rem',
-                  color: 'var(--zander-gray)',
+                  color: '#8888A0',
                 }}
               >
                 <div

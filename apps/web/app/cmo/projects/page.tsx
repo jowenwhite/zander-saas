@@ -87,7 +87,7 @@ export default function CMOProjectsPage() {
             <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Projects
             </h1>
-            <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+            <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
               View deals and projects for marketing coordination
             </p>
           </div>
@@ -113,17 +113,17 @@ export default function CMOProjectsPage() {
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Total Projects</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total Projects</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>{deals.length}</div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Pipeline Value</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Pipeline Value</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>
               {formatCurrency(deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}
             </div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Won This Month</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Won This Month</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#28a745' }}>
               {formatCurrency(deals.filter(d => d.stage === 'CLOSED_WON').reduce((sum, d) => sum + d.dealValue, 0))}
             </div>
@@ -132,12 +132,12 @@ export default function CMOProjectsPage() {
 
         {/* Projects List */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>Loading projects...</div>
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading projects...</div>
         ) : filteredDeals.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
             <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No projects found</h3>
-            <p style={{ color: 'var(--zander-gray)' }}>Projects will appear here when deals are created</p>
+            <p style={{ color: '#8888A0' }}>Projects will appear here when deals are created</p>
           </div>
         ) : (
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', overflow: 'hidden' }}>
@@ -160,7 +160,7 @@ export default function CMOProjectsPage() {
                     <td style={{ padding: '1rem' }}>
                       <div style={{ fontWeight: '600', color: '#13131A' }}>{deal.dealName}</div>
                     </td>
-                    <td style={{ padding: '1rem', color: 'var(--zander-gray)' }}>
+                    <td style={{ padding: '1rem', color: '#8888A0' }}>
                       {deal.contact ? `${deal.contact.firstName} ${deal.contact.lastName}` : '—'}
                     </td>
                     <td style={{ padding: '1rem', fontWeight: '600', color: '#13131A' }}>

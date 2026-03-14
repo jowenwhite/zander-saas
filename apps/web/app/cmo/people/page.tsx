@@ -90,7 +90,7 @@ export default function CMOPeoplePage() {
             <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Contacts
             </h1>
-            <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+            <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
               Manage contacts for your marketing campaigns
             </p>
           </div>
@@ -118,12 +118,12 @@ export default function CMOPeoplePage() {
 
         {/* People Grid */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--zander-gray)' }}>Loading contacts...</div>
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading contacts...</div>
         ) : filteredPeople.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👥</div>
             <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No contacts yet</h3>
-            <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>Add your first contact to get started</p>
+            <p style={{ color: '#8888A0', marginBottom: '1.5rem' }}>Add your first contact to get started</p>
             <button onClick={() => setShowModal(true)} style={{ padding: '0.75rem 1.5rem', background: '#F57C00', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
               + Add Contact
             </button>
@@ -148,7 +148,7 @@ export default function CMOPeoplePage() {
                     <h3 style={{ margin: 0, color: '#13131A', fontSize: '1.1rem', fontWeight: '600' }}>
                       {person.firstName} {person.lastName}
                     </h3>
-                    <p style={{ margin: '0.25rem 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
+                    <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
                       {person.email}
                     </p>
                   </div>
@@ -156,8 +156,8 @@ export default function CMOPeoplePage() {
                 {(person.company || person.title) && (
                   <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
                     {person.title && <span style={{ fontSize: '0.85rem', color: '#13131A' }}>{person.title}</span>}
-                    {person.title && person.company && <span style={{ color: 'var(--zander-gray)' }}> at </span>}
-                    {person.company && <span style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>{person.company}</span>}
+                    {person.title && person.company && <span style={{ color: '#8888A0' }}> at </span>}
+                    {person.company && <span style={{ fontSize: '0.85rem', color: '#8888A0' }}>{person.company}</span>}
                   </div>
                 )}
               </div>
@@ -172,7 +172,7 @@ export default function CMOPeoplePage() {
           <div style={{ background: 'white', borderRadius: '12px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflow: 'auto' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ margin: 0, color: '#13131A' }}>Add Contact</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--zander-gray)' }}>×</button>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#8888A0' }}>×</button>
             </div>
             <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
@@ -204,7 +204,7 @@ export default function CMOPeoplePage() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', color: 'var(--zander-gray)', border: '1px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setShowModal(false)} style={{ padding: '0.75rem 1.5rem', background: 'white', color: '#8888A0', border: '1px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" style={{ padding: '0.75rem 1.5rem', background: '#F57C00', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Add Contact</button>
               </div>
             </form>

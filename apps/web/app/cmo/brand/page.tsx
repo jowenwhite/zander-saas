@@ -234,7 +234,7 @@ export default function CMOBrandPage() {
             style={{
               ...tabStyle,
               borderBottom: activeTab === tab ? '3px solid #F57C00' : '3px solid transparent',
-              color: activeTab === tab ? '#F57C00' : 'var(--zander-gray)',
+              color: activeTab === tab ? '#F57C00' : '#8888A0',
             }}
           >
             {tab === 'profile' && '🎨 Brand Profile'}
@@ -321,7 +321,7 @@ export default function CMOBrandPage() {
               </div>
 
               {/* Typography Preview */}
-              <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '8px' }}>
+              <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#1C1C26', borderRadius: '8px' }}>
                 <div style={{ fontFamily: brandProfile.fontPrimary || 'Inter', fontSize: '1.5rem', fontWeight: '700', color: '#13131A', marginBottom: '0.5rem' }}>
                   Heading Text
                 </div>
@@ -348,7 +348,7 @@ export default function CMOBrandPage() {
                   style={inputStyle}
                 />
                 {brandProfile.logoUrl && (
-                  <div style={{ marginTop: '0.75rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '8px', textAlign: 'center' }}>
+                  <div style={{ marginTop: '0.75rem', padding: '1rem', background: '#1C1C26', borderRadius: '8px', textAlign: 'center' }}>
                     <img src={brandProfile.logoUrl} alt="Logo" style={{ maxHeight: '60px', maxWidth: '100%' }} />
                   </div>
                 )}
@@ -363,7 +363,7 @@ export default function CMOBrandPage() {
                   style={inputStyle}
                 />
                 {brandProfile.logoIconUrl && (
-                  <div style={{ marginTop: '0.75rem', padding: '1rem', background: 'var(--zander-off-white)', borderRadius: '8px', textAlign: 'center' }}>
+                  <div style={{ marginTop: '0.75rem', padding: '1rem', background: '#1C1C26', borderRadius: '8px', textAlign: 'center' }}>
                     <img src={brandProfile.logoIconUrl} alt="Icon" style={{ maxHeight: '40px' }} />
                   </div>
                 )}
@@ -435,7 +435,7 @@ export default function CMOBrandPage() {
               <div style={emptyStateStyle}>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
                 <h3 style={{ margin: '0 0 0.5rem 0', color: '#13131A' }}>No brand assets yet</h3>
-                <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
+                <p style={{ color: '#8888A0', margin: 0 }}>
                   Upload logos, images, and brand files to your library
                 </p>
               </div>
@@ -456,7 +456,7 @@ export default function CMOBrandPage() {
                       <div style={{ fontWeight: '600', fontSize: '0.875rem', color: '#13131A', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {asset.name}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                         {asset.fileSize ? formatFileSize(asset.fileSize) : 'External'}
                       </div>
                     </div>
@@ -533,36 +533,36 @@ Examples:
             <div style={{ padding: '1.5rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                 <div style={quickRefCardStyle}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Primary Color</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Primary Color</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: brandProfile.primaryColor || '#0C2340' }} />
                     <code style={{ fontSize: '0.875rem' }}>{brandProfile.primaryColor || '#0C2340'}</code>
                   </div>
                 </div>
                 <div style={quickRefCardStyle}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Secondary Color</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Secondary Color</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: brandProfile.secondaryColor || '#F57C00' }} />
                     <code style={{ fontSize: '0.875rem' }}>{brandProfile.secondaryColor || '#F57C00'}</code>
                   </div>
                 </div>
                 <div style={quickRefCardStyle}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Accent Color</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Accent Color</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: brandProfile.accentColor || '#005687' }} />
                     <code style={{ fontSize: '0.875rem' }}>{brandProfile.accentColor || '#005687'}</code>
                   </div>
                 </div>
                 <div style={quickRefCardStyle}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Primary Font</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Primary Font</div>
                   <code style={{ fontSize: '0.875rem' }}>{brandProfile.fontPrimary || 'Inter'}</code>
                 </div>
                 <div style={quickRefCardStyle}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Secondary Font</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Secondary Font</div>
                   <code style={{ fontSize: '0.875rem' }}>{brandProfile.fontSecondary || 'Inter'}</code>
                 </div>
                 <div style={quickRefCardStyle}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Voice</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Voice</div>
                   <code style={{ fontSize: '0.875rem' }}>{brandProfile.voiceTone || 'Not set'}</code>
                 </div>
               </div>
@@ -632,7 +632,7 @@ const titleStyle: CSSProperties = {
 };
 
 const subtitleStyle: CSSProperties = {
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   margin: 0,
 };
 
@@ -715,7 +715,7 @@ const assetCardStyle: CSSProperties = {
 
 const assetPreviewStyle: CSSProperties = {
   height: '120px',
-  background: 'var(--zander-off-white)',
+  background: '#1C1C26',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -737,7 +737,7 @@ const assetActionStyle: CSSProperties = {
 
 const quickRefCardStyle: CSSProperties = {
   padding: '0.75rem',
-  background: 'var(--zander-off-white)',
+  background: '#1C1C26',
   borderRadius: '6px',
 };
 

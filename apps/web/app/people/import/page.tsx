@@ -86,7 +86,7 @@ export default function ImportContactsPage() {
 
   return (
     <AuthGuard>
-    <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)' }}>
+    <div style={{ minHeight: '100vh', background: '#1C1C26' }}>
       {/* Top Navigation */}
       <NavBar activeModule="cro" />
 
@@ -101,7 +101,7 @@ export default function ImportContactsPage() {
             gap: '0.5rem',
             background: 'none',
             border: 'none',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
             cursor: 'pointer',
             marginBottom: '1rem',
             fontSize: '0.875rem'
@@ -115,7 +115,7 @@ export default function ImportContactsPage() {
           <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A', margin: '0 0 0.5rem 0' }}>
             Import Contacts
           </h1>
-          <p style={{ color: 'var(--zander-gray)', margin: 0, fontSize: '1rem' }}>
+          <p style={{ color: '#8888A0', margin: 0, fontSize: '1rem' }}>
             Bring your existing contacts into Zander from your favorite apps and services
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function ImportContactsPage() {
           <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
             Drag & Drop Your File
           </h3>
-          <p style={{ color: 'var(--zander-gray)', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
+          <p style={{ color: '#8888A0', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
             Drop a CSV, Excel, or vCard file here to import contacts
           </p>
           <input
@@ -237,7 +237,7 @@ export default function ImportContactsPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '10px',
-                      background: 'var(--zander-off-white)',
+                      background: '#1C1C26',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -267,11 +267,11 @@ export default function ImportContactsPage() {
                           }}>Soon</span>
                         )}
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
+                      <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
                         {source.description}
                       </div>
                     </div>
-                    <div style={{ color: 'var(--zander-gray)', fontSize: '1.25rem' }}>→</div>
+                    <div style={{ color: '#8888A0', fontSize: '1.25rem' }}>→</div>
                   </button>
                 ))}
               </div>

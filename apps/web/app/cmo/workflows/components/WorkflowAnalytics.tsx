@@ -44,7 +44,7 @@ export default function WorkflowAnalytics({
           gap: '0.5rem',
           padding: '0.75rem 1rem',
           borderRadius: '8px',
-          background: status === 'active' ? 'rgba(39, 174, 96, 0.1)' : 'var(--zander-off-white)',
+          background: status === 'active' ? 'rgba(39, 174, 96, 0.1)' : '#1C1C26',
           marginBottom: '1.5rem',
         }}
       >
@@ -61,7 +61,7 @@ export default function WorkflowAnalytics({
           style={{
             fontSize: '0.875rem',
             fontWeight: '500',
-            color: status === 'active' ? '#27AE60' : 'var(--zander-gray)',
+            color: status === 'active' ? '#27AE60' : '#8888A0',
           }}
         >
           {status === 'active' ? 'Running' : status === 'paused' ? 'Paused' : 'Draft'}
@@ -80,14 +80,14 @@ export default function WorkflowAnalytics({
         <div
           style={{
             padding: '1rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             borderRadius: '8px',
           }}
         >
           <div
             style={{
               fontSize: '0.7rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               textTransform: 'uppercase',
               marginBottom: '0.25rem',
             }}
@@ -103,7 +103,7 @@ export default function WorkflowAnalytics({
           >
             {formatNumber(entryCount)}
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>
             Contacts entered this workflow
           </div>
         </div>
@@ -112,14 +112,14 @@ export default function WorkflowAnalytics({
         <div
           style={{
             padding: '1rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             borderRadius: '8px',
           }}
         >
           <div
             style={{
               fontSize: '0.7rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               textTransform: 'uppercase',
               marginBottom: '0.25rem',
             }}
@@ -161,14 +161,14 @@ export default function WorkflowAnalytics({
         <div
           style={{
             padding: '1rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             borderRadius: '8px',
           }}
         >
           <div
             style={{
               fontSize: '0.7rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               textTransform: 'uppercase',
               marginBottom: '0.25rem',
             }}
@@ -184,7 +184,7 @@ export default function WorkflowAnalytics({
           >
             {formatNumber(completionCount)}
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>
             Finished all steps
           </div>
         </div>
@@ -193,14 +193,14 @@ export default function WorkflowAnalytics({
         <div
           style={{
             padding: '1rem',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             borderRadius: '8px',
           }}
         >
           <div
             style={{
               fontSize: '0.7rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               textTransform: 'uppercase',
               marginBottom: '0.25rem',
             }}
@@ -216,7 +216,7 @@ export default function WorkflowAnalytics({
           >
             {formatNumber(Math.max(0, activeCount))}
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>
             Currently in workflow
           </div>
         </div>
@@ -236,7 +236,7 @@ export default function WorkflowAnalytics({
           <div style={{ fontSize: '0.85rem', color: '#13131A', fontWeight: '500' }}>
             No runs yet
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>
             {status === 'draft'
               ? 'Activate this workflow to start processing contacts.'
               : status === 'paused'

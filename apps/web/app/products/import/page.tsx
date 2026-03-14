@@ -53,7 +53,7 @@ type ImportStep = 'upload' | 'preview' | 'importing' | 'complete';
 const styles: Record<string, CSSProperties> = {
   container: {
     minHeight: '100vh',
-    background: 'var(--zander-off-white)',
+    background: '#1C1C26',
   },
   main: {
     marginTop: '64px',
@@ -67,7 +67,7 @@ const styles: Record<string, CSSProperties> = {
     gap: '0.5rem',
     background: 'none',
     border: 'none',
-    color: 'var(--zander-gray)',
+    color: '#8888A0',
     cursor: 'pointer',
     marginBottom: '1rem',
     fontSize: '0.875rem',
@@ -82,7 +82,7 @@ const styles: Record<string, CSSProperties> = {
     margin: '0 0 0.5rem 0',
   },
   subtitle: {
-    color: 'var(--zander-gray)',
+    color: '#8888A0',
     margin: 0,
     fontSize: '1rem',
   },
@@ -144,14 +144,14 @@ const styles: Record<string, CSSProperties> = {
     padding: '0.75rem',
     textAlign: 'left' as const,
     borderBottom: '2px solid var(--zander-border-gray)',
-    background: 'var(--zander-off-white)',
+    background: '#1C1C26',
     fontWeight: '600',
     color: '#13131A',
   },
   td: {
     padding: '0.75rem',
     borderBottom: '1px solid var(--zander-border-gray)',
-    color: 'var(--zander-gray)',
+    color: '#8888A0',
   },
   errorRow: {
     background: 'rgba(231, 76, 60, 0.05)',
@@ -183,7 +183,7 @@ const styles: Record<string, CSSProperties> = {
     color: '#27AE60',
   },
   progressContainer: {
-    background: 'var(--zander-off-white)',
+    background: '#1C1C26',
     borderRadius: '8px',
     height: '8px',
     overflow: 'hidden',
@@ -212,7 +212,7 @@ const styles: Record<string, CSSProperties> = {
   },
   summaryLabel: {
     fontSize: '0.85rem',
-    color: 'var(--zander-gray)',
+    color: '#8888A0',
   },
 };
 
@@ -502,7 +502,7 @@ export default function ImportProductsPage() {
                 <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
                   {isValidating ? 'Processing...' : 'Drag & Drop Your CSV File'}
                 </h3>
-                <p style={{ color: 'var(--zander-gray)', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
+                <p style={{ color: '#8888A0', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>
                   or click to browse files
                 </p>
                 <input
@@ -560,7 +560,7 @@ export default function ImportProductsPage() {
                     </tbody>
                   </table>
                 </div>
-                <p style={{ color: 'var(--zander-gray)', fontSize: '0.8rem', marginTop: '0.75rem', marginBottom: 0 }}>
+                <p style={{ color: '#8888A0', fontSize: '0.8rem', marginTop: '0.75rem', marginBottom: 0 }}>
                   * Required field. Type: PHYSICAL, SERVICE, SUBSCRIPTION, DIGITAL, ACCESS, BUNDLE. Status: ACTIVE, DRAFT, DISCONTINUED.
                 </p>
               </div>
@@ -596,7 +596,7 @@ export default function ImportProductsPage() {
                   <h3 style={{ color: '#13131A', margin: '0 0 1rem 0', fontSize: '1rem' }}>
                     Duplicate Handling
                   </h3>
-                  <p style={{ color: 'var(--zander-gray)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                  <p style={{ color: '#8888A0', marginBottom: '1rem', fontSize: '0.9rem' }}>
                     {validationSummary.duplicates} product(s) have SKUs that already exist. How should we handle them?
                   </p>
                   <div style={{ display: 'flex', gap: '1rem' }}>
@@ -719,7 +719,7 @@ export default function ImportProductsPage() {
                 <div style={styles.progressContainer}>
                   <div style={{ ...styles.progressBar, width: `${importProgress}%` }} />
                 </div>
-                <p style={{ color: 'var(--zander-gray)' }}>{importProgress}% complete</p>
+                <p style={{ color: '#8888A0' }}>{importProgress}% complete</p>
               </div>
             </div>
           )}

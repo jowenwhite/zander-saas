@@ -25,7 +25,7 @@ export default function MonthlyThemeBanner({
     return (
       <div
         style={{
-          background: 'var(--zander-off-white)',
+          background: '#1C1C26',
           border: '2px dashed var(--zander-border-gray)',
           borderRadius: '12px',
           padding: '1rem 1.5rem',
@@ -41,7 +41,7 @@ export default function MonthlyThemeBanner({
             <div style={{ fontWeight: '600', color: '#13131A' }}>
               No theme set for {monthName} {year}
             </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
               Set a monthly marketing theme to focus your efforts
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function MonthlyThemeBanner({
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '0.875rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
             }}
           >
             {expanded ? 'Less' : 'More'}
@@ -152,7 +152,7 @@ export default function MonthlyThemeBanner({
             <p
               style={{
                 margin: '0 0 1rem 0',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 fontSize: '0.875rem',
               }}
             >
@@ -207,7 +207,7 @@ export default function MonthlyThemeBanner({
                 style={{
                   margin: 0,
                   paddingLeft: '1.25rem',
-                  color: 'var(--zander-gray)',
+                  color: '#8888A0',
                   fontSize: '0.875rem',
                 }}
               >

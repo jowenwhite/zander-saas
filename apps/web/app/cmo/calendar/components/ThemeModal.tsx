@@ -176,7 +176,7 @@ export default function ThemeModal({
                 background: 'none',
                 border: 'none',
                 fontSize: '1.5rem',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 cursor: 'pointer',
               }}
             >
@@ -252,7 +252,7 @@ export default function ThemeModal({
                     key={idx}
                     style={{
                       padding: '0.375rem 0.75rem',
-                      background: 'var(--zander-off-white)',
+                      background: '#1C1C26',
                       borderRadius: '16px',
                       fontSize: '0.875rem',
                       display: 'flex',
@@ -267,7 +267,7 @@ export default function ThemeModal({
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: 'var(--zander-gray)',
+                        color: '#8888A0',
                         cursor: 'pointer',
                         fontSize: '1rem',
                         padding: 0,
@@ -320,7 +320,7 @@ export default function ThemeModal({
                 style={{
                   margin: 0,
                   paddingLeft: '1.25rem',
-                  color: 'var(--zander-gray)',
+                  color: '#8888A0',
                 }}
               >
                 {formData.goals.map((goal, idx) => (
@@ -340,7 +340,7 @@ export default function ThemeModal({
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: 'var(--zander-gray)',
+                        color: '#8888A0',
                         cursor: 'pointer',
                         fontSize: '0.875rem',
                       }}
@@ -359,7 +359,7 @@ export default function ThemeModal({
           style={{
             padding: '1rem 1.5rem',
             borderTop: '1px solid var(--zander-border-gray)',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: '0.75rem',
@@ -371,7 +371,7 @@ export default function ThemeModal({
             style={{
               padding: '0.75rem 1.5rem',
               background: 'transparent',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               border: '2px solid var(--zander-border-gray)',
               borderRadius: '8px',
               cursor: 'pointer',

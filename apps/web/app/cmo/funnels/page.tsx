@@ -184,7 +184,7 @@ export default function CMOFunnelsPage() {
           >
             Marketing Funnels
           </h1>
-          <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
+          <p style={{ color: '#8888A0', margin: 0 }}>
             Build and manage your lead conversion funnels
           </p>
         </div>
@@ -204,7 +204,7 @@ export default function CMOFunnelsPage() {
               justifyContent: 'center',
               alignItems: 'center',
               padding: '4rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
             }}
           >
             <div
@@ -253,7 +253,7 @@ export default function CMOFunnelsPage() {
             >
               Error Loading Funnels
             </h3>
-            <p style={{ color: 'var(--zander-gray)', margin: '0 0 1.5rem 0' }}>
+            <p style={{ color: '#8888A0', margin: '0 0 1.5rem 0' }}>
               {error}
             </p>
             <Button variant="secondary" onClick={fetchFunnels}>

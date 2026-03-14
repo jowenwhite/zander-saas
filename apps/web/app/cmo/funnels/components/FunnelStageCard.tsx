@@ -104,20 +104,20 @@ export default function FunnelStageCard({
             }}
           >
             <div style={{ fontSize: '0.8rem' }}>
-              <span style={{ color: 'var(--zander-gray)' }}>Entries: </span>
+              <span style={{ color: '#8888A0' }}>Entries: </span>
               <span style={{ fontWeight: '600', color: '#13131A' }}>
                 {formatNumber(stage.entryCount)}
               </span>
             </div>
             <div style={{ fontSize: '0.8rem' }}>
-              <span style={{ color: 'var(--zander-gray)' }}>Exits: </span>
+              <span style={{ color: '#8888A0' }}>Exits: </span>
               <span style={{ fontWeight: '600', color: '#13131A' }}>
                 {formatNumber(stage.exitCount)}
               </span>
             </div>
             {stage.conversionRate !== null && (
               <div style={{ fontSize: '0.8rem' }}>
-                <span style={{ color: 'var(--zander-gray)' }}>Conv: </span>
+                <span style={{ color: '#8888A0' }}>Conv: </span>
                 <span style={{ fontWeight: '600', color: '#27AE60' }}>
                   {formatConversionRate(stage.conversionRate)}
                 </span>
@@ -142,9 +142,9 @@ export default function FunnelStageCard({
               height: '28px',
               border: '1px solid var(--zander-border-gray)',
               borderRadius: '6px',
-              background: isFirst ? 'var(--zander-off-white)' : 'white',
+              background: isFirst ? '#1C1C26' : 'white',
               cursor: isFirst ? 'not-allowed' : 'pointer',
-              color: isFirst ? 'var(--zander-border-gray)' : 'var(--zander-gray)',
+              color: isFirst ? 'var(--zander-border-gray)' : '#8888A0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -159,7 +159,7 @@ export default function FunnelStageCard({
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
-              e.currentTarget.style.color = isFirst ? 'var(--zander-border-gray)' : 'var(--zander-gray)';
+              e.currentTarget.style.color = isFirst ? 'var(--zander-border-gray)' : '#8888A0';
             }}
             title="Move up"
           >
@@ -173,9 +173,9 @@ export default function FunnelStageCard({
               height: '28px',
               border: '1px solid var(--zander-border-gray)',
               borderRadius: '6px',
-              background: isLast ? 'var(--zander-off-white)' : 'white',
+              background: isLast ? '#1C1C26' : 'white',
               cursor: isLast ? 'not-allowed' : 'pointer',
-              color: isLast ? 'var(--zander-border-gray)' : 'var(--zander-gray)',
+              color: isLast ? 'var(--zander-border-gray)' : '#8888A0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -190,7 +190,7 @@ export default function FunnelStageCard({
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
-              e.currentTarget.style.color = isLast ? 'var(--zander-border-gray)' : 'var(--zander-gray)';
+              e.currentTarget.style.color = isLast ? 'var(--zander-border-gray)' : '#8888A0';
             }}
             title="Move down"
           >
@@ -209,11 +209,11 @@ export default function FunnelStageCard({
             onClick={onEdit}
             style={{
               padding: '0.5rem 0.75rem',
-              background: 'var(--zander-off-white)',
+              background: '#1C1C26',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               fontSize: '0.8rem',
               fontWeight: '500',
               transition: 'all 0.2s ease',
@@ -223,8 +223,8 @@ export default function FunnelStageCard({
               e.currentTarget.style.color = 'white';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'var(--zander-off-white)';
-              e.currentTarget.style.color = 'var(--zander-gray)';
+              e.currentTarget.style.background = '#1C1C26';
+              e.currentTarget.style.color = '#8888A0';
             }}
           >
             Edit
@@ -233,7 +233,7 @@ export default function FunnelStageCard({
             onClick={onDelete}
             style={{
               padding: '0.5rem 0.75rem',
-              background: 'var(--zander-off-white)',
+              background: '#1C1C26',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
@@ -247,7 +247,7 @@ export default function FunnelStageCard({
               e.currentTarget.style.color = 'white';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'var(--zander-off-white)';
+              e.currentTarget.style.background = '#1C1C26';
               e.currentTarget.style.color = '#00CCEE';
             }}
           >

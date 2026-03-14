@@ -42,7 +42,7 @@ export default function ColumnsBlock({ block, isSelected, onSelect }: ColumnsBlo
             style={{
               flex: column.width,
               minHeight: '80px',
-              backgroundColor: 'var(--zander-off-white)',
+              backgroundColor: '#1C1C26',
               borderRadius: '4px',
               border: '2px dashed var(--zander-border-gray)',
               display: 'flex',
@@ -73,5 +73,5 @@ const containerStyle: CSSProperties = {
 
 const placeholderTextStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };

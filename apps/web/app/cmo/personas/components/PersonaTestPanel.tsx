@@ -174,7 +174,7 @@ const titleStyle: CSSProperties = {
 const subtitleStyle: CSSProperties = {
   margin: '0 0 1.5rem 0',
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const fieldStyle: CSSProperties = {
@@ -214,7 +214,7 @@ const textareaStyle: CSSProperties = {
 const hintStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   marginTop: '0.25rem',
   textAlign: 'right',
 };

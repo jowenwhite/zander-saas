@@ -26,7 +26,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        background: 'var(--zander-off-white)' 
+        background: '#1C1C26' 
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ marginBottom: '1rem' }}>
@@ -38,7 +38,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
               priority
             />
           </div>
-          <div style={{ color: 'var(--zander-gray)' }}>Loading...</div>
+          <div style={{ color: '#8888A0' }}>Loading...</div>
         </div>
       </div>
     );

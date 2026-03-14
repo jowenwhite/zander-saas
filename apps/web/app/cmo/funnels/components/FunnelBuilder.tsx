@@ -22,7 +22,7 @@ export default function FunnelBuilder({
   return (
     <div
       style={{
-        background: 'var(--zander-off-white)',
+        background: '#1C1C26',
         borderRadius: '12px',
         padding: '1.5rem',
         minHeight: '400px',
@@ -49,7 +49,7 @@ export default function FunnelBuilder({
         <span
           style={{
             fontSize: '0.8rem',
-            color: 'var(--zander-gray)',
+            color: '#8888A0',
           }}
         >
           {stages.length} stage{stages.length !== 1 ? 's' : ''}
@@ -85,7 +85,7 @@ export default function FunnelBuilder({
             style={{
               margin: '0 0 1.5rem 0',
               fontSize: '0.9rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
               maxWidth: '300px',
             }}
           >

@@ -35,7 +35,7 @@ export default function WeeklyScheduleCard({
   if (loading) {
     return (
       <Card title="This Week's Schedule">
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           Loading schedule...
         </div>
       </Card>
@@ -83,7 +83,7 @@ export default function WeeklyScheduleCard({
       )}
 
       {events.length === 0 ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--zander-gray)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
           <div>No events scheduled this week</div>
           <a
@@ -113,7 +113,7 @@ export default function WeeklyScheduleCard({
                 alignItems: 'center',
                 gap: '0.75rem',
                 padding: '0.75rem',
-                background: 'var(--zander-off-white)',
+                background: '#1C1C26',
                 borderRadius: '8px',
               }}
             >
@@ -128,7 +128,7 @@ export default function WeeklyScheduleCard({
                 >
                   {event.title}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                   {formatDate(event.date)}
                 </div>
               </div>
@@ -146,7 +146,7 @@ export default function WeeklyScheduleCard({
             </div>
           ))}
           {events.length > 5 && (
-            <div style={{ textAlign: 'center', color: 'var(--zander-gray)', fontSize: '0.875rem' }}>
+            <div style={{ textAlign: 'center', color: '#8888A0', fontSize: '0.875rem' }}>
               +{events.length - 5} more events
             </div>
           )}

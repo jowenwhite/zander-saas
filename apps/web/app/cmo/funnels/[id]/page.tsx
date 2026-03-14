@@ -240,7 +240,7 @@ export default function FunnelBuilderPage() {
               justifyContent: 'center',
               alignItems: 'center',
               padding: '4rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
             }}
           >
             <div
@@ -286,7 +286,7 @@ export default function FunnelBuilderPage() {
             <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
               {error === 'Funnel not found' ? 'Funnel Not Found' : 'Error Loading Funnel'}
             </h3>
-            <p style={{ color: 'var(--zander-gray)', margin: '0 0 1.5rem 0' }}>
+            <p style={{ color: '#8888A0', margin: '0 0 1.5rem 0' }}>
               {error}
             </p>
             <Button variant="secondary" onClick={() => router.push('/cmo/funnels')}>
@@ -325,7 +325,7 @@ export default function FunnelBuilderPage() {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 cursor: 'pointer',
                 padding: '0.25rem',
                 fontSize: '1rem',
@@ -374,7 +374,7 @@ export default function FunnelBuilderPage() {
             )}
           </div>
           {funnel.description && (
-            <p style={{ color: 'var(--zander-gray)', margin: '0.5rem 0 0 0' }}>
+            <p style={{ color: '#8888A0', margin: '0.5rem 0 0 0' }}>
               {funnel.description}
             </p>
           )}

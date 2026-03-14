@@ -1567,7 +1567,7 @@ export default function CommunicationsPage() {
                               </div>
                               <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{new Date(email.sentAt).toLocaleString()}</span>
                             </div>
-                            <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap', fontSize: '0.9rem', color: '#333' }}>{email.body}</div>
+                            <div style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap', fontSize: '0.9rem', color: '#F0F0F5' }}>{email.body}</div>
                           </div>
                         ))}
                       </div>
@@ -2605,7 +2605,7 @@ export default function CommunicationsPage() {
             </div>
             <div style={{ padding: '1.5rem' }}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>Recipients (comma-separated emails)</label>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>Recipients (comma-separated emails)</label>
                 <input
                   type="text"
                   placeholder="john@company.com, jane@company.com"
@@ -2615,7 +2615,7 @@ export default function CommunicationsPage() {
                 />
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>Quick Add</label>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem', color: '#F0F0F5' }}>Quick Add</label>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {selectedCall.contact?.email && (
                     <button onClick={() => setSharingEmails(prev => { const email = selectedCall.contact?.email; return email && !prev.includes(email) ? [...prev, email] : prev; })} style={{ padding: '0.4rem 0.8rem', background: '#e8f4fd', border: '1px solid #3498db', borderRadius: '20px', fontSize: '0.8rem', cursor: 'pointer', color: '#2980b9' }}>

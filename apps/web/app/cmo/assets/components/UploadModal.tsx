@@ -138,7 +138,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, isUploading }: 
           style={{
             ...dropZoneStyle,
             borderColor: dragOver ? '#F57C00' : 'var(--zander-border-gray)',
-            backgroundColor: dragOver ? 'rgba(245, 124, 0, 0.05)' : 'var(--zander-off-white)',
+            backgroundColor: dragOver ? 'rgba(245, 124, 0, 0.05)' : '#1C1C26',
           }}
         >
           <input
@@ -249,7 +249,7 @@ const dropTextStyle: CSSProperties = {
 const dropSubtextStyle: CSSProperties = {
   margin: 0,
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const filePreviewStyle: CSSProperties = {
@@ -285,7 +285,7 @@ const fileNameStyle: CSSProperties = {
 
 const fileSizeStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const removeButtonStyle: CSSProperties = {
@@ -341,5 +341,5 @@ const textareaStyle: CSSProperties = {
 
 const hintStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };

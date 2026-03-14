@@ -185,7 +185,7 @@ export default function CMOWorkflowsPage() {
           >
             Marketing Workflows
           </h1>
-          <p style={{ color: 'var(--zander-gray)', margin: 0 }}>
+          <p style={{ color: '#8888A0', margin: 0 }}>
             Automate your marketing processes with triggers and actions
           </p>
         </div>
@@ -205,7 +205,7 @@ export default function CMOWorkflowsPage() {
               justifyContent: 'center',
               alignItems: 'center',
               padding: '4rem',
-              color: 'var(--zander-gray)',
+              color: '#8888A0',
             }}
           >
             <div
@@ -252,7 +252,7 @@ export default function CMOWorkflowsPage() {
             >
               Error Loading Workflows
             </h3>
-            <p style={{ color: 'var(--zander-gray)', margin: '0 0 1.5rem 0' }}>{error}</p>
+            <p style={{ color: '#8888A0', margin: '0 0 1.5rem 0' }}>{error}</p>
             <Button variant="secondary" onClick={fetchWorkflows}>
               Try Again
             </Button>

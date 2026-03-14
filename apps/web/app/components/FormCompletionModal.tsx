@@ -439,7 +439,7 @@ export default function FormCompletionModal({
         {/* Form Content */}
         <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem' }}>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
               Loading form...
             </div>
           ) : submission?.form?.fields ? (
@@ -462,7 +462,7 @@ export default function FormCompletionModal({
               ))}
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--zander-gray)' }}>
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#8888A0' }}>
               No form fields defined
             </div>
           )}
@@ -476,10 +476,10 @@ export default function FormCompletionModal({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            background: 'var(--zander-off-white)'
+            background: '#1C1C26'
           }}
         >
-          <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>
+          <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>
             {hasUnsavedChanges && <span style={{ color: '#856404' }}>● Unsaved changes</span>}
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>

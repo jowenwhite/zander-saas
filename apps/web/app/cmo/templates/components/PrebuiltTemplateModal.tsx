@@ -203,7 +203,7 @@ const templateCardStyle: CSSProperties = {
 
 const thumbnailStyle: CSSProperties = {
   height: '120px',
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -239,7 +239,7 @@ const categoryBadgeStyle: CSSProperties = {
 const descriptionStyle: CSSProperties = {
   margin: '0 0 0.5rem 0',
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   lineHeight: '1.4',
 };
 
@@ -269,7 +269,7 @@ const previewLabelStyle: CSSProperties = {
 };
 
 const previewBoxStyle: CSSProperties = {
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   borderRadius: '8px',
   padding: '2rem',
   display: 'flex',
@@ -283,14 +283,14 @@ const previewBoxStyle: CSSProperties = {
 const previewTextStyle: CSSProperties = {
   margin: '1rem 0 0.5rem 0',
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   textAlign: 'center',
 };
 
 const blockCountStyle: CSSProperties = {
   margin: 0,
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   fontWeight: '500',
 };
 
@@ -322,11 +322,11 @@ const inputStyle: CSSProperties = {
 
 const hintStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const infoBoxStyle: CSSProperties = {
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   borderRadius: '8px',
   padding: '1rem',
   border: '1px solid var(--zander-border-gray)',
@@ -343,6 +343,6 @@ const infoListStyle: CSSProperties = {
   margin: 0,
   paddingLeft: '1.25rem',
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   lineHeight: '1.6',
 };

@@ -67,7 +67,7 @@ export default function IdeaParkingLot({
       <div
         style={{
           padding: '1rem 1.25rem',
-          background: 'var(--zander-off-white)',
+          background: '#1C1C26',
           borderBottom: expanded ? '2px solid var(--zander-border-gray)' : 'none',
           display: 'flex',
           justifyContent: 'space-between',
@@ -89,12 +89,12 @@ export default function IdeaParkingLot({
             >
               Idea Parking Lot
             </h3>
-            <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+            <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
               {ideas.length} {ideas.length === 1 ? 'idea' : 'ideas'}
             </span>
           </div>
         </div>
-        <span style={{ color: 'var(--zander-gray)', fontSize: '1.25rem' }}>
+        <span style={{ color: '#8888A0', fontSize: '1.25rem' }}>
           {expanded ? '▾' : '▸'}
         </span>
       </div>
@@ -108,11 +108,11 @@ export default function IdeaParkingLot({
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                background: 'var(--zander-off-white)',
+                background: '#1C1C26',
                 border: '2px dashed var(--zander-border-gray)',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 fontWeight: '600',
                 marginBottom: ideas.length > 0 ? '1rem' : 0,
                 display: 'flex',
@@ -131,7 +131,7 @@ export default function IdeaParkingLot({
               onSubmit={handleSubmit}
               style={{
                 padding: '1rem',
-                background: 'var(--zander-off-white)',
+                background: '#1C1C26',
                 borderRadius: '8px',
                 marginBottom: ideas.length > 0 ? '1rem' : 0,
               }}
@@ -206,7 +206,7 @@ export default function IdeaParkingLot({
                     border: '2px solid var(--zander-border-gray)',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    color: 'var(--zander-gray)',
+                    color: '#8888A0',
                     fontWeight: '600',
                     fontSize: '0.875rem',
                   }}
@@ -242,7 +242,7 @@ export default function IdeaParkingLot({
                   style={{
                     padding: '0.75rem',
                     borderRadius: '8px',
-                    background: 'var(--zander-off-white)',
+                    background: '#1C1C26',
                     borderLeft: `4px solid ${eventTypeColors[idea.type]}`,
                   }}
                 >
@@ -286,7 +286,7 @@ export default function IdeaParkingLot({
                       style={{
                         margin: '0.25rem 0 0.5rem 0',
                         fontSize: '0.75rem',
-                        color: 'var(--zander-gray)',
+                        color: '#8888A0',
                       }}
                     >
                       {idea.description}
@@ -316,7 +316,7 @@ export default function IdeaParkingLot({
                       style={{
                         padding: '0.25rem 0.5rem',
                         background: 'transparent',
-                        color: 'var(--zander-gray)',
+                        color: '#8888A0',
                         border: '1px solid var(--zander-border-gray)',
                         borderRadius: '4px',
                         cursor: 'pointer',
@@ -331,7 +331,7 @@ export default function IdeaParkingLot({
             </div>
           ) : (
             !showForm && (
-              <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--zander-gray)' }}>
+              <div style={{ textAlign: 'center', padding: '1rem', color: '#8888A0' }}>
                 <div style={{ fontSize: '0.875rem' }}>No ideas yet</div>
                 <div style={{ fontSize: '0.75rem' }}>Capture marketing ideas here</div>
               </div>

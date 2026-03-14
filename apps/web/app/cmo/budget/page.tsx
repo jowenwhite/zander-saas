@@ -149,7 +149,7 @@ Format your response clearly with category names and percentages.`
             <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Budget
             </h1>
-            <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
+            <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
               Plan and track your marketing spend across categories
             </p>
           </div>
@@ -218,7 +218,7 @@ Format your response clearly with category names and percentages.`
                     setTempBudget(annualBudget.toString());
                     setEditingBudget(false);
                   }}
-                  style={{ padding: '0.5rem 1rem', background: 'var(--zander-light-gray)', color: 'var(--zander-gray)', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                  style={{ padding: '0.5rem 1rem', background: 'var(--zander-light-gray)', color: '#8888A0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
                 >
                   Cancel
                 </button>
@@ -234,30 +234,30 @@ Format your response clearly with category names and percentages.`
                 {formatCurrency(annualBudget)}
               </div>
             )}
-            <span style={{ color: 'var(--zander-gray)', fontSize: '0.9rem' }}>Click to edit</span>
+            <span style={{ color: '#8888A0', fontSize: '0.9rem' }}>Click to edit</span>
           </div>
         </div>
 
         {/* Summary Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Total Budget</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total Budget</div>
             <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A' }}>{formatCurrency(annualBudget)}</div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Allocated</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Allocated</div>
             <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F57C00' }}>{formatCurrency(totalPlanned)}</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{((totalPlanned / annualBudget) * 100).toFixed(1)}% of budget</div>
+            <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{((totalPlanned / annualBudget) * 100).toFixed(1)}% of budget</div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Remaining</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Remaining</div>
             <div style={{ fontSize: '1.75rem', fontWeight: '700', color: remaining >= 0 ? '#28a745' : '#dc3545' }}>{formatCurrency(remaining)}</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{remaining >= 0 ? 'Unallocated' : 'Over budget'}</div>
+            <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{remaining >= 0 ? 'Unallocated' : 'Over budget'}</div>
           </div>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Spent vs Planned</div>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Spent vs Planned</div>
             <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A' }}>{percentSpent.toFixed(1)}%</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{formatCurrency(totalActual)} spent</div>
+            <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{formatCurrency(totalActual)} spent</div>
           </div>
         </div>
 
@@ -275,7 +275,7 @@ Format your response clearly with category names and percentages.`
             </thead>
             <tbody>
               {lineItems.map((item, index) => (
-                <tr key={item.id} style={{ borderBottom: '1px solid var(--zander-border-gray)', background: index % 2 === 0 ? 'white' : 'var(--zander-off-white)' }}>
+                <tr key={item.id} style={{ borderBottom: '1px solid var(--zander-border-gray)', background: index % 2 === 0 ? 'white' : '#1C1C26' }}>
                   <td style={{ padding: '1rem', fontWeight: '500', color: '#13131A' }}>{item.category}</td>
                   <td style={{ padding: '0.5rem 1rem' }}>
                     <input
@@ -295,7 +295,7 @@ Format your response clearly with category names and percentages.`
                       style={inputStyle}
                     />
                   </td>
-                  <td style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: 'var(--zander-gray)' }}>
+                  <td style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>
                     {getPercentOfTotal(item.planned)}%
                   </td>
                   <td style={{ padding: '1rem' }}>
@@ -311,7 +311,7 @@ Format your response clearly with category names and percentages.`
                           }}
                         />
                       </div>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)', minWidth: '45px' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#8888A0', minWidth: '45px' }}>
                         {item.planned > 0 ? `${getProgressPercent(item.planned, item.actual).toFixed(0)}%` : '—'}
                       </span>
                     </div>
@@ -341,7 +341,7 @@ Format your response clearly with category names and percentages.`
                 <span style={{ fontSize: '1.5rem' }}>🤖</span>
                 <h2 style={{ margin: 0, color: '#13131A' }}>Ask Don for Budget Allocation</h2>
               </div>
-              <button onClick={() => setShowAiModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--zander-gray)' }}>×</button>
+              <button onClick={() => setShowAiModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#8888A0' }}>×</button>
             </div>
             <div style={{ padding: '1.5rem' }}>
               <div style={{ marginBottom: '1.5rem' }}>
@@ -365,7 +365,7 @@ Format your response clearly with category names and percentages.`
                 />
               </div>
               <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px' }}>
-                <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>
+                <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>
                   <strong>Current Budget:</strong> {formatCurrency(annualBudget)} for {fiscalYear}
                 </div>
               </div>
@@ -375,7 +375,7 @@ Format your response clearly with category names and percentages.`
                 style={{
                   width: '100%',
                   padding: '0.75rem 1.5rem',
-                  background: businessGoals.trim() && !aiLoading ? '#F57C00' : 'var(--zander-gray)',
+                  background: businessGoals.trim() && !aiLoading ? '#F57C00' : '#8888A0',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',

@@ -95,7 +95,7 @@ export default function TestResultsDisplay({ results }: TestResultsDisplayProps)
 }
 
 const containerStyle: CSSProperties = {
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   borderRadius: '8px',
   padding: '1.25rem',
   border: '1px solid var(--zander-border-gray)',
@@ -108,7 +108,7 @@ const scoreContainerStyle: CSSProperties = {
 const scoreLabelStyle: CSSProperties = {
   fontSize: '0.75rem',
   fontWeight: '600',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
   marginBottom: '0.5rem',
@@ -129,7 +129,7 @@ const scoreValueStyle: CSSProperties = {
 
 const scoreMaxStyle: CSSProperties = {
   fontSize: '1rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const scoreBarContainerStyle: CSSProperties = {

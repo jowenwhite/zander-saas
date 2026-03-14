@@ -71,12 +71,12 @@ const placeholderStyle: CSSProperties = {
   alignItems: 'center',
   gap: '0.5rem',
   padding: '2rem',
-  backgroundColor: 'var(--zander-off-white)',
+  backgroundColor: '#1C1C26',
   borderRadius: '8px',
   border: '2px dashed var(--zander-border-gray)',
 };
 
 const placeholderTextStyle: CSSProperties = {
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };

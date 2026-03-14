@@ -61,7 +61,7 @@ const tabStyle: CSSProperties = {
   background: 'white',
   fontSize: '0.875rem',
   fontWeight: '500',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
 };

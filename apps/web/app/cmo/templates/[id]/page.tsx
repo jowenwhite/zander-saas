@@ -305,7 +305,7 @@ const backButtonStyle: CSSProperties = {
   background: 'none',
   border: 'none',
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   cursor: 'pointer',
   padding: '0.5rem',
 };

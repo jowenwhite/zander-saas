@@ -60,7 +60,7 @@ export default function DayView({
         <div
           style={{
             padding: '1.5rem',
-            background: isToday() ? 'rgba(245, 124, 0, 0.1)' : 'var(--zander-off-white)',
+            background: isToday() ? 'rgba(245, 124, 0, 0.1)' : '#1C1C26',
             borderBottom: '2px solid var(--zander-border-gray)',
             display: 'flex',
             alignItems: 'center',
@@ -89,7 +89,7 @@ export default function DayView({
             <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
               {dayNames[date.getDay()]}
             </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+            <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
               {getMonthName(date.getMonth())} {date.getDate()}, {date.getFullYear()}
             </div>
           </div>
@@ -116,14 +116,14 @@ export default function DayView({
             style={{
               padding: '1rem',
               borderBottom: '1px solid var(--zander-border-gray)',
-              background: 'var(--zander-off-white)',
+              background: '#1C1C26',
             }}
           >
             <div
               style={{
                 fontSize: '0.75rem',
                 fontWeight: '600',
-                color: 'var(--zander-gray)',
+                color: '#8888A0',
                 marginBottom: '0.5rem',
               }}
             >
@@ -174,9 +174,9 @@ export default function DayView({
                   style={{
                     padding: '0.75rem',
                     fontSize: '0.875rem',
-                    color: 'var(--zander-gray)',
+                    color: '#8888A0',
                     fontWeight: '500',
-                    background: 'var(--zander-off-white)',
+                    background: '#1C1C26',
                     borderRight: '1px solid var(--zander-border-gray)',
                   }}
                 >
@@ -263,7 +263,7 @@ export default function DayView({
           style={{
             padding: '1rem 1.5rem',
             borderBottom: '2px solid var(--zander-border-gray)',
-            background: 'var(--zander-off-white)',
+            background: '#1C1C26',
           }}
         >
           <h3
@@ -276,14 +276,14 @@ export default function DayView({
           >
             Agenda
           </h3>
-          <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
+          <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#8888A0' }}>
             {events.length} {events.length === 1 ? 'event' : 'events'} scheduled
           </p>
         </div>
 
         <div style={{ padding: '1rem', maxHeight: '500px', overflowY: 'auto' }}>
           {events.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--zander-gray)' }}>
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
               <div>No events scheduled</div>
               <div style={{ fontSize: '0.875rem' }}>Click on the calendar to add one</div>
@@ -303,7 +303,7 @@ export default function DayView({
                     style={{
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: 'var(--zander-off-white)',
+                      background: '#1C1C26',
                       cursor: 'pointer',
                       borderLeft: `4px solid ${getEventColor(event.type)}`,
                     }}
@@ -327,7 +327,7 @@ export default function DayView({
                         {event.title}
                       </span>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                       {event.allDay
                         ? 'All day'
                         : new Date(event.startDate).toLocaleTimeString([], {

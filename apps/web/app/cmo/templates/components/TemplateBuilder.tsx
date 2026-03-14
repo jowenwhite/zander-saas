@@ -212,7 +212,7 @@ const emptyTextStyle: CSSProperties = {
 const hintTextStyle: CSSProperties = {
   margin: 0,
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
 };
 
 const blockWrapperStyle: CSSProperties = {
@@ -238,7 +238,7 @@ const dragHandleStyle: CSSProperties = {
 
 const dragIconStyle: CSSProperties = {
   fontSize: '0.875rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   letterSpacing: '-2px',
 };
 
@@ -292,7 +292,7 @@ const lastDropZoneStyle: CSSProperties = {
 
 const dropZoneLabelStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--zander-gray)',
+  color: '#8888A0',
   opacity: 0,
   transition: 'opacity 0.15s ease',
 };
