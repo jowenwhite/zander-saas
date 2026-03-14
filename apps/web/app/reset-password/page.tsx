@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -210,13 +211,14 @@ export default function ResetPasswordPage() {
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            color: '#BF0A30',
-            marginBottom: '0.5rem',
-            letterSpacing: '-1px'
-          }}>ZANDER</h1>
+          <Image
+            src="/images/zander-logo.svg"
+            alt="Zander"
+            width={160}
+            height={40}
+            priority
+            style={{ marginBottom: '0.5rem' }}
+          />
           <p style={{ color: '#666', fontSize: '1.1rem' }}>Create a new password</p>
         </div>
 

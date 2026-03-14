@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
@@ -384,7 +385,15 @@ export default function ProductionPage() {
         background: 'var(--zander-off-white)'
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
+          <div style={{ marginBottom: '1rem' }}>
+            <Image
+              src="/images/zander-icon.svg"
+              alt="Zander"
+              width={48}
+              height={48}
+              priority
+            />
+          </div>
           <div style={{ color: 'var(--zander-gray)' }}>Loading Zander...</div>
         </div>
       </div>

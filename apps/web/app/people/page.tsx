@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import { logout } from '../utils/auth';
@@ -124,7 +125,15 @@ export default function PeoplePage() {
 
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--zander-off-white)' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
+          <div style={{ marginBottom: '1rem' }}>
+            <Image
+              src="/images/zander-icon.svg"
+              alt="Zander"
+              width={48}
+              height={48}
+              priority
+            />
+          </div>
           <div style={{ color: 'var(--zander-gray)' }}>Loading People...</div>
         </div>
       </div>
