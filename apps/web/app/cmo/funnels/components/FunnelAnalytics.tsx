@@ -41,7 +41,7 @@ export default function FunnelAnalytics({
             margin: 0,
             fontSize: '1rem',
             fontWeight: '600',
-            color: 'var(--zander-navy)',
+            color: '#13131A',
           }}
         >
           Funnel Analytics
@@ -76,7 +76,7 @@ export default function FunnelAnalytics({
           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
             TOTAL VISITS
           </div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>
             {formatNumber(totalVisits)}
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function FunnelAnalytics({
                     <div
                       style={{
                         fontSize: '0.7rem',
-                        color: dropOffRate > 50 ? 'var(--zander-red)' : 'var(--zander-gray)',
+                        color: dropOffRate > 50 ? '#00CCEE' : 'var(--zander-gray)',
                         fontWeight: '500',
                       }}
                     >
@@ -182,7 +182,7 @@ export default function FunnelAnalytics({
                         style={{
                           fontSize: '0.8rem',
                           fontWeight: '500',
-                          color: 'var(--zander-navy)',
+                          color: '#13131A',
                         }}
                       >
                         {stage.name}
@@ -191,7 +191,7 @@ export default function FunnelAnalytics({
                         style={{
                           fontSize: '0.8rem',
                           fontWeight: '600',
-                          color: 'var(--zander-navy)',
+                          color: '#13131A',
                         }}
                       >
                         {formatNumber(stage.entryCount)}

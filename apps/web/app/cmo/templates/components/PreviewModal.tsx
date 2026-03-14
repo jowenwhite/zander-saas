@@ -151,7 +151,7 @@ const toggleButtonStyle: CSSProperties = {
 
 const activeToggleStyle: CSSProperties = {
   backgroundColor: 'white',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
 };
 

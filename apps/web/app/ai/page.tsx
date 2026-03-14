@@ -346,12 +346,13 @@ export default function AIAssistantPage() {
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--zander-off-white)', marginLeft: '240px' }}>
             {/* Page Header - Matching Forms/Schedule/Communication */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--zander-red) 0%, #a00828 100%)',
+              background: '#13131A',
               borderRadius: '12px',
               padding: '2rem',
               color: 'white',
               margin: '2rem',
-              marginBottom: '0'
+              marginBottom: '0',
+              border: '1px solid #2A2A38'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
@@ -384,8 +385,8 @@ export default function AIAssistantPage() {
                     onClick={() => alert('New Prompt feature coming soon!')}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      background: 'var(--zander-gold)',
-                      color: 'var(--zander-navy)',
+                      background: '#00CCEE',
+                      color: '#13131A',
                       border: 'none',
                       borderRadius: '8px',
                       fontWeight: '700',
@@ -417,7 +418,7 @@ export default function AIAssistantPage() {
                     margin: 0, 
                     fontSize: '1.1rem', 
                     lineHeight: 1.7, 
-                    color: 'var(--zander-navy)',
+                    color: '#13131A',
                     maxWidth: '800px'
                   }}>
                     {selectedExecutive.personality}
@@ -461,7 +462,7 @@ export default function AIAssistantPage() {
 
                   {/* Suggested Prompts */}
                   <div>
-                    <h3 style={{ color: 'var(--zander-navy)', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '600' }}>
+                    <h3 style={{ color: '#13131A', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '600' }}>
                       Suggested questions to get started:
                     </h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
@@ -476,7 +477,7 @@ export default function AIAssistantPage() {
                             borderRadius: '8px',
                             textAlign: 'left',
                             cursor: 'pointer',
-                            color: 'var(--zander-navy)',
+                            color: '#13131A',
                             fontSize: '0.9rem',
                             transition: 'all 0.2s ease'
                           }}
@@ -525,8 +526,8 @@ export default function AIAssistantPage() {
                         maxWidth: '70%',
                         padding: '1rem 1.25rem',
                         borderRadius: message.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                        background: message.role === 'user' ? 'var(--zander-navy)' : 'white',
-                        color: message.role === 'user' ? 'white' : 'var(--zander-navy)',
+                        background: message.role === 'user' ? '#13131A' : 'white',
+                        color: message.role === 'user' ? 'white' : '#13131A',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                         whiteSpace: 'pre-wrap',
                         lineHeight: 1.6
@@ -548,7 +549,7 @@ export default function AIAssistantPage() {
                               alignItems: 'center',
                               gap: '0.35rem'
                             }}
-                            onMouseOver={(e) => { e.currentTarget.style.background = '#f5f5f5'; e.currentTarget.style.borderColor = 'var(--zander-red)'; }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = '#f5f5f5'; e.currentTarget.style.borderColor = '#00CCEE'; }}
                             onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#ddd'; }}
                           >
                             🎫 Need more help? Create Support Ticket
@@ -692,7 +693,7 @@ export default function AIAssistantPage() {
               overflow: 'auto',
               boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
             }}>
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: 'var(--zander-navy)', borderRadius: '12px 12px 0 0' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: '#13131A', borderRadius: '12px 12px 0 0' }}>
                 <h2 style={{ margin: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   🎫 Create Support Ticket
                 </h2>
@@ -767,8 +768,8 @@ export default function AIAssistantPage() {
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: 'var(--zander-red)',
-                    color: 'white',
+                    background: '#00CCEE',
+                    color: '#000000',
                     fontWeight: '600',
                     opacity: savingTicket || !ticketForm.subject || !ticketForm.description ? 0.5 : 1
                   }}
@@ -812,7 +813,7 @@ export default function AIAssistantPage() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <div>
-                  <h2 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.5rem' }}>Your AI Team</h2>
+                  <h2 style={{ margin: 0, color: '#13131A', fontSize: '1.5rem' }}>Your AI Team</h2>
                   <p style={{ margin: '0.25rem 0 0 0', color: 'var(--zander-gray)', fontSize: '0.9rem' }}>
                     Meet your virtual executives
                   </p>
@@ -865,7 +866,7 @@ export default function AIAssistantPage() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '1rem' }}>{exec.name}</span>
+                        <span style={{ fontWeight: '600', color: '#13131A', fontSize: '1rem' }}>{exec.name}</span>
                         <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>({exec.role})</span>
                         {exec.status === 'coming_soon' && (
                           <span style={{

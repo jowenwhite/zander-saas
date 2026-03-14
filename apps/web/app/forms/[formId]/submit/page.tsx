@@ -222,9 +222,9 @@ export default function FormSubmitPage() {
                   width: '50px',
                   height: '50px',
                   borderRadius: '50%',
-                  border: value === rating ? '3px solid var(--zander-red)' : '2px solid var(--zander-border-gray)',
-                  background: value === rating ? 'var(--zander-red)' : 'white',
-                  color: value === rating ? 'white' : 'var(--zander-navy)',
+                  border: value === rating ? '3px solid #00CCEE' : '2px solid var(--zander-border-gray)',
+                  background: value === rating ? '#00CCEE' : 'white',
+                  color: value === rating ? 'white' : '#13131A',
                   fontSize: '1.25rem',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -303,10 +303,11 @@ export default function FormSubmitPage() {
                 {/* Header */}
                 <div
                   style={{
-                    background: 'linear-gradient(135deg, var(--zander-red) 0%, #a00a28 100%)',
+                    background: '#13131A',
                     color: 'white',
                     padding: '2rem',
                     borderRadius: '12px 12px 0 0',
+                    border: '1px solid #2A2A38',
                     marginBottom: 0
                   }}
                 >
@@ -393,7 +394,7 @@ export default function FormSubmitPage() {
                     >
                       <span style={{ fontSize: '1.5rem' }}>👤</span>
                       <div>
-                        <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+                        <div style={{ fontWeight: '600', color: '#13131A' }}>
                           {submission.contact.firstName} {submission.contact.lastName}
                         </div>
                         <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>
@@ -411,12 +412,12 @@ export default function FormSubmitPage() {
                             display: 'block',
                             marginBottom: '0.75rem',
                             fontWeight: '600',
-                            color: 'var(--zander-navy)',
+                            color: '#13131A',
                             fontSize: '1.1rem'
                           }}
                         >
                           {field.label}
-                          {field.required && <span style={{ color: 'var(--zander-red)', marginLeft: '4px' }}>*</span>}
+                          {field.required && <span style={{ color: '#00CCEE', marginLeft: '4px' }}>*</span>}
                         </label>
                         {renderField(field)}
                       </div>
@@ -448,7 +449,7 @@ export default function FormSubmitPage() {
                           borderRadius: '6px',
                           cursor: 'pointer',
                           fontWeight: '600',
-                          color: 'var(--zander-navy)',
+                          color: '#13131A',
                           fontSize: '1rem'
                         }}
                       >
@@ -460,7 +461,7 @@ export default function FormSubmitPage() {
                         style={{
                           padding: '0.875rem 2rem',
                           border: 'none',
-                          background: 'var(--zander-red)',
+                          background: '#00CCEE',
                           color: 'white',
                           borderRadius: '6px',
                           cursor: saving ? 'not-allowed' : 'pointer',

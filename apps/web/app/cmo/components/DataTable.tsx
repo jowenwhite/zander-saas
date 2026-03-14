@@ -45,7 +45,7 @@ export default function DataTable<T extends Record<string, unknown>>({
     padding: '1rem',
     textAlign: align as 'left' | 'center' | 'right',
     fontWeight: '600',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     background: 'var(--zander-off-white)',
     borderBottom: '2px solid var(--zander-border-gray)',
   });
@@ -54,7 +54,7 @@ export default function DataTable<T extends Record<string, unknown>>({
     padding: '1rem',
     textAlign: align as 'left' | 'center' | 'right',
     borderBottom: '1px solid var(--zander-border-gray)',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
   });
 
   const rowStyle: CSSProperties = {
@@ -167,7 +167,7 @@ export default function DataTable<T extends Record<string, unknown>>({
             </button>
             <span style={{
               padding: '0.5rem 1rem',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
               fontWeight: '600',
             }}>
               {pagination.page} / {pagination.totalPages}

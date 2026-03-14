@@ -191,7 +191,7 @@ export default function WorkflowBuilder({
             margin: 0,
             fontSize: '1rem',
             fontWeight: '600',
-            color: 'var(--zander-navy)',
+            color: '#13131A',
           }}
         >
           Workflow Steps
@@ -248,7 +248,7 @@ export default function WorkflowBuilder({
                 margin: 0,
                 fontSize: '0.9rem',
                 fontWeight: '600',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
               }}
             >
               Trigger
@@ -338,7 +338,7 @@ export default function WorkflowBuilder({
               margin: '0 0 0.5rem 0',
               fontSize: '1rem',
               fontWeight: '600',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
             }}
           >
             No Actions Yet

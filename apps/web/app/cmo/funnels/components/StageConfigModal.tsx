@@ -100,7 +100,7 @@ export default function StageConfigModal({
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     fontSize: '0.875rem',
   };
 
@@ -148,7 +148,7 @@ export default function StageConfigModal({
               margin: 0,
               fontSize: '1.25rem',
               fontWeight: '700',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
             }}
           >
             {stage ? 'Edit Stage' : 'Add Stage'}
@@ -268,7 +268,7 @@ export default function StageConfigModal({
             >
               <span style={{ fontSize: '1.5rem' }}>{stageTypeInfo.icon}</span>
               <div>
-                <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+                <div style={{ fontWeight: '600', color: '#13131A' }}>
                   {formData.name || stageTypeInfo.label}
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>
@@ -301,7 +301,7 @@ export default function StageConfigModal({
                   onClick={handleDelete}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
@@ -336,8 +336,8 @@ export default function StageConfigModal({
                 style={{
                   padding: '0.5rem 1rem',
                   background: 'transparent',
-                  color: 'var(--zander-red)',
-                  border: '2px solid var(--zander-red)',
+                  color: '#00CCEE',
+                  border: '2px solid #00CCEE',
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '600',

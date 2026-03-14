@@ -89,7 +89,7 @@ export default function CalendarHeader({
             borderRadius: '8px',
             cursor: 'pointer',
             fontWeight: '600',
-            color: 'var(--zander-navy)',
+            color: '#13131A',
           }}
         >
           Today
@@ -113,7 +113,7 @@ export default function CalendarHeader({
             marginLeft: '1rem',
             fontSize: '1.5rem',
             fontWeight: '700',
-            color: 'var(--zander-navy)',
+            color: '#13131A',
           }}
         >
           {formatDateDisplay()}

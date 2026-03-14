@@ -83,7 +83,7 @@ export default function DonRecommendationsCard({
                     <span
                       style={{
                         fontWeight: '600',
-                        color: 'var(--zander-navy)',
+                        color: '#13131A',
                         fontSize: '0.875rem',
                       }}
                     >

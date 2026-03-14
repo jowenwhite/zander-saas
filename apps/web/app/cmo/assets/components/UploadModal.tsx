@@ -243,7 +243,7 @@ const dropTextStyle: CSSProperties = {
   margin: '1rem 0 0.5rem',
   fontSize: '1rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const dropSubtextStyle: CSSProperties = {
@@ -276,7 +276,7 @@ const fileInfoStyle: CSSProperties = {
 const fileNameStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   maxWidth: '300px',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
@@ -290,8 +290,8 @@ const fileSizeStyle: CSSProperties = {
 
 const removeButtonStyle: CSSProperties = {
   background: 'none',
-  border: '1px solid var(--zander-red)',
-  color: 'var(--zander-red)',
+  border: '1px solid #00CCEE',
+  color: '#00CCEE',
   padding: '0.5rem 1rem',
   borderRadius: '6px',
   cursor: 'pointer',
@@ -308,7 +308,7 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const selectStyle: CSSProperties = {

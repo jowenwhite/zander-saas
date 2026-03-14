@@ -74,7 +74,7 @@ export default function NodeTypeSelector({ selected, onChange }: NodeTypeSelecto
                       <div
                         style={{
                           fontWeight: '600',
-                          color: isSelected ? nodeType.color : 'var(--zander-navy)',
+                          color: isSelected ? nodeType.color : '#13131A',
                           fontSize: '0.8rem',
                         }}
                       >

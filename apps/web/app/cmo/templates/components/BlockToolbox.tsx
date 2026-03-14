@@ -75,7 +75,7 @@ const titleStyle: CSSProperties = {
   margin: '0 0 1rem 0',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
 };

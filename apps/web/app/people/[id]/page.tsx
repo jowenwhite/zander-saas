@@ -239,8 +239,8 @@ export default function ContactDetailPage() {
       <AuthGuard>
         <div style={{ minHeight: '100vh', background: 'var(--zander-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: 'var(--zander-red)', marginBottom: '1rem' }}>{error || 'Contact not found'}</p>
-            <button onClick={() => router.push('/people')} style={{ padding: '0.5rem 1rem', background: 'var(--zander-navy)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
+            <p style={{ color: '#00CCEE', marginBottom: '1rem' }}>{error || 'Contact not found'}</p>
+            <button onClick={() => router.push('/people')} style={{ padding: '0.5rem 1rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
               Back to Contacts
             </button>
           </div>
@@ -277,7 +277,7 @@ export default function ContactDetailPage() {
 
           {/* Contact Header Card */}
           <div style={{
-            background: 'linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%)',
+            background: 'linear-gradient(135deg, #13131A 0%, #1a3a5c 100%)',
             borderRadius: '12px',
             padding: '2rem',
             color: 'white',
@@ -311,7 +311,7 @@ export default function ContactDetailPage() {
                 width: '80px',
                 height: '80px',
                 borderRadius: '50%',
-                background: 'var(--zander-red)',
+                background: '#00CCEE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -381,7 +381,7 @@ export default function ContactDetailPage() {
 
           {/* Tabs */}
           <div style={{
-            background: 'var(--zander-navy)',
+            background: '#13131A',
             borderRadius: '8px 8px 0 0',
             display: 'flex'
           }}>
@@ -399,11 +399,11 @@ export default function ContactDetailPage() {
                   padding: '1rem',
                   background: activeTab === tab.id ? 'white' : 'transparent',
                   border: 'none',
-                  borderBottom: activeTab === tab.id ? '3px solid var(--zander-red)' : 'none',
+                  borderBottom: activeTab === tab.id ? '3px solid #00CCEE' : 'none',
                   borderRadius: activeTab === tab.id ? '8px 8px 0 0' : '0',
                   cursor: 'pointer',
                   fontWeight: '600',
-                  color: activeTab === tab.id ? 'var(--zander-navy)' : 'rgba(255,255,255,0.7)',
+                  color: activeTab === tab.id ? '#13131A' : 'rgba(255,255,255,0.7)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -430,43 +430,43 @@ export default function ContactDetailPage() {
             {activeTab === 'overview' && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                 <div>
-                  <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>Contact Details</h3>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#13131A', fontSize: '1rem' }}>Contact Details</h3>
                   <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem' }}>
                     <div style={{ marginBottom: '1rem' }}>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Email</div>
-                      <div style={{ color: 'var(--zander-navy)' }}>{contact.email}</div>
+                      <div style={{ color: '#13131A' }}>{contact.email}</div>
                     </div>
                     {contact.phone && (
                       <div style={{ marginBottom: '1rem' }}>
                         <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Phone</div>
-                        <div style={{ color: 'var(--zander-navy)' }}>{contact.phone}</div>
+                        <div style={{ color: '#13131A' }}>{contact.phone}</div>
                       </div>
                     )}
                     {contact.company && (
                       <div style={{ marginBottom: '1rem' }}>
                         <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Company</div>
-                        <div style={{ color: 'var(--zander-navy)' }}>{contact.company}</div>
+                        <div style={{ color: '#13131A' }}>{contact.company}</div>
                       </div>
                     )}
                     {contact.title && (
                       <div style={{ marginBottom: '1rem' }}>
                         <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Title</div>
-                        <div style={{ color: 'var(--zander-navy)' }}>{contact.title}</div>
+                        <div style={{ color: '#13131A' }}>{contact.title}</div>
                       </div>
                     )}
                     {contact.source && (
                       <div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>Source</div>
-                        <div style={{ color: 'var(--zander-navy)' }}>{contact.source}</div>
+                        <div style={{ color: '#13131A' }}>{contact.source}</div>
                       </div>
                     )}
                   </div>
 
-                  <h3 style={{ margin: '1.5rem 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>Quick Actions</h3>
+                  <h3 style={{ margin: '1.5rem 0 1rem 0', color: '#13131A', fontSize: '1rem' }}>Quick Actions</h3>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                     <a href={`mailto:${contact.email}`} style={{
                       padding: '0.75rem 1rem',
-                      background: 'var(--zander-navy)',
+                      background: '#13131A',
                       color: 'white',
                       borderRadius: '8px',
                       textDecoration: 'none',
@@ -481,7 +481,7 @@ export default function ContactDetailPage() {
                     {contact.phone && (
                       <a href={`tel:${contact.phone}`} style={{
                         padding: '0.75rem 1rem',
-                        background: 'var(--zander-navy)',
+                        background: '#13131A',
                         color: 'white',
                         borderRadius: '8px',
                         textDecoration: 'none',
@@ -498,7 +498,7 @@ export default function ContactDetailPage() {
                       onClick={() => alert('Create new deal for this contact - coming soon!')}
                       style={{
                         padding: '0.75rem 1rem',
-                        background: 'var(--zander-red)',
+                        background: '#00CCEE',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -517,14 +517,14 @@ export default function ContactDetailPage() {
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1rem' }}>Notes</h3>
+                    <h3 style={{ margin: 0, color: '#13131A', fontSize: '1rem' }}>Notes</h3>
                     <button
                       onClick={() => isEditingNotes ? handleSaveNotes() : setIsEditingNotes(true)}
                       style={{
                         padding: '0.375rem 0.75rem',
-                        background: isEditingNotes ? 'var(--zander-red)' : 'transparent',
-                        color: isEditingNotes ? 'white' : 'var(--zander-red)',
-                        border: isEditingNotes ? 'none' : '1px solid var(--zander-red)',
+                        background: isEditingNotes ? '#00CCEE' : 'transparent',
+                        color: isEditingNotes ? 'white' : '#00CCEE',
+                        border: isEditingNotes ? 'none' : '1px solid #00CCEE',
                         borderRadius: '6px',
                         fontSize: '0.75rem',
                         fontWeight: '600',
@@ -542,7 +542,7 @@ export default function ContactDetailPage() {
                         width: '100%',
                         minHeight: '120px',
                         padding: '1rem',
-                        border: '2px solid var(--zander-red)',
+                        border: '2px solid #00CCEE',
                         borderRadius: '8px',
                         fontSize: '0.9rem',
                         resize: 'vertical',
@@ -556,7 +556,7 @@ export default function ContactDetailPage() {
                       borderRadius: '8px',
                       padding: '1rem',
                       minHeight: '120px',
-                      color: notes ? 'var(--zander-navy)' : 'var(--zander-gray)',
+                      color: notes ? '#13131A' : 'var(--zander-gray)',
                       fontSize: '0.9rem',
                       lineHeight: 1.6
                     }}>
@@ -564,7 +564,7 @@ export default function ContactDetailPage() {
                     </div>
                   )}
 
-                  <h3 style={{ margin: '1.5rem 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>Recent Activity</h3>
+                  <h3 style={{ margin: '1.5rem 0 1rem 0', color: '#13131A', fontSize: '1rem' }}>Recent Activity</h3>
                   <div style={{ background: 'var(--zander-off-white)', borderRadius: '8px', padding: '1rem' }}>
                     {timeline.length === 0 ? (
                       <p style={{ color: 'var(--zander-gray)', fontSize: '0.9rem' }}>No activity yet</p>
@@ -578,7 +578,7 @@ export default function ContactDetailPage() {
                       }}>
                         <span style={{ fontSize: '1rem' }}>{getActivityIcon(activity.type)}</span>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: '0.85rem', color: 'var(--zander-navy)' }}>{activity.title || activity.description}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#13131A' }}>{activity.title || activity.description}</div>
                           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginTop: '0.25rem' }}>
                             {formatDateTime(activity.date)}
                           </div>
@@ -590,7 +590,7 @@ export default function ContactDetailPage() {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: 'var(--zander-red)',
+                        color: '#00CCEE',
                         cursor: 'pointer',
                         fontSize: '0.8rem',
                         fontWeight: '600',
@@ -603,15 +603,15 @@ export default function ContactDetailPage() {
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <h3 style={{ margin: '0 0 1rem 0', color: 'var(--zander-navy)', fontSize: '1rem' }}>Timeline</h3>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#13131A', fontSize: '1rem' }}>Timeline</h3>
                   <div style={{ display: 'flex', gap: '2rem' }}>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Created</div>
-                      <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{formatDate(contact.createdAt)}</div>
+                      <div style={{ fontWeight: '600', color: '#13131A' }}>{formatDate(contact.createdAt)}</div>
                     </div>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>Last Updated</div>
-                      <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{formatDate(contact.updatedAt)}</div>
+                      <div style={{ fontWeight: '600', color: '#13131A' }}>{formatDate(contact.updatedAt)}</div>
                     </div>
                   </div>
                 </div>
@@ -622,12 +622,12 @@ export default function ContactDetailPage() {
             {activeTab === 'deals' && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                  <h3 style={{ margin: 0, color: 'var(--zander-navy)' }}>Deals ({deals.length})</h3>
+                  <h3 style={{ margin: 0, color: '#13131A' }}>Deals ({deals.length})</h3>
                   <button
                     onClick={() => alert('Create new deal for this contact - coming soon!')}
                     style={{
                       padding: '0.5rem 1rem',
-                      background: 'var(--zander-red)',
+                      background: '#00CCEE',
                       color: 'white',
                       border: 'none',
                       borderRadius: '6px',
@@ -647,7 +647,7 @@ export default function ContactDetailPage() {
                       onClick={() => alert('Create new deal - coming soon!')}
                       style={{
                         padding: '0.75rem 1.5rem',
-                        background: 'var(--zander-red)',
+                        background: '#00CCEE',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -679,12 +679,12 @@ export default function ContactDetailPage() {
                           }}
                         >
                           <div>
-                            <div style={{ fontWeight: '600', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{deal.name}</div>
+                            <div style={{ fontWeight: '600', color: '#13131A', marginBottom: '0.25rem' }}>{deal.name}</div>
                             <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>Created {formatDate(deal.createdAt)}</div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                             <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontWeight: '700', color: 'var(--zander-navy)' }}>{formatCurrency(deal.value)}</div>
+                              <div style={{ fontWeight: '700', color: '#13131A' }}>{formatCurrency(deal.value)}</div>
                               <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{deal.probability}% probability</div>
                             </div>
                             <span style={{
@@ -711,7 +711,7 @@ export default function ContactDetailPage() {
             {activeTab === 'communications' && (
               <div>
                 <div style={{
-                  background: 'var(--zander-navy)',
+                  background: '#13131A',
                   borderRadius: '8px',
                   padding: '1rem 1.5rem',
                   color: 'white',
@@ -750,7 +750,7 @@ export default function ContactDetailPage() {
                         {getActivityIcon(activity.type)}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: '500', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>
+                        <div style={{ fontWeight: '500', color: '#13131A', marginBottom: '0.25rem' }}>
                           {activity.direction === 'inbound' ? '📥 ' : activity.direction === 'outbound' ? '📤 ' : ''}{activity.title || activity.description}
                         </div>
                         <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
@@ -768,7 +768,7 @@ export default function ContactDetailPage() {
             {activeTab === 'forms' && (
               <div>
                 <div style={{
-                  background: 'var(--zander-navy)',
+                  background: '#13131A',
                   borderRadius: '8px',
                   padding: '1rem 1.5rem',
                   color: 'white',
@@ -787,8 +787,8 @@ export default function ContactDetailPage() {
                     onClick={() => alert('Send form to contact - coming soon!')}
                     style={{
                       padding: '0.5rem 1rem',
-                      background: 'var(--zander-gold)',
-                      color: 'var(--zander-navy)',
+                      background: '#00CCEE',
+                      color: '#13131A',
                       border: 'none',
                       borderRadius: '6px',
                       fontWeight: '700',
@@ -817,7 +817,7 @@ export default function ContactDetailPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <span style={{ fontSize: '1.5rem' }}>📋</span>
                         <div>
-                          <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>{form.formName}</div>
+                          <div style={{ fontWeight: '600', color: '#13131A' }}>{form.formName}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>
                             {form.status === 'complete' && `Completed ${formatDateTime(form.submittedAt!)}`}
                             {form.status === 'sent' && `Sent ${formatDateTime(form.sentAt!)}`}
@@ -841,7 +841,7 @@ export default function ContactDetailPage() {
                           onClick={() => alert(`View ${form.formName} - coming soon!`)}
                           style={{
                             padding: '0.375rem 0.75rem',
-                            background: 'var(--zander-navy)',
+                            background: '#13131A',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -874,7 +874,7 @@ export default function ContactDetailPage() {
               onClick={() => alert('Enroll in email sequence - coming soon!')}
               style={{
                 padding: '0.75rem 1.25rem',
-                background: 'var(--zander-navy)',
+                background: '#13131A',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -894,8 +894,8 @@ export default function ContactDetailPage() {
               style={{
                 padding: '0.75rem 1.25rem',
                 background: 'white',
-                color: 'var(--zander-red)',
-                border: '2px solid var(--zander-red)',
+                color: '#00CCEE',
+                border: '2px solid #00CCEE',
                 borderRadius: '8px',
                 fontWeight: '600',
                 cursor: 'pointer',

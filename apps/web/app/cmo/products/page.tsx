@@ -192,7 +192,7 @@ export default function CMOProductsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Products & Services
             </h1>
             <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
@@ -238,7 +238,7 @@ export default function CMOProductsPage() {
         ) : filteredProducts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
-            <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No products yet</h3>
+            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No products yet</h3>
             <p style={{ color: 'var(--zander-gray)', marginBottom: '1.5rem' }}>Add your first product to get started</p>
             <button onClick={() => setShowModal(true)} style={{ padding: '0.75rem 1.5rem', background: '#F57C00', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
               + Add Product
@@ -256,7 +256,7 @@ export default function CMOProductsPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <span style={{ fontSize: '1.5rem' }}>{getTypeIcon(product.type)}</span>
                     <div>
-                      <h3 style={{ margin: 0, color: 'var(--zander-navy)', fontSize: '1.1rem', fontWeight: '600' }}>{product.name}</h3>
+                      <h3 style={{ margin: 0, color: '#13131A', fontSize: '1.1rem', fontWeight: '600' }}>{product.name}</h3>
                       {product.sku && <span style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>SKU: {product.sku}</span>}
                     </div>
                   </div>
@@ -266,7 +266,7 @@ export default function CMOProductsPage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--zander-navy)' }}>{product.basePrice ? formatCurrency(product.basePrice) : '—'}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>{product.basePrice ? formatCurrency(product.basePrice) : '—'}</div>
                     <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>per {product.unit.replace('_', ' ')}</div>
                   </div>
                 </div>
@@ -286,7 +286,7 @@ export default function CMOProductsPage() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
           <div style={{ background: 'white', borderRadius: '12px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0, color: 'var(--zander-navy)' }}>{editingProduct ? 'Edit Product' : 'New Product'}</h2>
+              <h2 style={{ margin: 0, color: '#13131A' }}>{editingProduct ? 'Edit Product' : 'New Product'}</h2>
               <button onClick={resetForm} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--zander-gray)' }}>×</button>
             </div>
             <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>

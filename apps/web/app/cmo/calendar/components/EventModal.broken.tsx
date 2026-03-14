@@ -163,7 +163,7 @@ export default function EventModal({
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: 'var(--zander-navy)',
+    color: '#13131A',
     fontSize: '0.875rem',
   };
 
@@ -206,7 +206,7 @@ export default function EventModal({
             alignItems: 'center',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
             {event ? 'Edit Event' : 'Add Event'}
           </h2>
           <button
@@ -279,7 +279,7 @@ export default function EventModal({
                 onChange={(e) => setFormData({ ...formData, allDay: e.target.checked })}
                 style={{ width: '18px', height: '18px', accentColor: '#F57C00' }}
               />
-              <span style={{ fontWeight: '500', color: 'var(--zander-navy)' }}>All Day Event</span>
+              <span style={{ fontWeight: '500', color: '#13131A' }}>All Day Event</span>
             </label>
           </div>
 
@@ -385,7 +385,7 @@ export default function EventModal({
                   onClick={handleDelete}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: 'var(--zander-red)',
+                    background: '#00CCEE',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
@@ -420,8 +420,8 @@ export default function EventModal({
                 style={{
                   padding: '0.5rem 1rem',
                   background: 'transparent',
-                  color: 'var(--zander-red)',
-                  border: '2px solid var(--zander-red)',
+                  color: '#00CCEE',
+                  border: '2px solid #00CCEE',
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '600',

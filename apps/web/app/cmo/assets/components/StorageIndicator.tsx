@@ -74,7 +74,7 @@ const labelRowStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const valueStyle: CSSProperties = {

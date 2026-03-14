@@ -71,7 +71,7 @@ export default function FunnelStageCard({
                 margin: 0,
                 fontSize: '1rem',
                 fontWeight: '600',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -105,13 +105,13 @@ export default function FunnelStageCard({
           >
             <div style={{ fontSize: '0.8rem' }}>
               <span style={{ color: 'var(--zander-gray)' }}>Entries: </span>
-              <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+              <span style={{ fontWeight: '600', color: '#13131A' }}>
                 {formatNumber(stage.entryCount)}
               </span>
             </div>
             <div style={{ fontSize: '0.8rem' }}>
               <span style={{ color: 'var(--zander-gray)' }}>Exits: </span>
-              <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+              <span style={{ fontWeight: '600', color: '#13131A' }}>
                 {formatNumber(stage.exitCount)}
               </span>
             </div>
@@ -237,18 +237,18 @@ export default function FunnelStageCard({
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              color: 'var(--zander-red)',
+              color: '#00CCEE',
               fontSize: '0.8rem',
               fontWeight: '500',
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--zander-red)';
+              e.currentTarget.style.background = '#00CCEE';
               e.currentTarget.style.color = 'white';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'var(--zander-off-white)';
-              e.currentTarget.style.color = 'var(--zander-red)';
+              e.currentTarget.style.color = '#00CCEE';
             }}
           >
             Delete

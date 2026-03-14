@@ -100,7 +100,7 @@ export default function CMOSchedulePage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Schedule
             </h1>
             <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
@@ -129,7 +129,7 @@ export default function CMOSchedulePage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Today's Events</div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>
               {events.filter(e => isToday(e.startTime)).length}
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function CMOSchedulePage() {
         {/* Marketing Calendar Link */}
         <div style={{ background: '#FFF3E0', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>Marketing Content Calendar</span>
+            <span style={{ fontWeight: '600', color: '#13131A' }}>Marketing Content Calendar</span>
             <span style={{ color: 'var(--zander-gray)', marginLeft: '0.5rem' }}>Plan campaigns, social posts, and content</span>
           </div>
           <a href="/cmo/calendar" style={{ color: '#F57C00', fontWeight: '600', textDecoration: 'none' }}>Open Calendar</a>
@@ -162,7 +162,7 @@ export default function CMOSchedulePage() {
         ) : filteredEvents.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
-            <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No events {view === 'today' ? 'today' : 'this week'}</h3>
+            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No events {view === 'today' ? 'today' : 'this week'}</h3>
             <p style={{ color: 'var(--zander-gray)' }}>Your schedule is clear</p>
           </div>
         ) : (
@@ -180,7 +180,7 @@ export default function CMOSchedulePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <h3 style={{ margin: '0 0 0.5rem', color: 'var(--zander-navy)', fontWeight: '600' }}>{event.title}</h3>
+                    <h3 style={{ margin: '0 0 0.5rem', color: '#13131A', fontWeight: '600' }}>{event.title}</h3>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>
                         {view === 'week' && `${formatDate(event.startTime)} • `}

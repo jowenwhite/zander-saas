@@ -41,7 +41,7 @@ export default function FunnelBuilder({
             margin: 0,
             fontSize: '1rem',
             fontWeight: '600',
-            color: 'var(--zander-navy)',
+            color: '#13131A',
           }}
         >
           Funnel Stages
@@ -76,7 +76,7 @@ export default function FunnelBuilder({
               margin: '0 0 0.5rem 0',
               fontSize: '1.125rem',
               fontWeight: '600',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
             }}
           >
             No Stages Yet

@@ -269,7 +269,7 @@ const titleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const sectionStyle: CSSProperties = {
@@ -374,9 +374,9 @@ const deleteButtonStyle: CSSProperties = {
   width: '100%',
   padding: '0.5rem',
   backgroundColor: 'transparent',
-  border: '1px solid var(--zander-red)',
+  border: '1px solid #00CCEE',
   borderRadius: '6px',
-  color: 'var(--zander-red)',
+  color: '#00CCEE',
   fontSize: '0.875rem',
   fontWeight: '500',
   cursor: 'pointer',

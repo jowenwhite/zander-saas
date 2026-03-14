@@ -91,7 +91,7 @@ export default function TemplateListCard({
                   Duplicate
                 </button>
                 <button
-                  style={{ ...menuItemStyle, color: 'var(--zander-red)' }}
+                  style={{ ...menuItemStyle, color: '#00CCEE' }}
                   onClick={() => {
                     setShowMenu(false);
                     onDelete();
@@ -175,7 +175,7 @@ const nameStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const menuButtonStyle: CSSProperties = {

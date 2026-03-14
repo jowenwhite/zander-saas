@@ -54,7 +54,7 @@ export default function StageTypeSelector({ selected, onChange }: StageTypeSelec
                 <div
                   style={{
                     fontWeight: '600',
-                    color: isSelected ? stageType.color : 'var(--zander-navy)',
+                    color: isSelected ? stageType.color : '#13131A',
                     fontSize: '0.9rem',
                   }}
                 >

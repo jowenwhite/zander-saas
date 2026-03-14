@@ -520,7 +520,7 @@ export default function FormsPage() {
                 onClick={() => setShowCreateModal(true)}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  background: 'var(--zander-gold)',
+                  background: '#00CCEE',
                   color: '#F0F0F5',
                   border: 'none',
                   borderRadius: '8px',
@@ -560,7 +560,7 @@ export default function FormsPage() {
               <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Total Submissions</div>
             </div>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--zander-gold)' }}>{sortedCategories.length}</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#00CCEE' }}>{sortedCategories.length}</div>
               <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Categories</div>
             </div>
           </div>
@@ -588,10 +588,10 @@ export default function FormsPage() {
                   padding: '1rem',
                   background: activeTab === tab.id ? 'var(--zander-off-white)' : 'white',
                   border: 'none',
-                  borderBottom: activeTab === tab.id ? '3px solid var(--zander-red)' : '3px solid transparent',
+                  borderBottom: activeTab === tab.id ? '3px solid #00CCEE' : '3px solid transparent',
                   cursor: 'pointer',
                   fontWeight: '600',
-                  color: activeTab === tab.id ? 'var(--zander-red)' : 'var(--zander-gray)',
+                  color: activeTab === tab.id ? '#00CCEE' : 'var(--zander-gray)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -744,7 +744,7 @@ export default function FormsPage() {
                                     onClick={() => { setViewingForm(form); setFormData({}); }}
                                     style={{
                                       padding: '0.5rem 1rem',
-                                      background: 'var(--zander-gold)',
+                                      background: '#00CCEE',
                                       color: '#F0F0F5',
                                       border: 'none',
                                       borderRadius: '6px',
@@ -761,7 +761,7 @@ export default function FormsPage() {
                                       padding: '0.5rem 0.75rem',
                                       background: 'transparent',
                                       color: '#00CCEE',
-                                      border: '1px solid var(--zander-red)',
+                                      border: '1px solid #00CCEE',
                                       borderRadius: '6px',
                                       fontWeight: '600',
                                       fontSize: '0.75rem',
@@ -881,7 +881,7 @@ export default function FormsPage() {
                         onClick={() => setShowTreasuryModal(true)}
                         style={{
                           padding: '0.75rem 1.5rem',
-                          background: 'var(--zander-gold)',
+                          background: '#00CCEE',
                           color: '#F0F0F5',
                           border: 'none',
                           borderRadius: '8px',
@@ -1213,7 +1213,7 @@ export default function FormsPage() {
                 disabled={saving || !newForm.name.trim()}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  background: saving || !newForm.name.trim() ? 'var(--zander-gray)' : 'var(--zander-red)',
+                  background: saving || !newForm.name.trim() ? 'var(--zander-gray)' : '#00CCEE',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -1356,14 +1356,14 @@ export default function FormsPage() {
                         transition: 'all 0.2s ease',
                         cursor: 'pointer'
                       }}
-                      onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--zander-gold)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
+                      onMouseOver={(e) => { e.currentTarget.style.borderColor = '#00CCEE'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
                       onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--zander-border-gray)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                         <span style={{ fontSize: '1.5rem' }}>{item.type === 'form' ? '📋' : '📑'}</span>
                         <span style={{
                           background: item.type === 'form' ? 'rgba(0, 86, 135, 0.1)' : 'rgba(191, 10, 48, 0.1)',
-                          color: item.type === 'form' ? 'var(--zander-blue)' : 'var(--zander-red)',
+                          color: item.type === 'form' ? 'var(--zander-blue)' : '#00CCEE',
                           padding: '0.25rem 0.5rem',
                           borderRadius: '4px',
                           fontSize: '0.7rem',

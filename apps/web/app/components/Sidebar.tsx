@@ -196,7 +196,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(191,10,48,0.05)';
-                e.currentTarget.style.color = 'var(--zander-red)';
+                e.currentTarget.style.color = '#00CCEE';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';

@@ -83,7 +83,7 @@ export default function WorkflowNodeCard({
               margin: 0,
               fontSize: '0.9rem',
               fontWeight: '600',
-              color: 'var(--zander-navy)',
+              color: '#13131A',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -157,18 +157,18 @@ export default function WorkflowNodeCard({
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            color: 'var(--zander-red)',
+            color: '#00CCEE',
             fontSize: '0.75rem',
             fontWeight: '500',
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--zander-red)';
+            e.currentTarget.style.background = '#00CCEE';
             e.currentTarget.style.color = 'white';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'var(--zander-off-white)';
-            e.currentTarget.style.color = 'var(--zander-red)';
+            e.currentTarget.style.color = '#00CCEE';
           }}
         >
           Delete

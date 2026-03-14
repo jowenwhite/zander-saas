@@ -113,7 +113,7 @@ const avatarStyle: CSSProperties = {
   width: '48px',
   height: '48px',
   borderRadius: '50%',
-  backgroundColor: 'var(--zander-navy)',
+  backgroundColor: '#13131A',
   color: 'white',
   display: 'flex',
   alignItems: 'center',
@@ -137,7 +137,7 @@ const nameStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: 'var(--zander-navy)',
+  color: '#13131A',
 };
 
 const defaultBadgeStyle: CSSProperties = {

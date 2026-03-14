@@ -85,7 +85,7 @@ export default function CMOCommunicationPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--zander-navy)', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
               Marketing Communication
             </h1>
             <p style={{ color: 'var(--zander-gray)', marginTop: '0.5rem' }}>
@@ -104,7 +104,7 @@ export default function CMOCommunicationPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)', marginBottom: '0.5rem' }}>Total {messageType === 'email' ? 'Emails' : 'SMS'}</div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>
               {messageType === 'email' ? emails.length : smsMessages.length}
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function CMOCommunicationPage() {
         ) : (messageType === 'email' ? emails : smsMessages).length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{messageType === 'email' ? '📧' : '💬'}</div>
-            <h3 style={{ color: 'var(--zander-navy)', marginBottom: '0.5rem' }}>No messages yet</h3>
+            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No messages yet</h3>
             <p style={{ color: 'var(--zander-gray)' }}>Messages will appear here when you send or receive them</p>
           </div>
         ) : messageType === 'email' ? (
@@ -151,12 +151,12 @@ export default function CMOCommunicationPage() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontWeight: '600', color: 'var(--zander-navy)', fontSize: '0.9rem' }}>
+                    <span style={{ fontWeight: '600', color: '#13131A', fontSize: '0.9rem' }}>
                       {email.contact ? `${email.contact.firstName} ${email.contact.lastName}` : email.fromAddress}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--zander-gray)' }}>{formatDate(email.sentAt)}</span>
                   </div>
-                  <div style={{ fontSize: '0.9rem', color: 'var(--zander-navy)', marginBottom: '0.25rem' }}>{email.subject}</div>
+                  <div style={{ fontSize: '0.9rem', color: '#13131A', marginBottom: '0.25rem' }}>{email.subject}</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--zander-gray)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {email.body.substring(0, 80)}...
                   </div>
@@ -166,15 +166,15 @@ export default function CMOCommunicationPage() {
             {/* Email Preview */}
             {selectedEmail && (
               <div style={{ flex: 1, background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-                <h2 style={{ margin: '0 0 1rem', color: 'var(--zander-navy)' }}>{selectedEmail.subject}</h2>
+                <h2 style={{ margin: '0 0 1rem', color: '#13131A' }}>{selectedEmail.subject}</h2>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--zander-border-gray)' }}>
                   <div>
-                    <div style={{ fontSize: '0.9rem', color: 'var(--zander-navy)' }}>From: {selectedEmail.fromAddress}</div>
+                    <div style={{ fontSize: '0.9rem', color: '#13131A' }}>From: {selectedEmail.fromAddress}</div>
                     <div style={{ fontSize: '0.9rem', color: 'var(--zander-gray)' }}>To: {selectedEmail.toAddress}</div>
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--zander-gray)' }}>{formatDate(selectedEmail.sentAt)}</div>
                 </div>
-                <div style={{ whiteSpace: 'pre-wrap', color: 'var(--zander-navy)', lineHeight: '1.6' }}>{selectedEmail.body}</div>
+                <div style={{ whiteSpace: 'pre-wrap', color: '#13131A', lineHeight: '1.6' }}>{selectedEmail.body}</div>
               </div>
             )}
           </div>
@@ -183,7 +183,7 @@ export default function CMOCommunicationPage() {
             {smsMessages.map(sms => (
               <div key={sms.id} style={{ padding: '1rem', borderBottom: '1px solid var(--zander-border-gray)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+                  <span style={{ fontWeight: '600', color: '#13131A' }}>
                     {sms.contact ? `${sms.contact.firstName} ${sms.contact.lastName}` : sms.direction === 'outbound' ? sms.toNumber : sms.fromNumber}
                   </span>
                   <span style={{ fontSize: '0.8rem', color: 'var(--zander-gray)' }}>{formatDate(sms.sentAt)}</span>

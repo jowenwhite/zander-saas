@@ -38,7 +38,7 @@ export default function MonthlyThemeBanner({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span style={{ fontSize: '1.5rem' }}>🎯</span>
           <div>
-            <div style={{ fontWeight: '600', color: 'var(--zander-navy)' }}>
+            <div style={{ fontWeight: '600', color: '#13131A' }}>
               No theme set for {monthName} {year}
             </div>
             <div style={{ fontSize: '0.875rem', color: 'var(--zander-gray)' }}>
@@ -99,7 +99,7 @@ export default function MonthlyThemeBanner({
             <div
               style={{
                 fontWeight: '700',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
                 fontSize: '1.125rem',
               }}
             >
@@ -166,7 +166,7 @@ export default function MonthlyThemeBanner({
                 style={{
                   fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: 'var(--zander-navy)',
+                  color: '#13131A',
                   marginBottom: '0.5rem',
                 }}
               >
@@ -181,7 +181,7 @@ export default function MonthlyThemeBanner({
                       background: 'white',
                       borderRadius: '16px',
                       fontSize: '0.8rem',
-                      color: 'var(--zander-navy)',
+                      color: '#13131A',
                     }}
                   >
                     {area}
@@ -197,7 +197,7 @@ export default function MonthlyThemeBanner({
                 style={{
                   fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: 'var(--zander-navy)',
+                  color: '#13131A',
                   marginBottom: '0.5rem',
                 }}
               >

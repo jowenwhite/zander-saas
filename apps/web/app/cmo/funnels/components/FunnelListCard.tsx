@@ -62,7 +62,7 @@ export default function FunnelListCard({
                 margin: 0,
                 fontSize: '1.125rem',
                 fontWeight: '700',
-                color: 'var(--zander-navy)',
+                color: '#13131A',
               }}
             >
               {funnel.name}
@@ -121,7 +121,7 @@ export default function FunnelListCard({
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              color: 'var(--zander-red)',
+              color: '#00CCEE',
               fontSize: '0.875rem',
             }}
           >
@@ -145,7 +145,7 @@ export default function FunnelListCard({
           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
             STAGES
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
             {funnel.stages.length}
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function FunnelListCard({
           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
             VISITS
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
             {formatNumber(funnel.totalVisits)}
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function FunnelListCard({
           <div style={{ fontSize: '0.7rem', color: 'var(--zander-gray)', marginBottom: '0.25rem' }}>
             CONVERSIONS
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--zander-navy)' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
             {formatNumber(funnel.totalConversions)}
           </div>
         </div>
