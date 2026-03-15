@@ -120,8 +120,13 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
       {/* Logo and Tenant Switcher */}
       {!collapsed && (
         <div style={{
-          padding: '24px 20px 16px 20px',
-          borderBottom: '1px solid #2A2A38'
+          padding: '28px 12px 20px 12px',
+          borderBottom: '1px solid #2A2A38',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%'
         }}>
           <div style={{
             marginBottom: '12px'
@@ -131,10 +136,10 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
                 src="/images/zander-logo.svg"
                 alt="Zander"
                 style={{
-                  width: '180px',
+                  width: '200px',
                   height: 'auto',
                   display: 'block',
-                  maxWidth: '100%'
+                  margin: '0 auto'
                 }}
               />
             </a>

@@ -98,22 +98,26 @@ export default function LoginPage() {
         padding: '40px 40px 20px 40px',
         color: 'white'
       }}>
-        <div>
-          <div style={{ marginBottom: '16px' }}>
-            <img
-              src="/images/zander-logo.svg"
-              alt="Zander"
-              style={{
-                width: '220px',
-                height: 'auto',
-                display: 'block'
-              }}
-            />
-          </div>
+        <div style={{
+          textAlign: 'center',
+          width: '100%',
+          padding: '40px 20px 24px 20px'
+        }}>
+          <img
+            src="/images/zander-logo.svg"
+            alt="Zander"
+            style={{
+              width: '400px',
+              height: 'auto',
+              display: 'block',
+              margin: '0 auto'
+            }}
+          />
           <p style={{
-            fontSize: '1.3rem',
+            fontSize: '1.4rem',
             fontWeight: '600',
             color: '#F0F0F5',
+            textAlign: 'center',
             marginTop: '20px',
             lineHeight: '1.4'
           }}>
