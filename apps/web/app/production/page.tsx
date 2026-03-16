@@ -188,21 +188,55 @@ export default function ProductionPage() {
     checkOnboardingStatus();
   }, []);
   
+  // Helper to extract first name with proper fallback chain
+  const extractFirstName = (user: any): string => {
+    if (!user) return 'there';
+    // 1. Direct firstName field
+    if (user.firstName && typeof user.firstName === 'string' && user.firstName.trim()) {
+      return user.firstName.trim();
+    }
+    // 2. Full name field - split and take first part
+    if (user.name && typeof user.name === 'string' && user.name.trim()) {
+      return user.name.trim().split(' ')[0];
+    }
+    // 3. Email - take part before @
+    if (user.email && typeof user.email === 'string') {
+      const emailName = user.email.split('@')[0];
+      // Capitalize first letter
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+    return 'there';
+  };
+
   async function checkOnboardingStatus() {
+    // First, set userName from localStorage as immediate fallback
+    const storedUser = localStorage.getItem('zander_user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        setUserName(extractFirstName(user));
+      } catch (e) {
+        console.error('Failed to parse stored user:', e);
+      }
+    }
+
     try {
       const token = localStorage.getItem('zander_token');
       if (!token) return;
-      
+
       const res = await fetch('https://api.zanderos.com/users/onboarding/status', {
         headers: { Authorization: 'Bearer ' + token },
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         console.log('[Zander v2.1] Onboarding status response:', { firstName: data.firstName, companyName: data.tenant?.companyName });
-        setUserName(data.firstName || 'there');
+        // Use API firstName if available, otherwise keep the localStorage-derived name
+        if (data.firstName) {
+          setUserName(data.firstName);
+        }
         setCompanyName(data.tenant?.companyName || 'your company');
-        
+
         // Show wizard if onboarding not completed
         if (!data.onboardingCompleted) {
           setShowOnboarding(true);
@@ -210,6 +244,7 @@ export default function ProductionPage() {
       }
     } catch (error) {
       console.error('Failed to check onboarding:', error);
+      // userName already set from localStorage, no additional action needed
     }
   }
   
