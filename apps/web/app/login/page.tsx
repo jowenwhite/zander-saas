@@ -58,7 +58,7 @@ export default function LoginPage() {
         }
 
         // Redirect to dashboard
-        router.push('/');
+        router.push('/production');
       } else {
         setError(data.message || 'Invalid email or password');
         // If 2FA code was wrong, let them try again
@@ -83,7 +83,7 @@ export default function LoginPage() {
   // Handle terms acceptance
   const handleTermsAccepted = () => {
     setShowTermsModal(false);
-    router.push('/');
+    router.push('/production');
   };
 
   return (
