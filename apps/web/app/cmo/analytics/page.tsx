@@ -65,7 +65,7 @@ export default function CMOAnalyticsPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('zander_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
       // Fetch campaigns
       const campaignsRes = await fetch(`${apiUrl}/campaigns`, {

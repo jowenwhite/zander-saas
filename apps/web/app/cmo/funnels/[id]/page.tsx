@@ -31,7 +31,7 @@ export default function FunnelBuilderPage() {
       setError(null);
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels/${funnelId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels/${funnelId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -92,7 +92,7 @@ export default function FunnelBuilderPage() {
       }));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels/${funnelId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels/${funnelId}`,
         {
           method: 'PATCH',
           headers: {
@@ -210,7 +210,7 @@ export default function FunnelBuilderPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels/${funnelId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels/${funnelId}`,
         {
           method: 'DELETE',
           headers: {

@@ -56,7 +56,7 @@ export default function CMOBrandPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('zander_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
       const [brandRes, assetsRes] = await Promise.all([
         fetch(`${apiUrl}/cmo/assets/brand`, {
@@ -106,7 +106,7 @@ export default function CMOBrandPage() {
     try {
       setSaving(true);
       const token = localStorage.getItem('zander_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
       const response = await fetch(`${apiUrl}/cmo/assets/brand`, {
         method: 'PATCH',
@@ -139,7 +139,7 @@ export default function CMOBrandPage() {
     try {
       setUploading(true);
       const token = localStorage.getItem('zander_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
       const formData = new FormData();
       formData.append('file', file);
@@ -176,7 +176,7 @@ export default function CMOBrandPage() {
 
     try {
       const token = localStorage.getItem('zander_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
       const response = await fetch(`${apiUrl}/cmo/assets/${assetId}`, {
         method: 'DELETE',

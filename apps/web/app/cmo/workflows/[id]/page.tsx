@@ -46,7 +46,7 @@ export default function WorkflowBuilderPage() {
       setError(null);
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${workflowId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${workflowId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ export default function WorkflowBuilderPage() {
       }));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${workflowId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${workflowId}`,
         {
           method: 'PATCH',
           headers: {
@@ -247,7 +247,7 @@ export default function WorkflowBuilderPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${workflowId}/activate`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${workflowId}/activate`,
         {
           method: 'POST',
           headers: {
@@ -274,7 +274,7 @@ export default function WorkflowBuilderPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${workflowId}/pause`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${workflowId}/pause`,
         {
           method: 'POST',
           headers: {
@@ -302,7 +302,7 @@ export default function WorkflowBuilderPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${workflowId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${workflowId}`,
         {
           method: 'DELETE',
           headers: {

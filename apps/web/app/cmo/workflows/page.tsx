@@ -20,7 +20,7 @@ export default function CMOWorkflowsPage() {
       setError(null);
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ export default function CMOWorkflowsPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${workflow.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${workflow.id}`,
         {
           method: 'DELETE',
           headers: {
@@ -89,8 +89,8 @@ export default function CMOWorkflowsPage() {
       const token = localStorage.getItem('zander_token');
       const isEdit = !!editingWorkflow;
       const url = isEdit
-        ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${editingWorkflow.id}`
-        : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows`;
+        ? `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${editingWorkflow.id}`
+        : `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows`;
 
       const response = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
@@ -140,7 +140,7 @@ export default function CMOWorkflowsPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/workflows/${editingWorkflow.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/workflows/${editingWorkflow.id}`,
         {
           method: 'DELETE',
           headers: {

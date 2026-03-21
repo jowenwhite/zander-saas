@@ -49,7 +49,7 @@ export default function AskDonPage() {
 
     try {
       const token = localStorage.getItem('zander_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
       const conversationHistory = messages.map((m) => ({
         role: m.role,

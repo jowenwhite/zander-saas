@@ -20,7 +20,7 @@ export default function CMOFunnelsPage() {
       setError(null);
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ export default function CMOFunnelsPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels/${funnel.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels/${funnel.id}`,
         {
           method: 'DELETE',
           headers: {
@@ -89,8 +89,8 @@ export default function CMOFunnelsPage() {
       const token = localStorage.getItem('zander_token');
       const isEdit = !!editingFunnel;
       const url = isEdit
-        ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels/${editingFunnel.id}`
-        : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels`;
+        ? `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels/${editingFunnel.id}`
+        : `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels`;
 
       const response = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
@@ -139,7 +139,7 @@ export default function CMOFunnelsPage() {
     try {
       const token = localStorage.getItem('zander_token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/cmo/funnels/${editingFunnel.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com'}/cmo/funnels/${editingFunnel.id}`,
         {
           method: 'DELETE',
           headers: {
