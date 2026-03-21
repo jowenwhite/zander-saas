@@ -5,38 +5,50 @@ import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { Ticket, AlertTriangle, Lightbulb } from 'lucide-react';
 
-interface Message {
+type ToolExecution = {
+  tool: string;
+  success: boolean;
+  itemCreated?: unknown;
+  error?: string;
+};
+
+type Message = {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-}
+  toolsExecuted?: ToolExecution[];
+};
 
 const JORDAN_STORAGE_KEY = 'jordan_chat_history';
 
 const suggestedPrompts = [
   'What deals should I focus on this week?',
   'Help me write a follow-up email for a prospect',
+  'Log a discovery call I just had with a new lead',
+  'Create a deal for a prospect interested in our services',
   'How can I improve my closing rate?',
-  'Draft a proposal introduction for a new client',
-  'What questions should I ask on a discovery call?',
-  'Help me overcome a common sales objection',
+  'Schedule a follow-up for next Tuesday',
 ];
 
-const API_URL = 'https://api.zanderos.com';
-
-const getAuthHeaders = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('zander_token') : null;
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-  };
+// Map tool names to user-friendly labels and icons
+const toolLabels: Record<string, { label: string; icon: string; link: string }> = {
+  create_deal: { label: 'Deal', icon: '💰', link: '/projects' },
+  update_deal_stage: { label: 'Deal Stage', icon: '📊', link: '/projects' },
+  update_deal: { label: 'Deal Update', icon: '✏️', link: '/projects' },
+  create_contact: { label: 'Contact', icon: '👤', link: '/people' },
+  update_contact: { label: 'Contact Update', icon: '✏️', link: '/people' },
+  create_activity: { label: 'Activity', icon: '📝', link: '/schedule' },
+  schedule_followup: { label: 'Follow-up', icon: '📅', link: '/schedule' },
+  send_email: { label: 'Email', icon: '📧', link: '/communication' },
+  create_support_ticket: { label: 'Support Ticket', icon: '🎫', link: '/settings' },
 };
 
 export default function AskJordanPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [executingTools, setExecutingTools] = useState<string[]>([]);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [ticketForm, setTicketForm] = useState({ subject: '', description: '', category: 'HOW_TO', priority: 'P3' });
   const [savingTicket, setSavingTicket] = useState(false);
@@ -92,18 +104,24 @@ export default function AskJordanPage() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setExecutingTools([]);
 
     try {
+      const token = localStorage.getItem('zander_token');
+
       const conversationHistory = messages.map(m => ({
         role: m.role,
         content: m.content
       }));
 
-      const response = await fetch(`${API_URL}/ai/chat`, {
+      // Call our new Jordan API route with tool use support
+      const response = await fetch('/api/cro/jordan', {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          executiveId: 'cro',
           message: userMessage.content,
           conversationHistory
         })
@@ -118,7 +136,8 @@ export default function AskJordanPage() {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: data.content,
-        timestamp: new Date()
+        timestamp: new Date(),
+        toolsExecuted: data.toolsExecuted
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
@@ -132,6 +151,7 @@ export default function AskJordanPage() {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setExecutingTools([]);
     }
   };
 
@@ -165,9 +185,13 @@ export default function AskJordanPage() {
   const submitTicket = async () => {
     setSavingTicket(true);
     try {
-      const response = await fetch(`${API_URL}/support-tickets`, {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch('https://api.zanderos.com/support-tickets', {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           subject: ticketForm.subject,
           description: ticketForm.description,
@@ -310,8 +334,8 @@ export default function AskJordanPage() {
                         fontWeight: '500',
                       }}
                     >
-                      I don't just advise — I help you take action. Ask me to write follow-ups, craft proposals,
-                      prepare for discovery calls, or overcome objections. Let's close some deals.
+                      I don't just advise — I execute. Ask me to log calls, create deals, send follow-ups,
+                      or schedule activities. I'll do it right here in your CRM.
                     </p>
 
                     {/* Suggested Prompts */}
@@ -391,6 +415,72 @@ export default function AskJordanPage() {
                             </div>
                           )}
 
+                          {/* Tool Execution Indicators */}
+                          {message.toolsExecuted && message.toolsExecuted.length > 0 && (
+                            <div
+                              style={{
+                                marginBottom: '1rem',
+                                padding: '0.75rem',
+                                background: 'rgba(0, 204, 238, 0.1)',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(0, 204, 238, 0.2)',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontSize: '0.75rem',
+                                  color: '#00CCEE',
+                                  fontWeight: '600',
+                                  marginBottom: '0.5rem',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.5px',
+                                }}
+                              >
+                                Actions Taken
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                {message.toolsExecuted.map((tool, idx) => {
+                                  const toolInfo = toolLabels[tool.tool] || { label: tool.tool, icon: '🔧', link: '#' };
+                                  return (
+                                    <a
+                                      key={idx}
+                                      href={toolInfo.link}
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.375rem',
+                                        padding: '0.375rem 0.75rem',
+                                        background: tool.success ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                        border: `1px solid ${tool.success ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                                        borderRadius: '16px',
+                                        fontSize: '0.8rem',
+                                        color: tool.success ? '#10B981' : '#EF4444',
+                                        textDecoration: 'none',
+                                        fontWeight: '500',
+                                        transition: 'all 0.2s ease',
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-1px)';
+                                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = 'none';
+                                      }}
+                                    >
+                                      <span>{tool.success ? '✅' : '❌'}</span>
+                                      <span>{toolInfo.icon}</span>
+                                      <span>{toolInfo.label}</span>
+                                      {tool.success && (
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>→ View</span>
+                                      )}
+                                    </a>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
                           <div
                             style={{
                               whiteSpace: 'pre-wrap',
@@ -450,6 +540,30 @@ export default function AskJordanPage() {
                           >
                             <span>💼</span> Jordan
                           </div>
+
+                          {/* Show executing tools */}
+                          {executingTools.length > 0 && (
+                            <div
+                              style={{
+                                marginBottom: '0.75rem',
+                                fontSize: '0.8rem',
+                                color: '#00CCEE',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <div className="spinner" style={{
+                                  width: '12px',
+                                  height: '12px',
+                                  border: '2px solid rgba(0, 204, 238, 0.3)',
+                                  borderTopColor: '#00CCEE',
+                                  borderRadius: '50%',
+                                  animation: 'spin 1s linear infinite',
+                                }} />
+                                Executing: {executingTools.map(t => toolLabels[t]?.label || t).join(', ')}
+                              </div>
+                            </div>
+                          )}
+
                           <div style={{ display: 'flex', gap: '4px' }}>
                             {[0, 1, 2].map((i) => (
                               <div
@@ -521,7 +635,7 @@ export default function AskJordanPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder="Ask Jordan about deals, follow-ups, proposals, closing strategies..."
+                    placeholder="Ask Jordan to log calls, create deals, send follow-ups..."
                     disabled={isLoading}
                     style={{
                       flex: 1,
@@ -697,6 +811,11 @@ export default function AskJordanPage() {
             50% {
               opacity: 1;
               transform: scale(1);
+            }
+          }
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
             }
           }
         `}</style>
