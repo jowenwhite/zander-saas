@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Sora } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './components/ThemeProvider'
+import { PostHogProvider } from './components/PostHogProvider'
 import AITeamButton from './components/AITeamButton'
 
 const inter = Inter({
@@ -28,10 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark">
       <body className={`${inter.variable} ${sora.variable} font-sans`}>
-        <ThemeProvider>
-          {children}
-          <AITeamButton />
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider>
+            {children}
+            <AITeamButton />
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   )
