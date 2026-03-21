@@ -109,6 +109,7 @@ model Tenant {
   segments                Segment[]
   contentAssets           ContentAsset[]
   brandProfile            BrandProfile?
+  marketingPlan           MarketingPlan?
 
   @@map("tenants")
 }
@@ -1283,6 +1284,31 @@ model BrandProfile {
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@map("cmo_brand_profiles")
+}
+
+// ============================================
+// CMO MODULE - MARKETING PLAN
+// ============================================
+
+model MarketingPlan {
+  id            String   @id @default(cuid())
+  tenantId      String   @unique
+  status        String   @default("draft") // draft, active, complete
+  mission       String?  @db.Text
+  vision        String?  @db.Text
+  strategy      String?  @db.Text
+  goals         String[] @default([])
+  swot          Json     @default("{\"strengths\":[],\"weaknesses\":[],\"opportunities\":[],\"threats\":[]}")
+  monthlyThemes String[] @default([])
+  kpis          Json     @default("[]")
+  budget        String?
+  timeline      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("cmo_marketing_plans")
 }
 
 // ============================================

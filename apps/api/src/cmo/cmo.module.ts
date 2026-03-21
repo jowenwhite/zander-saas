@@ -10,6 +10,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { InsightsModule } from './insights/insights.module';
 import { DonModule } from './don/don.module';
 import { TemplatesModule } from './templates/templates.module';
+import { MarketingPlanModule } from './marketing-plan/marketing-plan.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TemplatesModule } from './templates/templates.module';
     InsightsModule,
     DonModule,
     TemplatesModule,
+    MarketingPlanModule,
   ],
   exports: [
     WorkflowsModule,
@@ -37,6 +39,7 @@ import { TemplatesModule } from './templates/templates.module';
     InsightsModule,
     DonModule,
     TemplatesModule,
+    MarketingPlanModule,
   ],
 })
 export class CmoModule {}

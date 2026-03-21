@@ -88,27 +88,26 @@ const TOOLS = [
   },
   {
     name: 'save_marketing_plan',
-    description: 'Save a marketing plan to the CMO Marketing Plan module. Use this when the user asks to create, save, or document a marketing strategy or plan.',
+    description: 'Save a marketing plan to the CMO Marketing Plan module. Use this when the user asks to create, save, or document a marketing strategy or plan. You can save mission, vision, and strategy separately.',
     input_schema: {
       type: 'object',
       properties: {
-        title: {
+        mission: {
           type: 'string',
-          description: 'Title of the marketing plan'
+          description: 'The marketing mission statement - what your marketing team aims to accomplish'
         },
-        summary: {
+        vision: {
           type: 'string',
-          description: 'Executive summary of the plan'
+          description: 'The marketing vision - where you want marketing to be in 3-5 years'
+        },
+        strategy: {
+          type: 'string',
+          description: 'The core marketing strategy - how you will achieve your goals'
         },
         goals: {
           type: 'array',
           items: { type: 'string' },
           description: 'Marketing goals for this plan'
-        },
-        strategies: {
-          type: 'array',
-          items: { type: 'string' },
-          description: 'Key strategies to achieve the goals'
         },
         timeline: {
           type: 'string',
@@ -119,7 +118,7 @@ const TOOLS = [
           description: 'Estimated budget for the plan'
         }
       },
-      required: ['title', 'summary', 'goals']
+      required: ['mission']
     }
   },
   {
@@ -334,21 +333,64 @@ async function executeTool(
       }
 
       case 'save_marketing_plan': {
-        // Marketing Plan API not yet implemented - store in notes/templates for now
-        console.log(`[Don Tool] Marketing plan feature not yet available`);
-        return {
-          success: false,
-          error: 'Marketing Plan save is not yet available. The plan has been generated but cannot be saved to the database yet. This feature is coming soon!'
+        const url = `${CMO_API_URL}/cmo/marketing-plan`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        // Map Don's tool fields to API fields
+        const planData = {
+          status: 'active',
+          mission: (toolInput.mission as string) || null,
+          vision: (toolInput.vision as string) || null,
+          strategy: (toolInput.strategy as string) || null,
+          goals: (toolInput.goals as string[]) || [],
+          budget: (toolInput.budget as string) || null,
+          timeline: (toolInput.timeline as string) || null,
         };
+
+        console.log(`[Don Tool] Marketing plan data:`, JSON.stringify(planData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(planData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          console.error(`[Don Tool] Failed to save marketing plan: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to save marketing plan (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          console.log(`[Don Tool] Marketing plan saved successfully:`, result);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Marketing plan saved' } };
+        }
       }
 
       case 'create_calendar_event': {
         const url = `${CMO_API_URL}/cmo/calendar/events`;
         console.log(`[Don Tool] POST ${url}`);
+
+        // Map Don's tool fields to API fields
+        // API expects: startTime, endTime (not startDate, endDate)
+        const eventData = {
+          title: toolInput.title as string,
+          description: (toolInput.description as string) || null,
+          startTime: toolInput.startDate as string,  // API field name is startTime
+          endTime: (toolInput.endDate as string) || (toolInput.startDate as string),  // API field name is endTime
+          eventType: (toolInput.eventType as string) || 'meeting',
+          color: (toolInput.color as string) || null,
+          allDay: false,
+        };
+
+        console.log(`[Don Tool] Calendar event data:`, JSON.stringify(eventData, null, 2));
+
         const response = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify(toolInput),
+          body: JSON.stringify(eventData),
         });
         const responseText = await response.text();
         console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
@@ -367,13 +409,22 @@ async function executeTool(
       case 'create_email_template': {
         const url = `${CMO_API_URL}/cmo/templates`;
         console.log(`[Don Tool] POST ${url}`);
+
+        // Map Don's tool fields to API fields
+        const templateData = {
+          name: toolInput.name as string,
+          subject: (toolInput.subject as string) || null,
+          body: (toolInput.body as string) || null,
+          category: (toolInput.category as string) || null,
+          status: 'draft',
+        };
+
+        console.log(`[Don Tool] Email template data:`, JSON.stringify(templateData, null, 2));
+
         const response = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify({
-            ...toolInput,
-            type: 'email',
-          }),
+          body: JSON.stringify(templateData),
         });
         const responseText = await response.text();
         console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
@@ -463,10 +514,25 @@ async function executeTool(
       case 'update_brand_settings': {
         const url = `${CMO_API_URL}/cmo/assets/brand`;
         console.log(`[Don Tool] PATCH ${url}`);
+
+        // Map Don's tool fields to API fields
+        // API expects: voiceTone (not brandVoice)
+        const brandData: Record<string, unknown> = {};
+        if (toolInput.brandVoice) brandData.voiceTone = toolInput.brandVoice;
+        if (toolInput.primaryColor) brandData.primaryColor = toolInput.primaryColor;
+        if (toolInput.secondaryColor) brandData.secondaryColor = toolInput.secondaryColor;
+        if (toolInput.tagline) brandData.tagline = toolInput.tagline;
+        if (toolInput.values) {
+          // Store values as part of voice guidelines
+          brandData.voiceGuidelines = `Brand Values: ${(toolInput.values as string[]).join(', ')}`;
+        }
+
+        console.log(`[Don Tool] Brand settings data:`, JSON.stringify(brandData, null, 2));
+
         const response = await fetch(url, {
           method: 'PATCH',
           headers,
-          body: JSON.stringify(toolInput),
+          body: JSON.stringify(brandData),
         });
         const responseText = await response.text();
         console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);

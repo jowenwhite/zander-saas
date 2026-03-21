@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import CMOLayout from '../components/CMOLayout';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+
 interface SwotItem {
   id: string;
   text: string;
@@ -19,6 +21,7 @@ interface MarketingPlan {
   status: 'draft' | 'active' | 'complete';
   mission: string;
   vision: string;
+  strategy?: string;
   goals: string[];
   swot: SwotData;
   monthlyThemes: string[];
@@ -29,10 +32,13 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 
 export default function CMOPlanPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [plan, setPlan] = useState<MarketingPlan>({
     status: 'draft',
     mission: '',
     vision: '',
+    strategy: '',
     goals: ['', '', ''],
     swot: {
       strengths: [],
@@ -56,6 +62,75 @@ export default function CMOPlanPage() {
     opportunities: '',
     threats: '',
   });
+
+  // Fetch marketing plan on load
+  useEffect(() => {
+    fetchMarketingPlan();
+  }, []);
+
+  const fetchMarketingPlan = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/cmo/marketing-plan`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Merge API data with default structure
+        setPlan(prev => ({
+          ...prev,
+          status: data.status || 'draft',
+          mission: data.mission || '',
+          vision: data.vision || '',
+          strategy: data.strategy || '',
+          goals: data.goals?.length ? data.goals : ['', '', ''],
+          swot: data.swot || prev.swot,
+          monthlyThemes: data.monthlyThemes?.length === 12 ? data.monthlyThemes : prev.monthlyThemes,
+          kpis: data.kpis?.length ? data.kpis : prev.kpis,
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch marketing plan:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const savePlan = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/cmo/marketing-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: plan.status,
+          mission: plan.mission,
+          vision: plan.vision,
+          strategy: plan.strategy,
+          goals: plan.goals.filter(g => g.trim()),
+          swot: plan.swot,
+          monthlyThemes: plan.monthlyThemes,
+          kpis: plan.kpis,
+        }),
+      });
+      if (response.ok) {
+        alert('Marketing plan saved successfully!');
+      } else {
+        alert('Failed to save marketing plan');
+      }
+    } catch (error) {
+      console.error('Failed to save marketing plan:', error);
+      alert('Failed to save marketing plan');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const updatePlanField = (field: string, value: any) => {
     setPlan(prev => ({ ...prev, [field]: value }));
@@ -139,6 +214,16 @@ export default function CMOPlanPage() {
     marginBottom: '1.5rem',
   };
 
+  if (loading) {
+    return (
+      <CMOLayout>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
+          Loading marketing plan...
+        </div>
+      </CMOLayout>
+    );
+  }
+
   return (
     <CMOLayout>
       <div style={{ padding: '2rem' }}>
@@ -171,17 +256,19 @@ export default function CMOPlanPage() {
               <option value="complete">Complete</option>
             </select>
             <button
+              onClick={savePlan}
+              disabled={saving}
               style={{
                 padding: '0.75rem 1.5rem',
-                background: '#F57C00',
+                background: saving ? '#888' : '#F57C00',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
                 fontWeight: '600',
-                cursor: 'pointer',
+                cursor: saving ? 'not-allowed' : 'pointer',
               }}
             >
-              Save Plan
+              {saving ? 'Saving...' : 'Save Plan'}
             </button>
           </div>
         </div>
@@ -236,6 +323,18 @@ export default function CMOPlanPage() {
               value={plan.vision}
               onChange={(e) => updatePlanField('vision', e.target.value)}
               placeholder="Where do you want your marketing to be in 3-5 years? (e.g., To be recognized as the leading voice in our industry...)"
+              rows={3}
+              style={{ ...inputStyle, resize: 'vertical' }}
+            />
+          </div>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
+              Marketing Strategy
+            </label>
+            <textarea
+              value={plan.strategy || ''}
+              onChange={(e) => updatePlanField('strategy', e.target.value)}
+              placeholder="How will you achieve your goals? (e.g., Focus on content marketing and community building...)"
               rows={3}
               style={{ ...inputStyle, resize: 'vertical' }}
             />
