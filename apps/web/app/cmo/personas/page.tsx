@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, CSSProperties } from 'react';
 import { CMOLayout, Button, EmptyState, LoadingSpinner } from '../components';
 import PersonaCard from './components/PersonaCard';
 import PersonaTestPanel from './components/PersonaTestPanel';
+import PersonaModal from './components/PersonaModal';
 
 interface Persona {
   id: string;
@@ -21,11 +22,20 @@ interface Persona {
   _count?: { contacts: number };
 }
 
+interface PersonaFormData {
+  name: string;
+  tagline: string;
+  painPoints: string[];
+  goals: string[];
+  preferredChannels: string[];
+}
+
 export default function CMOPersonasPage() {
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -78,6 +88,33 @@ export default function CMOPersonasPage() {
     }
   };
 
+  const handleCreatePersona = async (data: PersonaFormData) => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+
+      const response = await fetch(`${apiUrl}/cmo/personas`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        showToast('Persona created successfully!');
+        setShowCreateModal(false);
+        fetchPersonas();
+      } else {
+        showToast('Failed to create persona', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating persona:', error);
+      showToast('Failed to create persona', 'error');
+    }
+  };
+
   useEffect(() => {
     fetchPersonas();
   }, [fetchPersonas]);
@@ -112,7 +149,7 @@ export default function CMOPersonasPage() {
           <h1 style={titleStyle}>Customer Personas</h1>
           <p style={subtitleStyle}>Define your ideal customers and test content against them</p>
         </div>
-        <Button variant="primary" onClick={() => {/* TODO: Open create modal */}}>
+        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
           + New Persona
         </Button>
       </div>
@@ -128,7 +165,7 @@ export default function CMOPersonasPage() {
                 <Button variant="secondary" onClick={seedDefaultPersona}>
                   Create Sample Persona
                 </Button>
-                <Button variant="primary" onClick={() => {/* TODO: Open create modal */}}>
+                <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                   + New Persona
                 </Button>
               </div>
@@ -161,6 +198,13 @@ export default function CMOPersonasPage() {
           </div>
         </div>
       )}
+
+      {/* Create Persona Modal */}
+      <PersonaModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSave={handleCreatePersona}
+      />
     </CMOLayout>
   );
 }

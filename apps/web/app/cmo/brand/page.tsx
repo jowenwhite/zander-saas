@@ -72,19 +72,20 @@ export default function CMOBrandPage() {
         setBrandProfile(brand);
       } else {
         // Create default brand profile structure if none exists
+        // Using Zander brand defaults
         setBrandProfile({
           id: '',
-          primaryColor: '#0C2340',
+          primaryColor: '#00CCEE',
           secondaryColor: '#F57C00',
-          accentColor: '#005687',
-          fontPrimary: 'Inter',
+          accentColor: '#09090F',
+          fontPrimary: 'Sora',
           fontSecondary: 'Inter',
-          logoUrl: null,
-          logoIconUrl: null,
-          voiceTone: 'Professional yet approachable',
-          voiceGuidelines: null,
-          tagline: null,
-          mission: null,
+          logoUrl: '/images/zander-logo.svg',
+          logoIconUrl: '/images/zander-icon.svg',
+          voiceTone: 'Bold and confident',
+          voiceGuidelines: 'We speak with clarity and purpose.\n\nGuidelines:\n- Use active voice\n- Be direct and concise\n- Inspire action and confidence\n- Avoid jargon unless industry-specific\n- Address customers professionally',
+          tagline: 'AI-Powered Growth Platform',
+          mission: 'Empowering businesses to grow smarter with AI-driven marketing, sales, and operations automation.',
         });
       }
 
@@ -256,7 +257,7 @@ export default function CMOBrandPage() {
               <div style={{ display: 'grid', gap: '1rem' }}>
                 <ColorInput
                   label="Primary Color"
-                  value={brandProfile.primaryColor || '#0C2340'}
+                  value={brandProfile.primaryColor || '#00CCEE'}
                   onChange={(v) => updateBrandField('primaryColor', v)}
                 />
                 <ColorInput
@@ -266,7 +267,7 @@ export default function CMOBrandPage() {
                 />
                 <ColorInput
                   label="Accent Color"
-                  value={brandProfile.accentColor || '#005687'}
+                  value={brandProfile.accentColor || '#09090F'}
                   onChange={(v) => updateBrandField('accentColor', v)}
                 />
               </div>
@@ -275,9 +276,9 @@ export default function CMOBrandPage() {
               <div style={{ marginTop: '1.5rem' }}>
                 <label style={labelStyle}>Preview</label>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  <div style={{ ...colorSwatchStyle, background: brandProfile.primaryColor || '#0C2340' }} />
+                  <div style={{ ...colorSwatchStyle, background: brandProfile.primaryColor || '#00CCEE' }} />
                   <div style={{ ...colorSwatchStyle, background: brandProfile.secondaryColor || '#F57C00' }} />
-                  <div style={{ ...colorSwatchStyle, background: brandProfile.accentColor || '#005687' }} />
+                  <div style={{ ...colorSwatchStyle, background: brandProfile.accentColor || '#09090F' }} />
                 </div>
               </div>
             </div>
@@ -292,10 +293,11 @@ export default function CMOBrandPage() {
               <div style={{ marginBottom: '1rem' }}>
                 <label style={labelStyle}>Primary Font</label>
                 <select
-                  value={brandProfile.fontPrimary || 'Inter'}
+                  value={brandProfile.fontPrimary || 'Sora'}
                   onChange={(e) => updateBrandField('fontPrimary', e.target.value)}
                   style={selectStyle}
                 >
+                  <option value="Sora">Sora</option>
                   <option value="Inter">Inter</option>
                   <option value="Roboto">Roboto</option>
                   <option value="Open Sans">Open Sans</option>
@@ -312,6 +314,7 @@ export default function CMOBrandPage() {
                   style={selectStyle}
                 >
                   <option value="Inter">Inter</option>
+                  <option value="Sora">Sora</option>
                   <option value="Roboto">Roboto</option>
                   <option value="Open Sans">Open Sans</option>
                   <option value="Lato">Lato</option>
@@ -322,7 +325,7 @@ export default function CMOBrandPage() {
 
               {/* Typography Preview */}
               <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#13131A', borderRadius: '8px' }}>
-                <div style={{ fontFamily: brandProfile.fontPrimary || 'Inter', fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem' }}>
+                <div style={{ fontFamily: brandProfile.fontPrimary || 'Sora', fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem' }}>
                   Heading Text
                 </div>
                 <div style={{ fontFamily: brandProfile.fontSecondary || 'Inter', fontSize: '1rem', color: '#8888A0' }}>
@@ -535,8 +538,8 @@ Examples:
                 <div style={quickRefCardStyle}>
                   <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Primary Color</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: brandProfile.primaryColor || '#0C2340' }} />
-                    <code style={{ fontSize: '0.875rem' }}>{brandProfile.primaryColor || '#0C2340'}</code>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: brandProfile.primaryColor || '#00CCEE' }} />
+                    <code style={{ fontSize: '0.875rem' }}>{brandProfile.primaryColor || '#00CCEE'}</code>
                   </div>
                 </div>
                 <div style={quickRefCardStyle}>
@@ -549,13 +552,13 @@ Examples:
                 <div style={quickRefCardStyle}>
                   <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Accent Color</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: brandProfile.accentColor || '#005687' }} />
-                    <code style={{ fontSize: '0.875rem' }}>{brandProfile.accentColor || '#005687'}</code>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: brandProfile.accentColor || '#09090F' }} />
+                    <code style={{ fontSize: '0.875rem' }}>{brandProfile.accentColor || '#09090F'}</code>
                   </div>
                 </div>
                 <div style={quickRefCardStyle}>
                   <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Primary Font</div>
-                  <code style={{ fontSize: '0.875rem' }}>{brandProfile.fontPrimary || 'Inter'}</code>
+                  <code style={{ fontSize: '0.875rem' }}>{brandProfile.fontPrimary || 'Sora'}</code>
                 </div>
                 <div style={quickRefCardStyle}>
                   <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Secondary Font</div>
