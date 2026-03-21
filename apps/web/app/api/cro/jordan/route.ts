@@ -20,19 +20,23 @@ Available Tools:
 - create_deal: Create a new deal in the pipeline
 - update_deal_stage: Move a deal to a different stage
 - update_deal: Update deal details (value, notes, expected close date)
-- create_contact: Create a new contact/lead
+- create_contact: Create a new contact/lead (requires email address)
 - update_contact: Update contact information
 - create_activity: Log a sales activity (call, meeting, email, note)
 - schedule_followup: Schedule a future follow-up activity
-- send_email: Send an email to a contact (through Zander's email system)
+- draft_email: Create an email draft for user review (NEVER sends directly)
 - create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
 
 **How to Use Tools:**
 1. When a user mentions a call, meeting, or interaction — log it with create_activity
-2. When a user mentions a new prospect — create the contact AND create a deal
-3. When a user asks for a follow-up email — use send_email to actually send it
+2. When a user mentions a new prospect — create the contact (you MUST have their email) AND create a deal
+3. When a user asks for a follow-up email — use draft_email to create a draft for their review
 4. When scheduling next steps — use schedule_followup to set reminders
 5. After creating items, confirm what you created and offer next steps
+
+**CRITICAL: Email Drafts Only**
+You can NEVER send emails on behalf of the user. All emails are created as DRAFTS.
+When you draft an email, tell the user: "I've drafted that email — review it in Communications before sending."
 
 **Response Style:**
 - Be encouraging and action-oriented
@@ -186,7 +190,7 @@ const TOOLS = [
           description: 'Notes about the contact'
         }
       },
-      required: ['firstName', 'lastName']
+      required: ['firstName', 'lastName', 'email']
     }
   },
   {
@@ -276,8 +280,8 @@ const TOOLS = [
     }
   },
   {
-    name: 'send_email',
-    description: 'Send an email to a contact. Use this when the user asks to draft or send a follow-up email, proposal email, or any other communication.',
+    name: 'draft_email',
+    description: 'Create an email draft for user review. NEVER sends emails directly - all emails are saved as drafts for the user to review in Communications before sending. Use this when the user asks to draft, write, or prepare a follow-up email, proposal email, or any other communication.',
     input_schema: {
       type: 'object',
       properties: {
@@ -513,25 +517,57 @@ async function executeTool(
         }
       }
 
-      case 'send_email': {
-        const url = `${CRO_API_URL}/email-messages/send`;
-        console.log(`[Jordan Tool] POST ${url}`);
+      case 'draft_email': {
+        // Create email draft via local endpoint - NEVER sends directly
+        // Uses the web app's draft endpoint which stores drafts safely
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const url = `${baseUrl}/api/email-drafts`;
+        console.log(`[Jordan Tool] POST ${url} (draft only, never sends)`);
+        const draftData = {
+          to: toolInput.to,
+          subject: toolInput.subject,
+          body: toolInput.body,
+          htmlBody: toolInput.htmlBody,
+          contactId: toolInput.contactId,
+          dealId: toolInput.dealId,
+          createdBy: 'jordan-ai',
+        };
         const response = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify(toolInput),
+          body: JSON.stringify(draftData),
         });
         const responseText = await response.text();
         console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          return { success: false, error: `Failed to send email (${response.status}): ${responseText}` };
+          // Fallback: return the draft content for manual review
+          console.log(`[Jordan Tool] Draft endpoint error, returning draft content for review`);
+          return {
+            success: true,
+            result: {
+              message: 'Email draft created for review',
+              draft: {
+                to: toolInput.to,
+                subject: toolInput.subject,
+                body: toolInput.body,
+                status: 'draft',
+                note: 'Review this draft in Communications before sending',
+              },
+            },
+          };
         }
         try {
           const result = JSON.parse(responseText);
-          console.log(`[Jordan Tool] Email sent successfully:`, result);
-          return { success: true, result };
+          console.log(`[Jordan Tool] Email draft created successfully:`, result);
+          return {
+            success: true,
+            result: {
+              message: 'Email draft saved — review it in Communications before sending',
+              draft: result.draft,
+            },
+          };
         } catch {
-          return { success: true, result: { message: 'Email sent' } };
+          return { success: true, result: { message: 'Email draft created for review' } };
         }
       }
 
