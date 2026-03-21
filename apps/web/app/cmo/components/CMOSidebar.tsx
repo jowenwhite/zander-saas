@@ -1,5 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
+import TenantSwitcher from '../../components/TenantSwitcher';
 
 interface CMOSidebarProps {
   collapsed?: boolean;
@@ -91,18 +92,49 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
   return (
     <aside style={{
       width: collapsed ? '64px' : '240px',
-      background: '#13131A',
+      background: '#09090F',
       borderRight: '2px solid #2A2A38',
-      height: 'calc(100vh - 64px)',
+      height: '100vh',
       position: 'fixed',
-      top: '64px',
+      top: 0,
       left: 0,
       overflowY: 'auto',
-      zIndex: 900,
+      zIndex: 950,
       transition: 'width 0.3s ease',
       display: 'flex',
       flexDirection: 'column',
     }}>
+      {/* Logo and Tenant Switcher */}
+      {!collapsed && (
+        <div style={{
+          padding: '28px 12px 20px 12px',
+          borderBottom: '1px solid #2A2A38',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%'
+        }}>
+          <div style={{
+            marginBottom: '12px'
+          }}>
+            <a href="/" style={{ display: 'block', textDecoration: 'none' }}>
+              <img
+                src="/images/zander-logo.svg"
+                alt="Zander"
+                style={{
+                  width: '200px',
+                  height: 'auto',
+                  display: 'block',
+                  margin: '0 auto'
+                }}
+              />
+            </a>
+          </div>
+          <TenantSwitcher />
+        </div>
+      )}
+
       <div style={{ flex: 1 }}>
         {renderSection('Marketing', marketingItems)}
         {renderSection('Process', processItems)}
