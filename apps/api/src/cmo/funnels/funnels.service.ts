@@ -6,13 +6,19 @@ export class FunnelsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(tenantId: string) {
-    return this.prisma.funnel.findMany({
-      where: { tenantId },
-      include: {
-        stages: { orderBy: { stageOrder: 'asc' } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    try {
+      return await this.prisma.funnel.findMany({
+        where: { tenantId },
+        include: {
+          stages: { orderBy: { stageOrder: 'asc' } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error) {
+      console.error('Error fetching funnels:', error);
+      // Return empty array if table doesn't exist or query fails
+      return [];
+    }
   }
 
   async findOne(id: string, tenantId: string) {

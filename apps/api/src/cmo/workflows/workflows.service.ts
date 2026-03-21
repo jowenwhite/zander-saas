@@ -6,14 +6,20 @@ export class WorkflowsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(tenantId: string) {
-    return this.prisma.workflow.findMany({
-      where: { tenantId },
-      include: {
-        nodes: { orderBy: { sortOrder: 'asc' } },
-        _count: { select: { executions: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    try {
+      return await this.prisma.workflow.findMany({
+        where: { tenantId },
+        include: {
+          nodes: { orderBy: { sortOrder: 'asc' } },
+          _count: { select: { executions: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error) {
+      console.error('Error fetching workflows:', error);
+      // Return empty array if table doesn't exist or query fails
+      return [];
+    }
   }
 
   async findOne(id: string, tenantId: string) {
