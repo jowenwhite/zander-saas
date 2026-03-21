@@ -77,10 +77,16 @@ export default function OnboardingWizard({ isOpen, onComplete, userName, company
   };
 
   const handleComplete = async () => {
-    await fetch(process.env.NEXT_PUBLIC_API_URL + '/users/onboarding/complete', { 
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('zander_token') },
-    });
+    try {
+      await fetch(process.env.NEXT_PUBLIC_API_URL + '/users/onboarding/complete', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('zander_token') },
+      });
+    } catch (error) {
+      // Log error but don't block completion - demo accounts may not have this endpoint
+      console.warn('Onboarding completion API call failed:', error);
+    }
+    // Always call onComplete to close the wizard
     onComplete();
   };
 
