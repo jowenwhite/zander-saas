@@ -197,18 +197,19 @@ export default function SupportAdminPage() {
   const fetchZanderGreeting = async () => {
     try {
       const token = localStorage.getItem('zander_token');
-      const response = await fetch(`${API_URL}/ai/zander/chat`, {
+      // Use the new tool-enabled Zander route
+      const response = await fetch('/api/admin/zander', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          message: 'Give me a brief operational status update.',
+          message: 'Give me a brief operational status update. Check current tickets and headwinds.',
           conversationHistory: []
         })
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         const greeting: ZanderMessage = {
@@ -407,7 +408,7 @@ export default function SupportAdminPage() {
 
   const handleZanderSend = async () => {
     if (!zanderInput.trim() || zanderLoading) return;
-    
+
     const userMessage: ZanderMessage = {
       role: 'user',
       content: zanderInput,
@@ -417,7 +418,7 @@ export default function SupportAdminPage() {
     const currentInput = zanderInput;
     setZanderInput('');
     setZanderLoading(true);
-    
+
     try {
       const token = localStorage.getItem('zander_token');
       // Build conversation history for context
@@ -425,8 +426,9 @@ export default function SupportAdminPage() {
         role: msg.role === 'zander' ? 'assistant' : msg.role,
         content: msg.content
       }));
-      
-      const response = await fetch(`${API_URL}/ai/zander/chat`, {
+
+      // Use the new tool-enabled Zander route
+      const response = await fetch('/api/admin/zander', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -437,13 +439,28 @@ export default function SupportAdminPage() {
           conversationHistory
         })
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to get response from Zander');
       }
-      
+
       const data = await response.json();
-      
+
+      // If tools were executed, refresh data
+      if (data.toolsExecuted && data.toolsExecuted.length > 0) {
+        // Refresh relevant data based on what tools were used
+        const toolNames = data.toolsExecuted.map((t: { tool: string }) => t.tool);
+        if (toolNames.some((t: string) => t.includes('ticket'))) {
+          fetchTickets();
+        }
+        if (toolNames.some((t: string) => t.includes('headwind'))) {
+          fetchHeadwinds();
+        }
+        if (toolNames.some((t: string) => t.includes('tenant'))) {
+          fetchTenants();
+        }
+      }
+
       const aiResponse: ZanderMessage = {
         role: 'zander',
         content: data.content,
