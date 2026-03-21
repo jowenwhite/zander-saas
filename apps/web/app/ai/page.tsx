@@ -12,6 +12,8 @@ interface Message {
   timestamp: Date;
 }
 
+const JORDAN_STORAGE_KEY = 'jordan_chat_history';
+
 const getExecutiveIcon = (iconKey: string, size: number = 18): React.ReactNode => {
   const icons: Record<string, React.ReactNode> = {
     briefcase: <Briefcase size={size} />,
@@ -202,6 +204,35 @@ export default function AIAssistantPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Load chat history from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(JORDAN_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Restore messages with Date objects
+        const restored = parsed.map((m: Message) => ({
+          ...m,
+          timestamp: new Date(m.timestamp),
+        }));
+        setMessages(restored);
+      }
+    } catch (e) {
+      console.error('Failed to restore chat history:', e);
+    }
+  }, []);
+
+  // Save chat history to sessionStorage whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        sessionStorage.setItem(JORDAN_STORAGE_KEY, JSON.stringify(messages));
+      } catch (e) {
+        console.error('Failed to save chat history:', e);
+      }
+    }
+  }, [messages]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -286,6 +317,7 @@ export default function AIAssistantPage() {
 
   const handleClearChat = () => {
     setMessages([]);
+    sessionStorage.removeItem(JORDAN_STORAGE_KEY);
   };
 
   const openTicketModal = (assistantMessage: string) => {

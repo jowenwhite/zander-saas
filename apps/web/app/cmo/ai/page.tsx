@@ -17,6 +17,8 @@ type Message = {
   toolsExecuted?: ToolExecution[];
 };
 
+const STORAGE_KEY = 'don_chat_history';
+
 const suggestedPrompts = [
   'Create a target persona for a 45-year-old HVAC business owner',
   'Help me write compelling ad copy',
@@ -49,6 +51,35 @@ export default function AskDonPage() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Load chat history from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Restore messages with Date objects
+        const restored = parsed.map((m: Message) => ({
+          ...m,
+          timestamp: new Date(m.timestamp),
+        }));
+        setMessages(restored);
+      }
+    } catch (e) {
+      console.error('Failed to restore chat history:', e);
+    }
+  }, []);
+
+  // Save chat history to sessionStorage whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      } catch (e) {
+        console.error('Failed to save chat history:', e);
+      }
+    }
+  }, [messages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -134,6 +165,7 @@ export default function AskDonPage() {
 
   const handleClearChat = () => {
     setMessages([]);
+    sessionStorage.removeItem(STORAGE_KEY);
   };
 
   return (

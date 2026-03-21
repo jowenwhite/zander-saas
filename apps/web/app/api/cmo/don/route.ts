@@ -318,52 +318,69 @@ async function executeTool(
     Authorization: `Bearer ${authToken}`,
   };
 
+  console.log(`[Don Tool] Executing ${toolName} with input:`, JSON.stringify(toolInput, null, 2));
+  console.log(`[Don Tool] API URL: ${CMO_API_URL}`);
+
   try {
     switch (toolName) {
       case 'create_persona': {
-        const response = await fetch(`${CMO_API_URL}/cmo/personas`, {
+        const url = `${CMO_API_URL}/cmo/personas`;
+        console.log(`[Don Tool] POST ${url}`);
+        const response = await fetch(url, {
           method: 'POST',
           headers,
           body: JSON.stringify(toolInput),
         });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to create persona: ${error}` };
+          console.error(`[Don Tool] Failed to create persona: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to create persona (${response.status}): ${responseText}` };
         }
-        const result = await response.json();
-        return { success: true, result };
+        try {
+          const result = JSON.parse(responseText);
+          console.log(`[Don Tool] Persona created successfully:`, result);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Persona created' } };
+        }
       }
 
       case 'save_marketing_plan': {
-        const response = await fetch(`${CMO_API_URL}/cmo/plan`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(toolInput),
-        });
-        if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to save marketing plan: ${error}` };
-        }
-        const result = await response.json();
-        return { success: true, result };
+        // Marketing Plan API not yet implemented - store in notes/templates for now
+        console.log(`[Don Tool] Marketing plan feature not yet available`);
+        return {
+          success: false,
+          error: 'Marketing Plan save is not yet available. The plan has been generated but cannot be saved to the database yet. This feature is coming soon!'
+        };
       }
 
       case 'create_calendar_event': {
-        const response = await fetch(`${CMO_API_URL}/cmo/calendar/events`, {
+        const url = `${CMO_API_URL}/cmo/calendar/events`;
+        console.log(`[Don Tool] POST ${url}`);
+        const response = await fetch(url, {
           method: 'POST',
           headers,
           body: JSON.stringify(toolInput),
         });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to create calendar event: ${error}` };
+          console.error(`[Don Tool] Failed to create calendar event: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to create calendar event (${response.status}): ${responseText}` };
         }
-        const result = await response.json();
-        return { success: true, result };
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Calendar event created' } };
+        }
       }
 
       case 'create_email_template': {
-        const response = await fetch(`${CMO_API_URL}/cmo/templates`, {
+        const url = `${CMO_API_URL}/cmo/templates`;
+        console.log(`[Don Tool] POST ${url}`);
+        const response = await fetch(url, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -371,16 +388,24 @@ async function executeTool(
             type: 'email',
           }),
         });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to create email template: ${error}` };
+          console.error(`[Don Tool] Failed to create email template: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to create email template (${response.status}): ${responseText}` };
         }
-        const result = await response.json();
-        return { success: true, result };
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Email template created' } };
+        }
       }
 
       case 'create_workflow': {
-        const response = await fetch(`${CMO_API_URL}/cmo/workflows`, {
+        const url = `${CMO_API_URL}/cmo/workflows`;
+        console.log(`[Don Tool] POST ${url}`);
+        const response = await fetch(url, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -388,16 +413,24 @@ async function executeTool(
             status: 'draft',
           }),
         });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to create workflow: ${error}` };
+          console.error(`[Don Tool] Failed to create workflow: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to create workflow (${response.status}): ${responseText}` };
         }
-        const result = await response.json();
-        return { success: true, result };
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Workflow created' } };
+        }
       }
 
       case 'create_funnel': {
-        const response = await fetch(`${CMO_API_URL}/cmo/funnels`, {
+        const url = `${CMO_API_URL}/cmo/funnels`;
+        console.log(`[Don Tool] POST ${url}`);
+        const response = await fetch(url, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -405,26 +438,40 @@ async function executeTool(
             status: 'draft',
           }),
         });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to create funnel: ${error}` };
+          console.error(`[Don Tool] Failed to create funnel: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to create funnel (${response.status}): ${responseText}` };
         }
-        const result = await response.json();
-        return { success: true, result };
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Funnel created' } };
+        }
       }
 
       case 'update_brand_settings': {
-        const response = await fetch(`${CMO_API_URL}/cmo/assets/brand`, {
+        const url = `${CMO_API_URL}/cmo/assets/brand`;
+        console.log(`[Don Tool] PATCH ${url}`);
+        const response = await fetch(url, {
           method: 'PATCH',
           headers,
           body: JSON.stringify(toolInput),
         });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to update brand settings: ${error}` };
+          console.error(`[Don Tool] Failed to update brand settings: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to update brand settings (${response.status}): ${responseText}` };
         }
-        const result = await response.json();
-        return { success: true, result };
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Brand settings updated' } };
+        }
       }
 
       case 'create_support_ticket': {
@@ -451,17 +498,25 @@ async function executeTool(
           createdVia: 'DON',
         };
 
-        const response = await fetch(`${CMO_API_URL}/support-tickets`, {
+        const url = `${CMO_API_URL}/support-tickets`;
+        console.log(`[Don Tool] POST ${url}`);
+        const response = await fetch(url, {
           method: 'POST',
           headers,
           body: JSON.stringify(ticketData),
         });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
         if (!response.ok) {
-          const error = await response.text();
-          return { success: false, error: `Failed to create support ticket: ${error}` };
+          console.error(`[Don Tool] Failed to create support ticket: ${response.status} ${responseText}`);
+          return { success: false, error: `Failed to create support ticket (${response.status}): ${responseText}` };
         }
-        const result = await response.json();
-        return { success: true, result };
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Support ticket created' } };
+        }
       }
 
       default:
