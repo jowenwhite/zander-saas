@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Bot, X } from 'lucide-react';
 
 interface Executive {
@@ -37,13 +38,32 @@ const executives: Executive[] = [
 
 export default function AITeamButton() {
   const [showModal, setShowModal] = useState(false);
+  const pathname = usePathname();
+
+  // Detect if we're in CMO context
+  const isCMOContext = pathname?.startsWith('/cmo');
 
   const handleExecutiveClick = (exec: Executive) => {
+    // Special handling for Don in CMO context
+    if (exec.id === 'cmo' && isCMOContext) {
+      window.location.href = '/cmo/ai';
+      return;
+    }
+
     if (exec.status === 'active') {
       window.location.href = '/ai';
     } else {
       alert(`${exec.name} (${exec.fullTitle}) is coming soon!`);
     }
+  }
+
+  // Modify executive status based on context
+  const getExecutiveStatus = (exec: Executive): 'active' | 'coming_soon' => {
+    // Don is active when in CMO context
+    if (exec.id === 'cmo' && isCMOContext) {
+      return 'active';
+    }
+    return exec.status;
   };
 
   return (
@@ -136,56 +156,59 @@ export default function AITeamButton() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {executives.map((exec) => (
-                <button
-                  key={exec.id}
-                  onClick={() => handleExecutiveClick(exec)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    padding: '1rem',
-                    background: exec.status === 'active' ? `${exec.color}15` : '#13131A',
-                    border: exec.status === 'active' ? `2px solid ${exec.color}` : '2px solid #2A2A38',
-                    borderRadius: '12px',
-                    cursor: exec.status === 'active' ? 'pointer' : 'default',
-                    textAlign: 'left',
-                    opacity: exec.status === 'coming_soon' ? 0.6 : 1,
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '50%',
-                    background: exec.status === 'active' ? exec.color : '#55556A',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white'
-                  }}>
-                    {getExecutiveIcon(exec.icon)}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem' }}>{exec.name}</span>
-                      <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>({exec.role})</span>
-                      {exec.status === 'coming_soon' && (
-                        <span style={{
-                          padding: '0.125rem 0.5rem',
-                          background: 'rgba(240, 179, 35, 0.2)',
-                          color: '#F0B323',
-                          borderRadius: '4px',
-                          fontSize: '0.65rem',
-                          fontWeight: '600'
-                        }}>SOON</span>
-                      )}
+              {executives.map((exec) => {
+                const status = getExecutiveStatus(exec);
+                return (
+                  <button
+                    key={exec.id}
+                    onClick={() => handleExecutiveClick(exec)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      padding: '1rem',
+                      background: status === 'active' ? `${exec.color}15` : '#13131A',
+                      border: status === 'active' ? `2px solid ${exec.color}` : '2px solid #2A2A38',
+                      borderRadius: '12px',
+                      cursor: status === 'active' ? 'pointer' : 'default',
+                      textAlign: 'left',
+                      opacity: status === 'coming_soon' ? 0.6 : 1,
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      background: status === 'active' ? exec.color : '#55556A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white'
+                    }}>
+                      {getExecutiveIcon(exec.icon)}
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{exec.fullTitle}</div>
-                  </div>
-                </button>
-              ))}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem' }}>{exec.name}</span>
+                        <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>({exec.role})</span>
+                        {status === 'coming_soon' && (
+                          <span style={{
+                            padding: '0.125rem 0.5rem',
+                            background: 'rgba(240, 179, 35, 0.2)',
+                            color: '#F0B323',
+                            borderRadius: '4px',
+                            fontSize: '0.65rem',
+                            fontWeight: '600'
+                          }}>SOON</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{exec.fullTitle}</div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

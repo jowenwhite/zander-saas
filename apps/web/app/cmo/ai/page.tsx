@@ -35,6 +35,7 @@ const toolLabels: Record<string, { label: string; icon: string; link: string }> 
   create_workflow: { label: 'Workflow', icon: '⚡', link: '/cmo/workflows' },
   create_funnel: { label: 'Funnel', icon: '🎯', link: '/cmo/funnels' },
   update_brand_settings: { label: 'Brand Settings', icon: '🎨', link: '/cmo/brand' },
+  create_support_ticket: { label: 'Support Ticket', icon: '🎫', link: '/settings' },
 };
 
 export default function AskDonPage() {

@@ -23,6 +23,7 @@ Available Tools:
 - create_workflow: Create marketing automation workflows
 - create_funnel: Create marketing funnels
 - update_brand_settings: Update brand voice, colors, or guidelines
+- create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
 
 **How to Use Tools:**
 1. When asked to create something, use the appropriate tool immediately
@@ -275,6 +276,34 @@ const TOOLS = [
       },
       required: []
     }
+  },
+  {
+    name: 'create_support_ticket',
+    description: 'Create a support ticket for bugs, feature requests, questions, or issues. Use this when the user reports a problem, asks for help with something not working, requests a new feature, or needs support assistance.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'Brief title summarizing the issue or request'
+        },
+        description: {
+          type: 'string',
+          description: 'Detailed description of the issue, including steps to reproduce if applicable'
+        },
+        priority: {
+          type: 'string',
+          enum: ['low', 'medium', 'high', 'critical'],
+          description: 'Priority level: low (minor inconvenience), medium (affects work), high (blocks work), critical (system down)'
+        },
+        category: {
+          type: 'string',
+          enum: ['bug', 'feature', 'question', 'other'],
+          description: 'Category: bug (something broken), feature (new functionality), question (how-to), other'
+        }
+      },
+      required: ['title', 'description']
+    }
   }
 ];
 
@@ -393,6 +422,43 @@ async function executeTool(
         if (!response.ok) {
           const error = await response.text();
           return { success: false, error: `Failed to update brand settings: ${error}` };
+        }
+        const result = await response.json();
+        return { success: true, result };
+      }
+
+      case 'create_support_ticket': {
+        // Map priority: low -> P3, medium -> P2, high -> P1, critical -> P1
+        const priorityMap: Record<string, string> = {
+          low: 'P3',
+          medium: 'P2',
+          high: 'P1',
+          critical: 'P1',
+        };
+        // Map category: bug -> BUG, feature -> FEATURE_REQUEST, question -> HOW_TO, other -> OTHER
+        const categoryMap: Record<string, string> = {
+          bug: 'BUG',
+          feature: 'FEATURE_REQUEST',
+          question: 'HOW_TO',
+          other: 'OTHER',
+        };
+
+        const ticketData = {
+          subject: toolInput.title as string,
+          description: toolInput.description as string,
+          priority: priorityMap[(toolInput.priority as string) || 'medium'] || 'P2',
+          category: categoryMap[(toolInput.category as string) || 'other'] || 'OTHER',
+          createdVia: 'DON',
+        };
+
+        const response = await fetch(`${CMO_API_URL}/support-tickets`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(ticketData),
+        });
+        if (!response.ok) {
+          const error = await response.text();
+          return { success: false, error: `Failed to create support ticket: ${error}` };
         }
         const result = await response.json();
         return { success: true, result };
