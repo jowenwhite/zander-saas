@@ -470,7 +470,7 @@ export default function AIAssistantPage() {
                     marginBottom: '2rem'
                   }}>
                     <p style={{ fontSize: '1rem', margin: 0 }}>
-                      👋 Hey there! I'm {selectedExecutive.name}. How can I help you today?
+                      Hey there! I'm {selectedExecutive.name}. How can I help you today?
                     </p>
                   </div>
 
