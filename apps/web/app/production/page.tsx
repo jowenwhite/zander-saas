@@ -503,7 +503,7 @@ export default function ProductionPage() {
                 margin: 0,
                 marginBottom: '0.25rem'
               }}>
-                {getGreeting()}, {userName || 'there'} 👋
+                {getGreeting()}, {userName || 'there'}
               </h1>
               <p style={{ color: '#8888A0', margin: 0 }}>
                 Here's what's happening with your sales today
