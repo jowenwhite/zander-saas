@@ -2,26 +2,46 @@
 import { useState, useRef, useEffect } from 'react';
 import { CMOLayout } from '../components';
 
+type ToolExecution = {
+  tool: string;
+  success: boolean;
+  itemCreated?: unknown;
+  error?: string;
+};
+
 type Message = {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  toolsExecuted?: ToolExecution[];
 };
 
 const suggestedPrompts = [
-  'What campaign should I launch next?',
+  'Create a target persona for a 45-year-old HVAC business owner',
   'Help me write compelling ad copy',
-  'Review my marketing funnel and suggest improvements',
-  'Create a content calendar for this month',
-  'How can I improve my email open rates?',
+  'Add a campaign launch to my calendar for next week',
+  'Create a welcome email sequence for new leads',
+  'Build a lead generation funnel',
   'What makes my brand unique?',
 ];
+
+// Map tool names to user-friendly labels and icons
+const toolLabels: Record<string, { label: string; icon: string; link: string }> = {
+  create_persona: { label: 'Persona', icon: '🎯', link: '/cmo/personas' },
+  save_marketing_plan: { label: 'Marketing Plan', icon: '📝', link: '/cmo/plan' },
+  create_calendar_event: { label: 'Calendar Event', icon: '📅', link: '/cmo/calendar' },
+  create_email_template: { label: 'Email Template', icon: '📧', link: '/cmo/templates' },
+  create_workflow: { label: 'Workflow', icon: '⚡', link: '/cmo/workflows' },
+  create_funnel: { label: 'Funnel', icon: '🎯', link: '/cmo/funnels' },
+  update_brand_settings: { label: 'Brand Settings', icon: '🎨', link: '/cmo/brand' },
+};
 
 export default function AskDonPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [executingTools, setExecutingTools] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,17 +66,18 @@ export default function AskDonPage() {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setExecutingTools([]);
 
     try {
       const token = localStorage.getItem('zander_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
       const conversationHistory = messages.map((m) => ({
         role: m.role,
         content: m.content,
       }));
 
-      const response = await fetch(`${apiUrl}/cmo/don/chat`, {
+      // Call our new API route with tool use support
+      const response = await fetch('/api/cmo/don', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,11 +94,13 @@ export default function AskDonPage() {
       }
 
       const data = await response.json();
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: data.content,
         timestamp: new Date(),
+        toolsExecuted: data.toolsExecuted,
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
@@ -92,6 +115,7 @@ export default function AskDonPage() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setExecutingTools([]);
     }
   };
 
@@ -135,7 +159,7 @@ export default function AskDonPage() {
             Ask Don
           </h1>
           <p style={{ color: '#8888A0', margin: 0 }}>
-            Your AI Chief Marketing Officer - bold ideas, timeless wisdom
+            Your AI Chief Marketing Officer - bold ideas, real actions
           </p>
         </div>
         {messages.length > 0 && (
@@ -207,13 +231,24 @@ export default function AskDonPage() {
                 style={{
                   color: '#8888A0',
                   maxWidth: '500px',
-                  margin: '0 auto 2rem',
+                  margin: '0 auto 1rem',
                   lineHeight: '1.6',
                 }}
               >
                 Classic Madison Avenue meets modern digital strategy. I believe great
-                marketing is about making people feel something. Let's make your brand
-                impossible to ignore.
+                marketing is about making people feel something.
+              </p>
+              <p
+                style={{
+                  color: '#00CCEE',
+                  maxWidth: '500px',
+                  margin: '0 auto 2rem',
+                  lineHeight: '1.6',
+                  fontWeight: '500',
+                }}
+              >
+                I don't just advise — I execute. Ask me to create personas, plan campaigns,
+                schedule events, or build funnels. I'll do it right here.
               </p>
 
               {/* Suggested Prompts */}
@@ -243,7 +278,7 @@ export default function AskDonPage() {
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = '#00CCEE';
-                      e.currentTarget.style.background = 'rgba(245, 124, 0, 0.05)';
+                      e.currentTarget.style.background = 'rgba(0, 204, 238, 0.05)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = '#2A2A38';
@@ -273,7 +308,7 @@ export default function AskDonPage() {
                       background:
                         message.role === 'user'
                           ? '#13131A'
-                          : 'rgba(245, 124, 0, 0.1)',
+                          : 'rgba(0, 204, 238, 0.1)',
                       color: message.role === 'user' ? 'white' : '#F0F0F5',
                     }}
                   >
@@ -292,6 +327,73 @@ export default function AskDonPage() {
                         <span>🎨</span> Don
                       </div>
                     )}
+
+                    {/* Tool Execution Indicators */}
+                    {message.toolsExecuted && message.toolsExecuted.length > 0 && (
+                      <div
+                        style={{
+                          marginBottom: '1rem',
+                          padding: '0.75rem',
+                          background: 'rgba(0, 204, 238, 0.1)',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(0, 204, 238, 0.2)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: '0.75rem',
+                            color: '#00CCEE',
+                            fontWeight: '600',
+                            marginBottom: '0.5rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                          }}
+                        >
+                          Actions Taken
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {message.toolsExecuted.map((tool, idx) => {
+                            const toolInfo = toolLabels[tool.tool] || { label: tool.tool, icon: '🔧', link: '#' };
+                            return (
+                              <a
+                                key={idx}
+                                href={toolInfo.link}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.375rem',
+                                  padding: '0.375rem 0.75rem',
+                                  background: tool.success ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                  border: `1px solid ${tool.success ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                                  borderRadius: '16px',
+                                  fontSize: '0.8rem',
+                                  color: tool.success ? '#10B981' : '#EF4444',
+                                  textDecoration: 'none',
+                                  fontWeight: '500',
+                                  transition: 'all 0.2s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(-1px)';
+                                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(0)';
+                                  e.currentTarget.style.boxShadow = 'none';
+                                }}
+                              >
+                                <span>{tool.success ? '✅' : '❌'}</span>
+                                <span>{toolInfo.icon}</span>
+                                <span>{toolInfo.label}</span>
+                                {tool.success && (
+                                  <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>→ View</span>
+                                )}
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     <div
                       style={{
                         whiteSpace: 'pre-wrap',
@@ -312,7 +414,7 @@ export default function AskDonPage() {
                     style={{
                       padding: '1rem 1.25rem',
                       borderRadius: '16px 16px 16px 4px',
-                      background: 'rgba(245, 124, 0, 0.1)',
+                      background: 'rgba(0, 204, 238, 0.1)',
                     }}
                   >
                     <div
@@ -328,6 +430,30 @@ export default function AskDonPage() {
                     >
                       <span>🎨</span> Don
                     </div>
+
+                    {/* Show executing tools */}
+                    {executingTools.length > 0 && (
+                      <div
+                        style={{
+                          marginBottom: '0.75rem',
+                          fontSize: '0.8rem',
+                          color: '#00CCEE',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div className="spinner" style={{
+                            width: '12px',
+                            height: '12px',
+                            border: '2px solid rgba(0, 204, 238, 0.3)',
+                            borderTopColor: '#00CCEE',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite',
+                          }} />
+                          Executing: {executingTools.map(t => toolLabels[t]?.label || t).join(', ')}
+                        </div>
+                      </div>
+                    )}
+
                     <div style={{ display: 'flex', gap: '4px' }}>
                       {[0, 1, 2].map((i) => (
                         <div
@@ -399,7 +525,7 @@ export default function AskDonPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Ask Don anything about marketing..."
+              placeholder="Ask Don to create personas, plan campaigns, schedule events..."
               disabled={isLoading}
               style={{
                 flex: 1,
@@ -421,7 +547,7 @@ export default function AskDonPage() {
               style={{
                 padding: '0.875rem 1.5rem',
                 background: input.trim() && !isLoading ? '#00CCEE' : '#2A2A38',
-                color: 'white',
+                color: input.trim() && !isLoading ? '#09090F' : '#8888A0',
                 border: 'none',
                 borderRadius: '10px',
                 fontWeight: '600',
@@ -447,6 +573,11 @@ export default function AskDonPage() {
           50% {
             opacity: 1;
             transform: scale(1);
+          }
+        }
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
           }
         }
       `}</style>
