@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { SentryModule } from '@sentry/nestjs/setup';
 import { ThrottleExceptionFilter } from './common/filters/throttle-exception.filter';
 
 import { AppController } from './app.controller';
@@ -45,6 +46,8 @@ import { AuditLogFeatureModule } from './audit-log/audit-log.module';
 
 @Module({
   imports: [
+    // Sentry must be first for proper instrumentation
+    SentryModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
