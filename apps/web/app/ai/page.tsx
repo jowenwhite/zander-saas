@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
-import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Bot, Ticket, Video, AlertTriangle, Lightbulb, FolderOpen, Package, Mail, Calendar } from 'lucide-react';
+import { Ticket, AlertTriangle, Lightbulb } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -14,166 +14,13 @@ interface Message {
 
 const JORDAN_STORAGE_KEY = 'jordan_chat_history';
 
-const getExecutiveIcon = (iconKey: string, size: number = 18): React.ReactNode => {
-  const icons: Record<string, React.ReactNode> = {
-    briefcase: <Briefcase size={size} />,
-    chart: <BarChart3 size={size} />,
-    settings: <Settings size={size} />,
-    palette: <Palette size={size} />,
-    users: <Users size={size} />,
-    monitor: <Monitor size={size} />,
-    clipboard: <ClipboardList size={size} />,
-  };
-  return icons[iconKey] || <Briefcase size={size} />;
-};
-
-interface Executive {
-  id: string;
-  name: string;
-  role: string;
-  fullTitle: string;
-  reference: string;
-  personality: string;
-  icon: string;
-  color: string;
-  status: 'active' | 'coming_soon';
-  suggestedPrompts: string[];
-}
-
-const executives: Executive[] = [
-  {
-    id: 'cro',
-    name: 'Jordan',
-    role: 'CRO',
-    fullTitle: 'Chief Revenue Officer',
-    reference: 'Sales & Revenue Expert',
-    personality: 'Enthusiastic, warm, and persuasive. Jordan is your dedicated sales coach who gets genuinely excited about helping you close deals and build lasting client relationships. Always encouraging and action-oriented, Jordan focuses on practical strategies that drive real results. Expects you to pick up the phone and make things happen!',
-    icon: 'briefcase',
-    color: '#00CCEE',
-    status: 'active',
-    suggestedPrompts: [
-      'What deals should I focus on this week?',
-      'Help me write a follow-up email for a prospect',
-      'How can I improve my closing rate?',
-      'Draft a proposal introduction for a new client',
-      'What questions should I ask on a discovery call?',
-      'Help me overcome a common sales objection',
-    ]
-  },
-  {
-    id: 'cfo',
-    name: 'Ben',
-    role: 'CFO',
-    fullTitle: 'Chief Financial Officer',
-    reference: 'Finance & Numbers Expert',
-    personality: 'Analytical, practical, and refreshingly cautious. Ben genuinely loves spreadsheets and gets a little too excited about balanced budgets. He gives careful, well-reasoned financial advice and always wants to see the numbers before making any decision. Will occasionally make accounting jokes that only he finds funny. Your voice of fiscal responsibility.',
-    icon: 'chart',
-    color: '#2E7D32',
-    status: 'coming_soon',
-    suggestedPrompts: [
-      'Analyze my cash flow for the next 30 days',
-      "What's my profit margin on recent projects?",
-      'Help me create a budget for next quarter',
-      'Should I take on this new expense?',
-      'How do I price my services profitably?',
-      'Review my financial health',
-    ]
-  },
-  {
-    id: 'coo',
-    name: 'Miranda',
-    role: 'COO',
-    fullTitle: 'Chief Operations Officer',
-    reference: 'Operations & Efficiency Expert',
-    personality: "Efficient, detail-oriented, and refreshingly direct. Miranda has zero tolerance for inefficiency and can spot a bottleneck from a mile away. She ensures everything runs like a well-oiled machine and isn't afraid to tell you when something isn't working. Delivers actionable advice without sugarcoating. Your operations will never be the same.",
-    icon: 'settings',
-    color: '#5E35B1',
-    status: 'coming_soon',
-    suggestedPrompts: [
-      'How can I streamline my workflow?',
-      'Create a checklist for project delivery',
-      'What processes should I automate?',
-      'My team keeps missing deadlines - help!',
-      'Design an onboarding process for new clients',
-      'How do I scale my operations?',
-    ]
-  },
-  {
-    id: 'cmo',
-    name: 'Don',
-    role: 'CMO',
-    fullTitle: 'Chief Marketing Officer',
-    reference: 'Marketing & Brand Expert',
-    personality: "Creative, confident, and a master storyteller. Don sees the deeper narrative behind every brand and knows exactly how to make people feel something. He thinks in campaigns and speaks in headlines. Bold ideas come naturally, but always grounded in what actually moves the needle. Will push you to be braver with your marketing than you've ever been.",
-    icon: 'palette',
-    color: '#F57C00',
-    status: 'coming_soon',
-    suggestedPrompts: [
-      'Help me write compelling ad copy',
-      'What should my brand message be?',
-      'Create a social media content calendar',
-      'How do I differentiate from competitors?',
-      'What marketing should I focus on first?',
-      'Review my website messaging',
-    ]
-  },
-  {
-    id: 'cpo',
-    name: 'Ted',
-    role: 'CPO',
-    fullTitle: 'Chief People Officer',
-    reference: 'Team & Culture Expert',
-    personality: "Warm, insightful, and deeply invested in people. Ted believes the best business results come from teams that genuinely thrive. He helps you build culture, navigate tricky conversations, and become the leader your team needs. Never preachy, always practical. Will remind you that your people are your greatest asset.",
-    icon: 'users',
-    color: '#0288D1',
-    status: 'coming_soon',
-    suggestedPrompts: [
-      'How do I give constructive feedback?',
-      'Help me write a job description',
-      'What should I look for when hiring?',
-      'My team morale is low - what can I do?',
-      'Create an employee onboarding checklist',
-      'How do I handle a difficult employee?',
-    ]
-  },
-  {
-    id: 'cio',
-    name: 'Jarvis',
-    role: 'CIO',
-    fullTitle: 'Chief Information Officer',
-    reference: 'Technology & Systems Expert',
-    personality: "Logical, forward-thinking, and surprisingly patient with non-tech folks. Jarvis makes technology feel approachable and helps you leverage the right tools without overcomplicating things. He sees technology as a means to an end, not an end itself. Will save you from bad software decisions and help you work smarter.",
-    icon: 'monitor',
-    color: '#455A64',
-    status: 'coming_soon',
-    suggestedPrompts: [
-      'What software should I use for X?',
-      'How do I automate this repetitive task?',
-      'Is my data secure enough?',
-      'Help me choose between these tools',
-      'What tech stack do I actually need?',
-      'How do I integrate my systems?',
-    ]
-  },
-  {
-    id: 'ea',
-    name: 'Pam',
-    role: 'EA',
-    fullTitle: 'Executive Assistant',
-    reference: 'Organization & Productivity Expert',
-    personality: "Organized, proactive, and three steps ahead. Pam keeps everything running smoothly and ensures nothing falls through the cracks. She manages your time like it's precious (because it is) and has an uncanny ability to anticipate what you need before you ask. Your secret weapon for staying sane.",
-    icon: 'clipboard',
-    color: '#C2185B',
-    status: 'coming_soon',
-    suggestedPrompts: [
-      'Help me prioritize my tasks today',
-      'Create a meeting agenda',
-      'What should I delegate?',
-      'Help me manage my calendar better',
-      'Draft an email to reschedule a meeting',
-      'How do I stay organized with so much going on?',
-    ]
-  }
+const suggestedPrompts = [
+  'What deals should I focus on this week?',
+  'Help me write a follow-up email for a prospect',
+  'How can I improve my closing rate?',
+  'Draft a proposal introduction for a new client',
+  'What questions should I ask on a discovery call?',
+  'Help me overcome a common sales objection',
 ];
 
 const API_URL = 'https://api.zanderos.com';
@@ -186,17 +33,13 @@ const getAuthHeaders = () => {
   };
 };
 
-export default function AIAssistantPage() {
-  const [selectedExecutive, setSelectedExecutive] = useState<Executive>(executives[0]);
+export default function AskJordanPage() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [showTeamModal, setShowTeamModal] = useState(false);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [showTicketModal, setShowTicketModal] = useState(false);
-  const [ticketContext, setTicketContext] = useState<{ message: string; executive: string } | null>(null);
   const [ticketForm, setTicketForm] = useState({ subject: '', description: '', category: 'HOW_TO', priority: 'P3' });
   const [savingTicket, setSavingTicket] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -210,7 +53,6 @@ export default function AIAssistantPage() {
       const saved = sessionStorage.getItem(JORDAN_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Restore messages with Date objects
         const restored = parsed.map((m: Message) => ({
           ...m,
           timestamp: new Date(m.timestamp),
@@ -238,18 +80,18 @@ export default function AIAssistantPage() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!inputValue.trim() || isTyping) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputValue.trim(),
+      content: input.trim(),
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
+    setInput('');
+    setIsLoading(true);
 
     try {
       const conversationHistory = messages.map(m => ({
@@ -261,7 +103,7 @@ export default function AIAssistantPage() {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          executiveId: selectedExecutive.id,
+          executiveId: 'cro',
           message: userMessage.content,
           conversationHistory
         })
@@ -284,18 +126,13 @@ export default function AIAssistantPage() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `I apologize, but I'm having trouble connecting right now. Please try again in a moment.\n\nIn the meantime, feel free to ask me about:\n- Sales strategies and deal prioritization\n- Follow-up emails and proposals\n- Closing techniques and objection handling\n- Discovery calls and qualification`,
+        content: `I'm having trouble connecting right now. Please try again in a moment.`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
-      setIsTyping(false);
+      setIsLoading(false);
     }
-  };
-
-  const handlePromptClick = (prompt: string) => {
-    setInputValue(prompt);
-    inputRef.current?.focus();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -305,14 +142,9 @@ export default function AIAssistantPage() {
     }
   };
 
-  const handleExecutiveChange = (exec: Executive) => {
-    if (exec.status === 'active') {
-      setSelectedExecutive(exec);
-      setMessages([]);
-      setShowTeamModal(false);
-    } else {
-      alert(`${exec.name} (${exec.fullTitle}) is coming soon!\n\n${exec.personality}`);
-    }
+  const handlePromptClick = (prompt: string) => {
+    setInput(prompt);
+    inputRef.current?.focus();
   };
 
   const handleClearChat = () => {
@@ -321,9 +153,8 @@ export default function AIAssistantPage() {
   };
 
   const openTicketModal = (assistantMessage: string) => {
-    setTicketContext({ message: assistantMessage, executive: selectedExecutive.name });
     setTicketForm({
-      subject: `Question for ${selectedExecutive.name} (${selectedExecutive.role})`,
+      subject: 'Question for Jordan (CRO)',
       description: `Original question: ${messages[messages.length - 2]?.content || 'N/A'}\n\nAI Response: ${assistantMessage}\n\nReason for escalation: `,
       category: 'HOW_TO',
       priority: 'P3'
@@ -342,15 +173,14 @@ export default function AIAssistantPage() {
           description: ticketForm.description,
           category: ticketForm.category,
           priority: ticketForm.priority,
-          createdVia: selectedExecutive.name.toUpperCase()
+          createdVia: 'JORDAN'
         })
       });
-      
+
       if (response.ok) {
         const ticket = await response.json();
         alert(`Support ticket #${ticket.ticketNumber} created successfully! Our team will review it shortly.`);
         setShowTicketModal(false);
-        setTicketContext(null);
       } else {
         throw new Error('Failed to create ticket');
       }
@@ -361,175 +191,157 @@ export default function AIAssistantPage() {
     setSavingTicket(false);
   };
 
-
-  // Standard sidebar items - using Lucide icons as React nodes
-  const salesRevenueItems = [
-    { icon: <BarChart3 size={18} />, label: 'Production', href: '/production' },
-    { icon: <FolderOpen size={18} />, label: 'Projects', href: '/projects' },
-    { icon: <Users size={18} />, label: 'People', href: '/people' },
-    { icon: <Package size={18} />, label: 'Products', href: '/products' },
-  ];
-
-  const toolsItems = [
-    { icon: <Mail size={18} />, label: 'Communication', href: '/communication' },
-    { icon: <Calendar size={18} />, label: 'Schedule', href: '/schedule' },
-    { icon: <ClipboardList size={18} />, label: 'Forms', href: '/forms' },
-    { icon: <Bot size={18} />, label: `Ask ${selectedExecutive.name} (${selectedExecutive.role})`, href: '/ai', active: true },
-  ];
-
   return (
     <AuthGuard>
       <div style={{ minHeight: '100vh', background: '#09090F' }}>
         <NavBar activeModule="cro" />
 
-        {/* Main Layout with Standard Sidebar */}
         <div style={{ display: 'flex', marginTop: '64px', height: 'calc(100vh - 64px)' }}>
-          
-          {/* Standard Sidebar */}
-          <Sidebar collapsed={sidebarCollapsed} />
+          <Sidebar collapsed={false} />
 
-          {/* Chat Area - with margin for sidebar */}
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#09090F', marginLeft: '240px' }}>
-            {/* Page Header - Matching Forms/Schedule/Communication */}
-            <div style={{
-              background: '#13131A',
-              borderRadius: '12px',
-              padding: '2rem',
-              color: 'white',
-              margin: '2rem',
-              marginBottom: '0',
-              border: '1px solid #2A2A38'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h1 style={{ fontSize: '2rem', fontWeight: '700', margin: '0 0 0.5rem 0' }}>
-                    Meet {selectedExecutive.name}
-                  </h1>
-                  <p style={{ margin: 0, opacity: 0.9 }}>
-                    Your {selectedExecutive.fullTitle} • {selectedExecutive.reference}
-                  </p>
-                </div>
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <button
-                    onClick={() => alert('Treasury Prompts coming soon!')}
-                    style={{
-                      padding: '0.75rem 1.5rem',
-                      background: 'rgba(255,255,255,0.2)',
-                      color: 'white',
-                      border: '2px solid rgba(255,255,255,0.3)',
-                      borderRadius: '8px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}
-                  >
-                    🏛️ The Treasury
-                  </button>
-                  <button
-                    onClick={() => alert('New Prompt feature coming soon!')}
-                    style={{
-                      padding: '0.75rem 1.5rem',
-                      background: '#00CCEE',
-                      color: '#13131A',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontWeight: '700',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}
-                  >
-                    + New Prompt
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Jordan Overview Box */}
-            <div style={{
-              background: '#1C1C26',
-              border: '1px solid #2A2A38',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              margin: '2rem',
-              marginTop: '1.5rem',
-              marginBottom: '0'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{
-                    margin: 0,
-                    fontSize: '1.1rem',
-                    lineHeight: 1.7,
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#09090F', marginLeft: '240px', padding: '2rem' }}>
+            {/* Page Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <div>
+                <h1
+                  style={{
+                    fontSize: '2rem',
+                    fontWeight: '700',
                     color: '#F0F0F5',
-                    maxWidth: '800px'
-                  }}>
-                    {selectedExecutive.personality}
-                  </p>
-                </div>
-                {messages.length > 0 && (
-                  <button
-                    onClick={handleClearChat}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      background: '#13131A',
-                      color: '#8888A0',
-                      border: '1px solid #2A2A38',
-                      borderRadius: '6px',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      marginLeft: '1rem',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    🗑 Clear Chat
-                  </button>
-                )}
+                    margin: 0,
+                    marginBottom: '0.25rem',
+                  }}
+                >
+                  Ask Jordan
+                </h1>
+                <p style={{ color: '#8888A0', margin: 0 }}>
+                  Your AI Chief Revenue Officer - sales coach and deal closer
+                </p>
               </div>
+              {messages.length > 0 && (
+                <button
+                  onClick={handleClearChat}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: '#1C1C26',
+                    border: '1px solid #2A2A38',
+                    borderRadius: '6px',
+                    color: '#8888A0',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  Clear Chat
+                </button>
+              )}
             </div>
 
-            {/* Messages Area */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 2rem' }}>
-              {messages.length === 0 ? (
-                <div>
-                  <div style={{
-                    textAlign: 'center',
-                    color: '#8888A0',
-                    marginBottom: '2rem'
-                  }}>
-                    <p style={{ fontSize: '1rem', margin: 0 }}>
-                      Hey there! I'm {selectedExecutive.name}. How can I help you today?
+            {/* Chat Container */}
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                background: '#1C1C26',
+                borderRadius: '12px',
+                border: '1px solid #2A2A38',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Messages Area */}
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  padding: '1.5rem',
+                }}
+              >
+                {messages.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+                    <div
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #00CCEE 0%, #0066CC 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '2.5rem',
+                        margin: '0 auto 1.5rem',
+                      }}
+                    >
+                      💼
+                    </div>
+                    <h2
+                      style={{
+                        fontSize: '1.5rem',
+                        fontWeight: '600',
+                        color: '#F0F0F5',
+                        marginBottom: '0.5rem',
+                      }}
+                    >
+                      Meet Jordan, Your CRO
+                    </h2>
+                    <p
+                      style={{
+                        color: '#8888A0',
+                        maxWidth: '500px',
+                        margin: '0 auto 1rem',
+                        lineHeight: '1.6',
+                      }}
+                    >
+                      Enthusiastic, warm, and persuasive. I'm your dedicated sales coach who gets
+                      genuinely excited about helping you close deals and build lasting client relationships.
                     </p>
-                  </div>
+                    <p
+                      style={{
+                        color: '#00CCEE',
+                        maxWidth: '500px',
+                        margin: '0 auto 2rem',
+                        lineHeight: '1.6',
+                        fontWeight: '500',
+                      }}
+                    >
+                      I don't just advise — I help you take action. Ask me to write follow-ups, craft proposals,
+                      prepare for discovery calls, or overcome objections. Let's close some deals.
+                    </p>
 
-                  {/* Suggested Prompts */}
-                  <div>
-                    <h3 style={{ color: '#F0F0F5', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '600' }}>
-                      Suggested questions to get started:
-                    </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
-                      {selectedExecutive.suggestedPrompts.map((prompt, index) => (
+                    {/* Suggested Prompts */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '0.75rem',
+                        justifyContent: 'center',
+                        maxWidth: '600px',
+                        margin: '0 auto',
+                      }}
+                    >
+                      {suggestedPrompts.map((prompt, index) => (
                         <button
                           key={index}
                           onClick={() => handlePromptClick(prompt)}
                           style={{
-                            padding: '1rem',
+                            padding: '0.625rem 1rem',
                             background: '#1C1C26',
                             border: '1px solid #2A2A38',
-                            borderRadius: '8px',
-                            textAlign: 'left',
-                            cursor: 'pointer',
+                            borderRadius: '20px',
                             color: '#F0F0F5',
-                            fontSize: '0.9rem',
-                            transition: 'all 0.2s ease'
+                            fontSize: '0.875rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = selectedExecutive.color;
-                            e.currentTarget.style.background = `${selectedExecutive.color}15`;
+                            e.currentTarget.style.borderColor = '#00CCEE';
+                            e.currentTarget.style.background = 'rgba(0, 204, 238, 0.05)';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.borderColor = '#2A2A38';
@@ -541,185 +353,227 @@ export default function AIAssistantPage() {
                       ))}
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div>
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      style={{
-                        display: 'flex',
-                        justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
-                        marginBottom: '1rem'
-                      }}
-                    >
-                      {message.role === 'assistant' && (
-                        <div style={{
-                          width: '36px',
-                          height: '36px',
-                          borderRadius: '50%',
-                          background: selectedExecutive.color,
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        style={{
                           display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginRight: '0.75rem',
-                          flexShrink: 0,
-                          color: 'white'
-                        }}>
-                          {getExecutiveIcon(selectedExecutive.icon)}
-                        </div>
-                      )}
-                      <div style={{
-                        maxWidth: '70%',
-                        padding: '1rem 1.25rem',
-                        borderRadius: message.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                        background: message.role === 'user' ? '#00CCEE' : '#1C1C26',
-                        color: message.role === 'user' ? '#000000' : '#F0F0F5',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                        whiteSpace: 'pre-wrap',
-                        lineHeight: 1.6
-                      }}>
-                        {message.content}
-                        {message.role === 'assistant' && (
-                          <button
-                            onClick={() => openTicketModal(message.content)}
+                          justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+                        }}
+                      >
+                        <div
+                          style={{
+                            maxWidth: '80%',
+                            padding: '1rem 1.25rem',
+                            borderRadius: message.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                            background:
+                              message.role === 'user'
+                                ? '#13131A'
+                                : 'rgba(0, 204, 238, 0.1)',
+                            color: message.role === 'user' ? 'white' : '#F0F0F5',
+                          }}
+                        >
+                          {message.role === 'assistant' && (
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                marginBottom: '0.5rem',
+                                fontSize: '0.8rem',
+                                fontWeight: '600',
+                                color: '#00CCEE',
+                              }}
+                            >
+                              <span>💼</span> Jordan
+                            </div>
+                          )}
+
+                          <div
                             style={{
-                              marginTop: '0.75rem',
-                              padding: '0.5rem 0.75rem',
-                              background: 'transparent',
-                              border: '1px solid #2A2A38',
-                              borderRadius: '6px',
-                              fontSize: '0.75rem',
-                              color: '#8888A0',
-                              cursor: 'pointer',
+                              whiteSpace: 'pre-wrap',
+                              lineHeight: '1.6',
+                              fontSize: '0.95rem',
+                            }}
+                          >
+                            {message.content}
+                          </div>
+
+                          {message.role === 'assistant' && (
+                            <button
+                              onClick={() => openTicketModal(message.content)}
+                              style={{
+                                marginTop: '0.75rem',
+                                padding: '0.5rem 0.75rem',
+                                background: 'transparent',
+                                border: '1px solid #2A2A38',
+                                borderRadius: '6px',
+                                fontSize: '0.75rem',
+                                color: '#8888A0',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.35rem'
+                              }}
+                              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(0, 204, 238, 0.1)'; e.currentTarget.style.borderColor = '#00CCEE'; }}
+                              onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#2A2A38'; }}
+                            >
+                              <Ticket size={12} /> Need more help? Create Support Ticket
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Typing Indicator */}
+                    {isLoading && (
+                      <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <div
+                          style={{
+                            padding: '1rem 1.25rem',
+                            borderRadius: '16px 16px 16px 4px',
+                            background: 'rgba(0, 204, 238, 0.1)',
+                          }}
+                        >
+                          <div
+                            style={{
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.35rem'
+                              gap: '0.5rem',
+                              marginBottom: '0.5rem',
+                              fontSize: '0.8rem',
+                              fontWeight: '600',
+                              color: '#00CCEE',
                             }}
-                            onMouseOver={(e) => { e.currentTarget.style.background = '#f5f5f5'; e.currentTarget.style.borderColor = '#00CCEE'; }}
-                            onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#ddd'; }}
                           >
-                            <Ticket size={12} /> Need more help? Create Support Ticket
-                          </button>
-                        )}
+                            <span>💼</span> Jordan
+                          </div>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            {[0, 1, 2].map((i) => (
+                              <div
+                                key={i}
+                                style={{
+                                  width: '8px',
+                                  height: '8px',
+                                  borderRadius: '50%',
+                                  background: '#00CCEE',
+                                  animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite`,
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  {isTyping && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: selectedExecutive.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white'
-                      }}>
-                        {getExecutiveIcon(selectedExecutive.icon)}
-                      </div>
-                      <div style={{
-                        padding: '1rem 1.25rem',
-                        background: '#1C1C26',
-                        borderRadius: '16px 16px 16px 4px',
-                        color: '#8888A0'
-                      }}>
-                        <span style={{ display: 'inline-block', animation: 'pulse 1.5s infinite' }}>
-                          {selectedExecutive.name} is thinking...
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
-            </div>
+                    )}
 
-            {/* Input Area */}
-            <div style={{
-              padding: '1rem 2rem 1.5rem',
-              background: '#1C1C26',
-              borderTop: '1px solid #2A2A38'
-            }}>
-              <div style={{
-                display: 'flex',
-                gap: '0.75rem',
-                maxWidth: '800px',
-                margin: '0 auto'
-              }}>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={`Ask ${selectedExecutive.name} anything...`}
-                  disabled={isTyping}
-                  style={{
-                    flex: 1,
-                    padding: '1rem 1.25rem',
-                    border: '1px solid #2A2A38',
-                    borderRadius: '12px',
-                    fontSize: '1rem',
-                    outline: 'none',
-                    transition: 'border-color 0.2s ease',
-                    opacity: isTyping ? 0.7 : 1,
-                    background: '#13131A',
-                    color: '#F0F0F5'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = selectedExecutive.color}
-                  onBlur={(e) => e.target.style.borderColor = '#2A2A38'}
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!inputValue.trim() || isTyping}
-                  style={{
-                    padding: '1rem 1.5rem',
-                    background: inputValue.trim() && !isTyping ? selectedExecutive.color : '#8888A0',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontWeight: '600',
-                    cursor: inputValue.trim() && !isTyping ? 'pointer' : 'not-allowed',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  {isTyping ? '...' : 'Send'}
-                  {!isTyping && <span>→</span>}
-                </button>
+                    <div ref={messagesEndRef} />
+                  </div>
+                )}
               </div>
-              {/* Subtle info text */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '1.5rem',
-                margin: '0.75rem 0 0 0',
-                fontSize: '0.7rem',
-                color: '#8888A0'
-              }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <Bot size={12} /> Powered by Claude AI
-                </span>
-                <span>•</span>
-                <span>Press Enter to send</span>
-                <span>•</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <Video size={12} /> Meeting transcription coming soon
-                </span>
+
+              {/* Input Area */}
+              <div
+                style={{
+                  borderTop: '1px solid #2A2A38',
+                  padding: '1rem 1.5rem',
+                  background: '#1C1C26',
+                }}
+              >
+                {/* Quick prompts when in conversation */}
+                {messages.length > 0 && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '0.5rem',
+                      marginBottom: '0.75rem',
+                      overflowX: 'auto',
+                      paddingBottom: '0.25rem',
+                    }}
+                  >
+                    {suggestedPrompts.slice(0, 4).map((prompt, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handlePromptClick(prompt)}
+                        style={{
+                          padding: '0.375rem 0.75rem',
+                          background: '#1C1C26',
+                          border: '1px solid #2A2A38',
+                          borderRadius: '16px',
+                          color: '#8888A0',
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Ask Jordan about deals, follow-ups, proposals, closing strategies..."
+                    disabled={isLoading}
+                    style={{
+                      flex: 1,
+                      padding: '0.875rem 1rem',
+                      border: '2px solid #2A2A38',
+                      borderRadius: '10px',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s ease',
+                      background: '#13131A',
+                      color: '#F0F0F5',
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = '#00CCEE')}
+                    onBlur={(e) => (e.target.style.borderColor = '#2A2A38')}
+                  />
+                  <button
+                    onClick={handleSend}
+                    disabled={!input.trim() || isLoading}
+                    style={{
+                      padding: '0.875rem 1.5rem',
+                      background: input.trim() && !isLoading ? '#00CCEE' : '#2A2A38',
+                      color: input.trim() && !isLoading ? '#09090F' : '#8888A0',
+                      border: 'none',
+                      borderRadius: '10px',
+                      fontWeight: '600',
+                      fontSize: '1rem',
+                      cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {isLoading ? '...' : 'Send'}
+                  </button>
+                </div>
+
+                {/* AI Disclaimer only */}
+                <p style={{
+                  textAlign: 'center',
+                  margin: '0.75rem 0 0 0',
+                  fontSize: '0.7rem',
+                  color: '#8888A0',
+                  opacity: 0.8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.25rem'
+                }}>
+                  <AlertTriangle size={12} /> AI can make mistakes. Please verify important information before taking action.
+                </p>
               </div>
-              <p style={{ textAlign: 'center', margin: '0.5rem 0 0 0', fontSize: '0.65rem', color: '#8888A0', opacity: 0.8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                <AlertTriangle size={12} /> AI can make mistakes. Please verify important information before taking action.
-              </p>
             </div>
           </main>
         </div>
-
-
 
         {/* Support Ticket Modal */}
         {showTicketModal && (
@@ -744,7 +598,7 @@ export default function AIAssistantPage() {
               boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               border: '1px solid #2A2A38'
             }}>
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', background: '#13131A', borderRadius: '12px 12px 0 0' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', background: '#13131A', borderRadius: '12px 12px 0 0' }}>
                 <h2 style={{ margin: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Ticket size={20} /> Create Support Ticket
                 </h2>
@@ -759,7 +613,7 @@ export default function AIAssistantPage() {
                     type="text"
                     value={ticketForm.subject}
                     onChange={(e) => setTicketForm({ ...ticketForm, subject: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }}
                   />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -768,7 +622,7 @@ export default function AIAssistantPage() {
                     <select
                       value={ticketForm.category}
                       onChange={(e) => setTicketForm({ ...ticketForm, category: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }}
                     >
                       <option value="HOW_TO">How To</option>
                       <option value="BUG">Bug Report</option>
@@ -783,7 +637,7 @@ export default function AIAssistantPage() {
                     <select
                       value={ticketForm.priority}
                       onChange={(e) => setTicketForm({ ...ticketForm, priority: e.target.value })}
-                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem' }}
+                      style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', background: '#13131A', color: '#F0F0F5' }}
                     >
                       <option value="P3">Low</option>
                       <option value="P2">Medium</option>
@@ -796,7 +650,7 @@ export default function AIAssistantPage() {
                   <textarea
                     value={ticketForm.description}
                     onChange={(e) => setTicketForm({ ...ticketForm, description: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', minHeight: '150px', fontFamily: 'inherit' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '1rem', minHeight: '150px', fontFamily: 'inherit', background: '#13131A', color: '#F0F0F5' }}
                     placeholder="Describe your issue or question in detail..."
                   />
                 </div>
@@ -804,9 +658,9 @@ export default function AIAssistantPage() {
                   <Lightbulb size={14} style={{ flexShrink: 0, marginTop: '2px' }} /> <span><strong>Tip:</strong> Include specific details about what you were trying to do and any error messages you encountered.</span>
                 </div>
               </div>
-              <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <div style={{ padding: '1.5rem', borderTop: '1px solid #2A2A38', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 <button
-                  onClick={() => { setShowTicketModal(false); setTicketContext(null); }}
+                  onClick={() => setShowTicketModal(false)}
                   style={{ padding: '0.75rem 1.5rem', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer', background: '#13131A', color: '#8888A0' }}
                 >
                   Cancel
@@ -832,118 +686,18 @@ export default function AIAssistantPage() {
           </div>
         )}
 
-        {/* AI Team Modal */}
-        {showTeamModal && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0,0,0,0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 2000
-            }}
-            onClick={() => setShowTeamModal(false)}
-          >
-            <div
-              style={{
-                background: '#1C1C26',
-                borderRadius: '16px',
-                padding: '2rem',
-                maxWidth: '500px',
-                width: '90%',
-                maxHeight: '80vh',
-                overflowY: 'auto',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                border: '1px solid #2A2A38'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <div>
-                  <h2 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.5rem' }}>Your AI Team</h2>
-                  <p style={{ margin: '0.25rem 0 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
-                    Meet your virtual executives
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowTeamModal(false)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    fontSize: '1.5rem',
-                    cursor: 'pointer',
-                    color: '#8888A0'
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {executives.map((exec) => (
-                  <button
-                    key={exec.id}
-                    onClick={() => handleExecutiveChange(exec)}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                      padding: '1rem',
-                      background: selectedExecutive.id === exec.id ? `${exec.color}15` : '#13131A',
-                      border: selectedExecutive.id === exec.id ? `2px solid ${exec.color}` : '2px solid transparent',
-                      borderRadius: '12px',
-                      cursor: exec.status === 'active' ? 'pointer' : 'default',
-                      textAlign: 'left',
-                      opacity: exec.status === 'coming_soon' ? 0.6 : 1,
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      background: exec.status === 'active' ? exec.color : '#8888A0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white'
-                    }}>
-                      {getExecutiveIcon(exec.icon, 24)}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '1rem' }}>{exec.name}</span>
-                        <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>({exec.role})</span>
-                        {exec.status === 'coming_soon' && (
-                          <span style={{
-                            padding: '0.125rem 0.5rem',
-                            background: 'rgba(240, 179, 35, 0.2)',
-                            color: '#B8860B',
-                            borderRadius: '4px',
-                            fontSize: '0.65rem',
-                            fontWeight: '600'
-                          }}>SOON</span>
-                        )}
-                      </div>
-                      <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{exec.fullTitle}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
+        {/* CSS Animation */}
         <style jsx>{`
           @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%,
+            100% {
+              opacity: 0.4;
+              transform: scale(0.8);
+            }
+            50% {
+              opacity: 1;
+              transform: scale(1);
+            }
           }
         `}</style>
       </div>
