@@ -198,23 +198,17 @@ const TOOLS = [
           type: 'string',
           description: 'Description of what this workflow does'
         },
-        trigger: {
+        triggerType: {
           type: 'string',
-          description: 'What triggers this workflow (e.g., "Form submission", "Tag added", "Purchase made")'
+          enum: ['manual', 'schedule', 'form_submission', 'tag_added', 'tag_removed', 'segment_entry', 'segment_exit', 'deal_stage_change', 'contact_created'],
+          description: 'What triggers this workflow. Use: manual (user triggers), schedule (time-based), form_submission, tag_added, tag_removed, segment_entry, segment_exit, deal_stage_change, or contact_created'
         },
-        steps: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              type: { type: 'string', enum: ['email', 'wait', 'tag', 'notification', 'condition'] },
-              config: { type: 'object' }
-            }
-          },
-          description: 'Steps in the workflow'
+        triggerConfig: {
+          type: 'object',
+          description: 'Configuration for the trigger (e.g., form ID for form_submission, schedule for schedule triggers)'
         }
       },
-      required: ['name', 'trigger']
+      required: ['name', 'triggerType']
     }
   },
   {
@@ -231,16 +225,9 @@ const TOOLS = [
           type: 'string',
           description: 'Description of the funnel purpose'
         },
-        stages: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              type: { type: 'string', enum: ['landing', 'form', 'email', 'offer', 'checkout', 'thank_you'] }
-            }
-          },
-          description: 'Stages in the funnel'
+        conversionGoal: {
+          type: 'string',
+          description: 'The goal of this funnel (e.g., "Free trial signup", "Demo request", "Purchase")'
         }
       },
       required: ['name']
@@ -405,13 +392,23 @@ async function executeTool(
       case 'create_workflow': {
         const url = `${CMO_API_URL}/cmo/workflows`;
         console.log(`[Don Tool] POST ${url}`);
+
+        // Build workflow data with correct field names
+        const workflowData = {
+          name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          triggerType: toolInput.triggerType as string,
+          triggerConfig: (toolInput.triggerConfig as Record<string, unknown>) || {},
+          status: 'draft',
+          nodes: [], // Empty nodes - user will add steps in workflow builder
+        };
+
+        console.log(`[Don Tool] Workflow data:`, JSON.stringify(workflowData, null, 2));
+
         const response = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify({
-            ...toolInput,
-            status: 'draft',
-          }),
+          body: JSON.stringify(workflowData),
         });
         const responseText = await response.text();
         console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
@@ -421,6 +418,7 @@ async function executeTool(
         }
         try {
           const result = JSON.parse(responseText);
+          console.log(`[Don Tool] Workflow created successfully:`, result);
           return { success: true, result };
         } catch {
           return { success: true, result: { message: 'Workflow created' } };
@@ -430,13 +428,22 @@ async function executeTool(
       case 'create_funnel': {
         const url = `${CMO_API_URL}/cmo/funnels`;
         console.log(`[Don Tool] POST ${url}`);
+
+        // Build funnel data with correct field names
+        const funnelData = {
+          name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          conversionGoal: (toolInput.conversionGoal as string) || null,
+          status: 'draft',
+          stages: [], // Empty stages - user will add stages in funnel builder
+        };
+
+        console.log(`[Don Tool] Funnel data:`, JSON.stringify(funnelData, null, 2));
+
         const response = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify({
-            ...toolInput,
-            status: 'draft',
-          }),
+          body: JSON.stringify(funnelData),
         });
         const responseText = await response.text();
         console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
@@ -446,6 +453,7 @@ async function executeTool(
         }
         try {
           const result = JSON.parse(responseText);
+          console.log(`[Don Tool] Funnel created successfully:`, result);
           return { success: true, result };
         } catch {
           return { success: true, result: { message: 'Funnel created' } };
