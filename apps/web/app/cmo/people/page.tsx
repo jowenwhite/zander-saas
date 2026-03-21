@@ -30,15 +30,17 @@ export default function CMOPeoplePage() {
 
   async function fetchPeople() {
     try {
-      const res = await fetch('https://api.zanderos.com/people', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const res = await fetch(`${apiUrl}/contacts`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` }
       });
       if (res.ok) {
         const data = await res.json();
-        setPeople(data.data || []);
+        // Contacts API returns array directly
+        setPeople(Array.isArray(data) ? data : (data.data || []));
       }
     } catch (error) {
-      console.error('Error fetching people:', error);
+      console.error('Error fetching contacts:', error);
     } finally {
       setLoading(false);
     }
@@ -47,7 +49,8 @@ export default function CMOPeoplePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const res = await fetch('https://api.zanderos.com/people', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const res = await fetch(`${apiUrl}/contacts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,9 +62,13 @@ export default function CMOPeoplePage() {
         setPersonForm({ firstName: '', lastName: '', email: '', phone: '', company: '', title: '' });
         setShowModal(false);
         fetchPeople();
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Error creating contact:', res.status, errorData);
+        alert('Failed to create contact. Please check required fields.');
       }
     } catch (error) {
-      console.error('Error creating person:', error);
+      console.error('Error creating contact:', error);
     }
   }
 

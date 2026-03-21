@@ -182,8 +182,8 @@ const TOOLS = [
         },
         primaryRole: {
           type: 'string',
-          enum: ['LEAD', 'CLIENT', 'PARTNER', 'VENDOR'],
-          description: 'Primary role of this contact'
+          enum: ['CLIENT', 'VENDOR', 'TEAM', 'PARTNER', 'REFERRAL'],
+          description: 'Primary role of this contact. Use CLIENT for customers, VENDOR for suppliers, TEAM for internal, PARTNER for business partners, REFERRAL for referral sources'
         },
         notes: {
           type: 'string',

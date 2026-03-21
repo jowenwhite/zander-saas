@@ -56,14 +56,16 @@ export default function PeoplePage() {
 
   async function fetchData() {
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
       const [peopleRes, dealsRes] = await Promise.all([
-        fetch('https://api.zanderos.com/people', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
-        fetch('https://api.zanderos.com/deals/pipeline', { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
+        fetch(`${apiUrl}/contacts`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } }),
+        fetch(`${apiUrl}/deals/pipeline`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` } })
       ]);
-      
+
       if (peopleRes.ok) {
         const peopleData = await peopleRes.json();
-        setPeople(peopleData.data || []);
+        // Contacts API returns array directly, not nested in .data
+        setPeople(Array.isArray(peopleData) ? peopleData : (peopleData.data || []));
       }
       if (dealsRes.ok) {
         const dealsData = await dealsRes.json();
@@ -79,7 +81,8 @@ export default function PeoplePage() {
   async function handleCreatePerson(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch('https://api.zanderos.com/people', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/contacts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('zander_token')}` },
         body: JSON.stringify(personForm),
@@ -88,9 +91,13 @@ export default function PeoplePage() {
         setPersonForm({ firstName: '', lastName: '', email: '', phone: '', company: '', title: '' });
         setShowNewPersonModal(false);
         fetchData();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error creating contact:', response.status, errorData);
+        alert('Failed to create contact. Please check required fields.');
       }
     } catch (error) {
-      console.error('Error creating person:', error);
+      console.error('Error creating contact:', error);
     }
   }
 
