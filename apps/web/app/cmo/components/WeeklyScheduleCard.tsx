@@ -122,7 +122,7 @@ export default function WeeklyScheduleCard({
                 <div
                   style={{
                     fontWeight: '600',
-                    color: '#13131A',
+                    color: '#F0F0F5',
                     fontSize: '0.875rem',
                   }}
                 >

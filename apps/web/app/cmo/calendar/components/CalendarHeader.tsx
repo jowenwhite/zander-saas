@@ -71,11 +71,12 @@ export default function CalendarHeader({
           onClick={onPrev}
           style={{
             padding: '0.5rem 0.75rem',
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '1rem',
+            color: '#F0F0F5',
           }}
         >
           ←
@@ -84,12 +85,12 @@ export default function CalendarHeader({
           onClick={onToday}
           style={{
             padding: '0.5rem 1rem',
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '8px',
             cursor: 'pointer',
             fontWeight: '600',
-            color: '#13131A',
+            color: '#F0F0F5',
           }}
         >
           Today
@@ -98,11 +99,12 @@ export default function CalendarHeader({
           onClick={onNext}
           style={{
             padding: '0.5rem 0.75rem',
-            background: 'white',
-            border: '2px solid var(--zander-border-gray)',
+            background: '#1C1C26',
+            border: '2px solid #2A2A38',
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '1rem',
+            color: '#F0F0F5',
           }}
         >
           →
@@ -113,7 +115,7 @@ export default function CalendarHeader({
             marginLeft: '1rem',
             fontSize: '1.5rem',
             fontWeight: '700',
-            color: '#13131A',
+            color: '#F0F0F5',
           }}
         >
           {formatDateDisplay()}

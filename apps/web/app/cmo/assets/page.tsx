@@ -334,7 +334,7 @@ const headerStyle: CSSProperties = {
 const titleStyle: CSSProperties = {
   fontSize: '2rem',
   fontWeight: '700',
-  color: '#13131A',
+  color: '#F0F0F5',
   margin: 0,
   marginBottom: '0.25rem',
 };
@@ -355,9 +355,9 @@ const gridStyle: CSSProperties = {
 };
 
 const emptyContainerStyle: CSSProperties = {
-  background: 'white',
+  background: '#1C1C26',
   borderRadius: '12px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   padding: '3rem',
 };
 

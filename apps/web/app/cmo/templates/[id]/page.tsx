@@ -314,7 +314,7 @@ const titleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1.25rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const statusBadgeStyle: CSSProperties = {

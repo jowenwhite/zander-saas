@@ -179,7 +179,7 @@ const contentStyle: CSSProperties = {
 };
 
 const previewContainerStyle: CSSProperties = {
-  background: 'var(--zander-light-gray)',
+  background: '#13131A',
   borderRadius: '8px',
   overflow: 'hidden',
   display: 'flex',
@@ -224,8 +224,8 @@ const metadataTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '700',
-  color: '#13131A',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  color: '#F0F0F5',
+  borderBottom: '1px solid #2A2A38',
   paddingBottom: '0.5rem',
 };
 
@@ -243,7 +243,7 @@ const metadataLabelStyle: CSSProperties = {
 
 const metadataValueStyle: CSSProperties = {
   fontSize: '0.875rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
 };
 
 const tagsContainerStyle: CSSProperties = {
@@ -266,7 +266,7 @@ const urlInputStyle: CSSProperties = {
   width: '100%',
   padding: '0.5rem 0.75rem',
   borderRadius: '6px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.75rem',
   color: '#8888A0',
   background: '#1C1C26',

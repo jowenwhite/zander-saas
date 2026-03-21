@@ -283,7 +283,7 @@ export default function FunnelBuilderPage() {
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
               ⚠️
             </div>
-            <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
+            <h3 style={{ color: '#F0F0F5', margin: '0 0 0.5rem 0' }}>
               {error === 'Funnel not found' ? 'Funnel Not Found' : 'Error Loading Funnel'}
             </h3>
             <p style={{ color: '#8888A0', margin: '0 0 1.5rem 0' }}>
@@ -339,7 +339,7 @@ export default function FunnelBuilderPage() {
               style={{
                 fontSize: '2rem',
                 fontWeight: '700',
-                color: '#13131A',
+                color: '#F0F0F5',
                 margin: 0,
               }}
             >

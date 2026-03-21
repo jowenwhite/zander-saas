@@ -29,7 +29,7 @@ export default function LoadingSpinner({
   const spinnerStyle: CSSProperties = {
     width: '48px',
     height: '48px',
-    border: '4px solid var(--zander-border-gray)',
+    border: '4px solid #2A2A38',
     borderTopColor: '#F57C00',
     borderRadius: '50%',
     animation: 'cmo-spin 1s linear infinite',

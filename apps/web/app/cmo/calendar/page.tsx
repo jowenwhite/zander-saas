@@ -311,7 +311,7 @@ export default function CMOCalendarPage() {
             style={{
               fontSize: '2rem',
               fontWeight: '700',
-              color: '#13131A',
+              color: '#F0F0F5',
               margin: 0,
               marginBottom: '0.25rem',
             }}

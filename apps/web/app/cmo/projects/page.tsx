@@ -74,8 +74,9 @@ export default function CMOProjectsPage() {
   });
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)',
-    borderRadius: '8px', fontSize: '1rem', outline: 'none'
+    width: '100%', padding: '0.75rem', border: '2px solid #2A2A38',
+    borderRadius: '8px', fontSize: '1rem', outline: 'none',
+    background: '#1C1C26', color: '#F0F0F5'
   };
 
   return (
@@ -84,7 +85,7 @@ export default function CMOProjectsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
               Marketing Projects
             </h1>
             <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
@@ -102,7 +103,7 @@ export default function CMOProjectsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ ...inputStyle, maxWidth: '300px' }}
           />
-          <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)} style={{ ...inputStyle, width: 'auto', background: 'white' }}>
+          <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)} style={{ ...inputStyle, width: 'auto' }}>
             <option value="all">All Stages</option>
             {Object.entries(stageLabels).map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
@@ -112,17 +113,17 @@ export default function CMOProjectsPage() {
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total Projects</div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>{deals.length}</div>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5' }}>{deals.length}</div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Pipeline Value</div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5' }}>
               {formatCurrency(deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}
             </div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Won This Month</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#28a745' }}>
               {formatCurrency(deals.filter(d => d.stage === 'CLOSED_WON').reduce((sum, d) => sum + d.dealValue, 0))}
@@ -134,20 +135,20 @@ export default function CMOProjectsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading projects...</div>
         ) : filteredDeals.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
-            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No projects found</h3>
+            <h3 style={{ color: '#F0F0F5', marginBottom: '0.5rem' }}>No projects found</h3>
             <p style={{ color: '#8888A0' }}>Projects will appear here when deals are created</p>
           </div>
         ) : (
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', overflow: 'hidden' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: 'var(--zander-light-gray)' }}>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#13131A' }}>Project</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#13131A' }}>Contact</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#13131A' }}>Value</th>
-                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#13131A' }}>Stage</th>
+                <tr style={{ background: '#13131A' }}>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0', textTransform: 'uppercase', fontSize: '0.85rem' }}>Project</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0', textTransform: 'uppercase', fontSize: '0.85rem' }}>Contact</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0', textTransform: 'uppercase', fontSize: '0.85rem' }}>Value</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0', textTransform: 'uppercase', fontSize: '0.85rem' }}>Stage</th>
                 </tr>
               </thead>
               <tbody>
@@ -155,15 +156,15 @@ export default function CMOProjectsPage() {
                   <tr
                     key={deal.id}
                     onClick={() => router.push(`/deals/${deal.id}`)}
-                    style={{ borderBottom: '1px solid var(--zander-border-gray)', cursor: 'pointer' }}
+                    style={{ borderBottom: '1px solid #2A2A38', cursor: 'pointer' }}
                   >
                     <td style={{ padding: '1rem' }}>
-                      <div style={{ fontWeight: '600', color: '#13131A' }}>{deal.dealName}</div>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{deal.dealName}</div>
                     </td>
                     <td style={{ padding: '1rem', color: '#8888A0' }}>
                       {deal.contact ? `${deal.contact.firstName} ${deal.contact.lastName}` : '—'}
                     </td>
-                    <td style={{ padding: '1rem', fontWeight: '600', color: '#13131A' }}>
+                    <td style={{ padding: '1rem', fontWeight: '600', color: '#F0F0F5' }}>
                       {formatCurrency(deal.dealValue)}
                     </td>
                     <td style={{ padding: '1rem' }}>

@@ -49,7 +49,7 @@ const containerStyle: CSSProperties = {
 const textStyle: CSSProperties = {
   fontSize: '1rem',
   lineHeight: '1.6',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
 };
 
 const placeholderStyle: CSSProperties = {
@@ -58,9 +58,9 @@ const placeholderStyle: CSSProperties = {
   alignItems: 'center',
   gap: '0.5rem',
   padding: '1rem',
-  backgroundColor: '#1C1C26',
+  backgroundColor: '#13131A',
   borderRadius: '8px',
-  border: '2px dashed var(--zander-border-gray)',
+  border: '2px dashed #2A2A38',
 };
 
 const placeholderTextStyle: CSSProperties = {

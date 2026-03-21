@@ -57,8 +57,8 @@ export default function IdeaParkingLot({
   return (
     <div
       style={{
-        background: 'white',
-        border: '2px solid var(--zander-border-gray)',
+        background: '#1C1C26',
+        border: '2px solid #2A2A38',
         borderRadius: '12px',
         overflow: 'hidden',
       }}
@@ -67,8 +67,8 @@ export default function IdeaParkingLot({
       <div
         style={{
           padding: '1rem 1.25rem',
-          background: '#1C1C26',
-          borderBottom: expanded ? '2px solid var(--zander-border-gray)' : 'none',
+          background: '#13131A',
+          borderBottom: expanded ? '2px solid #2A2A38' : 'none',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -84,7 +84,7 @@ export default function IdeaParkingLot({
                 margin: 0,
                 fontSize: '1rem',
                 fontWeight: '700',
-                color: '#13131A',
+                color: '#F0F0F5',
               }}
             >
               Idea Parking Lot
@@ -108,8 +108,8 @@ export default function IdeaParkingLot({
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                background: '#1C1C26',
-                border: '2px dashed var(--zander-border-gray)',
+                background: '#13131A',
+                border: '2px dashed #2A2A38',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 color: '#8888A0',
@@ -131,7 +131,7 @@ export default function IdeaParkingLot({
               onSubmit={handleSubmit}
               style={{
                 padding: '1rem',
-                background: '#1C1C26',
+                background: '#13131A',
                 borderRadius: '8px',
                 marginBottom: ideas.length > 0 ? '1rem' : 0,
               }}
@@ -145,10 +145,12 @@ export default function IdeaParkingLot({
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '2px solid var(--zander-border-gray)',
+                  border: '2px solid #2A2A38',
                   borderRadius: '8px',
                   fontSize: '0.875rem',
                   marginBottom: '0.75rem',
+                  background: '#1C1C26',
+                  color: '#F0F0F5',
                 }}
               />
 
@@ -158,10 +160,12 @@ export default function IdeaParkingLot({
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as CalendarEventType })}
                   style={{
                     padding: '0.5rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '6px',
                     fontSize: '0.8rem',
                     cursor: 'pointer',
+                    background: '#1C1C26',
+                    color: '#F0F0F5',
                   }}
                 >
                   {eventTypes.map((t) => (
@@ -178,10 +182,12 @@ export default function IdeaParkingLot({
                   }
                   style={{
                     padding: '0.5rem',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '6px',
                     fontSize: '0.8rem',
                     cursor: 'pointer',
+                    background: '#1C1C26',
+                    color: '#F0F0F5',
                   }}
                 >
                   {priorities.map((p) => (
@@ -203,7 +209,7 @@ export default function IdeaParkingLot({
                     flex: 1,
                     padding: '0.5rem',
                     background: 'transparent',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     color: '#8888A0',
@@ -259,7 +265,7 @@ export default function IdeaParkingLot({
                       <span
                         style={{
                           fontWeight: '600',
-                          color: '#13131A',
+                          color: '#F0F0F5',
                           fontSize: '0.875rem',
                         }}
                       >
@@ -317,7 +323,7 @@ export default function IdeaParkingLot({
                         padding: '0.25rem 0.5rem',
                         background: 'transparent',
                         color: '#8888A0',
-                        border: '1px solid var(--zander-border-gray)',
+                        border: '1px solid #2A2A38',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         fontSize: '0.7rem',

@@ -28,8 +28,8 @@ export default function FunnelListCard({
     <div
       onClick={onClick}
       style={{
-        background: 'white',
-        border: '2px solid var(--zander-border-gray)',
+        background: '#1C1C26',
+        border: '2px solid #2A2A38',
         borderRadius: '12px',
         padding: '1.5rem',
         cursor: 'pointer',
@@ -38,10 +38,10 @@ export default function FunnelListCard({
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = '#F57C00';
         e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+        e.currentTarget.style.borderColor = '#2A2A38';
         e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = 'none';
       }}
@@ -62,7 +62,7 @@ export default function FunnelListCard({
                 margin: 0,
                 fontSize: '1.125rem',
                 fontWeight: '700',
-                color: '#13131A',
+                color: '#F0F0F5',
               }}
             >
               {funnel.name}
@@ -137,7 +137,7 @@ export default function FunnelListCard({
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '1rem',
           padding: '1rem',
-          background: '#1C1C26',
+          background: '#13131A',
           borderRadius: '8px',
         }}
       >
@@ -145,7 +145,7 @@ export default function FunnelListCard({
           <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             STAGES
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
             {funnel.stages.length}
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function FunnelListCard({
           <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             VISITS
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
             {formatNumber(funnel.totalVisits)}
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function FunnelListCard({
           <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             CONVERSIONS
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
             {formatNumber(funnel.totalConversions)}
           </div>
         </div>

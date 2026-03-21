@@ -47,9 +47,9 @@ export default function NodeTypeSelector({ selected, onChange }: NodeTypeSelecto
                   onClick={() => onChange(nodeType.type)}
                   style={{
                     padding: '0.75rem',
-                    border: `2px solid ${isSelected ? nodeType.color : 'var(--zander-border-gray)'}`,
+                    border: `2px solid ${isSelected ? nodeType.color : '#2A2A38'}`,
                     borderRadius: '8px',
-                    background: isSelected ? `${nodeType.color}10` : 'white',
+                    background: isSelected ? `${nodeType.color}10` : '#1C1C26',
                     cursor: 'pointer',
                     textAlign: 'left',
                     transition: 'all 0.2s ease',
@@ -74,7 +74,7 @@ export default function NodeTypeSelector({ selected, onChange }: NodeTypeSelecto
                       <div
                         style={{
                           fontWeight: '600',
-                          color: isSelected ? nodeType.color : '#13131A',
+                          color: isSelected ? nodeType.color : '#F0F0F5',
                           fontSize: '0.8rem',
                         }}
                       >

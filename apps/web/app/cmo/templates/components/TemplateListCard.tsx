@@ -128,9 +128,9 @@ export default function TemplateListCard({
 }
 
 const cardStyle: CSSProperties = {
-  background: 'white',
+  background: '#1C1C26',
   borderRadius: '12px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   overflow: 'hidden',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
@@ -138,11 +138,11 @@ const cardStyle: CSSProperties = {
 
 const previewStyle: CSSProperties = {
   height: '140px',
-  backgroundColor: '#1C1C26',
+  backgroundColor: '#13131A',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const previewContentStyle: CSSProperties = {
@@ -175,7 +175,7 @@ const nameStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const menuButtonStyle: CSSProperties = {
@@ -192,10 +192,10 @@ const menuStyle: CSSProperties = {
   position: 'absolute',
   top: '100%',
   right: 0,
-  background: 'white',
+  background: '#1C1C26',
   borderRadius: '8px',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-  border: '1px solid var(--zander-border-gray)',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+  border: '1px solid #2A2A38',
   zIndex: 10,
   minWidth: '140px',
   overflow: 'hidden',
@@ -210,7 +210,7 @@ const menuItemStyle: CSSProperties = {
   textAlign: 'left',
   fontSize: '0.875rem',
   cursor: 'pointer',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
 };
 
 const subjectStyle: CSSProperties = {

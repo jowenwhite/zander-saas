@@ -45,16 +45,16 @@ export default function DataTable<T extends Record<string, unknown>>({
     padding: '1rem',
     textAlign: align as 'left' | 'center' | 'right',
     fontWeight: '600',
-    color: '#13131A',
-    background: '#1C1C26',
-    borderBottom: '2px solid var(--zander-border-gray)',
+    color: '#F0F0F5',
+    background: '#13131A',
+    borderBottom: '2px solid #2A2A38',
   });
 
   const cellStyle = (align: string = 'left'): CSSProperties => ({
     padding: '1rem',
     textAlign: align as 'left' | 'center' | 'right',
-    borderBottom: '1px solid var(--zander-border-gray)',
-    color: '#13131A',
+    borderBottom: '1px solid #2A2A38',
+    color: '#F0F0F5',
   });
 
   const rowStyle: CSSProperties = {
@@ -145,7 +145,7 @@ export default function DataTable<T extends Record<string, unknown>>({
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '1rem',
-          borderTop: '1px solid var(--zander-border-gray)',
+          borderTop: '1px solid #2A2A38',
         }}>
           <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>
             Showing {data.length} of {pagination.total} results
@@ -156,9 +156,10 @@ export default function DataTable<T extends Record<string, unknown>>({
               onClick={() => onPageChange?.(pagination.page - 1)}
               style={{
                 padding: '0.5rem 1rem',
-                border: '1px solid var(--zander-border-gray)',
+                border: '1px solid #2A2A38',
                 borderRadius: '6px',
-                background: 'white',
+                background: '#1C1C26',
+                color: '#F0F0F5',
                 cursor: pagination.page <= 1 ? 'not-allowed' : 'pointer',
                 opacity: pagination.page <= 1 ? 0.5 : 1,
               }}
@@ -167,7 +168,7 @@ export default function DataTable<T extends Record<string, unknown>>({
             </button>
             <span style={{
               padding: '0.5rem 1rem',
-              color: '#13131A',
+              color: '#F0F0F5',
               fontWeight: '600',
             }}>
               {pagination.page} / {pagination.totalPages}
@@ -177,9 +178,10 @@ export default function DataTable<T extends Record<string, unknown>>({
               onClick={() => onPageChange?.(pagination.page + 1)}
               style={{
                 padding: '0.5rem 1rem',
-                border: '1px solid var(--zander-border-gray)',
+                border: '1px solid #2A2A38',
                 borderRadius: '6px',
-                background: 'white',
+                background: '#1C1C26',
+                color: '#F0F0F5',
                 cursor: pagination.page >= pagination.totalPages ? 'not-allowed' : 'pointer',
                 opacity: pagination.page >= pagination.totalPages ? 0.5 : 1,
               }}

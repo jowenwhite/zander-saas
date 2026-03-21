@@ -99,17 +99,19 @@ export default function ThemeModal({
   const inputStyle = {
     width: '100%',
     padding: '0.75rem',
-    border: '2px solid var(--zander-border-gray)',
+    border: '2px solid #2A2A38',
     borderRadius: '8px',
     fontSize: '1rem',
     outline: 'none',
+    background: '#1C1C26',
+    color: '#F0F0F5',
   };
 
   const labelStyle = {
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: '#13131A',
+    color: '#F0F0F5',
     fontSize: '0.875rem',
   };
 
@@ -134,7 +136,7 @@ export default function ThemeModal({
     >
       <div
         style={{
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
           width: '90%',
           maxWidth: '550px',
@@ -149,7 +151,7 @@ export default function ThemeModal({
         <div
           style={{
             padding: '1.5rem',
-            borderBottom: '1px solid var(--zander-border-gray)',
+            borderBottom: '1px solid #2A2A38',
             background: 'linear-gradient(135deg, rgba(245, 124, 0, 0.1) 0%, rgba(245, 124, 0, 0.05) 100%)',
           }}
         >
@@ -166,7 +168,7 @@ export default function ThemeModal({
               >
                 {monthName} {year}
               </div>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
                 {theme ? 'Edit Monthly Theme' : 'Set Monthly Theme'}
               </h2>
             </div>
@@ -358,8 +360,8 @@ export default function ThemeModal({
         <div
           style={{
             padding: '1rem 1.5rem',
-            borderTop: '1px solid var(--zander-border-gray)',
-            background: '#1C1C26',
+            borderTop: '1px solid #2A2A38',
+            background: '#13131A',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: '0.75rem',
@@ -372,7 +374,7 @@ export default function ThemeModal({
               padding: '0.75rem 1.5rem',
               background: 'transparent',
               color: '#8888A0',
-              border: '2px solid var(--zander-border-gray)',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               cursor: 'pointer',
               fontWeight: '600',

@@ -177,7 +177,7 @@ export default function CMOFunnelsPage() {
             style={{
               fontSize: '2rem',
               fontWeight: '700',
-              color: '#13131A',
+              color: '#F0F0F5',
               margin: 0,
               marginBottom: '0.25rem',
             }}
@@ -247,7 +247,7 @@ export default function CMOFunnelsPage() {
             </div>
             <h3
               style={{
-                color: '#13131A',
+                color: '#F0F0F5',
                 margin: '0 0 0.5rem 0',
               }}
             >

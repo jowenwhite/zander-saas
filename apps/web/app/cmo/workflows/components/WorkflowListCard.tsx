@@ -32,8 +32,8 @@ export default function WorkflowListCard({
     <div
       onClick={onClick}
       style={{
-        background: 'white',
-        border: '2px solid var(--zander-border-gray)',
+        background: '#1C1C26',
+        border: '2px solid #2A2A38',
         borderRadius: '12px',
         padding: '1.5rem',
         cursor: 'pointer',
@@ -45,7 +45,7 @@ export default function WorkflowListCard({
         e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+        e.currentTarget.style.borderColor = '#2A2A38';
         e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = 'none';
       }}
@@ -66,7 +66,7 @@ export default function WorkflowListCard({
                 margin: 0,
                 fontSize: '1.125rem',
                 fontWeight: '700',
-                color: '#13131A',
+                color: '#F0F0F5',
               }}
             >
               {workflow.name}
@@ -185,7 +185,7 @@ export default function WorkflowListCard({
           <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             TOTAL RUNS
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
             {formatNumber(workflow.entryCount)}
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function WorkflowListCard({
           <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             COMPLETED
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
             {formatNumber(workflow.completionCount)}
           </div>
         </div>

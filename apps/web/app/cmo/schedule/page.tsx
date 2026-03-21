@@ -100,7 +100,7 @@ export default function CMOSchedulePage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
               Marketing Schedule
             </h1>
             <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
@@ -180,7 +180,7 @@ export default function CMOSchedulePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <h3 style={{ margin: '0 0 0.5rem', color: '#13131A', fontWeight: '600' }}>{event.title}</h3>
+                    <h3 style={{ margin: '0 0 0.5rem', color: '#F0F0F5', fontWeight: '600' }}>{event.title}</h3>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '0.9rem', color: '#8888A0' }}>
                         {view === 'week' && `${formatDate(event.startTime)} • `}

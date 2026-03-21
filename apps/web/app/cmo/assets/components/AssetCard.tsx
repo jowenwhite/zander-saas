@@ -125,9 +125,9 @@ export default function AssetCard({
 }
 
 const cardStyle: CSSProperties = {
-  background: 'white',
+  background: '#1C1C26',
   borderRadius: '12px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   overflow: 'hidden',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
@@ -161,7 +161,7 @@ const iconContainerStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: 'var(--zander-light-gray)',
+  backgroundColor: '#13131A',
 };
 
 const overlayStyle: CSSProperties = {
@@ -182,7 +182,7 @@ const actionButtonStyle: CSSProperties = {
   height: '40px',
   borderRadius: '8px',
   border: 'none',
-  background: 'white',
+  background: '#1C1C26',
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
@@ -205,7 +205,7 @@ const infoStyle: CSSProperties = {
 const nameStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',

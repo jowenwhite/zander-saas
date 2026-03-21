@@ -191,8 +191,8 @@ const gridStyle: CSSProperties = {
 };
 
 const templateCardStyle: CSSProperties = {
-  background: 'white',
-  border: '1px solid var(--zander-border-gray)',
+  background: '#1C1C26',
+  border: '1px solid #2A2A38',
   borderRadius: '12px',
   overflow: 'hidden',
   cursor: 'pointer',
@@ -203,11 +203,11 @@ const templateCardStyle: CSSProperties = {
 
 const thumbnailStyle: CSSProperties = {
   height: '120px',
-  backgroundColor: '#1C1C26',
+  backgroundColor: '#13131A',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const cardContentStyle: CSSProperties = {
@@ -225,7 +225,7 @@ const templateNameStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const categoryBadgeStyle: CSSProperties = {
@@ -246,7 +246,7 @@ const descriptionStyle: CSSProperties = {
 const subjectStyle: CSSProperties = {
   margin: 0,
   fontSize: '0.75rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#8888A0',
   fontStyle: 'italic',
 };
 
@@ -265,11 +265,11 @@ const previewContainerStyle: CSSProperties = {
 const previewLabelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const previewBoxStyle: CSSProperties = {
-  backgroundColor: '#1C1C26',
+  backgroundColor: '#13131A',
   borderRadius: '8px',
   padding: '2rem',
   display: 'flex',
@@ -277,7 +277,7 @@ const previewBoxStyle: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   minHeight: '200px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
 };
 
 const previewTextStyle: CSSProperties = {
@@ -309,15 +309,16 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const inputStyle: CSSProperties = {
   padding: '0.75rem 1rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '1rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
+  background: '#1C1C26',
 };
 
 const hintStyle: CSSProperties = {
@@ -326,17 +327,17 @@ const hintStyle: CSSProperties = {
 };
 
 const infoBoxStyle: CSSProperties = {
-  backgroundColor: '#1C1C26',
+  backgroundColor: '#13131A',
   borderRadius: '8px',
   padding: '1rem',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
 };
 
 const infoTitleStyle: CSSProperties = {
   margin: '0 0 0.5rem 0',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const infoListStyle: CSSProperties = {

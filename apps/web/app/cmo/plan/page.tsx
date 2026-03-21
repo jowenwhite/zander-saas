@@ -112,27 +112,29 @@ export default function CMOPlanPage() {
 
   const getSwotColor = (quadrant: string) => {
     switch (quadrant) {
-      case 'strengths': return { bg: '#d4edda', border: '#28a745', text: '#155724' };
-      case 'weaknesses': return { bg: '#f8d7da', border: '#dc3545', text: '#721c24' };
-      case 'opportunities': return { bg: '#cce5ff', border: '#007bff', text: '#004085' };
-      case 'threats': return { bg: '#fff3cd', border: '#ffc107', text: '#856404' };
-      default: return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
+      case 'strengths': return { bg: 'rgba(40, 167, 69, 0.15)', border: '#28a745', text: '#4ade80' };
+      case 'weaknesses': return { bg: 'rgba(220, 53, 69, 0.15)', border: '#dc3545', text: '#f87171' };
+      case 'opportunities': return { bg: 'rgba(0, 123, 255, 0.15)', border: '#007bff', text: '#60a5fa' };
+      case 'threats': return { bg: 'rgba(255, 193, 7, 0.15)', border: '#ffc107', text: '#fbbf24' };
+      default: return { bg: '#1C1C26', border: '#2A2A38', text: '#F0F0F5' };
     }
   };
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '0.75rem',
-    border: '2px solid var(--zander-border-gray)',
+    border: '2px solid #2A2A38',
     borderRadius: '8px',
     fontSize: '1rem',
     outline: 'none',
+    background: '#1C1C26',
+    color: '#F0F0F5',
   };
 
   const sectionStyle: React.CSSProperties = {
-    background: 'white',
+    background: '#1C1C26',
     borderRadius: '12px',
-    border: '1px solid var(--zander-border-gray)',
+    border: '1px solid #2A2A38',
     padding: '1.5rem',
     marginBottom: '1.5rem',
   };
@@ -143,7 +145,7 @@ export default function CMOPlanPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
               Marketing Plan
             </h1>
             <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
@@ -159,7 +161,7 @@ export default function CMOPlanPage() {
                 border: `2px solid ${getStatusColor(plan.status)}`,
                 borderRadius: '8px',
                 fontSize: '0.95rem',
-                background: 'white',
+                background: '#1C1C26',
                 fontWeight: '600',
                 color: getStatusColor(plan.status),
               }}
@@ -186,23 +188,23 @@ export default function CMOPlanPage() {
 
         {/* Plan Overview */}
         <div style={sectionStyle}>
-          <h2 style={{ margin: '0 0 1rem', color: '#13131A', fontSize: '1.25rem', fontWeight: '600' }}>
+          <h2 style={{ margin: '0 0 1rem', color: '#F0F0F5', fontSize: '1.25rem', fontWeight: '600' }}>
             Plan Overview
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-            <div style={{ padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px', textAlign: 'center' }}>
+            <div style={{ padding: '1rem', background: '#13131A', borderRadius: '8px', textAlign: 'center' }}>
               <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.25rem' }}>Status</div>
               <div style={{ fontWeight: '700', color: getStatusColor(plan.status), textTransform: 'capitalize' }}>{plan.status}</div>
             </div>
-            <div style={{ padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px', textAlign: 'center' }}>
+            <div style={{ padding: '1rem', background: '#13131A', borderRadius: '8px', textAlign: 'center' }}>
               <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.25rem' }}>Sections Complete</div>
-              <div style={{ fontWeight: '700', color: '#13131A' }}>
+              <div style={{ fontWeight: '700', color: '#F0F0F5' }}>
                 {[plan.mission, plan.vision, plan.goals.filter(g => g).length > 0, plan.swot.strengths.length > 0].filter(Boolean).length}/4
               </div>
             </div>
-            <div style={{ padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px', textAlign: 'center' }}>
+            <div style={{ padding: '1rem', background: '#13131A', borderRadius: '8px', textAlign: 'center' }}>
               <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.25rem' }}>Monthly Themes Set</div>
-              <div style={{ fontWeight: '700', color: '#13131A' }}>
+              <div style={{ fontWeight: '700', color: '#F0F0F5' }}>
                 {plan.monthlyThemes.filter(t => t).length}/12
               </div>
             </div>
@@ -211,11 +213,11 @@ export default function CMOPlanPage() {
 
         {/* Strategy Section */}
         <div style={sectionStyle}>
-          <h2 style={{ margin: '0 0 1.5rem', color: '#13131A', fontSize: '1.25rem', fontWeight: '600' }}>
+          <h2 style={{ margin: '0 0 1.5rem', color: '#F0F0F5', fontSize: '1.25rem', fontWeight: '600' }}>
             Strategy
           </h2>
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#13131A' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
               Marketing Mission
             </label>
             <textarea
@@ -227,7 +229,7 @@ export default function CMOPlanPage() {
             />
           </div>
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#13131A' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
               Marketing Vision
             </label>
             <textarea
@@ -239,7 +241,7 @@ export default function CMOPlanPage() {
             />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#13131A' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#F0F0F5' }}>
               Marketing Goals (Top 3)
             </label>
             {plan.goals.map((goal, index) => (
@@ -257,7 +259,7 @@ export default function CMOPlanPage() {
 
         {/* SWOT Analysis */}
         <div style={sectionStyle}>
-          <h2 style={{ margin: '0 0 1.5rem', color: '#13131A', fontSize: '1.25rem', fontWeight: '600' }}>
+          <h2 style={{ margin: '0 0 1.5rem', color: '#F0F0F5', fontSize: '1.25rem', fontWeight: '600' }}>
             SWOT Analysis
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -289,7 +291,7 @@ export default function CMOPlanPage() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          background: 'white',
+                          background: '#1C1C26',
                           padding: '0.5rem 0.75rem',
                           borderRadius: '6px',
                           marginBottom: '0.5rem',
@@ -320,6 +322,8 @@ export default function CMOPlanPage() {
                         borderRadius: '6px',
                         fontSize: '0.85rem',
                         outline: 'none',
+                        background: '#1C1C26',
+                        color: '#F0F0F5',
                       }}
                     />
                     <button
@@ -359,7 +363,7 @@ export default function CMOPlanPage() {
           >
             <div style={{ fontSize: '2rem' }}>👥</div>
             <div>
-              <h3 style={{ margin: 0, color: '#13131A', fontSize: '1rem' }}>Target Personas</h3>
+              <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1rem' }}>Target Personas</h3>
               <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.85rem' }}>View customer personas</p>
             </div>
             <span style={{ marginLeft: 'auto', color: '#F57C00' }}>→</span>
@@ -378,7 +382,7 @@ export default function CMOPlanPage() {
           >
             <div style={{ fontSize: '2rem' }}>💰</div>
             <div>
-              <h3 style={{ margin: 0, color: '#13131A', fontSize: '1rem' }}>Budget</h3>
+              <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1rem' }}>Budget</h3>
               <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.85rem' }}>Manage marketing budget</p>
             </div>
             <span style={{ marginLeft: 'auto', color: '#F57C00' }}>→</span>
@@ -397,7 +401,7 @@ export default function CMOPlanPage() {
           >
             <div style={{ fontSize: '2rem' }}>📊</div>
             <div>
-              <h3 style={{ margin: 0, color: '#13131A', fontSize: '1rem' }}>KPIs & Analytics</h3>
+              <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1rem' }}>KPIs & Analytics</h3>
               <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.85rem' }}>Track performance</p>
             </div>
             <span style={{ marginLeft: 'auto', color: '#F57C00' }}>→</span>
@@ -407,14 +411,14 @@ export default function CMOPlanPage() {
         {/* Annual Calendar Overview */}
         <div style={sectionStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h2 style={{ margin: 0, color: '#13131A', fontSize: '1.25rem', fontWeight: '600' }}>
+            <h2 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.25rem', fontWeight: '600' }}>
               Annual Calendar Overview
             </h2>
             <button
               onClick={() => router.push('/cmo/calendar')}
               style={{
                 padding: '0.5rem 1rem',
-                background: 'var(--zander-light-gray)',
+                background: '#13131A',
                 color: '#F57C00',
                 border: 'none',
                 borderRadius: '6px',
@@ -427,8 +431,8 @@ export default function CMOPlanPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
             {MONTHS.map((month, index) => (
-              <div key={month} style={{ background: 'var(--zander-light-gray)', borderRadius: '8px', padding: '0.75rem' }}>
-                <div style={{ fontWeight: '600', color: '#13131A', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+              <div key={month} style={{ background: '#13131A', borderRadius: '8px', padding: '0.75rem' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
                   {month}
                 </div>
                 <input
@@ -439,10 +443,12 @@ export default function CMOPlanPage() {
                   style={{
                     width: '100%',
                     padding: '0.5rem',
-                    border: '1px solid var(--zander-border-gray)',
+                    border: '1px solid #2A2A38',
                     borderRadius: '6px',
                     fontSize: '0.85rem',
                     outline: 'none',
+                    background: '#1C1C26',
+                    color: '#F0F0F5',
                   }}
                 />
               </div>
@@ -453,14 +459,14 @@ export default function CMOPlanPage() {
         {/* KPIs Section */}
         <div style={sectionStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h2 style={{ margin: 0, color: '#13131A', fontSize: '1.25rem', fontWeight: '600' }}>
+            <h2 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.25rem', fontWeight: '600' }}>
               Key Performance Indicators
             </h2>
             <button
               onClick={() => router.push('/cmo/analytics')}
               style={{
                 padding: '0.5rem 1rem',
-                background: 'var(--zander-light-gray)',
+                background: '#13131A',
                 color: '#F57C00',
                 border: 'none',
                 borderRadius: '6px',
@@ -473,7 +479,7 @@ export default function CMOPlanPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
             {plan.kpis.map((kpi, index) => (
-              <div key={index} style={{ background: 'var(--zander-light-gray)', borderRadius: '8px', padding: '1rem' }}>
+              <div key={index} style={{ background: '#13131A', borderRadius: '8px', padding: '1rem' }}>
                 <input
                   type="text"
                   value={kpi.name}
@@ -483,7 +489,7 @@ export default function CMOPlanPage() {
                     background: 'transparent',
                     border: 'none',
                     fontWeight: '600',
-                    color: '#13131A',
+                    color: '#F0F0F5',
                     marginBottom: '0.5rem',
                     fontSize: '0.9rem',
                     outline: 'none',
@@ -497,11 +503,12 @@ export default function CMOPlanPage() {
                   style={{
                     width: '100%',
                     padding: '0.5rem',
-                    border: '1px solid var(--zander-border-gray)',
+                    border: '1px solid #2A2A38',
                     borderRadius: '6px',
                     fontSize: '0.9rem',
                     outline: 'none',
-                    background: 'white',
+                    background: '#1C1C26',
+                    color: '#F0F0F5',
                   }}
                 />
               </div>

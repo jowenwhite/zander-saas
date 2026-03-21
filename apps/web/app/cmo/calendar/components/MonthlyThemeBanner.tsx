@@ -26,7 +26,7 @@ export default function MonthlyThemeBanner({
       <div
         style={{
           background: '#1C1C26',
-          border: '2px dashed var(--zander-border-gray)',
+          border: '2px dashed #2A2A38',
           borderRadius: '12px',
           padding: '1rem 1.5rem',
           marginBottom: '1.5rem',
@@ -38,7 +38,7 @@ export default function MonthlyThemeBanner({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span style={{ fontSize: '1.5rem' }}>🎯</span>
           <div>
-            <div style={{ fontWeight: '600', color: '#13131A' }}>
+            <div style={{ fontWeight: '600', color: '#F0F0F5' }}>
               No theme set for {monthName} {year}
             </div>
             <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
@@ -99,7 +99,7 @@ export default function MonthlyThemeBanner({
             <div
               style={{
                 fontWeight: '700',
-                color: '#13131A',
+                color: '#F0F0F5',
                 fontSize: '1.125rem',
               }}
             >
@@ -113,7 +113,7 @@ export default function MonthlyThemeBanner({
             style={{
               padding: '0.5rem 0.75rem',
               background: 'transparent',
-              border: '2px solid var(--zander-border-gray)',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '0.875rem',
@@ -126,7 +126,7 @@ export default function MonthlyThemeBanner({
             onClick={onEditTheme}
             style={{
               padding: '0.5rem 1rem',
-              background: 'white',
+              background: '#1C1C26',
               color: '#F57C00',
               border: '2px solid #F57C00',
               borderRadius: '8px',
@@ -166,7 +166,7 @@ export default function MonthlyThemeBanner({
                 style={{
                   fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: '#13131A',
+                  color: '#F0F0F5',
                   marginBottom: '0.5rem',
                 }}
               >
@@ -178,10 +178,10 @@ export default function MonthlyThemeBanner({
                     key={idx}
                     style={{
                       padding: '0.25rem 0.75rem',
-                      background: 'white',
+                      background: '#1C1C26',
                       borderRadius: '16px',
                       fontSize: '0.8rem',
-                      color: '#13131A',
+                      color: '#F0F0F5',
                     }}
                   >
                     {area}
@@ -197,7 +197,7 @@ export default function MonthlyThemeBanner({
                 style={{
                   fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: '#13131A',
+                  color: '#F0F0F5',
                   marginBottom: '0.5rem',
                 }}
               >

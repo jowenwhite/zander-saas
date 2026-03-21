@@ -64,8 +64,8 @@ function BlockItem({ block, onDragStart }: BlockItemProps) {
 
 const containerStyle: CSSProperties = {
   width: '160px',
-  backgroundColor: 'white',
-  borderRight: '1px solid var(--zander-border-gray)',
+  backgroundColor: '#1C1C26',
+  borderRight: '1px solid #2A2A38',
   padding: '1rem',
   overflowY: 'auto',
   height: '100%',
@@ -75,7 +75,7 @@ const titleStyle: CSSProperties = {
   margin: '0 0 1rem 0',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
 };
@@ -97,7 +97,7 @@ const blockItemStyle: CSSProperties = {
   alignItems: 'center',
   gap: '0.5rem',
   padding: '0.5rem',
-  backgroundColor: '#1C1C26',
+  backgroundColor: '#13131A',
   borderRadius: '6px',
   marginBottom: '0.5rem',
   cursor: 'grab',
@@ -111,6 +111,6 @@ const iconStyle: CSSProperties = {
 
 const labelStyle: CSSProperties = {
   fontSize: '0.8rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
   fontWeight: '500',
 };

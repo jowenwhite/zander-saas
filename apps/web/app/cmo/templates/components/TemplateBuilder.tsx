@@ -175,7 +175,7 @@ export default function TemplateBuilder({
 
 const containerStyle: CSSProperties = {
   flex: 1,
-  backgroundColor: '#e5e5e5',
+  backgroundColor: '#13131A',
   padding: '2rem',
   overflowY: 'auto',
   display: 'flex',
@@ -196,16 +196,16 @@ const emptyCanvasStyle: CSSProperties = {
   justifyContent: 'center',
   minHeight: '400px',
   padding: '2rem',
-  border: '2px dashed var(--zander-border-gray)',
+  border: '2px dashed #2A2A38',
   borderRadius: '8px',
   margin: '1rem',
-  backgroundColor: 'white',
+  backgroundColor: '#1C1C26',
 };
 
 const emptyTextStyle: CSSProperties = {
   margin: '1rem 0 0.5rem 0',
   fontSize: '1rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
   fontWeight: '500',
 };
 
@@ -257,8 +257,8 @@ const quickActionButtonStyle: CSSProperties = {
   height: '28px',
   borderRadius: '4px',
   border: 'none',
-  backgroundColor: 'white',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+  backgroundColor: '#1C1C26',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',

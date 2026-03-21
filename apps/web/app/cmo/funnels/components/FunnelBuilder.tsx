@@ -41,7 +41,7 @@ export default function FunnelBuilder({
             margin: 0,
             fontSize: '1rem',
             fontWeight: '600',
-            color: '#13131A',
+            color: '#F0F0F5',
           }}
         >
           Funnel Stages
@@ -76,7 +76,7 @@ export default function FunnelBuilder({
               margin: '0 0 0.5rem 0',
               fontSize: '1.125rem',
               fontWeight: '600',
-              color: '#13131A',
+              color: '#F0F0F5',
             }}
           >
             No Stages Yet
@@ -144,7 +144,7 @@ export default function FunnelBuilder({
               onClick={onAddStage}
               style={{
                 padding: '0.75rem 1.5rem',
-                background: 'white',
+                background: '#1C1C26',
                 color: '#F57C00',
                 border: '2px dashed #F57C00',
                 borderRadius: '8px',
@@ -162,7 +162,7 @@ export default function FunnelBuilder({
                 e.currentTarget.style.borderStyle = 'solid';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.background = '#1C1C26';
                 e.currentTarget.style.color = '#F57C00';
                 e.currentTarget.style.borderStyle = 'dashed';
               }}

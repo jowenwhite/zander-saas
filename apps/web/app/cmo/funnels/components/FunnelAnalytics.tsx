@@ -22,9 +22,9 @@ export default function FunnelAnalytics({
   return (
     <div
       style={{
-        background: 'white',
+        background: '#1C1C26',
         borderRadius: '12px',
-        border: '2px solid var(--zander-border-gray)',
+        border: '2px solid #2A2A38',
         padding: '1.5rem',
       }}
     >
@@ -41,7 +41,7 @@ export default function FunnelAnalytics({
             margin: 0,
             fontSize: '1rem',
             fontWeight: '600',
-            color: '#13131A',
+            color: '#F0F0F5',
           }}
         >
           Funnel Analytics
@@ -68,7 +68,7 @@ export default function FunnelAnalytics({
           gap: '1rem',
           marginBottom: '1.5rem',
           padding: '1rem',
-          background: '#1C1C26',
+          background: '#13131A',
           borderRadius: '8px',
         }}
       >
@@ -76,7 +76,7 @@ export default function FunnelAnalytics({
           <div style={{ fontSize: '0.7rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             TOTAL VISITS
           </div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
             {formatNumber(totalVisits)}
           </div>
         </div>
@@ -182,7 +182,7 @@ export default function FunnelAnalytics({
                         style={{
                           fontSize: '0.8rem',
                           fontWeight: '500',
-                          color: '#13131A',
+                          color: '#F0F0F5',
                         }}
                       >
                         {stage.name}
@@ -191,7 +191,7 @@ export default function FunnelAnalytics({
                         style={{
                           fontSize: '0.8rem',
                           fontWeight: '600',
-                          color: '#13131A',
+                          color: '#F0F0F5',
                         }}
                       >
                         {formatNumber(stage.entryCount)}
@@ -201,7 +201,7 @@ export default function FunnelAnalytics({
                     <div
                       style={{
                         height: '24px',
-                        background: '#1C1C26',
+                        background: '#13131A',
                         borderRadius: '4px',
                         overflow: 'hidden',
                       }}
@@ -245,7 +245,7 @@ export default function FunnelAnalytics({
           style={{
             marginTop: '1.5rem',
             paddingTop: '1rem',
-            borderTop: '1px solid var(--zander-border-gray)',
+            borderTop: '1px solid #2A2A38',
             display: 'flex',
             flexWrap: 'wrap',
             gap: '1rem',

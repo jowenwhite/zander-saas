@@ -90,17 +90,19 @@ export default function StageConfigModal({
   const inputStyle = {
     width: '100%',
     padding: '0.75rem',
-    border: '2px solid var(--zander-border-gray)',
+    border: '2px solid #2A2A38',
     borderRadius: '8px',
     fontSize: '1rem',
     outline: 'none',
+    background: '#1C1C26',
+    color: '#F0F0F5',
   };
 
   const labelStyle = {
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: '#13131A',
+    color: '#F0F0F5',
     fontSize: '0.875rem',
   };
 
@@ -122,7 +124,7 @@ export default function StageConfigModal({
     >
       <div
         style={{
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
           width: '90%',
           maxWidth: '600px',
@@ -137,7 +139,7 @@ export default function StageConfigModal({
         <div
           style={{
             padding: '1.5rem',
-            borderBottom: '1px solid var(--zander-border-gray)',
+            borderBottom: '1px solid #2A2A38',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -148,7 +150,7 @@ export default function StageConfigModal({
               margin: 0,
               fontSize: '1.25rem',
               fontWeight: '700',
-              color: '#13131A',
+              color: '#F0F0F5',
             }}
           >
             {stage ? 'Edit Stage' : 'Add Stage'}
@@ -268,7 +270,7 @@ export default function StageConfigModal({
             >
               <span style={{ fontSize: '1.5rem' }}>{stageTypeInfo.icon}</span>
               <div>
-                <div style={{ fontWeight: '600', color: '#13131A' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5' }}>
                   {formData.name || stageTypeInfo.label}
                 </div>
                 <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
@@ -283,8 +285,8 @@ export default function StageConfigModal({
         <div
           style={{
             padding: '1rem 1.5rem',
-            borderTop: '1px solid var(--zander-border-gray)',
-            background: '#1C1C26',
+            borderTop: '1px solid #2A2A38',
+            background: '#13131A',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -319,7 +321,7 @@ export default function StageConfigModal({
                     padding: '0.5rem 1rem',
                     background: 'transparent',
                     color: '#8888A0',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontWeight: '600',
@@ -359,7 +361,7 @@ export default function StageConfigModal({
                 padding: '0.75rem 1.5rem',
                 background: 'transparent',
                 color: '#8888A0',
-                border: '2px solid var(--zander-border-gray)',
+                border: '2px solid #2A2A38',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: '600',

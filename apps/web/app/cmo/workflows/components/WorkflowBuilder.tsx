@@ -74,7 +74,7 @@ export default function WorkflowBuilder({
                 style={{
                   width: '2px',
                   height: '16px',
-                  background: 'var(--zander-border-gray)',
+                  background: '#2A2A38',
                 }}
               />
               {!isCondition && (
@@ -84,7 +84,7 @@ export default function WorkflowBuilder({
                     height: '0',
                     borderLeft: '5px solid transparent',
                     borderRight: '5px solid transparent',
-                    borderTop: '6px solid var(--zander-border-gray)',
+                    borderTop: '6px solid #2A2A38',
                   }}
                 />
               )}
@@ -191,7 +191,7 @@ export default function WorkflowBuilder({
             margin: 0,
             fontSize: '1rem',
             fontWeight: '600',
-            color: '#13131A',
+            color: '#F0F0F5',
           }}
         >
           Workflow Steps
@@ -210,7 +210,7 @@ export default function WorkflowBuilder({
       <div
         onClick={onEditTrigger}
         style={{
-          background: 'white',
+          background: '#13131A',
           border: '2px solid #F57C00',
           borderRadius: '10px',
           padding: '1rem',
@@ -248,7 +248,7 @@ export default function WorkflowBuilder({
                 margin: 0,
                 fontSize: '0.9rem',
                 fontWeight: '600',
-                color: '#13131A',
+                color: '#F0F0F5',
               }}
             >
               Trigger
@@ -301,7 +301,7 @@ export default function WorkflowBuilder({
           style={{
             width: '2px',
             height: '16px',
-            background: 'var(--zander-border-gray)',
+            background: '#2A2A38',
           }}
         />
         <div
@@ -310,7 +310,7 @@ export default function WorkflowBuilder({
             height: '0',
             borderLeft: '5px solid transparent',
             borderRight: '5px solid transparent',
-            borderTop: '6px solid var(--zander-border-gray)',
+            borderTop: '6px solid #2A2A38',
           }}
         />
       </div>
@@ -325,9 +325,9 @@ export default function WorkflowBuilder({
             justifyContent: 'center',
             padding: '3rem 2rem',
             textAlign: 'center',
-            background: 'white',
+            background: '#13131A',
             borderRadius: '10px',
-            border: '2px dashed var(--zander-border-gray)',
+            border: '2px dashed #2A2A38',
           }}
         >
           <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>
@@ -338,7 +338,7 @@ export default function WorkflowBuilder({
               margin: '0 0 0.5rem 0',
               fontSize: '1rem',
               fontWeight: '600',
-              color: '#13131A',
+              color: '#F0F0F5',
             }}
           >
             No Actions Yet
@@ -410,7 +410,7 @@ function AddNodeButton({
         onClick={onClick}
         style={{
           padding: '0.5rem 1rem',
-          background: 'white',
+          background: '#13131A',
           color: color,
           border: `2px dashed ${color}`,
           borderRadius: '8px',
@@ -425,7 +425,7 @@ function AddNodeButton({
           e.currentTarget.style.borderStyle = 'solid';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'white';
+          e.currentTarget.style.background = '#13131A';
           e.currentTarget.style.color = color;
           e.currentTarget.style.borderStyle = 'dashed';
         }}

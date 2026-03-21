@@ -192,9 +192,9 @@ export default function CMOAnalyticsPage() {
               style={{
                 padding: '0.5rem 1rem',
                 border: '2px solid',
-                borderColor: dateRange === range ? '#F57C00' : 'var(--zander-border-gray)',
+                borderColor: dateRange === range ? '#F57C00' : '#2A2A38',
                 borderRadius: '8px',
-                background: dateRange === range ? 'rgba(245, 124, 0, 0.1)' : 'white',
+                background: dateRange === range ? 'rgba(245, 124, 0, 0.1)' : '#1C1C26',
                 color: dateRange === range ? '#F57C00' : '#8888A0',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -262,7 +262,7 @@ export default function CMOAnalyticsPage() {
                   <tr key={campaign.id}>
                     <td style={tdStyle}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: '600', color: '#13131A' }}>
+                        <span style={{ fontWeight: '600', color: '#F0F0F5' }}>
                           {campaign.name}
                         </span>
                         {campaign.businessUnit && (
@@ -302,7 +302,7 @@ export default function CMOAnalyticsPage() {
             {data.emailPerformance.map((week, i) => (
               <div key={i} style={{ marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#13131A' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
                     {week.period}
                   </span>
                   <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
@@ -378,7 +378,7 @@ export default function CMOAnalyticsPage() {
                   <div key={funnel.id} style={funnelCardStyle}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#13131A' }}>
+                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#F0F0F5' }}>
                           {funnel.name}
                         </h4>
                         <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
@@ -435,10 +435,10 @@ export default function CMOAnalyticsPage() {
                       ))}
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #2A2A38' }}>
                       <div>
                         <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>Total Visits</span>
-                        <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#13131A' }}>
+                        <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#F0F0F5' }}>
                           {formatNumber(funnel.totalVisits)}
                         </div>
                       </div>
@@ -475,7 +475,7 @@ function KPICard({ label, value, subValue, icon, color }: {
           <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>
             {label}
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5' }}>
             {value}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>
@@ -526,7 +526,7 @@ const headerStyle: CSSProperties = {
 const titleStyle: CSSProperties = {
   fontSize: '2rem',
   fontWeight: '700',
-  color: '#13131A',
+  color: '#F0F0F5',
   margin: 0,
   marginBottom: '0.25rem',
 };
@@ -544,9 +544,9 @@ const kpiGridStyle: CSSProperties = {
 };
 
 const kpiCardStyle: CSSProperties = {
-  background: 'white',
+  background: '#1C1C26',
   borderRadius: '12px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   padding: '1.25rem',
 };
 
@@ -558,14 +558,14 @@ const contentGridStyle: CSSProperties = {
 
 const cardHeaderStyle: CSSProperties = {
   padding: '1rem 1.25rem',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const cardTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const tableStyle: CSSProperties = {
@@ -580,14 +580,14 @@ const thStyle: CSSProperties = {
   fontWeight: '600',
   color: '#8888A0',
   textTransform: 'uppercase',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const tdStyle: CSSProperties = {
   padding: '0.75rem 1rem',
   fontSize: '0.875rem',
-  color: 'var(--zander-dark-gray)',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  color: '#F0F0F5',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const businessUnitBadgeStyle: CSSProperties = {

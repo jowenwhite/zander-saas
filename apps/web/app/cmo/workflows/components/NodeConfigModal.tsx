@@ -95,17 +95,19 @@ export default function NodeConfigModal({
   const inputStyle = {
     width: '100%',
     padding: '0.75rem',
-    border: '2px solid var(--zander-border-gray)',
+    border: '2px solid #2A2A38',
     borderRadius: '8px',
     fontSize: '1rem',
     outline: 'none',
+    background: '#1C1C26',
+    color: '#F0F0F5',
   };
 
   const labelStyle = {
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: '#13131A',
+    color: '#F0F0F5',
     fontSize: '0.875rem',
   };
 
@@ -127,7 +129,7 @@ export default function NodeConfigModal({
     >
       <div
         style={{
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
           width: '90%',
           maxWidth: '600px',
@@ -142,7 +144,7 @@ export default function NodeConfigModal({
         <div
           style={{
             padding: '1.5rem',
-            borderBottom: '1px solid var(--zander-border-gray)',
+            borderBottom: '1px solid #2A2A38',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -153,7 +155,7 @@ export default function NodeConfigModal({
               margin: 0,
               fontSize: '1.25rem',
               fontWeight: '700',
-              color: '#13131A',
+              color: '#F0F0F5',
             }}
           >
             {node ? 'Edit Node' : 'Add Node'}
@@ -281,7 +283,7 @@ export default function NodeConfigModal({
             >
               <span style={{ fontSize: '1.5rem' }}>{nodeTypeInfo.icon}</span>
               <div>
-                <div style={{ fontWeight: '600', color: '#13131A' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5' }}>
                   {formData.name || nodeTypeInfo.label}
                 </div>
                 <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
@@ -296,8 +298,8 @@ export default function NodeConfigModal({
         <div
           style={{
             padding: '1rem 1.5rem',
-            borderTop: '1px solid var(--zander-border-gray)',
-            background: '#1C1C26',
+            borderTop: '1px solid #2A2A38',
+            background: '#13131A',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -332,7 +334,7 @@ export default function NodeConfigModal({
                     padding: '0.5rem 1rem',
                     background: 'transparent',
                     color: '#8888A0',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontWeight: '600',
@@ -372,7 +374,7 @@ export default function NodeConfigModal({
                 padding: '0.75rem 1.5rem',
                 background: 'transparent',
                 color: '#8888A0',
-                border: '2px solid var(--zander-border-gray)',
+                border: '2px solid #2A2A38',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: '600',

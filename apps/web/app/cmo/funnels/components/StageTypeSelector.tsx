@@ -27,9 +27,9 @@ export default function StageTypeSelector({ selected, onChange }: StageTypeSelec
             onClick={() => onChange(stageType.type)}
             style={{
               padding: '1rem',
-              border: `2px solid ${isSelected ? stageType.color : 'var(--zander-border-gray)'}`,
+              border: `2px solid ${isSelected ? stageType.color : '#2A2A38'}`,
               borderRadius: '8px',
-              background: isSelected ? `${stageType.color}10` : 'white',
+              background: isSelected ? `${stageType.color}10` : '#1C1C26',
               cursor: 'pointer',
               textAlign: 'left',
               transition: 'all 0.2s ease',
@@ -54,7 +54,7 @@ export default function StageTypeSelector({ selected, onChange }: StageTypeSelec
                 <div
                   style={{
                     fontWeight: '600',
-                    color: isSelected ? stageType.color : '#13131A',
+                    color: isSelected ? stageType.color : '#F0F0F5',
                     fontSize: '0.9rem',
                   }}
                 >

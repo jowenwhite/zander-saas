@@ -95,10 +95,10 @@ export default function TestResultsDisplay({ results }: TestResultsDisplayProps)
 }
 
 const containerStyle: CSSProperties = {
-  backgroundColor: '#1C1C26',
+  backgroundColor: '#13131A',
   borderRadius: '8px',
   padding: '1.25rem',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
 };
 
 const scoreContainerStyle: CSSProperties = {
@@ -134,7 +134,7 @@ const scoreMaxStyle: CSSProperties = {
 
 const scoreBarContainerStyle: CSSProperties = {
   height: '8px',
-  backgroundColor: '#E5E7EB',
+  backgroundColor: '#2A2A38',
   borderRadius: '4px',
   overflow: 'hidden',
 };
@@ -147,11 +147,11 @@ const scoreBarStyle: CSSProperties = {
 
 const summaryStyle: CSSProperties = {
   fontSize: '0.95rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
   lineHeight: '1.5',
   marginBottom: '1.25rem',
   paddingBottom: '1rem',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const sectionStyle: CSSProperties = {
@@ -162,7 +162,7 @@ const sectionTitleStyle: CSSProperties = {
   margin: '0 0 0.5rem 0',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
   display: 'flex',
   alignItems: 'center',
   gap: '0.5rem',
@@ -182,16 +182,16 @@ const listStyle: CSSProperties = {
 };
 
 const strengthItemStyle: CSSProperties = {
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
   marginBottom: '0.25rem',
 };
 
 const weaknessItemStyle: CSSProperties = {
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
   marginBottom: '0.25rem',
 };
 
 const suggestionItemStyle: CSSProperties = {
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
   marginBottom: '0.25rem',
 };

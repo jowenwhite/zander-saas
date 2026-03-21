@@ -24,8 +24,8 @@ export default function WorkflowNodeCard({
   return (
     <div
       style={{
-        background: 'white',
-        border: `2px solid ${isCondition ? nodeInfo.color : 'var(--zander-border-gray)'}`,
+        background: '#1C1C26',
+        border: `2px solid ${isCondition ? nodeInfo.color : '#2A2A38'}`,
         borderRadius: isCondition ? '12px' : '10px',
         padding: '1rem',
         display: 'flex',
@@ -40,7 +40,7 @@ export default function WorkflowNodeCard({
         e.currentTarget.style.boxShadow = `0 4px 12px ${nodeInfo.color}20`;
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = isCondition ? nodeInfo.color : 'var(--zander-border-gray)';
+        e.currentTarget.style.borderColor = isCondition ? nodeInfo.color : '#2A2A38';
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
@@ -53,7 +53,7 @@ export default function WorkflowNodeCard({
             top: '50%',
             width: '1.5rem',
             height: '2px',
-            background: branchType === 'true' ? '#27AE60' : branchType === 'false' ? '#E74C3C' : 'var(--zander-border-gray)',
+            background: branchType === 'true' ? '#27AE60' : branchType === 'false' ? '#E74C3C' : '#2A2A38',
           }}
         />
       )}
@@ -83,7 +83,7 @@ export default function WorkflowNodeCard({
               margin: 0,
               fontSize: '0.9rem',
               fontWeight: '600',
-              color: '#13131A',
+              color: '#F0F0F5',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

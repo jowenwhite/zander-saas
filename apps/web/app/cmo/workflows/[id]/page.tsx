@@ -373,7 +373,7 @@ export default function WorkflowBuilderPage() {
             }}
           >
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
-            <h3 style={{ color: '#13131A', margin: '0 0 0.5rem 0' }}>
+            <h3 style={{ color: '#F0F0F5', margin: '0 0 0.5rem 0' }}>
               {error === 'Workflow not found' ? 'Workflow Not Found' : 'Error Loading Workflow'}
             </h3>
             <p style={{ color: '#8888A0', margin: '0 0 1.5rem 0' }}>{error}</p>
@@ -427,7 +427,7 @@ export default function WorkflowBuilderPage() {
               style={{
                 fontSize: '2rem',
                 fontWeight: '700',
-                color: '#13131A',
+                color: '#F0F0F5',
                 margin: 0,
               }}
             >

@@ -30,8 +30,8 @@ export default function WeekView({
   return (
     <div
       style={{
-        background: 'white',
-        border: '2px solid var(--zander-border-gray)',
+        background: '#1C1C26',
+        border: '2px solid #2A2A38',
         borderRadius: '12px',
         overflow: 'hidden',
       }}
@@ -41,15 +41,15 @@ export default function WeekView({
         style={{
           display: 'grid',
           gridTemplateColumns: '60px repeat(7, 1fr)',
-          borderBottom: '2px solid var(--zander-border-gray)',
+          borderBottom: '2px solid #2A2A38',
         }}
       >
         {/* Empty corner */}
         <div
           style={{
             padding: '0.75rem',
-            background: '#1C1C26',
-            borderRight: '1px solid var(--zander-border-gray)',
+            background: '#13131A',
+            borderRight: '1px solid #2A2A38',
           }}
         />
 
@@ -60,8 +60,8 @@ export default function WeekView({
             style={{
               padding: '0.75rem',
               textAlign: 'center',
-              background: day.isToday ? 'rgba(245, 124, 0, 0.1)' : '#1C1C26',
-              borderRight: '1px solid var(--zander-border-gray)',
+              background: day.isToday ? 'rgba(245, 124, 0, 0.1)' : '#13131A',
+              borderRight: '1px solid #2A2A38',
             }}
           >
             <div
@@ -77,7 +77,7 @@ export default function WeekView({
               style={{
                 fontSize: '1.25rem',
                 fontWeight: '700',
-                color: day.isToday ? '#F57C00' : '#13131A',
+                color: day.isToday ? '#F57C00' : '#F0F0F5',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -115,7 +115,7 @@ export default function WeekView({
         style={{
           display: 'grid',
           gridTemplateColumns: '60px repeat(7, 1fr)',
-          borderBottom: '2px solid var(--zander-border-gray)',
+          borderBottom: '2px solid #2A2A38',
           minHeight: '40px',
         }}
       >
@@ -124,8 +124,8 @@ export default function WeekView({
             padding: '0.5rem',
             fontSize: '0.65rem',
             color: '#8888A0',
-            background: '#1C1C26',
-            borderRight: '1px solid var(--zander-border-gray)',
+            background: '#13131A',
+            borderRight: '1px solid #2A2A38',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -140,7 +140,7 @@ export default function WeekView({
               key={`allday-${day.dateString}`}
               style={{
                 padding: '4px',
-                borderRight: '1px solid var(--zander-border-gray)',
+                borderRight: '1px solid #2A2A38',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '2px',
@@ -179,7 +179,7 @@ export default function WeekView({
             style={{
               display: 'grid',
               gridTemplateColumns: '60px repeat(7, 1fr)',
-              borderBottom: '1px solid var(--zander-border-gray)',
+              borderBottom: '1px solid #2A2A38',
               minHeight: '60px',
             }}
           >
@@ -189,8 +189,8 @@ export default function WeekView({
                 padding: '0.5rem',
                 fontSize: '0.75rem',
                 color: '#8888A0',
-                background: '#1C1C26',
-                borderRight: '1px solid var(--zander-border-gray)',
+                background: '#13131A',
+                borderRight: '1px solid #2A2A38',
                 textAlign: 'right',
               }}
             >
@@ -207,10 +207,10 @@ export default function WeekView({
                   key={`${day.dateString}-${hour}`}
                   onClick={() => onTimeSlotClick(day.date, hour)}
                   style={{
-                    borderRight: '1px solid var(--zander-border-gray)',
+                    borderRight: '1px solid #2A2A38',
                     padding: '4px',
                     cursor: 'pointer',
-                    background: day.isToday ? 'rgba(245, 124, 0, 0.02)' : 'white',
+                    background: day.isToday ? 'rgba(245, 124, 0, 0.02)' : '#1C1C26',
                     transition: 'background 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
@@ -219,7 +219,7 @@ export default function WeekView({
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = day.isToday
                       ? 'rgba(245, 124, 0, 0.02)'
-                      : 'white';
+                      : '#1C1C26';
                   }}
                 >
                   {timedEvents.map((event) => (

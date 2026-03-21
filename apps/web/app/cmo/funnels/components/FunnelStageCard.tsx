@@ -28,8 +28,8 @@ export default function FunnelStageCard({
       {/* Stage Card */}
       <div
         style={{
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '2px solid #2A2A38',
           borderRadius: '12px',
           padding: '1.25rem',
           display: 'flex',
@@ -42,7 +42,7 @@ export default function FunnelStageCard({
           e.currentTarget.style.boxShadow = `0 4px 12px ${stageInfo.color}20`;
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
+          e.currentTarget.style.borderColor = '#2A2A38';
           e.currentTarget.style.boxShadow = 'none';
         }}
       >
@@ -71,7 +71,7 @@ export default function FunnelStageCard({
                 margin: 0,
                 fontSize: '1rem',
                 fontWeight: '600',
-                color: '#13131A',
+                color: '#F0F0F5',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -105,13 +105,13 @@ export default function FunnelStageCard({
           >
             <div style={{ fontSize: '0.8rem' }}>
               <span style={{ color: '#8888A0' }}>Entries: </span>
-              <span style={{ fontWeight: '600', color: '#13131A' }}>
+              <span style={{ fontWeight: '600', color: '#F0F0F5' }}>
                 {formatNumber(stage.entryCount)}
               </span>
             </div>
             <div style={{ fontSize: '0.8rem' }}>
               <span style={{ color: '#8888A0' }}>Exits: </span>
-              <span style={{ fontWeight: '600', color: '#13131A' }}>
+              <span style={{ fontWeight: '600', color: '#F0F0F5' }}>
                 {formatNumber(stage.exitCount)}
               </span>
             </div>
@@ -140,11 +140,11 @@ export default function FunnelStageCard({
             style={{
               width: '28px',
               height: '28px',
-              border: '1px solid var(--zander-border-gray)',
+              border: '1px solid #2A2A38',
               borderRadius: '6px',
-              background: isFirst ? '#1C1C26' : 'white',
+              background: isFirst ? '#13131A' : '#1C1C26',
               cursor: isFirst ? 'not-allowed' : 'pointer',
-              color: isFirst ? 'var(--zander-border-gray)' : '#8888A0',
+              color: isFirst ? '#2A2A38' : '#8888A0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -158,8 +158,8 @@ export default function FunnelStageCard({
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
-              e.currentTarget.style.color = isFirst ? 'var(--zander-border-gray)' : '#8888A0';
+              e.currentTarget.style.borderColor = '#2A2A38';
+              e.currentTarget.style.color = isFirst ? '#2A2A38' : '#8888A0';
             }}
             title="Move up"
           >
@@ -171,11 +171,11 @@ export default function FunnelStageCard({
             style={{
               width: '28px',
               height: '28px',
-              border: '1px solid var(--zander-border-gray)',
+              border: '1px solid #2A2A38',
               borderRadius: '6px',
-              background: isLast ? '#1C1C26' : 'white',
+              background: isLast ? '#13131A' : '#1C1C26',
               cursor: isLast ? 'not-allowed' : 'pointer',
-              color: isLast ? 'var(--zander-border-gray)' : '#8888A0',
+              color: isLast ? '#2A2A38' : '#8888A0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -189,8 +189,8 @@ export default function FunnelStageCard({
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--zander-border-gray)';
-              e.currentTarget.style.color = isLast ? 'var(--zander-border-gray)' : '#8888A0';
+              e.currentTarget.style.borderColor = '#2A2A38';
+              e.currentTarget.style.color = isLast ? '#2A2A38' : '#8888A0';
             }}
             title="Move down"
           >
@@ -270,7 +270,7 @@ export default function FunnelStageCard({
             style={{
               width: '2px',
               height: '20px',
-              background: 'var(--zander-border-gray)',
+              background: '#2A2A38',
             }}
           />
           <div
@@ -279,7 +279,7 @@ export default function FunnelStageCard({
               height: '0',
               borderLeft: '6px solid transparent',
               borderRight: '6px solid transparent',
-              borderTop: '8px solid var(--zander-border-gray)',
+              borderTop: '8px solid #2A2A38',
             }}
           />
         </div>

@@ -182,8 +182,9 @@ export default function CMOProductsPage() {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)',
-    borderRadius: '8px', fontSize: '1rem', outline: 'none'
+    width: '100%', padding: '0.75rem', border: '2px solid #2A2A38',
+    borderRadius: '8px', fontSize: '1rem', outline: 'none',
+    background: '#1C1C26', color: '#F0F0F5'
   };
 
   return (
@@ -192,7 +193,7 @@ export default function CMOProductsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
               Products & Services
             </h1>
             <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
@@ -220,11 +221,11 @@ export default function CMOProductsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ ...inputStyle, width: '300px' }}
           />
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value)} style={{ ...inputStyle, width: 'auto', background: 'white' }}>
+          <select value={filterType} onChange={(e) => setFilterType(e.target.value)} style={{ ...inputStyle, width: 'auto' }}>
             <option value="all">All Types</option>
             {productTypes.map(type => <option key={type.value} value={type.value}>{type.icon} {type.label}</option>)}
           </select>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ ...inputStyle, width: 'auto', background: 'white' }}>
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ ...inputStyle, width: 'auto' }}>
             <option value="all">All Status</option>
             <option value="ACTIVE">Active</option>
             <option value="DRAFT">Draft</option>
@@ -236,9 +237,9 @@ export default function CMOProductsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading products...</div>
         ) : filteredProducts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
-            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No products yet</h3>
+            <h3 style={{ color: '#F0F0F5', marginBottom: '0.5rem' }}>No products yet</h3>
             <p style={{ color: '#8888A0', marginBottom: '1.5rem' }}>Add your first product to get started</p>
             <button onClick={() => setShowModal(true)} style={{ padding: '0.75rem 1.5rem', background: '#F57C00', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
               + Add Product
@@ -250,13 +251,13 @@ export default function CMOProductsPage() {
               <div
                 key={product.id}
                 onClick={() => openEditModal(product)}
-                style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem', cursor: 'pointer', transition: 'box-shadow 0.2s' }}
+                style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem', cursor: 'pointer', transition: 'box-shadow 0.2s' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <span style={{ fontSize: '1.5rem' }}>{getTypeIcon(product.type)}</span>
                     <div>
-                      <h3 style={{ margin: 0, color: '#13131A', fontSize: '1.1rem', fontWeight: '600' }}>{product.name}</h3>
+                      <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.1rem', fontWeight: '600' }}>{product.name}</h3>
                       {product.sku && <span style={{ fontSize: '0.85rem', color: '#8888A0' }}>SKU: {product.sku}</span>}
                     </div>
                   </div>
@@ -266,13 +267,13 @@ export default function CMOProductsPage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#13131A' }}>{product.basePrice ? formatCurrency(product.basePrice) : '—'}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>{product.basePrice ? formatCurrency(product.basePrice) : '—'}</div>
                     <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>per {product.unit.replace('_', ' ')}</div>
                   </div>
                 </div>
                 {product.category && (
-                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
-                    <span style={{ padding: '0.25rem 0.5rem', background: 'var(--zander-light-gray)', borderRadius: '4px', fontSize: '0.8rem', color: '#8888A0' }}>{product.category}</span>
+                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2A2A38' }}>
+                    <span style={{ padding: '0.25rem 0.5rem', background: '#13131A', borderRadius: '4px', fontSize: '0.8rem', color: '#8888A0' }}>{product.category}</span>
                   </div>
                 )}
               </div>
@@ -283,38 +284,38 @@ export default function CMOProductsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-          <div style={{ background: 'white', borderRadius: '12px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--zander-border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0, color: '#13131A' }}>{editingProduct ? 'Edit Product' : 'New Product'}</h2>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflow: 'auto', border: '1px solid #2A2A38' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0, color: '#F0F0F5' }}>{editingProduct ? 'Edit Product' : 'New Product'}</h2>
               <button onClick={resetForm} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#8888A0' }}>×</button>
             </div>
             <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Product Name *</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Product Name *</label>
                 <input type="text" required value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} style={inputStyle} placeholder="e.g., Signature Series Cabinets" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Price</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Price</label>
                   <input type="number" step="0.01" value={productForm.basePrice} onChange={(e) => setProductForm({ ...productForm, basePrice: e.target.value })} style={inputStyle} placeholder="0.00" />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Unit</label>
-                  <select value={productForm.unit} onChange={(e) => setProductForm({ ...productForm, unit: e.target.value })} style={{ ...inputStyle, background: 'white' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Unit</label>
+                  <select value={productForm.unit} onChange={(e) => setProductForm({ ...productForm, unit: e.target.value })} style={{ ...inputStyle, background: '#1C1C26' }}>
                     {unitTypes.map(unit => <option key={unit.value} value={unit.value}>{unit.label}</option>)}
                   </select>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Type</label>
-                  <select value={productForm.type} onChange={(e) => setProductForm({ ...productForm, type: e.target.value })} style={{ ...inputStyle, background: 'white' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Type</label>
+                  <select value={productForm.type} onChange={(e) => setProductForm({ ...productForm, type: e.target.value })} style={{ ...inputStyle, background: '#1C1C26' }}>
                     {productTypes.map(type => <option key={type.value} value={type.value}>{type.icon} {type.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Category</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Category</label>
                   <input type="text" value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })} style={inputStyle} placeholder="e.g., Kitchen Cabinets" />
                 </div>
               </div>
@@ -322,19 +323,19 @@ export default function CMOProductsPage() {
                 {showAdvanced ? '▼' : '▶'} More Options
               </button>
               {showAdvanced && (
-                <div style={{ padding: '1rem', background: 'var(--zander-light-gray)', borderRadius: '8px', marginBottom: '1rem' }}>
+                <div style={{ padding: '1rem', background: '#13131A', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #2A2A38' }}>
                   <div style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Description</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Description</label>
                     <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} placeholder="Product description..." />
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>SKU</label>
+                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>SKU</label>
                       <input type="text" value={productForm.sku} onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })} style={inputStyle} placeholder="e.g., SIG-CAB-001" />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Status</label>
-                      <select value={productForm.status} onChange={(e) => setProductForm({ ...productForm, status: e.target.value })} style={{ ...inputStyle, background: 'white' }}>
+                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Status</label>
+                      <select value={productForm.status} onChange={(e) => setProductForm({ ...productForm, status: e.target.value })} style={{ ...inputStyle, background: '#1C1C26' }}>
                         <option value="ACTIVE">Active</option>
                         <option value="DRAFT">Draft</option>
                         <option value="DISCONTINUED">Discontinued</option>
@@ -347,7 +348,7 @@ export default function CMOProductsPage() {
                 {editingProduct && (
                   <button type="button" onClick={() => handleDelete(editingProduct.id)} style={{ padding: '0.75rem 1.5rem', background: '#dc3545', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', marginRight: 'auto' }}>Delete</button>
                 )}
-                <button type="button" onClick={resetForm} style={{ padding: '0.75rem 1.5rem', background: 'white', color: '#8888A0', border: '1px solid var(--zander-border-gray)', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={resetForm} style={{ padding: '0.75rem 1.5rem', background: '#13131A', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" style={{ padding: '0.75rem 1.5rem', background: '#F57C00', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>{editingProduct ? 'Save Changes' : 'Create Product'}</button>
               </div>
             </form>

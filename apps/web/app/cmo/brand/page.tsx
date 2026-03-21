@@ -321,11 +321,11 @@ export default function CMOBrandPage() {
               </div>
 
               {/* Typography Preview */}
-              <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#1C1C26', borderRadius: '8px' }}>
-                <div style={{ fontFamily: brandProfile.fontPrimary || 'Inter', fontSize: '1.5rem', fontWeight: '700', color: '#13131A', marginBottom: '0.5rem' }}>
+              <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#13131A', borderRadius: '8px' }}>
+                <div style={{ fontFamily: brandProfile.fontPrimary || 'Inter', fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem' }}>
                   Heading Text
                 </div>
-                <div style={{ fontFamily: brandProfile.fontSecondary || 'Inter', fontSize: '1rem', color: 'var(--zander-dark-gray)' }}>
+                <div style={{ fontFamily: brandProfile.fontSecondary || 'Inter', fontSize: '1rem', color: '#8888A0' }}>
                   Body text example showing your secondary font in action.
                 </div>
               </div>
@@ -434,7 +434,7 @@ export default function CMOBrandPage() {
             {assets.length === 0 ? (
               <div style={emptyStateStyle}>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
-                <h3 style={{ margin: '0 0 0.5rem 0', color: '#13131A' }}>No brand assets yet</h3>
+                <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5' }}>No brand assets yet</h3>
                 <p style={{ color: '#8888A0', margin: 0 }}>
                   Upload logos, images, and brand files to your library
                 </p>
@@ -453,14 +453,14 @@ export default function CMOBrandPage() {
                       )}
                     </div>
                     <div style={{ padding: '0.75rem' }}>
-                      <div style={{ fontWeight: '600', fontSize: '0.875rem', color: '#13131A', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontWeight: '600', fontSize: '0.875rem', color: '#F0F0F5', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {asset.name}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                         {asset.fileSize ? formatFileSize(asset.fileSize) : 'External'}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', borderTop: '1px solid var(--zander-border-gray)' }}>
+                    <div style={{ display: 'flex', borderTop: '1px solid #2A2A38' }}>
                       <a
                         href={asset.url}
                         target="_blank"
@@ -471,7 +471,7 @@ export default function CMOBrandPage() {
                       </a>
                       <button
                         onClick={() => handleDeleteAsset(asset.id)}
-                        style={{ ...assetActionStyle, color: '#00CCEE', borderLeft: '1px solid var(--zander-border-gray)' }}
+                        style={{ ...assetActionStyle, color: '#00CCEE', borderLeft: '1px solid #2A2A38' }}
                       >
                         Delete
                       </button>
@@ -591,7 +591,7 @@ function ColorInput({ label, value, onChange }: { label: string; value: string; 
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          style={{ width: '50px', height: '42px', border: '2px solid var(--zander-border-gray)', borderRadius: '8px', cursor: 'pointer' }}
+          style={{ width: '50px', height: '42px', border: '2px solid #2A2A38', borderRadius: '8px', cursor: 'pointer' }}
         />
         <input
           type="text"
@@ -626,7 +626,7 @@ const headerStyle: CSSProperties = {
 const titleStyle: CSSProperties = {
   fontSize: '2rem',
   fontWeight: '700',
-  color: '#13131A',
+  color: '#F0F0F5',
   margin: 0,
   marginBottom: '0.25rem',
 };
@@ -640,7 +640,7 @@ const tabsContainerStyle: CSSProperties = {
   display: 'flex',
   gap: '0.5rem',
   marginBottom: '1.5rem',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const tabStyle: CSSProperties = {
@@ -655,44 +655,46 @@ const tabStyle: CSSProperties = {
 
 const cardHeaderStyle: CSSProperties = {
   padding: '1rem 1.25rem',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const cardTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
   marginBottom: '0.5rem',
 };
 
 const inputStyle: CSSProperties = {
   width: '100%',
   padding: '0.75rem',
-  border: '2px solid var(--zander-border-gray)',
+  border: '2px solid #2A2A38',
   borderRadius: '8px',
   fontSize: '0.9rem',
   outline: 'none',
+  background: '#1C1C26',
+  color: '#F0F0F5',
 };
 
 const selectStyle: CSSProperties = {
   ...inputStyle,
   cursor: 'pointer',
-  background: 'white',
+  background: '#1C1C26',
 };
 
 const colorSwatchStyle: CSSProperties = {
   width: '60px',
   height: '60px',
   borderRadius: '8px',
-  border: '2px solid var(--zander-border-gray)',
+  border: '2px solid #2A2A38',
 };
 
 const emptyStateStyle: CSSProperties = {
@@ -707,8 +709,8 @@ const assetsGridStyle: CSSProperties = {
 };
 
 const assetCardStyle: CSSProperties = {
-  background: 'white',
-  border: '1px solid var(--zander-border-gray)',
+  background: '#1C1C26',
+  border: '1px solid #2A2A38',
   borderRadius: '8px',
   overflow: 'hidden',
 };

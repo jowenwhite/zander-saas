@@ -50,8 +50,8 @@ export default function DayView({
       {/* Main Day Schedule */}
       <div
         style={{
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '2px solid #2A2A38',
           borderRadius: '12px',
           overflow: 'hidden',
         }}
@@ -60,8 +60,8 @@ export default function DayView({
         <div
           style={{
             padding: '1.5rem',
-            background: isToday() ? 'rgba(245, 124, 0, 0.1)' : '#1C1C26',
-            borderBottom: '2px solid var(--zander-border-gray)',
+            background: isToday() ? 'rgba(245, 124, 0, 0.1)' : '#13131A',
+            borderBottom: '2px solid #2A2A38',
             display: 'flex',
             alignItems: 'center',
             gap: '1rem',
@@ -86,7 +86,7 @@ export default function DayView({
             <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>{date.getDate()}</div>
           </div>
           <div>
-            <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+            <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
               {dayNames[date.getDay()]}
             </div>
             <div style={{ fontSize: '0.875rem', color: '#8888A0' }}>
@@ -115,8 +115,8 @@ export default function DayView({
           <div
             style={{
               padding: '1rem',
-              borderBottom: '1px solid var(--zander-border-gray)',
-              background: '#1C1C26',
+              borderBottom: '1px solid #2A2A38',
+              background: '#13131A',
             }}
           >
             <div
@@ -164,7 +164,7 @@ export default function DayView({
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '80px 1fr',
-                  borderBottom: '1px solid var(--zander-border-gray)',
+                  borderBottom: '1px solid #2A2A38',
                   minHeight: '60px',
                   cursor: 'pointer',
                 }}
@@ -176,8 +176,8 @@ export default function DayView({
                     fontSize: '0.875rem',
                     color: '#8888A0',
                     fontWeight: '500',
-                    background: '#1C1C26',
-                    borderRight: '1px solid var(--zander-border-gray)',
+                    background: '#13131A',
+                    borderRight: '1px solid #2A2A38',
                   }}
                 >
                   {formatHour(hour)}
@@ -193,7 +193,7 @@ export default function DayView({
                     e.currentTarget.style.background = 'rgba(245, 124, 0, 0.05)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'white';
+                    e.currentTarget.style.background = '#1C1C26';
                   }}
                 >
                   {hourEvents.map((event) => (
@@ -253,8 +253,8 @@ export default function DayView({
       {/* Sidebar: Agenda */}
       <div
         style={{
-          background: 'white',
-          border: '2px solid var(--zander-border-gray)',
+          background: '#1C1C26',
+          border: '2px solid #2A2A38',
           borderRadius: '12px',
           overflow: 'hidden',
         }}
@@ -262,8 +262,8 @@ export default function DayView({
         <div
           style={{
             padding: '1rem 1.5rem',
-            borderBottom: '2px solid var(--zander-border-gray)',
-            background: '#1C1C26',
+            borderBottom: '2px solid #2A2A38',
+            background: '#13131A',
           }}
         >
           <h3
@@ -271,7 +271,7 @@ export default function DayView({
               margin: 0,
               fontSize: '1rem',
               fontWeight: '700',
-              color: '#13131A',
+              color: '#F0F0F5',
             }}
           >
             Agenda
@@ -320,7 +320,7 @@ export default function DayView({
                       <span
                         style={{
                           fontWeight: '600',
-                          color: '#13131A',
+                          color: '#F0F0F5',
                           fontSize: '0.875rem',
                         }}
                       >

@@ -85,7 +85,7 @@ export default function CMOCommunicationPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
               Marketing Communication
             </h1>
             <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
@@ -95,20 +95,20 @@ export default function CMOCommunicationPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'var(--zander-light-gray)', padding: '0.5rem', borderRadius: '12px', width: 'fit-content' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: '#1C1C26', padding: '0.5rem', borderRadius: '12px', width: 'fit-content', border: '1px solid #2A2A38' }}>
           <button onClick={() => setMessageType('email')} style={tabStyle(messageType === 'email')}>Email</button>
           <button onClick={() => setMessageType('sms')} style={tabStyle(messageType === 'sms')}>SMS</button>
         </div>
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total {messageType === 'email' ? 'Emails' : 'SMS'}</div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5' }}>
               {messageType === 'email' ? emails.length : smsMessages.length}
             </div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Sent</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#28a745' }}>
               {messageType === 'email'
@@ -116,7 +116,7 @@ export default function CMOCommunicationPage() {
                 : smsMessages.filter(s => s.direction === 'outbound').length}
             </div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Received</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F57C00' }}>
               {messageType === 'email'
@@ -130,33 +130,33 @@ export default function CMOCommunicationPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading messages...</div>
         ) : (messageType === 'email' ? emails : smsMessages).length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{messageType === 'email' ? '📧' : '💬'}</div>
-            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No messages yet</h3>
+            <h3 style={{ color: '#F0F0F5', marginBottom: '0.5rem' }}>No messages yet</h3>
             <p style={{ color: '#8888A0' }}>Messages will appear here when you send or receive them</p>
           </div>
         ) : messageType === 'email' ? (
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             {/* Email List */}
-            <div style={{ flex: '0 0 400px', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', overflow: 'hidden' }}>
+            <div style={{ flex: '0 0 400px', background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', overflow: 'hidden' }}>
               {emails.map(email => (
                 <div
                   key={email.id}
                   onClick={() => setSelectedEmail(email)}
                   style={{
                     padding: '1rem',
-                    borderBottom: '1px solid var(--zander-border-gray)',
+                    borderBottom: '1px solid #2A2A38',
                     cursor: 'pointer',
-                    background: selectedEmail?.id === email.id ? 'var(--zander-light-gray)' : 'white'
+                    background: selectedEmail?.id === email.id ? '#13131A' : '#1C1C26'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontWeight: '600', color: '#13131A', fontSize: '0.9rem' }}>
+                    <span style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>
                       {email.contact ? `${email.contact.firstName} ${email.contact.lastName}` : email.fromAddress}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>{formatDate(email.sentAt)}</span>
                   </div>
-                  <div style={{ fontSize: '0.9rem', color: '#13131A', marginBottom: '0.25rem' }}>{email.subject}</div>
+                  <div style={{ fontSize: '0.9rem', color: '#F0F0F5', marginBottom: '0.25rem' }}>{email.subject}</div>
                   <div style={{ fontSize: '0.8rem', color: '#8888A0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {email.body.substring(0, 80)}...
                   </div>
@@ -165,25 +165,25 @@ export default function CMOCommunicationPage() {
             </div>
             {/* Email Preview */}
             {selectedEmail && (
-              <div style={{ flex: 1, background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
-                <h2 style={{ margin: '0 0 1rem', color: '#13131A' }}>{selectedEmail.subject}</h2>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--zander-border-gray)' }}>
+              <div style={{ flex: 1, background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
+                <h2 style={{ margin: '0 0 1rem', color: '#F0F0F5' }}>{selectedEmail.subject}</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #2A2A38' }}>
                   <div>
-                    <div style={{ fontSize: '0.9rem', color: '#13131A' }}>From: {selectedEmail.fromAddress}</div>
+                    <div style={{ fontSize: '0.9rem', color: '#F0F0F5' }}>From: {selectedEmail.fromAddress}</div>
                     <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>To: {selectedEmail.toAddress}</div>
                   </div>
                   <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{formatDate(selectedEmail.sentAt)}</div>
                 </div>
-                <div style={{ whiteSpace: 'pre-wrap', color: '#13131A', lineHeight: '1.6' }}>{selectedEmail.body}</div>
+                <div style={{ whiteSpace: 'pre-wrap', color: '#F0F0F5', lineHeight: '1.6' }}>{selectedEmail.body}</div>
               </div>
             )}
           </div>
         ) : (
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', overflow: 'hidden' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', overflow: 'hidden' }}>
             {smsMessages.map(sms => (
-              <div key={sms.id} style={{ padding: '1rem', borderBottom: '1px solid var(--zander-border-gray)' }}>
+              <div key={sms.id} style={{ padding: '1rem', borderBottom: '1px solid #2A2A38' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: '600', color: '#13131A' }}>
+                  <span style={{ fontWeight: '600', color: '#F0F0F5' }}>
                     {sms.contact ? `${sms.contact.firstName} ${sms.contact.lastName}` : sms.direction === 'outbound' ? sms.toNumber : sms.fromNumber}
                   </span>
                   <span style={{ fontSize: '0.8rem', color: '#8888A0' }}>{formatDate(sms.sentAt)}</span>

@@ -32,7 +32,7 @@ export default function EmptyState({
   const titleStyle: CSSProperties = {
     fontSize: '1.5rem',
     fontWeight: '700',
-    color: '#13131A',
+    color: '#F0F0F5',
     marginBottom: '0.5rem',
   };
 

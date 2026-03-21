@@ -52,8 +52,9 @@ export default function CMOFormsPage() {
   });
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '0.75rem', border: '2px solid var(--zander-border-gray)',
-    borderRadius: '8px', fontSize: '1rem', outline: 'none'
+    width: '100%', padding: '0.75rem', border: '2px solid #2A2A38',
+    borderRadius: '8px', fontSize: '1rem', outline: 'none',
+    background: '#1C1C26', color: '#F0F0F5'
   };
 
   return (
@@ -62,7 +63,7 @@ export default function CMOFormsPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
               Marketing Forms
             </h1>
             <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
@@ -89,7 +90,7 @@ export default function CMOFormsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ ...inputStyle, maxWidth: '300px' }}
           />
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ ...inputStyle, width: 'auto', background: 'white' }}>
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ ...inputStyle, width: 'auto' }}>
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="draft">Draft</option>
@@ -98,15 +99,15 @@ export default function CMOFormsPage() {
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total Forms</div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A' }}>{forms.length}</div>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5' }}>{forms.length}</div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Active Forms</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#28a745' }}>{forms.filter(f => f.status === 'active').length}</div>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Total Submissions</div>
             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F57C00' }}>{forms.reduce((sum, f) => sum + (f._count?.submissions || 0), 0)}</div>
           </div>
@@ -116,9 +117,9 @@ export default function CMOFormsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: '#8888A0' }}>Loading forms...</div>
         ) : filteredForms.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📝</div>
-            <h3 style={{ color: '#13131A', marginBottom: '0.5rem' }}>No forms yet</h3>
+            <h3 style={{ color: '#F0F0F5', marginBottom: '0.5rem' }}>No forms yet</h3>
             <p style={{ color: '#8888A0', marginBottom: '1.5rem' }}>Create forms to capture leads and gather feedback</p>
             <button onClick={() => router.push('/forms')} style={{ padding: '0.75rem 1.5rem', background: '#F57C00', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
               Create Form
@@ -129,11 +130,11 @@ export default function CMOFormsPage() {
             {filteredForms.map(form => (
               <div
                 key={form.id}
-                style={{ background: 'white', borderRadius: '12px', border: '1px solid var(--zander-border-gray)', padding: '1.5rem' }}
+                style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div style={{ flex: 1 }}>
-                    <h3 style={{ margin: 0, color: '#13131A', fontSize: '1.1rem', fontWeight: '600' }}>{form.name}</h3>
+                    <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.1rem', fontWeight: '600' }}>{form.name}</h3>
                     {form.description && (
                       <p style={{ margin: '0.5rem 0 0', color: '#8888A0', fontSize: '0.9rem', lineHeight: '1.4' }}>
                         {form.description.substring(0, 100)}{form.description.length > 100 ? '...' : ''}
@@ -148,20 +149,20 @@ export default function CMOFormsPage() {
                     {form.status}
                   </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--zander-border-gray)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid #2A2A38' }}>
                   <div style={{ display: 'flex', gap: '1.5rem' }}>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Fields</div>
-                      <div style={{ fontWeight: '600', color: '#13131A' }}>{form.fields?.length || 0}</div>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{form.fields?.length || 0}</div>
                     </div>
                     <div>
                       <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Submissions</div>
-                      <div style={{ fontWeight: '600', color: '#13131A' }}>{form._count?.submissions || 0}</div>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{form._count?.submissions || 0}</div>
                     </div>
                   </div>
                   <button
                     onClick={() => navigator.clipboard.writeText(`${window.location.origin}/forms/${form.id}/submit`)}
-                    style={{ padding: '0.5rem 1rem', background: 'var(--zander-light-gray)', color: '#13131A', border: 'none', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer' }}
+                    style={{ padding: '0.5rem 1rem', background: '#13131A', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer' }}
                   >
                     Copy Link
                   </button>

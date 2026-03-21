@@ -124,24 +124,25 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const inputStyle: CSSProperties = {
   padding: '0.75rem 1rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '1rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
+  background: '#1C1C26',
 };
 
 const selectStyle: CSSProperties = {
   padding: '0.75rem 1rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '1rem',
-  color: 'var(--zander-dark-gray)',
-  background: 'white',
+  color: '#F0F0F5',
+  background: '#1C1C26',
   cursor: 'pointer',
 };
 

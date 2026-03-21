@@ -19,9 +19,9 @@ export default function WorkflowAnalytics({
   return (
     <div
       style={{
-        background: 'white',
+        background: '#1C1C26',
         borderRadius: '12px',
-        border: '2px solid var(--zander-border-gray)',
+        border: '2px solid #2A2A38',
         padding: '1.5rem',
       }}
     >
@@ -30,7 +30,7 @@ export default function WorkflowAnalytics({
           margin: '0 0 1.5rem 0',
           fontSize: '1rem',
           fontWeight: '600',
-          color: '#13131A',
+          color: '#F0F0F5',
         }}
       >
         Workflow Analytics
@@ -98,7 +98,7 @@ export default function WorkflowAnalytics({
             style={{
               fontSize: '1.75rem',
               fontWeight: '700',
-              color: '#13131A',
+              color: '#F0F0F5',
             }}
           >
             {formatNumber(entryCount)}
@@ -130,7 +130,7 @@ export default function WorkflowAnalytics({
             style={{
               fontSize: '1.75rem',
               fontWeight: '700',
-              color: completionRate >= 50 ? '#27AE60' : completionRate >= 25 ? '#F57C00' : '#13131A',
+              color: completionRate >= 50 ? '#27AE60' : completionRate >= 25 ? '#F57C00' : '#F0F0F5',
             }}
           >
             {formatPercentage(completionRate)}
@@ -139,7 +139,7 @@ export default function WorkflowAnalytics({
           <div
             style={{
               height: '6px',
-              background: 'var(--zander-border-gray)',
+              background: '#2A2A38',
               borderRadius: '3px',
               marginTop: '0.5rem',
               overflow: 'hidden',
@@ -233,7 +233,7 @@ export default function WorkflowAnalytics({
             borderLeft: '4px solid #F57C00',
           }}
         >
-          <div style={{ fontSize: '0.85rem', color: '#13131A', fontWeight: '500' }}>
+          <div style={{ fontSize: '0.85rem', color: '#F0F0F5', fontWeight: '500' }}>
             No runs yet
           </div>
           <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>

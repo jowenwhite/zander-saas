@@ -19,8 +19,8 @@ export default function CalendarGrid({
   return (
     <div
       style={{
-        background: 'white',
-        border: '2px solid var(--zander-border-gray)',
+        background: '#1C1C26',
+        border: '2px solid #2A2A38',
         borderRadius: '12px',
         overflow: 'hidden',
       }}
@@ -30,8 +30,8 @@ export default function CalendarGrid({
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
-          background: '#1C1C26',
-          borderBottom: '2px solid var(--zander-border-gray)',
+          background: '#13131A',
+          borderBottom: '2px solid #2A2A38',
         }}
       >
         {dayNames.map((day) => (
@@ -67,15 +67,15 @@ export default function CalendarGrid({
               key={day.dateString}
               onClick={() => onDayClick(day.date)}
               style={{
-                borderRight: (index + 1) % 7 !== 0 ? '1px solid var(--zander-border-gray)' : 'none',
-                borderBottom: index < 35 ? '1px solid var(--zander-border-gray)' : 'none',
+                borderRight: (index + 1) % 7 !== 0 ? '1px solid #2A2A38' : 'none',
+                borderBottom: index < 35 ? '1px solid #2A2A38' : 'none',
                 padding: '0.5rem',
                 cursor: 'pointer',
                 background: day.isToday
                   ? 'rgba(245, 124, 0, 0.05)'
                   : day.isCurrentMonth
-                  ? 'white'
-                  : '#1C1C26',
+                  ? '#1C1C26'
+                  : '#13131A',
                 minHeight: '100px',
                 transition: 'background 0.2s ease',
               }}
@@ -87,8 +87,8 @@ export default function CalendarGrid({
               onMouseLeave={(e) => {
                 if (!day.isToday) {
                   e.currentTarget.style.background = day.isCurrentMonth
-                    ? 'white'
-                    : '#1C1C26';
+                    ? '#1C1C26'
+                    : '#13131A';
                 }
               }}
             >
@@ -106,7 +106,7 @@ export default function CalendarGrid({
                   color: day.isToday
                     ? 'white'
                     : day.isCurrentMonth
-                    ? '#13131A'
+                    ? '#F0F0F5'
                     : '#8888A0',
                   background: day.isToday ? '#F57C00' : 'transparent',
                   marginBottom: '0.5rem',

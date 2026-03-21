@@ -60,9 +60,9 @@ const containerStyle: CSSProperties = {
   flexDirection: 'column',
   gap: '0.5rem',
   padding: '1rem 1.5rem',
-  background: 'white',
+  background: '#1C1C26',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
 };
 
 const labelRowStyle: CSSProperties = {
@@ -74,7 +74,7 @@ const labelRowStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const valueStyle: CSSProperties = {
@@ -90,7 +90,7 @@ const warningStyle: CSSProperties = {
 const barBackgroundStyle: CSSProperties = {
   width: '100%',
   height: '8px',
-  backgroundColor: 'var(--zander-light-gray)',
+  backgroundColor: '#13131A',
   borderRadius: '4px',
   overflow: 'hidden',
 };

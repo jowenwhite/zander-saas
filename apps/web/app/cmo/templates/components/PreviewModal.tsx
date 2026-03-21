@@ -150,13 +150,13 @@ const toggleButtonStyle: CSSProperties = {
 };
 
 const activeToggleStyle: CSSProperties = {
-  backgroundColor: 'white',
-  color: '#13131A',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+  backgroundColor: '#13131A',
+  color: '#F0F0F5',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
 };
 
 const previewContainerStyle: CSSProperties = {
-  backgroundColor: '#e5e5e5',
+  backgroundColor: '#13131A',
   padding: '2rem',
   borderRadius: '8px',
   maxHeight: '60vh',
@@ -182,7 +182,9 @@ const emptyPreviewStyle: CSSProperties = {
 const emailInputStyle: CSSProperties = {
   padding: '0.5rem 1rem',
   borderRadius: '6px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
   width: '250px',
+  background: '#1C1C26',
+  color: '#F0F0F5',
 };

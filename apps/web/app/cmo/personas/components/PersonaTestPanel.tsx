@@ -157,9 +157,9 @@ export default function PersonaTestPanel({
 }
 
 const containerStyle: CSSProperties = {
-  backgroundColor: 'white',
+  backgroundColor: '#1C1C26',
   borderRadius: '12px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   padding: '1.5rem',
   height: 'fit-content',
 };
@@ -168,7 +168,7 @@ const titleStyle: CSSProperties = {
   margin: '0 0 0.25rem 0',
   fontSize: '1.125rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const subtitleStyle: CSSProperties = {
@@ -185,7 +185,7 @@ const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
   marginBottom: '0.5rem',
 };
 
@@ -193,19 +193,20 @@ const selectStyle: CSSProperties = {
   width: '100%',
   padding: '0.75rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
-  color: 'var(--zander-dark-gray)',
-  backgroundColor: 'white',
+  color: '#F0F0F5',
+  backgroundColor: '#1C1C26',
 };
 
 const textareaStyle: CSSProperties = {
   width: '100%',
   padding: '0.75rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
+  backgroundColor: '#1C1C26',
   resize: 'vertical',
   fontFamily: 'inherit',
   minHeight: '150px',

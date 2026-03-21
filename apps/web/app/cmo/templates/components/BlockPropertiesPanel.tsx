@@ -230,8 +230,8 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
 
 const containerStyle: CSSProperties = {
   width: '280px',
-  backgroundColor: 'white',
-  borderLeft: '1px solid var(--zander-border-gray)',
+  backgroundColor: '#1C1C26',
+  borderLeft: '1px solid #2A2A38',
   padding: '1rem',
   overflowY: 'auto',
   height: '100%',
@@ -258,7 +258,7 @@ const headerStyle: CSSProperties = {
   gap: '0.5rem',
   marginBottom: '1rem',
   paddingBottom: '1rem',
-  borderBottom: '1px solid var(--zander-border-gray)',
+  borderBottom: '1px solid #2A2A38',
 };
 
 const iconStyle: CSSProperties = {
@@ -269,7 +269,7 @@ const titleStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const sectionStyle: CSSProperties = {
@@ -292,7 +292,7 @@ const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.8rem',
   fontWeight: '500',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
   marginBottom: '0.25rem',
 };
 
@@ -300,27 +300,32 @@ const inputStyle: CSSProperties = {
   width: '100%',
   padding: '0.5rem',
   borderRadius: '4px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
+  background: '#13131A',
+  color: '#F0F0F5',
 };
 
 const textareaStyle: CSSProperties = {
   width: '100%',
   padding: '0.5rem',
   borderRadius: '4px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
   resize: 'vertical',
   fontFamily: 'inherit',
+  background: '#13131A',
+  color: '#F0F0F5',
 };
 
 const selectStyle: CSSProperties = {
   width: '100%',
   padding: '0.5rem',
   borderRadius: '4px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
-  backgroundColor: 'white',
+  backgroundColor: '#13131A',
+  color: '#F0F0F5',
 };
 
 const colorInputStyle: CSSProperties = {
@@ -328,7 +333,7 @@ const colorInputStyle: CSSProperties = {
   height: '32px',
   padding: '2px',
   borderRadius: '4px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   cursor: 'pointer',
 };
 
@@ -354,9 +359,11 @@ const paddingInputStyle: CSSProperties = {
   width: '50px',
   padding: '0.25rem',
   borderRadius: '4px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.8rem',
   textAlign: 'center',
+  background: '#13131A',
+  color: '#F0F0F5',
 };
 
 const paddingLabelStyle: CSSProperties = {
@@ -367,7 +374,7 @@ const paddingLabelStyle: CSSProperties = {
 const deleteContainerStyle: CSSProperties = {
   marginTop: 'auto',
   paddingTop: '1rem',
-  borderTop: '1px solid var(--zander-border-gray)',
+  borderTop: '1px solid #2A2A38',
 };
 
 const deleteButtonStyle: CSSProperties = {

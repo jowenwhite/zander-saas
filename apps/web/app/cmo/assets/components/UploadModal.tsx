@@ -137,7 +137,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, isUploading }: 
           onClick={() => fileInputRef.current?.click()}
           style={{
             ...dropZoneStyle,
-            borderColor: dragOver ? '#F57C00' : 'var(--zander-border-gray)',
+            borderColor: dragOver ? '#F57C00' : '#2A2A38',
             backgroundColor: dragOver ? 'rgba(245, 124, 0, 0.05)' : '#1C1C26',
           }}
         >
@@ -243,7 +243,7 @@ const dropTextStyle: CSSProperties = {
   margin: '1rem 0 0.5rem',
   fontSize: '1rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const dropSubtextStyle: CSSProperties = {
@@ -276,7 +276,7 @@ const fileInfoStyle: CSSProperties = {
 const fileNameStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
   maxWidth: '300px',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
@@ -308,33 +308,35 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const selectStyle: CSSProperties = {
   padding: '0.75rem 1rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '1rem',
-  color: 'var(--zander-dark-gray)',
-  background: 'white',
+  color: '#F0F0F5',
+  background: '#1C1C26',
   cursor: 'pointer',
 };
 
 const inputStyle: CSSProperties = {
   padding: '0.75rem 1rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '1rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
+  background: '#1C1C26',
 };
 
 const textareaStyle: CSSProperties = {
   padding: '0.75rem 1rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '1rem',
-  color: 'var(--zander-dark-gray)',
+  color: '#F0F0F5',
+  background: '#1C1C26',
   resize: 'vertical',
   fontFamily: 'inherit',
 };

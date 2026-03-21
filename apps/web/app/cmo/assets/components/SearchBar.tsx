@@ -107,10 +107,10 @@ const searchInputStyle: CSSProperties = {
   width: '100%',
   padding: '0.75rem 2.5rem 0.75rem 2.5rem',
   borderRadius: '8px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
-  color: 'var(--zander-dark-gray)',
-  background: 'white',
+  color: '#F0F0F5',
+  background: '#1C1C26',
 };
 
 const clearButtonStyle: CSSProperties = {
@@ -141,9 +141,9 @@ const filterLabelStyle: CSSProperties = {
 const selectStyle: CSSProperties = {
   padding: '0.5rem 0.75rem',
   borderRadius: '6px',
-  border: '1px solid var(--zander-border-gray)',
+  border: '1px solid #2A2A38',
   fontSize: '0.875rem',
-  color: 'var(--zander-dark-gray)',
-  background: 'white',
+  color: '#F0F0F5',
+  background: '#1C1C26',
   cursor: 'pointer',
 };

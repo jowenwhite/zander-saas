@@ -27,7 +27,7 @@ export default function PersonaCard({
     <div
       style={{
         ...cardStyle,
-        borderColor: isSelected ? 'var(--zander-blue)' : 'var(--zander-border-gray)',
+        borderColor: isSelected ? 'var(--zander-blue)' : '#2A2A38',
         boxShadow: isSelected ? '0 0 0 2px var(--zander-blue)' : 'none',
       }}
       onClick={onSelect}
@@ -95,9 +95,9 @@ export default function PersonaCard({
 }
 
 const cardStyle: CSSProperties = {
-  backgroundColor: 'white',
+  backgroundColor: '#1C1C26',
   borderRadius: '12px',
-  border: '2px solid var(--zander-border-gray)',
+  border: '2px solid #2A2A38',
   padding: '1rem',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
@@ -137,7 +137,7 @@ const nameStyle: CSSProperties = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '600',
-  color: '#13131A',
+  color: '#F0F0F5',
 };
 
 const defaultBadgeStyle: CSSProperties = {
@@ -198,7 +198,7 @@ const moreStyle: CSSProperties = {
 };
 
 const footerStyle: CSSProperties = {
-  borderTop: '1px solid var(--zander-border-gray)',
+  borderTop: '1px solid #2A2A38',
   paddingTop: '0.75rem',
   marginTop: '0.5rem',
 };

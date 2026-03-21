@@ -134,18 +134,20 @@ export default function EventModal({
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '0.75rem',
-    border: '2px solid var(--zander-border-gray)',
+    border: '2px solid #2A2A38',
     borderRadius: '8px',
     fontSize: '1rem',
     outline: 'none',
     transition: 'border-color 0.2s ease',
+    background: '#1C1C26',
+    color: '#F0F0F5',
   };
 
   const labelStyle: React.CSSProperties = {
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: '#13131A',
+    color: '#F0F0F5',
     fontSize: '0.875rem',
   };
 
@@ -167,7 +169,7 @@ export default function EventModal({
     >
       <div
         style={{
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
           width: '90%',
           maxWidth: '500px',
@@ -182,13 +184,13 @@ export default function EventModal({
         <div
           style={{
             padding: '1.5rem',
-            borderBottom: '1px solid var(--zander-border-gray)',
+            borderBottom: '1px solid #2A2A38',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#13131A' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>
             {event ? 'Edit Event' : 'Add Event'}
           </h2>
           <button
@@ -261,7 +263,7 @@ export default function EventModal({
                 onChange={(e) => setFormData({ ...formData, allDay: e.target.checked })}
                 style={{ width: '18px', height: '18px', accentColor: '#F57C00' }}
               />
-              <span style={{ fontWeight: '500', color: '#13131A' }}>All Day Event</span>
+              <span style={{ fontWeight: '500', color: '#F0F0F5' }}>All Day Event</span>
             </label>
           </div>
 
@@ -351,8 +353,8 @@ export default function EventModal({
         <div
           style={{
             padding: '1rem 1.5rem',
-            borderTop: '1px solid var(--zander-border-gray)',
-            background: '#1C1C26',
+            borderTop: '1px solid #2A2A38',
+            background: '#13131A',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -385,7 +387,7 @@ export default function EventModal({
                     padding: '0.5rem 1rem',
                     background: 'transparent',
                     color: '#8888A0',
-                    border: '2px solid var(--zander-border-gray)',
+                    border: '2px solid #2A2A38',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontWeight: '600',
@@ -425,7 +427,7 @@ export default function EventModal({
                 padding: '0.75rem 1.5rem',
                 background: 'transparent',
                 color: '#8888A0',
-                border: '2px solid var(--zander-border-gray)',
+                border: '2px solid #2A2A38',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: '600',

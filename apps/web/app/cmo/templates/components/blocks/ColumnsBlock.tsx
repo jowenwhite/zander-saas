@@ -42,9 +42,9 @@ export default function ColumnsBlock({ block, isSelected, onSelect }: ColumnsBlo
             style={{
               flex: column.width,
               minHeight: '80px',
-              backgroundColor: '#1C1C26',
+              backgroundColor: '#13131A',
               borderRadius: '4px',
-              border: '2px dashed var(--zander-border-gray)',
+              border: '2px dashed #2A2A38',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

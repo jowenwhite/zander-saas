@@ -59,17 +59,19 @@ export default function TriggerConfigModal({
   const inputStyle = {
     width: '100%',
     padding: '0.75rem',
-    border: '2px solid var(--zander-border-gray)',
+    border: '2px solid #2A2A38',
     borderRadius: '8px',
     fontSize: '1rem',
     outline: 'none',
+    background: '#1C1C26',
+    color: '#F0F0F5',
   };
 
   const labelStyle = {
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: '#13131A',
+    color: '#F0F0F5',
     fontSize: '0.875rem',
   };
 
@@ -91,7 +93,7 @@ export default function TriggerConfigModal({
     >
       <div
         style={{
-          background: 'white',
+          background: '#1C1C26',
           borderRadius: '12px',
           width: '90%',
           maxWidth: '550px',
@@ -106,7 +108,7 @@ export default function TriggerConfigModal({
         <div
           style={{
             padding: '1.5rem',
-            borderBottom: '1px solid var(--zander-border-gray)',
+            borderBottom: '1px solid #2A2A38',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -117,7 +119,7 @@ export default function TriggerConfigModal({
               margin: 0,
               fontSize: '1.25rem',
               fontWeight: '700',
-              color: '#13131A',
+              color: '#F0F0F5',
             }}
           >
             Configure Trigger
@@ -160,9 +162,9 @@ export default function TriggerConfigModal({
                     onClick={() => handleTypeChange(trigger.type)}
                     style={{
                       padding: '0.75rem 0.5rem',
-                      border: `2px solid ${isSelected ? '#F57C00' : 'var(--zander-border-gray)'}`,
+                      border: `2px solid ${isSelected ? '#F57C00' : '#2A2A38'}`,
                       borderRadius: '8px',
-                      background: isSelected ? 'rgba(245, 124, 0, 0.1)' : 'white',
+                      background: isSelected ? 'rgba(245, 124, 0, 0.1)' : '#1C1C26',
                       cursor: 'pointer',
                       textAlign: 'center',
                       transition: 'all 0.2s ease',
@@ -173,7 +175,7 @@ export default function TriggerConfigModal({
                       style={{
                         fontSize: '0.65rem',
                         fontWeight: '500',
-                        color: isSelected ? '#F57C00' : '#13131A',
+                        color: isSelected ? '#F57C00' : '#F0F0F5',
                       }}
                     >
                       {trigger.label}
@@ -264,7 +266,7 @@ export default function TriggerConfigModal({
             >
               <span style={{ fontSize: '1.5rem' }}>{selectedTriggerInfo.icon}</span>
               <div>
-                <div style={{ fontWeight: '600', color: '#13131A' }}>
+                <div style={{ fontWeight: '600', color: '#F0F0F5' }}>
                   Trigger
                 </div>
                 <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
@@ -279,8 +281,8 @@ export default function TriggerConfigModal({
         <div
           style={{
             padding: '1rem 1.5rem',
-            borderTop: '1px solid var(--zander-border-gray)',
-            background: '#1C1C26',
+            borderTop: '1px solid #2A2A38',
+            background: '#13131A',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: '0.75rem',
@@ -293,7 +295,7 @@ export default function TriggerConfigModal({
               padding: '0.75rem 1.5rem',
               background: 'transparent',
               color: '#8888A0',
-              border: '2px solid var(--zander-border-gray)',
+              border: '2px solid #2A2A38',
               borderRadius: '8px',
               cursor: 'pointer',
               fontWeight: '600',

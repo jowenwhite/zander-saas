@@ -247,7 +247,7 @@ export default function AskDonPage() {
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = '#2A2A38';
-                      e.currentTarget.style.background = 'white';
+                      e.currentTarget.style.background = '#1C1C26';
                     }}
                   >
                     {prompt}
@@ -409,6 +409,8 @@ export default function AskDonPage() {
                 fontSize: '1rem',
                 outline: 'none',
                 transition: 'border-color 0.2s ease',
+                background: '#13131A',
+                color: '#F0F0F5',
               }}
               onFocus={(e) => (e.target.style.borderColor = '#00CCEE')}
               onBlur={(e) => (e.target.style.borderColor = '#2A2A38')}
