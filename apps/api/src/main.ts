@@ -123,7 +123,12 @@ async function bootstrap() {
     'https://api.zanderos.com',
     'https://zander.mcfapp.com',
     'https://api.zander.mcfapp.com',
+    // Vercel deployment domains
+    'https://zander-web.vercel.app',
   ];
+
+  // Also allow Vercel preview deployments (pattern matching)
+  const vercelPreviewPattern = /^https:\/\/zander-[a-z0-9]+-jonathan-white-s-projects\.vercel\.app$/;
 
   // Add development origins only in non-production environments
   if (process.env.NODE_ENV !== 'production') {
@@ -136,7 +141,25 @@ async function bootstrap() {
   }
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., mobile apps, curl)
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      // Check static allowlist
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      // Check Vercel preview deployment pattern
+      if (vercelPreviewPattern.test(origin)) {
+        callback(null, true);
+        return;
+      }
+      // Reject other origins
+      callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
