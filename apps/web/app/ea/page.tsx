@@ -213,7 +213,9 @@ export default function EAPage() {
       const response = await fetch(API_URL + '/tasks', { headers: getAuthHeaders() });
       if (response.ok) {
         const data = await response.json();
-        setTasks(data);
+        // Handle both array and paginated response formats
+        const tasksArray = Array.isArray(data) ? data : (data.data || []);
+        setTasks(tasksArray);
       }
     } catch (error) {
       console.error('Failed to fetch tasks:', error);
@@ -228,7 +230,9 @@ export default function EAPage() {
       const response = await fetch(API_URL + '/calendar-events', { headers: getAuthHeaders() });
       if (response.ok) {
         const data = await response.json();
-        setEvents(data);
+        // Handle both array and paginated response formats
+        const eventsArray = Array.isArray(data) ? data : (data.data || []);
+        setEvents(eventsArray);
       }
     } catch (error) {
       console.error('Failed to fetch events:', error);
@@ -243,7 +247,9 @@ export default function EAPage() {
       const response = await fetch(API_URL + '/email-messages', { headers: getAuthHeaders() });
       if (response.ok) {
         const data = await response.json();
-        setEmails(data);
+        // Handle both array and paginated response formats
+        const emailsArray = Array.isArray(data) ? data : (data.data || []);
+        setEmails(emailsArray);
       }
     } catch (error) {
       console.error('Failed to fetch emails:', error);
@@ -254,10 +260,12 @@ export default function EAPage() {
 
   const fetchContacts = async () => {
     try {
-      const response = await fetch(API_URL + '/people', { headers: getAuthHeaders() });
+      const response = await fetch(API_URL + '/contacts', { headers: getAuthHeaders() });
       if (response.ok) {
         const data = await response.json();
-        setContacts(data);
+        // Handle both array and paginated response formats
+        const contactsArray = Array.isArray(data) ? data : (data.data || []);
+        setContacts(contactsArray);
       }
     } catch (error) {
       console.error('Failed to fetch contacts:', error);
