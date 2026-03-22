@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Maximize2, Minimize2, Send, Bot, Lock } from 'lucide-react';
 import { usePEP, Executive, ExecutiveInfo, EXECUTIVES, ZANDER } from './PEPContext';
+import { getActiveTenant } from '../../utils/auth';
 
 type ToolExecution = {
   tool: string;
@@ -54,10 +55,15 @@ export default function PersistentExecutivePanel() {
         const user = JSON.parse(userStr);
         setIsSuperAdmin(user.isSuperAdmin || false);
         setUserPlan(user.plan || 'starter');
-        setTenantId(user.tenantId || '');
       } catch (e) {
         console.error('Failed to parse user data:', e);
       }
+    }
+
+    // Get tenantId from active tenant (stored in zander_active_tenant)
+    const activeTenant = getActiveTenant();
+    if (activeTenant?.id) {
+      setTenantId(activeTenant.id);
     }
   }, []);
 
