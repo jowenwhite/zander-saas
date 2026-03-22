@@ -26,6 +26,16 @@ Available Tools:
 - schedule_followup: Schedule a future follow-up activity
 - draft_email: Create an email draft for user review (NEVER sends directly)
 - create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
+- get_pipeline_summary: Get pipeline overview with deal counts and values by stage
+- get_deals: Search and list deals with filters (stage, priority, search)
+- get_contacts: Search and list contacts
+- get_activities: List recent activities with optional filters
+- get_deal_details: Get full details for a specific deal
+- get_overdue_followups: Find follow-up tasks that are past due
+- update_deal_notes: Update notes or next steps on a deal
+- tag_contact: Add marketing tags to a contact
+- set_deal_priority: Set priority level on a deal (LOW, MEDIUM, HIGH, CRITICAL)
+- draft_follow_up_email: Create a contextual follow-up email draft
 
 **How to Use Tools:**
 1. When a user mentions a call, meeting, or interaction — log it with create_activity
@@ -74,7 +84,7 @@ const TOOLS = [
         },
         priority: {
           type: 'string',
-          enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'],
+          enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
           description: 'Priority level of the deal'
         },
         expectedCloseDate: {
@@ -339,6 +349,215 @@ const TOOLS = [
         }
       },
       required: ['title', 'description']
+    }
+  },
+  // ========== READ TOOLS (10 new) ==========
+  {
+    name: 'get_pipeline_summary',
+    description: 'Get an overview of the sales pipeline showing deals grouped by stage, total values, and counts. Use this when the user asks about pipeline status, deal counts, or revenue forecasts.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'get_deals',
+    description: 'Search and list deals with optional filters. Use this to find specific deals or show deal lists.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        search: {
+          type: 'string',
+          description: 'Search term to filter deals by name'
+        },
+        stage: {
+          type: 'string',
+          enum: ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'],
+          description: 'Filter by pipeline stage'
+        },
+        priority: {
+          type: 'string',
+          enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
+          description: 'Filter by priority level'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of deals to return (default 20)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_contacts',
+    description: 'Search and list contacts. Use this to find specific contacts or show contact lists.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        search: {
+          type: 'string',
+          description: 'Search term to filter contacts by name, email, or company'
+        },
+        company: {
+          type: 'string',
+          description: 'Filter by company name'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of contacts to return (default 20)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_activities',
+    description: 'List recent activities with optional filters. Use this to review activity history.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['call', 'meeting', 'email', 'note', 'task'],
+          description: 'Filter by activity type'
+        },
+        contactId: {
+          type: 'string',
+          description: 'Filter by contact ID'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Filter by deal ID'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of activities to return (default 20)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_deal_details',
+    description: 'Get full details for a specific deal including contact info, activities, and notes.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        dealId: {
+          type: 'string',
+          description: 'ID of the deal to retrieve'
+        }
+      },
+      required: ['dealId']
+    }
+  },
+  {
+    name: 'get_overdue_followups',
+    description: 'Find follow-up tasks that are past their due date. Use this to identify urgent follow-ups that need attention.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          description: 'Maximum number of overdue items to return (default 10)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'update_deal_notes',
+    description: 'Update the notes or next steps on a deal. Use this to add context or action items.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        dealId: {
+          type: 'string',
+          description: 'ID of the deal to update'
+        },
+        notes: {
+          type: 'string',
+          description: 'Updated notes for the deal'
+        },
+        nextSteps: {
+          type: 'string',
+          description: 'Updated next steps for the deal'
+        }
+      },
+      required: ['dealId']
+    }
+  },
+  {
+    name: 'tag_contact',
+    description: 'Add marketing tags to a contact for segmentation and targeting. Tags help organize contacts by interest, source, or campaign.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'ID of the contact to tag'
+        },
+        tags: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Tags to add to the contact (e.g., ["VIP", "Newsletter", "Q1-Campaign"])'
+        }
+      },
+      required: ['contactId', 'tags']
+    }
+  },
+  {
+    name: 'set_deal_priority',
+    description: 'Set the priority level on a deal to indicate urgency.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        dealId: {
+          type: 'string',
+          description: 'ID of the deal to update'
+        },
+        priority: {
+          type: 'string',
+          enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
+          description: 'Priority level to set'
+        }
+      },
+      required: ['dealId', 'priority']
+    }
+  },
+  {
+    name: 'draft_follow_up_email',
+    description: 'Create a contextual follow-up email draft based on previous interactions. NEVER sends - always creates a draft for review.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        to: {
+          type: 'string',
+          description: 'Recipient email address'
+        },
+        subject: {
+          type: 'string',
+          description: 'Email subject line'
+        },
+        body: {
+          type: 'string',
+          description: 'Email body text'
+        },
+        contactId: {
+          type: 'string',
+          description: 'ID of the contact being followed up with'
+        },
+        dealId: {
+          type: 'string',
+          description: 'ID of the associated deal'
+        },
+        context: {
+          type: 'string',
+          description: 'Context about the follow-up (e.g., "after demo", "proposal sent", "no response")'
+        }
+      },
+      required: ['to', 'subject', 'body']
     }
   }
 ];
@@ -610,6 +829,286 @@ async function executeTool(
           return { success: true, result };
         } catch {
           return { success: true, result: { message: 'Support ticket created' } };
+        }
+      }
+
+      // ========== READ TOOLS (10 new) ==========
+      case 'get_pipeline_summary': {
+        const url = `${CRO_API_URL}/deals/pipeline`;
+        console.log(`[Jordan Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get pipeline (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: false, error: 'Failed to parse pipeline data' };
+        }
+      }
+
+      case 'get_deals': {
+        const params = new URLSearchParams();
+        if (toolInput.search) params.append('search', toolInput.search as string);
+        if (toolInput.stage) params.append('stage', toolInput.stage as string);
+        if (toolInput.priority) params.append('priority', toolInput.priority as string);
+        params.append('limit', String(toolInput.limit || 20));
+
+        const url = `${CRO_API_URL}/deals?${params.toString()}`;
+        console.log(`[Jordan Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get deals (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: false, error: 'Failed to parse deals data' };
+        }
+      }
+
+      case 'get_contacts': {
+        const params = new URLSearchParams();
+        if (toolInput.search) params.append('search', toolInput.search as string);
+        if (toolInput.company) params.append('company', toolInput.company as string);
+        params.append('limit', String(toolInput.limit || 20));
+
+        const url = `${CRO_API_URL}/contacts?${params.toString()}`;
+        console.log(`[Jordan Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get contacts (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: false, error: 'Failed to parse contacts data' };
+        }
+      }
+
+      case 'get_activities': {
+        const params = new URLSearchParams();
+        if (toolInput.type) params.append('type', toolInput.type as string);
+        if (toolInput.contactId) params.append('contactId', toolInput.contactId as string);
+        if (toolInput.dealId) params.append('dealId', toolInput.dealId as string);
+        params.append('limit', String(toolInput.limit || 20));
+
+        const url = `${CRO_API_URL}/activities?${params.toString()}`;
+        console.log(`[Jordan Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get activities (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: false, error: 'Failed to parse activities data' };
+        }
+      }
+
+      case 'get_deal_details': {
+        const { dealId } = toolInput as { dealId: string };
+        const url = `${CRO_API_URL}/deals/${dealId}`;
+        console.log(`[Jordan Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get deal details (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: false, error: 'Failed to parse deal data' };
+        }
+      }
+
+      case 'get_overdue_followups': {
+        // Fetch tasks and filter for overdue ones (date < now)
+        const limit = (toolInput.limit as number) || 10;
+        const url = `${CRO_API_URL}/activities?type=task&limit=100`;
+        console.log(`[Jordan Tool] GET ${url} (filtering for overdue)`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get followups (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          const now = new Date();
+          const overdue = (result.data || [])
+            .filter((task: { date: string }) => new Date(task.date) < now)
+            .slice(0, limit);
+          return {
+            success: true,
+            result: {
+              data: overdue,
+              count: overdue.length,
+              message: overdue.length > 0 ? `Found ${overdue.length} overdue follow-ups` : 'No overdue follow-ups'
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse followups data' };
+        }
+      }
+
+      case 'update_deal_notes': {
+        const { dealId, notes, nextSteps } = toolInput as { dealId: string; notes?: string; nextSteps?: string };
+        const updateData: Record<string, string> = {};
+        if (notes !== undefined) updateData.notes = notes;
+        if (nextSteps !== undefined) updateData.nextSteps = nextSteps;
+
+        const url = `${CRO_API_URL}/deals/${dealId}`;
+        console.log(`[Jordan Tool] PATCH ${url}`);
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update deal notes (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Deal notes updated' } };
+        }
+      }
+
+      case 'tag_contact': {
+        const { contactId, tags } = toolInput as { contactId: string; tags: string[] };
+
+        // First get current tags
+        const getUrl = `${CRO_API_URL}/contacts/${contactId}`;
+        console.log(`[Jordan Tool] GET ${getUrl} (to merge tags)`);
+        const getResponse = await fetch(getUrl, { method: 'GET', headers });
+
+        let existingTags: string[] = [];
+        if (getResponse.ok) {
+          try {
+            const contact = JSON.parse(await getResponse.text());
+            existingTags = contact.marketingTags || [];
+          } catch {
+            // Continue with empty existing tags
+          }
+        }
+
+        // Merge tags (avoid duplicates)
+        const mergedTags = [...new Set([...existingTags, ...tags])];
+
+        const url = `${CRO_API_URL}/contacts/${contactId}`;
+        console.log(`[Jordan Tool] PATCH ${url}`);
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ marketingTags: mergedTags }),
+        });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to tag contact (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result: { ...result, tagsAdded: tags, allTags: mergedTags } };
+        } catch {
+          return { success: true, result: { message: 'Contact tagged', tagsAdded: tags } };
+        }
+      }
+
+      case 'set_deal_priority': {
+        const { dealId, priority } = toolInput as { dealId: string; priority: string };
+        const url = `${CRO_API_URL}/deals/${dealId}`;
+        console.log(`[Jordan Tool] PATCH ${url}`);
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ priority }),
+        });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to set deal priority (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: `Deal priority set to ${priority}` } };
+        }
+      }
+
+      case 'draft_follow_up_email': {
+        // Create email draft with follow-up context - NEVER sends directly
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const url = `${baseUrl}/api/email-drafts`;
+        console.log(`[Jordan Tool] POST ${url} (follow-up draft, never sends)`);
+        const draftData = {
+          to: toolInput.to,
+          subject: toolInput.subject,
+          body: toolInput.body,
+          contactId: toolInput.contactId,
+          dealId: toolInput.dealId,
+          createdBy: 'jordan-ai',
+          metadata: {
+            type: 'follow-up',
+            context: toolInput.context || 'general follow-up'
+          },
+        };
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(draftData),
+        });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          // Fallback: return the draft content for manual review
+          console.log(`[Jordan Tool] Draft endpoint error, returning draft content for review`);
+          return {
+            success: true,
+            result: {
+              message: 'Follow-up email draft created for review',
+              draft: {
+                to: toolInput.to,
+                subject: toolInput.subject,
+                body: toolInput.body,
+                context: toolInput.context,
+                status: 'draft',
+                note: 'Review this draft in Communications before sending',
+              },
+            },
+          };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          console.log(`[Jordan Tool] Follow-up email draft created successfully:`, result);
+          return {
+            success: true,
+            result: {
+              message: 'Follow-up email draft saved — review it in Communications before sending',
+              draft: result.draft,
+            },
+          };
+        } catch {
+          return { success: true, result: { message: 'Follow-up email draft created for review' } };
         }
       }
 
