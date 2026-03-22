@@ -144,9 +144,16 @@ export function PEPProvider({ children }: { children: ReactNode }) {
   // Get available executives based on plan
   const getAvailableExecutives = useCallback((userPlan: string, isSuperAdmin: boolean): ExecutiveInfo[] => {
     const planHierarchy = ['starter', 'pro', 'business', 'enterprise'];
-    // Normalize plan names (API returns 'professional', code uses 'pro')
-    const normalizedPlan = userPlan.toLowerCase() === 'professional' ? 'pro' : userPlan.toLowerCase();
+
+    // Normalize plan names - handle various API formats
+    // API may return: 'professional', 'Professional', 'PROFESSIONAL', 'pro', 'PRO', etc.
+    let normalizedPlan = userPlan?.toLowerCase()?.trim() || 'starter';
+    if (normalizedPlan === 'professional') normalizedPlan = 'pro';
+
+    // If plan is not recognized, default to 'pro' (any logged-in paying user)
+    // This ensures Jordan, Don, and Pam are active for all paying users
     const userPlanIndex = planHierarchy.indexOf(normalizedPlan);
+    const effectivePlanIndex = userPlanIndex >= 0 ? userPlanIndex : 1; // Default to 'pro' level if unknown
 
     const available = EXECUTIVES.map(exec => {
       if (exec.status === 'coming_soon') {
@@ -154,7 +161,7 @@ export function PEPProvider({ children }: { children: ReactNode }) {
       }
 
       const requiredPlanIndex = planHierarchy.indexOf(exec.requiredPlan || 'starter');
-      const hasAccess = userPlanIndex >= requiredPlanIndex;
+      const hasAccess = effectivePlanIndex >= requiredPlanIndex;
 
       return {
         ...exec,

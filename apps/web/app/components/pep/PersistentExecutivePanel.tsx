@@ -137,17 +137,21 @@ export default function PersistentExecutivePanel() {
         content: m.content,
       }));
 
+      // Get tenantId fresh at request time (may have loaded after component mount)
+      const activeTenant = getActiveTenant();
+      const currentTenantId = activeTenant?.id || tenantId;
+
       const response = await fetch(execInfo.apiRoute, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-          ...(tenantId && { 'x-tenant-id': tenantId }),
+          ...(currentTenantId && { 'x-tenant-id': currentTenantId }),
         },
         body: JSON.stringify({
           message: userMessage.content,
           conversationHistory,
-          tenantId,
+          tenantId: currentTenantId,
         }),
       });
 
