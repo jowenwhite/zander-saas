@@ -3,13 +3,12 @@ import { SupportTicketsController } from './support-tickets.controller';
 import { SupportTicketsService } from './support-tickets.service';
 import { TicketNotificationService } from './ticket-notification.service';
 import { TicketSLAService } from './ticket-sla.service';
-import { PrismaService } from '../prisma.service';
 import { EmailModule } from '../integrations/email/email.module';
 
 @Module({
   imports: [EmailModule],
   controllers: [SupportTicketsController],
-  providers: [SupportTicketsService, TicketNotificationService, TicketSLAService, PrismaService],
+  providers: [SupportTicketsService, TicketNotificationService, TicketSLAService],
   exports: [SupportTicketsService, TicketSLAService],
 })
 export class SupportTicketsModule {}

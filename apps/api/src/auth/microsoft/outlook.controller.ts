@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Query, Body, Request, Logger, UseGuards } from '@nestjs/common';
 import { OutlookService } from './outlook.service';
 import { MicrosoftAuthService } from './microsoft-auth.service';
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 
 @Controller('outlook')

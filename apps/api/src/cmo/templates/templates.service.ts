@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { generateEmailHtml } from './html-generator';
 import { prebuiltTemplates, PrebuiltTemplate } from './prebuilt-templates';
 

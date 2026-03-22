@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../integrations/email/email.service';
 import { getOwnershipFilter } from '../common/utils/ownership-filter.util';
 

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { S3Service } from '../../common/s3/s3.service';
 import { StorageService, StorageInfo } from '../../common/storage/storage.service';
 

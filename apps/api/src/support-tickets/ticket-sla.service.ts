@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { HeadwindPriority, TicketStatus } from '@prisma/client';
 
 export type SLAStatus = 'on_track' | 'at_risk' | 'breached';

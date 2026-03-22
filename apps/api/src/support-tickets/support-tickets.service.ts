@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { TicketNotificationService } from './ticket-notification.service';
 import { TicketSLAService, SLAInfo } from './ticket-sla.service';
 import { TicketSource, TicketCategory, TicketStatus, HeadwindPriority } from '@prisma/client';

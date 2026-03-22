@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 export type RecommendationType = 'insight' | 'action' | 'warning';
 export type Priority = 'high' | 'medium' | 'low';

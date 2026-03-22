@@ -1,6 +1,6 @@
 // MEDIUM-4: Audit logging service for forensics and compliance
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 export enum AuditAction {
   CREATE = 'CREATE',

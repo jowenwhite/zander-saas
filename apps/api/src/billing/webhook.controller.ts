@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Public } from '../auth/jwt-auth.decorator';
 
 @Controller('webhooks')

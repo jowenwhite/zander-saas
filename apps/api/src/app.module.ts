@@ -7,7 +7,7 @@ import { ThrottleExceptionFilter } from './common/filters/throttle-exception.fil
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from './prisma.service';
+import { PrismaModule } from './prisma/prisma.module';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { TwoFactorService } from './auth/two-factor.service';
@@ -57,6 +57,7 @@ import { TasksModule } from './tasks/tasks.module';
       ttl: 60000,  // 60 seconds
       limit: 60,   // 60 requests per minute (global default - generous for authenticated users)
     }]),
+    PrismaModule,  // Global database connection - singleton for all modules
     S3Module,
     StorageModule,
     ContactsModule,
@@ -92,7 +93,6 @@ import { TasksModule } from './tasks/tasks.module';
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [
     AppService,
-    PrismaService,
     AuthService,
     TwoFactorService,
     {
