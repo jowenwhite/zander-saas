@@ -179,6 +179,34 @@ export default function EAPage() {
     }
   }, [activeTab]);
 
+  // Listen for PEP tool executions to refresh data
+  useEffect(() => {
+    const handlePEPToolExecuted = (event: CustomEvent) => {
+      const { executive, tools } = event.detail;
+      if (executive !== 'pam') return;
+
+      const taskTools = ['create_task', 'update_task_status', 'get_open_tasks'];
+      const calendarTools = ['book_meeting', 'get_calendar_events', 'create_calendar_event'];
+      const emailTools = ['send_email', 'get_emails'];
+
+      if (tools.some((t: { tool: string }) => taskTools.includes(t.tool))) {
+        fetchTasks();
+      }
+      if (tools.some((t: { tool: string }) => calendarTools.includes(t.tool))) {
+        fetchEvents();
+        fetchContacts();
+      }
+      if (tools.some((t: { tool: string }) => emailTools.includes(t.tool))) {
+        fetchEmails();
+      }
+    };
+
+    window.addEventListener('pep:tool-executed', handlePEPToolExecuted as EventListener);
+    return () => {
+      window.removeEventListener('pep:tool-executed', handlePEPToolExecuted as EventListener);
+    };
+  }, []);
+
   const fetchTasks = async () => {
     setLoadingTasks(true);
     try {

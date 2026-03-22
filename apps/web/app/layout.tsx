@@ -3,7 +3,7 @@ import { Inter, Sora } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './components/ThemeProvider'
 import { PostHogProvider } from './components/PostHogProvider'
-import AITeamButton from './components/AITeamButton'
+import { PEPProvider, PersistentExecutivePanel } from './components/pep'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,8 +31,10 @@ export default function RootLayout({
       <body className={`${inter.variable} ${sora.variable} font-sans`}>
         <PostHogProvider>
           <ThemeProvider>
-            {children}
-            <AITeamButton />
+            <PEPProvider>
+              {children}
+              <PersistentExecutivePanel />
+            </PEPProvider>
           </ThemeProvider>
         </PostHogProvider>
       </body>
