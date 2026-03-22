@@ -771,6 +771,7 @@ async function executeTool(
   };
 
   console.log(`[Zander Tool] Executing ${toolName} with input:`, JSON.stringify(toolInput, null, 2));
+  console.log(`[Zander Tool] Auth token present: ${!!authToken}, length: ${authToken?.length || 0}`);
 
   try {
     switch (toolName) {
@@ -786,7 +787,9 @@ async function executeTool(
         const response = await fetch(url, { headers });
 
         if (!response.ok) {
-          return { success: false, error: `Failed to fetch tickets (${response.status})` };
+          const errorBody = await response.text();
+          console.error(`[Zander Tool] API error ${response.status}:`, errorBody);
+          return { success: false, error: `Failed to fetch tickets (${response.status}): ${errorBody}` };
         }
         const tickets = await response.json();
         return {

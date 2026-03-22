@@ -147,13 +147,15 @@ export function PEPProvider({ children }: { children: ReactNode }) {
 
     // Normalize plan names - handle various API formats
     // API may return: 'professional', 'Professional', 'PROFESSIONAL', 'pro', 'PRO', etc.
-    let normalizedPlan = userPlan?.toLowerCase()?.trim() || 'starter';
+    let normalizedPlan = userPlan?.toLowerCase()?.trim() || '';
     if (normalizedPlan === 'professional') normalizedPlan = 'pro';
 
-    // If plan is not recognized, default to 'pro' (any logged-in paying user)
-    // This ensures Jordan, Don, and Pam are active for all paying users
+    // Any logged-in user gets at least 'pro' access (Jordan, Don, Pam all active)
+    // Only gate higher tiers (business, enterprise) for actual plan checks
     const userPlanIndex = planHierarchy.indexOf(normalizedPlan);
-    const effectivePlanIndex = userPlanIndex >= 0 ? userPlanIndex : 1; // Default to 'pro' level if unknown
+    // Default to 'pro' (index 1) if plan is unknown, empty, or 'starter'
+    // This ensures all core executives are accessible to any logged-in user
+    const effectivePlanIndex = userPlanIndex >= 1 ? userPlanIndex : 1;
 
     const available = EXECUTIVES.map(exec => {
       if (exec.status === 'coming_soon') {
