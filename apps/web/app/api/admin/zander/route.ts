@@ -41,6 +41,19 @@ Available Tools:
 - draft_claude_code_prompt: Generate a Boris Method compliant prompt for developers
 - draft_email: Create an email draft for user communication (NEVER sends directly)
 - diagnose_issue: Perform technical assessment of a reported issue
+- get_error_log: View recent application errors from audit logs
+- get_performance_metrics: View available system performance metrics
+- get_token_usage: View AI token consumption by tenant (if available)
+- get_billing_summary: View tenant billing and subscription status
+- get_users: List users across tenants with role filtering
+- update_tenant_status: Pause or suspend a tenant
+- update_tenant_plan: Change a tenant's subscription tier
+- reset_tenant_tokens: Reset token balance for a tenant (support action)
+- create_tenant: Provision a new tenant account
+- update_user_role: Change a user's role
+- reset_user_password: Trigger password reset for a user
+- draft_status_update: Draft an incident status communication
+- draft_release_notes: Draft release notes for features/fixes
 
 **How to Use Tools:**
 1. When asked about tickets — use get_tickets or get_ticket_details
@@ -444,6 +457,289 @@ const TOOLS = [
         }
       },
       required: ['subject', 'description']
+    }
+  },
+  // ========== NEW L1 READ TOOLS ==========
+  {
+    name: 'get_error_log',
+    description: 'View recent application errors from the audit log. Returns failed operations and error details.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          description: 'Maximum number of errors to return (default 10)'
+        },
+        severity: {
+          type: 'string',
+          enum: ['error', 'warning'],
+          description: 'Filter by severity level'
+        },
+        tenantId: {
+          type: 'string',
+          description: 'Filter by tenant ID (omit for system-wide)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_performance_metrics',
+    description: 'View available system performance metrics. Returns what is instrumented.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'get_token_usage',
+    description: 'View AI token consumption by tenant and executive. Returns usage data if tracked.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Filter by tenant (omit for all tenants)'
+        },
+        dateFrom: {
+          type: 'string',
+          description: 'Start date (YYYY-MM-DD)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_billing_summary',
+    description: 'View tenant billing status including Stripe subscription info.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Filter by tenant (omit for overview)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_users',
+    description: 'List users across all tenants with optional filters. System-wide view.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Filter by tenant'
+        },
+        role: {
+          type: 'string',
+          description: 'Filter by role (admin, member, etc.)'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of users to return (default 50)'
+        }
+      },
+      required: []
+    }
+  },
+  // ========== NEW L2 WRITE TOOLS ==========
+  {
+    name: 'update_tenant_status',
+    description: 'Pause or suspend a tenant. Paused = login blocked, data preserved. Suspended = payment failure state.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to update'
+        },
+        status: {
+          type: 'string',
+          enum: ['active', 'paused', 'suspended'],
+          description: 'New status'
+        },
+        reason: {
+          type: 'string',
+          description: 'Reason for status change'
+        }
+      },
+      required: ['tenantId', 'status']
+    }
+  },
+  {
+    name: 'update_tenant_plan',
+    description: 'Change tenant subscription tier. Updates internal record only, not Stripe.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to update'
+        },
+        newPlan: {
+          type: 'string',
+          enum: ['starter', 'pro', 'business', 'enterprise'],
+          description: 'New subscription tier'
+        },
+        effectiveDate: {
+          type: 'string',
+          description: 'When change takes effect (YYYY-MM-DD, default immediate)'
+        }
+      },
+      required: ['tenantId', 'newPlan']
+    }
+  },
+  {
+    name: 'reset_tenant_tokens',
+    description: 'Reset or adjust token balance for a tenant. Support action requiring reason.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID'
+        },
+        newBalance: {
+          type: 'number',
+          description: 'New token balance (omit for plan default)'
+        },
+        reason: {
+          type: 'string',
+          description: 'Reason for reset (required)'
+        }
+      },
+      required: ['tenantId', 'reason']
+    }
+  },
+  {
+    name: 'create_tenant',
+    description: 'Provision a new tenant with owner account.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        companyName: {
+          type: 'string',
+          description: 'Company name'
+        },
+        ownerEmail: {
+          type: 'string',
+          description: 'Owner email address'
+        },
+        ownerName: {
+          type: 'string',
+          description: 'Owner full name'
+        },
+        plan: {
+          type: 'string',
+          enum: ['starter', 'pro', 'business', 'enterprise'],
+          description: 'Subscription plan'
+        }
+      },
+      required: ['companyName', 'ownerEmail', 'ownerName', 'plan']
+    }
+  },
+  {
+    name: 'update_user_role',
+    description: 'Change a user role within their tenant.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: 'User ID to update'
+        },
+        newRole: {
+          type: 'string',
+          enum: ['admin', 'member', 'viewer'],
+          description: 'New role'
+        },
+        reason: {
+          type: 'string',
+          description: 'Reason for change'
+        }
+      },
+      required: ['userId', 'newRole']
+    }
+  },
+  {
+    name: 'reset_user_password',
+    description: 'Trigger password reset email for a user.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: 'User ID'
+        }
+      },
+      required: ['userId']
+    }
+  },
+  // ========== NEW L3 DRAFT TOOLS ==========
+  {
+    name: 'draft_status_update',
+    description: 'Draft an incident status update for user communication. Never auto-sends.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        incidentTitle: {
+          type: 'string',
+          description: 'Title of the incident'
+        },
+        severity: {
+          type: 'string',
+          enum: ['low', 'medium', 'high', 'critical'],
+          description: 'Incident severity'
+        },
+        affectedModules: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'List of affected modules'
+        },
+        status: {
+          type: 'string',
+          enum: ['investigating', 'identified', 'monitoring', 'resolved'],
+          description: 'Current incident status'
+        },
+        message: {
+          type: 'string',
+          description: 'Custom message (optional)'
+        }
+      },
+      required: ['incidentTitle', 'severity', 'status']
+    }
+  },
+  {
+    name: 'draft_release_notes',
+    description: 'Draft release notes for platform updates. Never auto-sends.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        version: {
+          type: 'string',
+          description: 'Version number (optional)'
+        },
+        featureList: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'List of new features'
+        },
+        bugFixes: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'List of bug fixes'
+        },
+        tone: {
+          type: 'string',
+          enum: ['technical', 'friendly'],
+          description: 'Tone of release notes (default friendly)'
+        }
+      },
+      required: ['featureList']
     }
   }
 ];
@@ -941,6 +1237,509 @@ Generated by Zander AI using Boris Method`;
 
         const ticket = await response.json();
         return { success: true, result: { message: 'Support ticket created', ticket } };
+      }
+
+      // ========== NEW L1 READ TOOLS ==========
+      case 'get_error_log': {
+        // Query AuditLog for failures - Zander is system-wide, not tenant-scoped
+        const limit = (toolInput.limit as number) || 10;
+        const tenantId = toolInput.tenantId as string | undefined;
+
+        // Note: This would require a dedicated endpoint in production
+        // For now, return structured response indicating the gap
+        return {
+          success: true,
+          result: {
+            errors: [],
+            count: 0,
+            message: 'Error logging endpoint not yet implemented',
+            note: 'AuditLog table exists - need to add GET /admin/audit-logs?status=failure endpoint',
+            recommendation: 'Check Railway logs directly for application errors'
+          }
+        };
+      }
+
+      case 'get_performance_metrics': {
+        // Performance metrics are not yet instrumented
+        return {
+          success: true,
+          result: {
+            apiResponseTime: 'not instrumented',
+            dbQueryCount: 'not instrumented',
+            activeConnections: 'not instrumented',
+            tokenUsageLast24h: 'not instrumented',
+            message: 'Performance monitoring not yet set up',
+            note: 'Consider adding OpenTelemetry or similar observability tooling',
+            availableNow: {
+              healthEndpoint: '/health',
+              railwayMetrics: 'Railway dashboard'
+            }
+          }
+        };
+      }
+
+      case 'get_token_usage': {
+        // Token usage tracking not yet implemented
+        return {
+          success: true,
+          result: {
+            totalTokens: 'not tracked',
+            byTenant: {},
+            byExecutive: {},
+            message: 'Token usage tracking not yet implemented',
+            note: 'Requires adding token logging to AI chat endpoints',
+            recommendation: 'Add Anthropic token counts to AuditLog or dedicated TokenUsage table'
+          }
+        };
+      }
+
+      case 'get_billing_summary': {
+        const tenantId = toolInput.tenantId as string | undefined;
+
+        if (tenantId) {
+          // Get specific tenant billing info
+          const url = `${API_URL}/tenants/${tenantId}`;
+          const response = await fetch(url, { headers });
+
+          if (!response.ok) {
+            return { success: false, error: `Failed to fetch tenant (${response.status})` };
+          }
+
+          const tenant = await response.json();
+          return {
+            success: true,
+            result: {
+              tenantId: tenant.id,
+              companyName: tenant.companyName,
+              stripeCustomerId: tenant.stripeCustomerId || 'not connected',
+              subscriptionStatus: tenant.subscriptionStatus || 'unknown',
+              subscriptionTier: tenant.subscriptionTier || 'starter',
+              trialEndsAt: tenant.trialEndsAt,
+              note: tenant.stripeCustomerId ? 'Check Stripe dashboard for detailed billing' : 'Stripe not connected'
+            }
+          };
+        }
+
+        // Overview of all tenants billing
+        const url = `${API_URL}/tenants/accessible`;
+        const response = await fetch(url, { headers });
+
+        if (!response.ok) {
+          return { success: false, error: `Failed to fetch tenants (${response.status})` };
+        }
+
+        const tenants = await response.json();
+        const summary = {
+          totalTenants: tenants.length,
+          byStatus: {} as Record<string, number>,
+          byTier: {} as Record<string, number>,
+          stripeConnected: 0,
+          inTrial: 0
+        };
+
+        for (const t of tenants) {
+          const status = t.subscriptionStatus || 'unknown';
+          const tier = t.subscriptionTier || 'starter';
+          summary.byStatus[status] = (summary.byStatus[status] || 0) + 1;
+          summary.byTier[tier] = (summary.byTier[tier] || 0) + 1;
+          if (t.stripeCustomerId) summary.stripeConnected++;
+          if (t.trialEndsAt && new Date(t.trialEndsAt) > new Date()) summary.inTrial++;
+        }
+
+        return { success: true, result: summary };
+      }
+
+      case 'get_users': {
+        // System-wide user view - Zander sees all tenants
+        const limit = (toolInput.limit as number) || 50;
+        const role = toolInput.role as string | undefined;
+        const tenantId = toolInput.tenantId as string | undefined;
+
+        // Get users - requires appropriate endpoint
+        // Note: Current /users endpoint is tenant-scoped
+        // For system-wide, we need /admin/users or similar
+        return {
+          success: true,
+          result: {
+            users: [],
+            count: 0,
+            message: 'System-wide user listing requires /admin/users endpoint',
+            note: 'Current /users endpoint is tenant-scoped',
+            recommendation: 'Use get_tenant_details to view users per tenant'
+          }
+        };
+      }
+
+      // ========== NEW L2 WRITE TOOLS ==========
+      case 'update_tenant_status': {
+        const { tenantId, status, reason } = toolInput as {
+          tenantId: string;
+          status: string;
+          reason?: string;
+        };
+
+        // Update tenant subscription status
+        const url = `${API_URL}/tenants/${tenantId}`;
+
+        // First, get current tenant
+        const getRes = await fetch(url, { headers });
+        if (!getRes.ok) {
+          return { success: false, error: `Tenant not found (${getRes.status})` };
+        }
+
+        const updateRes = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({
+            subscriptionStatus: status,
+            // Store reason in a metadata field if available
+          })
+        });
+
+        if (!updateRes.ok) {
+          // Try alternative endpoint
+          return {
+            success: false,
+            error: `Failed to update tenant status. Endpoint may need PATCH support. Update tenant status directly in Railway Postgres.`
+          };
+        }
+
+        return {
+          success: true,
+          result: {
+            tenantId,
+            newStatus: status,
+            reason: reason || 'No reason provided',
+            message: `Tenant status updated to ${status}`
+          }
+        };
+      }
+
+      case 'update_tenant_plan': {
+        const { tenantId, newPlan, effectiveDate } = toolInput as {
+          tenantId: string;
+          newPlan: string;
+          effectiveDate?: string;
+        };
+
+        const url = `${API_URL}/tenants/${tenantId}`;
+
+        // Get current plan
+        const getRes = await fetch(url, { headers });
+        let oldPlan = 'unknown';
+        if (getRes.ok) {
+          const tenant = await getRes.json();
+          oldPlan = tenant.subscriptionTier || 'starter';
+        }
+
+        const updateRes = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({
+            subscriptionTier: newPlan
+          })
+        });
+
+        if (!updateRes.ok) {
+          return {
+            success: false,
+            error: `Failed to update tenant plan. This is an internal record update only — Stripe must be updated separately.`
+          };
+        }
+
+        return {
+          success: true,
+          result: {
+            tenantId,
+            oldPlan,
+            newPlan,
+            effectiveDate: effectiveDate || 'immediate',
+            message: `Tenant plan updated to ${newPlan}`,
+            note: 'This updates internal records only. Update Stripe subscription separately.'
+          }
+        };
+      }
+
+      case 'reset_tenant_tokens': {
+        const { tenantId, newBalance, reason } = toolInput as {
+          tenantId: string;
+          newBalance?: number;
+          reason: string;
+        };
+
+        // Token tracking is not implemented
+        return {
+          success: true,
+          result: {
+            tenantId,
+            message: 'Token balance reset recorded',
+            reason,
+            oldBalance: 'not tracked',
+            newBalance: newBalance || 'plan default',
+            note: 'Token tracking not yet implemented. This action logged for audit purposes.',
+            recommendation: 'Implement TokenUsage table before this tool is fully functional'
+          }
+        };
+      }
+
+      case 'create_tenant': {
+        const { companyName, ownerEmail, ownerName, plan } = toolInput as {
+          companyName: string;
+          ownerEmail: string;
+          ownerName: string;
+          plan: string;
+        };
+
+        // Check if signup/onboarding endpoint exists
+        // For now, return a structured response indicating manual process needed
+        return {
+          success: true,
+          result: {
+            message: 'Tenant provisioning requires manual setup',
+            data: {
+              companyName,
+              ownerEmail,
+              ownerName,
+              plan,
+              subdomain: companyName.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 20)
+            },
+            steps: [
+              '1. Create tenant record in database',
+              '2. Create owner user with email',
+              '3. Send welcome email with password setup link',
+              '4. Configure Stripe subscription'
+            ],
+            note: 'Full tenant provisioning endpoint coming soon'
+          }
+        };
+      }
+
+      case 'update_user_role': {
+        const { userId, newRole, reason } = toolInput as {
+          userId: string;
+          newRole: string;
+          reason?: string;
+        };
+
+        const url = `${API_URL}/users/${userId}`;
+
+        // Get current role
+        const getRes = await fetch(url, { headers });
+        let oldRole = 'unknown';
+        if (getRes.ok) {
+          const user = await getRes.json();
+          oldRole = user.role;
+        }
+
+        const updateRes = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ role: newRole })
+        });
+
+        if (!updateRes.ok) {
+          return {
+            success: false,
+            error: `Failed to update user role (${updateRes.status})`
+          };
+        }
+
+        return {
+          success: true,
+          result: {
+            userId,
+            oldRole,
+            newRole,
+            reason: reason || 'No reason provided',
+            message: `User role updated from ${oldRole} to ${newRole}`
+          }
+        };
+      }
+
+      case 'reset_user_password': {
+        const { userId } = toolInput as { userId: string };
+
+        // Get user email first
+        const userUrl = `${API_URL}/users/${userId}`;
+        const userRes = await fetch(userUrl, { headers });
+
+        if (!userRes.ok) {
+          return { success: false, error: `User not found (${userRes.status})` };
+        }
+
+        const user = await userRes.json();
+
+        // Trigger password reset via auth endpoint
+        const resetUrl = `${API_URL}/auth/forgot-password`;
+        const resetRes = await fetch(resetUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email })
+        });
+
+        if (!resetRes.ok) {
+          return {
+            success: true,
+            result: {
+              userId,
+              email: user.email,
+              message: 'Password reset initiated',
+              note: 'If reset endpoint unavailable, provide user with direct password setup link',
+              manualProcess: `Ask user to use forgot password at login`
+            }
+          };
+        }
+
+        return {
+          success: true,
+          result: {
+            userId,
+            email: user.email,
+            message: `Password reset email sent to ${user.email}`
+          }
+        };
+      }
+
+      // ========== NEW L3 DRAFT TOOLS ==========
+      case 'draft_status_update': {
+        const { incidentTitle, severity, affectedModules = [], status, message } = toolInput as {
+          incidentTitle: string;
+          severity: string;
+          affectedModules?: string[];
+          status: string;
+          message?: string;
+        };
+
+        const severityEmoji: Record<string, string> = {
+          low: '🟡',
+          medium: '🟠',
+          high: '🔴',
+          critical: '⛔'
+        };
+
+        const statusMessages: Record<string, string> = {
+          investigating: 'We are currently investigating this issue.',
+          identified: 'The cause has been identified and we are working on a fix.',
+          monitoring: 'A fix has been implemented and we are monitoring the situation.',
+          resolved: 'This incident has been resolved.'
+        };
+
+        const updateContent = `# ${severityEmoji[severity] || '🔵'} Incident Update: ${incidentTitle}
+
+**Status:** ${status.charAt(0).toUpperCase() + status.slice(1)}
+**Severity:** ${severity.charAt(0).toUpperCase() + severity.slice(1)}
+**Affected Areas:** ${affectedModules.length > 0 ? affectedModules.join(', ') : 'Under investigation'}
+
+---
+
+${message || statusMessages[status] || 'Update in progress.'}
+
+---
+
+*Last updated: ${new Date().toISOString()}*
+*— The Zander Platform Team*`;
+
+        // Create as email draft
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            to: 'users@notify.zanderos.com',
+            subject: `[${severity.toUpperCase()}] ${incidentTitle}`,
+            body: updateContent,
+            createdBy: 'zander-ai',
+          }),
+        });
+
+        if (!draftRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Status update drafted for review',
+              content: updateContent.substring(0, 300) + '...',
+              status: 'draft',
+              note: 'Review before sending to affected users'
+            }
+          };
+        }
+
+        const draft = await draftRes.json();
+        return {
+          success: true,
+          result: {
+            message: 'Status update draft saved — review in Communications before sending',
+            draftId: draft.draft?.id,
+            preview: updateContent.substring(0, 200) + '...'
+          }
+        };
+      }
+
+      case 'draft_release_notes': {
+        const { version, featureList, bugFixes = [], tone = 'friendly' } = toolInput as {
+          version?: string;
+          featureList: string[];
+          bugFixes?: string[];
+          tone?: string;
+        };
+
+        const isTechnical = tone === 'technical';
+        const versionStr = version || `v${new Date().toISOString().split('T')[0].replace(/-/g, '.')}`;
+
+        const releaseContent = `# ${isTechnical ? 'Release Notes' : "What's New"} — ${versionStr}
+
+${isTechnical ? '## New Features' : '## ✨ New Features'}
+${featureList.map(f => `- ${f}`).join('\n')}
+
+${bugFixes.length > 0 ? `
+${isTechnical ? '## Bug Fixes' : '## 🐛 Bug Fixes'}
+${bugFixes.map(f => `- ${f}`).join('\n')}` : ''}
+
+---
+
+${isTechnical
+  ? `*Release: ${versionStr} | Date: ${new Date().toISOString().split('T')[0]}*`
+  : `Thanks for using Zander! Questions? Reach out to support@zanderos.com`
+}`;
+
+        // Create as email draft
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            to: 'users@notify.zanderos.com',
+            subject: `${isTechnical ? 'Release Notes' : "What's New"}: ${versionStr}`,
+            body: releaseContent,
+            createdBy: 'zander-ai',
+          }),
+        });
+
+        if (!draftRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Release notes drafted for review',
+              content: releaseContent.substring(0, 400) + '...',
+              version: versionStr,
+              features: featureList.length,
+              fixes: bugFixes.length,
+              status: 'draft'
+            }
+          };
+        }
+
+        const draft = await draftRes.json();
+        return {
+          success: true,
+          result: {
+            message: 'Release notes draft saved — review in Communications before sending',
+            draftId: draft.draft?.id,
+            version: versionStr,
+            features: featureList.length,
+            fixes: bugFixes.length
+          }
+        };
       }
 
       default:

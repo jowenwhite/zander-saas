@@ -24,6 +24,17 @@ Available Tools:
 - create_funnel: Create marketing funnels
 - update_brand_settings: Update brand voice, colors, or guidelines
 - create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
+- get_marketing_plan: View the current marketing plan
+- get_campaigns: List marketing campaigns with optional filters
+- get_personas: List all saved customer personas
+- get_workflows: List marketing automation workflows
+- get_funnels: List marketing funnels
+- get_analytics_summary: Get marketing performance metrics
+- get_brand_settings: View current brand settings
+- create_campaign: Create a new marketing campaign
+- update_campaign: Update an existing campaign
+- draft_campaign_brief: Draft a campaign brief document
+- draft_ad_copy: Generate ad copy variants as a draft
 
 **How to Use Tools:**
 1. When asked to create something, use the appropriate tool immediately
@@ -289,6 +300,228 @@ const TOOLS = [
         }
       },
       required: ['title', 'description']
+    }
+  },
+  // ========== L1 READ TOOLS ==========
+  {
+    name: 'get_marketing_plan',
+    description: 'Get the current marketing plan for the tenant including mission, vision, strategy, goals, and SWOT analysis.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'get_campaigns',
+    description: 'List marketing campaigns with optional filters. Use this to see active campaigns or find specific ones.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['draft', 'active', 'paused', 'completed'],
+          description: 'Filter by campaign status'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of campaigns to return (default 20)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_personas',
+    description: 'List all saved customer personas with their demographics, pain points, and goals.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'get_workflows',
+    description: 'List marketing automation workflows with optional status filter.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['draft', 'active', 'paused'],
+          description: 'Filter by workflow status'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_funnels',
+    description: 'List all marketing funnels with their stages and conversion metrics.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'get_analytics_summary',
+    description: 'Get aggregate marketing metrics and performance data. Returns available metrics or zeros if no data yet.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        dateFrom: {
+          type: 'string',
+          description: 'Start date (YYYY-MM-DD)'
+        },
+        dateTo: {
+          type: 'string',
+          description: 'End date (YYYY-MM-DD)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_brand_settings',
+    description: 'Get current brand settings including colors, fonts, logo, voice/tone guidelines, and tagline.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  // ========== L2 WRITE TOOLS ==========
+  {
+    name: 'create_campaign',
+    description: 'Create a new marketing campaign. Use this when launching a new marketing initiative.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Campaign name'
+        },
+        channel: {
+          type: 'string',
+          enum: ['email', 'social', 'paid', 'content', 'events', 'other'],
+          description: 'Primary marketing channel'
+        },
+        budget: {
+          type: 'number',
+          description: 'Campaign budget in dollars'
+        },
+        startDate: {
+          type: 'string',
+          description: 'Start date (YYYY-MM-DD)'
+        },
+        endDate: {
+          type: 'string',
+          description: 'End date (YYYY-MM-DD)'
+        },
+        goal: {
+          type: 'string',
+          description: 'Campaign goal or objective'
+        },
+        targetPersonaId: {
+          type: 'string',
+          description: 'ID of target persona'
+        }
+      },
+      required: ['name', 'channel']
+    }
+  },
+  {
+    name: 'update_campaign',
+    description: 'Update an existing marketing campaign.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        campaignId: {
+          type: 'string',
+          description: 'ID of the campaign to update'
+        },
+        status: {
+          type: 'string',
+          enum: ['draft', 'active', 'paused', 'completed'],
+          description: 'New status'
+        },
+        budget: {
+          type: 'number',
+          description: 'Updated budget'
+        },
+        endDate: {
+          type: 'string',
+          description: 'Updated end date'
+        },
+        notes: {
+          type: 'string',
+          description: 'Additional notes'
+        }
+      },
+      required: ['campaignId']
+    }
+  },
+  // ========== L3 DRAFT TOOLS ==========
+  {
+    name: 'draft_campaign_brief',
+    description: 'Create a structured campaign brief document as a draft for review. Never auto-sends.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        campaignName: {
+          type: 'string',
+          description: 'Name of the campaign'
+        },
+        objective: {
+          type: 'string',
+          description: 'Campaign objective'
+        },
+        targetPersonaId: {
+          type: 'string',
+          description: 'Target persona ID (will fetch details)'
+        },
+        channel: {
+          type: 'string',
+          description: 'Primary channel'
+        },
+        budget: {
+          type: 'number',
+          description: 'Proposed budget'
+        }
+      },
+      required: ['campaignName', 'objective']
+    }
+  },
+  {
+    name: 'draft_ad_copy',
+    description: 'Generate multiple ad copy variants as a draft document for review. Never auto-posts.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        campaignId: {
+          type: 'string',
+          description: 'Associated campaign ID'
+        },
+        targetPersonaId: {
+          type: 'string',
+          description: 'Target persona ID'
+        },
+        productDescription: {
+          type: 'string',
+          description: 'Description of product/service being advertised'
+        },
+        tone: {
+          type: 'string',
+          enum: ['professional', 'casual', 'urgent', 'inspirational'],
+          description: 'Desired tone of the ad copy'
+        },
+        numVariants: {
+          type: 'number',
+          description: 'Number of variants to generate (default 3, max 5)'
+        }
+      },
+      required: ['productDescription']
     }
   }
 ];
@@ -591,6 +824,470 @@ async function executeTool(
         } catch {
           return { success: true, result: { message: 'Support ticket created' } };
         }
+      }
+
+      // ========== L1 READ TOOLS ==========
+      case 'get_marketing_plan': {
+        const url = `${CMO_API_URL}/cmo/marketing-plan`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get marketing plan (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: false, error: 'Failed to parse marketing plan data' };
+        }
+      }
+
+      case 'get_campaigns': {
+        const params = new URLSearchParams();
+        if (toolInput.status) params.append('status', toolInput.status as string);
+        const limit = (toolInput.limit as number) || 20;
+
+        const url = `${CMO_API_URL}/campaigns${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get campaigns (${response.status}): ${responseText}` };
+        }
+        try {
+          const campaigns = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: campaigns.length,
+              campaigns: campaigns.slice(0, limit).map((c: Record<string, unknown>) => ({
+                id: c.id,
+                name: c.name,
+                status: c.status,
+                channels: c.channels,
+                budget: c.budget,
+                startDate: c.startDate,
+                endDate: c.endDate,
+                goal: c.goal
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse campaigns data' };
+        }
+      }
+
+      case 'get_personas': {
+        const url = `${CMO_API_URL}/cmo/personas`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get personas (${response.status}): ${responseText}` };
+        }
+        try {
+          const personas = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: personas.length,
+              personas: personas.map((p: Record<string, unknown>) => ({
+                id: p.id,
+                name: p.name,
+                tagline: p.tagline,
+                demographics: p.demographics,
+                painPoints: p.painPoints,
+                goals: p.goals,
+                preferredChannels: p.preferredChannels
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse personas data' };
+        }
+      }
+
+      case 'get_workflows': {
+        const params = new URLSearchParams();
+        if (toolInput.status) params.append('status', toolInput.status as string);
+
+        const url = `${CMO_API_URL}/cmo/workflows${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get workflows (${response.status}): ${responseText}` };
+        }
+        try {
+          const workflows = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: workflows.length,
+              workflows: workflows.map((w: Record<string, unknown>) => ({
+                id: w.id,
+                name: w.name,
+                status: w.status,
+                triggerType: w.triggerType,
+                entryCount: w.entryCount,
+                completionCount: w.completionCount,
+                createdAt: w.createdAt
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse workflows data' };
+        }
+      }
+
+      case 'get_funnels': {
+        const url = `${CMO_API_URL}/cmo/funnels`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get funnels (${response.status}): ${responseText}` };
+        }
+        try {
+          const funnels = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: funnels.length,
+              funnels: funnels.map((f: Record<string, unknown>) => ({
+                id: f.id,
+                name: f.name,
+                status: f.status,
+                conversionGoal: f.conversionGoal,
+                totalVisits: f.totalVisits,
+                totalConversions: f.totalConversions,
+                stages: f.stages
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse funnels data' };
+        }
+      }
+
+      case 'get_analytics_summary': {
+        // Try dashboard metrics first, fall back to structured empty response
+        const url = `${CMO_API_URL}/cmo/dashboard/metrics`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+
+        if (!response.ok) {
+          // Return structured empty response
+          return {
+            success: true,
+            result: {
+              impressions: 0,
+              clicks: 0,
+              leads: 0,
+              conversions: 0,
+              costPerLead: 0,
+              message: 'No analytics data available yet. Start running campaigns to see metrics.',
+              note: 'Analytics tracking not yet instrumented'
+            }
+          };
+        }
+
+        try {
+          const metrics = JSON.parse(await response.text());
+          return { success: true, result: metrics };
+        } catch {
+          return {
+            success: true,
+            result: {
+              impressions: 0,
+              clicks: 0,
+              leads: 0,
+              conversions: 0,
+              costPerLead: 0,
+              message: 'Analytics data parsing issue. Please check dashboard directly.'
+            }
+          };
+        }
+      }
+
+      case 'get_brand_settings': {
+        const url = `${CMO_API_URL}/cmo/assets/brand`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get brand settings (${response.status}): ${responseText}` };
+        }
+        try {
+          const brand = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              primaryColor: brand.primaryColor,
+              secondaryColor: brand.secondaryColor,
+              accentColor: brand.accentColor,
+              fontPrimary: brand.fontPrimary,
+              fontSecondary: brand.fontSecondary,
+              logoUrl: brand.logoUrl,
+              voiceTone: brand.voiceTone,
+              voiceGuidelines: brand.voiceGuidelines,
+              tagline: brand.tagline,
+              mission: brand.mission
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse brand settings' };
+        }
+      }
+
+      // ========== L2 WRITE TOOLS ==========
+      case 'create_campaign': {
+        const url = `${CMO_API_URL}/campaigns`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        // Map channel to channels array format
+        const channelMap: Record<string, string[]> = {
+          email: ['email'],
+          social: ['social'],
+          paid: ['paid'],
+          content: ['content'],
+          events: ['events'],
+          other: ['other']
+        };
+
+        const campaignData = {
+          name: toolInput.name as string,
+          channels: channelMap[(toolInput.channel as string) || 'other'] || ['other'],
+          budget: (toolInput.budget as number) || null,
+          startDate: (toolInput.startDate as string) || null,
+          endDate: (toolInput.endDate as string) || null,
+          goal: (toolInput.goal as string) || null,
+          targetSegmentId: (toolInput.targetPersonaId as string) || null,
+          status: 'draft',
+        };
+
+        console.log(`[Don Tool] Campaign data:`, JSON.stringify(campaignData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(campaignData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create campaign (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Campaign created' } };
+        }
+      }
+
+      case 'update_campaign': {
+        const { campaignId, ...updateData } = toolInput as { campaignId: string; [key: string]: unknown };
+        const url = `${CMO_API_URL}/campaigns/${campaignId}`;
+        console.log(`[Don Tool] PATCH ${url}`);
+
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update campaign (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Campaign updated' } };
+        }
+      }
+
+      // ========== L3 DRAFT TOOLS ==========
+      case 'draft_campaign_brief': {
+        const { campaignName, objective, targetPersonaId, channel, budget } = toolInput as {
+          campaignName: string;
+          objective: string;
+          targetPersonaId?: string;
+          channel?: string;
+          budget?: number;
+        };
+
+        // Fetch persona details if provided
+        let personaInfo = '';
+        if (targetPersonaId) {
+          try {
+            const personaRes = await fetch(`${CMO_API_URL}/cmo/personas/${targetPersonaId}`, { headers });
+            if (personaRes.ok) {
+              const persona = await personaRes.json();
+              personaInfo = `\n\n**Target Persona: ${persona.name}**\n- Pain Points: ${(persona.painPoints || []).join(', ')}\n- Goals: ${(persona.goals || []).join(', ')}\n- Preferred Channels: ${(persona.preferredChannels || []).join(', ')}`;
+            }
+          } catch {
+            // Continue without persona info
+          }
+        }
+
+        const briefContent = `# Campaign Brief: ${campaignName}
+
+## Objective
+${objective}
+${personaInfo}
+
+## Channel
+${channel || 'To be determined'}
+
+## Budget
+${budget ? `$${budget.toLocaleString()}` : 'To be determined'}
+
+## Key Messages
+[To be developed]
+
+## Call to Action
+[To be developed]
+
+## Timeline
+[To be determined]
+
+## Success Metrics
+[To be defined]
+
+---
+*Draft generated by Don (CMO AI) - Review before finalizing*`;
+
+        // Create as email draft
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            to: 'internal@team.com',
+            subject: `Campaign Brief: ${campaignName}`,
+            body: briefContent,
+            createdBy: 'don-ai',
+          }),
+        });
+
+        if (!draftRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Campaign brief drafted for review',
+              brief: {
+                title: campaignName,
+                content: briefContent.substring(0, 500) + '...',
+                status: 'draft',
+                note: 'Review in Communications before sharing'
+              }
+            }
+          };
+        }
+
+        const draft = await draftRes.json();
+        return {
+          success: true,
+          result: {
+            message: 'Campaign brief saved as draft — review in Communications',
+            draftId: draft.draft?.id,
+            preview: briefContent.substring(0, 200) + '...'
+          }
+        };
+      }
+
+      case 'draft_ad_copy': {
+        const { campaignId, targetPersonaId, productDescription, tone = 'professional', numVariants = 3 } = toolInput as {
+          campaignId?: string;
+          targetPersonaId?: string;
+          productDescription: string;
+          tone?: string;
+          numVariants?: number;
+        };
+
+        const variantCount = Math.min(numVariants, 5);
+
+        // Generate ad copy variants based on tone
+        const toneStyles: Record<string, { style: string; cta: string }> = {
+          professional: { style: 'Clear, authoritative, and trustworthy', cta: 'Learn More' },
+          casual: { style: 'Friendly, conversational, and approachable', cta: 'Check It Out' },
+          urgent: { style: 'Time-sensitive with scarcity messaging', cta: 'Act Now' },
+          inspirational: { style: 'Aspirational and emotionally compelling', cta: 'Start Your Journey' }
+        };
+
+        const toneConfig = toneStyles[tone] || toneStyles.professional;
+
+        // Generate variant placeholders
+        const variants = [];
+        for (let i = 1; i <= variantCount; i++) {
+          variants.push(`
+### Variant ${i}
+**Headline:** [${toneConfig.style} headline for: ${productDescription.substring(0, 50)}...]
+**Body:** [${toneConfig.style} body copy highlighting key benefits]
+**CTA:** ${toneConfig.cta}
+`);
+        }
+
+        const adCopyContent = `# Ad Copy Variants
+
+**Product:** ${productDescription}
+**Tone:** ${tone}
+**Generated:** ${variantCount} variants
+
+---
+${variants.join('\n---')}
+
+---
+*Draft generated by Don (CMO AI) - Review and refine before use*
+*Note: Replace bracketed placeholders with actual copy*`;
+
+        // Create as email draft
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            to: 'internal@team.com',
+            subject: `Ad Copy Variants - ${productDescription.substring(0, 30)}...`,
+            body: adCopyContent,
+            createdBy: 'don-ai',
+          }),
+        });
+
+        if (!draftRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Ad copy variants drafted for review',
+              variantCount,
+              tone,
+              preview: adCopyContent.substring(0, 300) + '...',
+              status: 'draft',
+              note: 'Review in Communications before use'
+            }
+          };
+        }
+
+        const draft = await draftRes.json();
+        return {
+          success: true,
+          result: {
+            message: `Generated ${variantCount} ${tone} ad copy variants — review in Communications`,
+            draftId: draft.draft?.id,
+            variantCount,
+            tone
+          }
+        };
       }
 
       default:
