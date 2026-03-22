@@ -31,6 +31,18 @@ export function requireAuth(): boolean {
   return true;
 }
 
+// Get stored auth credentials (token, user, tenant)
+export function getStoredAuth(): { token: string | null; user: any | null; tenantId: string | null } {
+  const token = getToken();
+  const user = getUser();
+  const tenant = getActiveTenant();
+  return {
+    token,
+    user,
+    tenantId: tenant?.id || user?.tenantId || null,
+  };
+}
+
 // Tenant management
 export function getActiveTenant(): any | null {
   if (typeof window === 'undefined') return null;

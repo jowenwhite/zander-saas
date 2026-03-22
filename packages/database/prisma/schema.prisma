@@ -113,6 +113,8 @@ model Tenant {
   // EA Module relations
   tasks                   Task[]
   tokenUsage              TokenUsage[]
+  // Assembly Module relations
+  assemblies              Assembly[]
 
   @@map("tenants")
 }
@@ -1446,4 +1448,81 @@ model ErrorLog {
   @@index([level])
   @@index([createdAt])
   @@map("error_logs")
+}
+
+// ============================================
+// ASSEMBLY MODULE - MULTI-EXECUTIVE COLLABORATION
+// ============================================
+
+enum AssemblyType {
+  WEEKLY_ALL_HANDS
+  MONTHLY_BOARD_REPORT
+  QUARTERLY_REVIEW
+  PROJECT_KICKOFF
+  ANNUAL_STRATEGIC_PLAN
+}
+
+enum AssemblyCadence {
+  ONCE
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+}
+
+enum AssemblyStatus {
+  DRAFT
+  RUNNING
+  COMPLETE
+  ARCHIVED
+}
+
+enum SectionStatus {
+  PENDING
+  GENERATING
+  COMPLETE
+  FAILED
+}
+
+model Assembly {
+  id                 String          @id @default(cuid())
+  tenantId           String
+  name               String
+  type               AssemblyType
+  cadence            AssemblyCadence @default(ONCE)
+  status             AssemblyStatus  @default(DRAFT)
+  scheduledFor       DateTime?
+  completedAt        DateTime?
+  treasuryTemplateId String?
+  createdById        String
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  tenant   Tenant            @relation(fields: [tenantId], references: [id])
+  sections AssemblySection[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([type])
+  @@map("assemblies")
+}
+
+model AssemblySection {
+  id          String        @id @default(cuid())
+  assemblyId  String
+  executive   String        // "jordan" | "don" | "pam" | "ben" | "miranda" | "ted" | "jarvis"
+  title       String
+  prompt      String        @db.Text
+  content     String?       @db.Text
+  status      SectionStatus @default(PENDING)
+  order       Int
+  generatedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  assembly Assembly @relation(fields: [assemblyId], references: [id], onDelete: Cascade)
+
+  @@index([assemblyId])
+  @@index([status])
+  @@map("assembly_sections")
 }

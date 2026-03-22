@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
-import { logout } from '../utils/auth';
+import { AssemblyModal } from '../components/assembly';
+import { logout, getStoredAuth } from '../utils/auth';
 import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Building2, Swords, Wind, FileText, Trophy, BookOpen, Calendar, Target, Rocket, Star, Map, Sparkles, Check, Scale } from 'lucide-react';
 
 export default function HeadquartersPage() {
@@ -13,6 +14,14 @@ export default function HeadquartersPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [showAssemblyModal, setShowAssemblyModal] = useState(false);
+  const [authData, setAuthData] = useState<{ token: string | null; tenantId: string | null }>({ token: null, tenantId: null });
+
+  // Load auth data on mount
+  useEffect(() => {
+    const auth = getStoredAuth();
+    setAuthData({ token: auth.token, tenantId: auth.tenantId });
+  }, []);
 
   // ============ ICON MAPPING ============
   const iconMap: Record<string, React.ReactNode> = {
@@ -766,9 +775,13 @@ export default function HeadquartersPage() {
 
   // Reset tab when modal changes
   const handleModalOpen = (modalId: string) => {
+    // Use the new Assembly modal for AI-generated assemblies
+    if (modalId === 'assembly') {
+      setShowAssemblyModal(true);
+      return;
+    }
     setActiveModal(modalId);
-    if (modalId === 'assembly') setActiveTab('upcoming');
-    else if (modalId === 'campaigns') setActiveTab('my');
+    if (modalId === 'campaigns') setActiveTab('my');
     else if (modalId === 'headwinds') setActiveTab('active');
     else if (modalId === 'ledger') setActiveTab('company');
   };
@@ -1018,7 +1031,6 @@ export default function HeadquartersPage() {
 
               {/* Modal Content */}
               <div style={{ padding: '2rem', maxHeight: 'calc(85vh - 120px)', overflowY: 'auto' }}>
-                {activeModal === 'assembly' && renderAssemblyContent()}
                 {activeModal === 'campaigns' && renderCampaignsContent()}
                 {activeModal === 'headwinds' && renderHeadwindsContent()}
                 {activeModal === 'founding' && renderFoundingContent()}
@@ -1028,6 +1040,14 @@ export default function HeadquartersPage() {
             </div>
           </div>
         )}
+
+        {/* Assembly Modal (AI-generated) */}
+        <AssemblyModal
+          isOpen={showAssemblyModal}
+          onClose={() => setShowAssemblyModal(false)}
+          authToken={authData.token || ''}
+          tenantId={authData.tenantId || ''}
+        />
       </div>
     </AuthGuard>
   );
