@@ -144,7 +144,9 @@ export function PEPProvider({ children }: { children: ReactNode }) {
   // Get available executives based on plan
   const getAvailableExecutives = useCallback((userPlan: string, isSuperAdmin: boolean): ExecutiveInfo[] => {
     const planHierarchy = ['starter', 'pro', 'business', 'enterprise'];
-    const userPlanIndex = planHierarchy.indexOf(userPlan.toLowerCase());
+    // Normalize plan names (API returns 'professional', code uses 'pro')
+    const normalizedPlan = userPlan.toLowerCase() === 'professional' ? 'pro' : userPlan.toLowerCase();
+    const userPlanIndex = planHierarchy.indexOf(normalizedPlan);
 
     const available = EXECUTIVES.map(exec => {
       if (exec.status === 'coming_soon') {

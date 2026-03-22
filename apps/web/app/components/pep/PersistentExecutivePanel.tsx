@@ -251,10 +251,10 @@ export default function PersistentExecutivePanel() {
       <aside
         style={{
           position: 'fixed',
-          top: panelState === 'fullscreen' ? '64px' : 0,
+          top: '64px',
           right: 0,
           width: panelWidth,
-          height: panelState === 'fullscreen' ? 'calc(100vh - 64px)' : '100vh',
+          height: 'calc(100vh - 64px)',
           background: '#1C1C26',
           borderLeft: '1px solid rgba(0, 204, 238, 0.2)',
           display: 'flex',

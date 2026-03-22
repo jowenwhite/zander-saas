@@ -155,7 +155,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
         title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         style={{
           position: 'absolute',
-          top: '20px',
+          top: '72px', // Below navbar (64px) + margin
           right: isCollapsed ? '50%' : '8px',
           transform: isCollapsed ? 'translateX(50%)' : 'none',
           width: '28px',
