@@ -42,10 +42,11 @@ export default function PersistentExecutivePanel() {
   const [isLoading, setIsLoading] = useState(false);
   const [userPlan, setUserPlan] = useState<string>('starter');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [tenantId, setTenantId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load user plan and superadmin status
+  // Load user plan, superadmin status, and tenantId
   useEffect(() => {
     const userStr = localStorage.getItem('zander_user');
     if (userStr) {
@@ -53,6 +54,7 @@ export default function PersistentExecutivePanel() {
         const user = JSON.parse(userStr);
         setIsSuperAdmin(user.isSuperAdmin || false);
         setUserPlan(user.plan || 'starter');
+        setTenantId(user.tenantId || '');
       } catch (e) {
         console.error('Failed to parse user data:', e);
       }
@@ -134,10 +136,12 @@ export default function PersistentExecutivePanel() {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+          ...(tenantId && { 'x-tenant-id': tenantId }),
         },
         body: JSON.stringify({
           message: userMessage.content,
           conversationHistory,
+          tenantId,
         }),
       });
 
