@@ -5,6 +5,208 @@ import { PrismaService } from '../prisma.service';
 export class AdminService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Get token usage statistics for AI executives
+   */
+  async getTokenUsage(
+    tenantId: string,
+    executive?: string,
+    month?: number,
+    year?: number,
+  ) {
+    const where: any = { tenantId };
+
+    if (executive) {
+      where.executive = executive;
+    }
+
+    if (month) {
+      where.month = month;
+    }
+
+    if (year) {
+      where.year = year;
+    }
+
+    const usage = await this.prisma.tokenUsage.findMany({
+      where,
+      orderBy: [{ year: 'desc' }, { month: 'desc' }, { executive: 'asc' }],
+    });
+
+    // Calculate totals
+    const totals = usage.reduce(
+      (acc, u) => ({
+        inputTokens: acc.inputTokens + u.inputTokens,
+        outputTokens: acc.outputTokens + u.outputTokens,
+        totalTokens: acc.totalTokens + u.totalTokens,
+      }),
+      { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+    );
+
+    // Group by executive
+    const byExecutive = usage.reduce((acc, u) => {
+      if (!acc[u.executive]) {
+        acc[u.executive] = { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
+      }
+      acc[u.executive].inputTokens += u.inputTokens;
+      acc[u.executive].outputTokens += u.outputTokens;
+      acc[u.executive].totalTokens += u.totalTokens;
+      return acc;
+    }, {} as Record<string, { inputTokens: number; outputTokens: number; totalTokens: number }>);
+
+    return {
+      success: true,
+      data: usage,
+      totals,
+      byExecutive,
+      count: usage.length,
+    };
+  }
+
+  /**
+   * Get all users for a tenant (admin view)
+   */
+  async getUsers(tenantId: string) {
+    const users = await this.prisma.user.findMany({
+      where: { tenantId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        createdAt: true,
+      },
+      orderBy: [{ role: 'asc' }, { lastName: 'asc' }],
+    });
+
+    return {
+      success: true,
+      data: users.map((u) => ({
+        ...u,
+        fullName: `${u.firstName} ${u.lastName}`.trim(),
+      })),
+      count: users.length,
+    };
+  }
+
+  /**
+   * Reset token usage for a tenant (admin operation)
+   */
+  async resetTenantTokens(tenantId: string) {
+    const deleted = await this.prisma.tokenUsage.deleteMany({
+      where: { tenantId },
+    });
+
+    return {
+      success: true,
+      message: `Reset token usage for tenant ${tenantId}`,
+      deletedRecords: deleted.count,
+    };
+  }
+
+  /**
+   * Get error logs for monitoring
+   */
+  async getErrorLogs(tenantId: string, level?: string, limit: number = 50) {
+    const where: any = {};
+
+    // Tenant can be null for system errors, but filter by tenant if provided
+    if (tenantId) {
+      where.OR = [{ tenantId }, { tenantId: null }];
+    }
+
+    if (level) {
+      where.level = level;
+    }
+
+    const logs = await this.prisma.errorLog.findMany({
+      where,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    // Count by level
+    const levelCounts = logs.reduce((acc, log) => {
+      acc[log.level] = (acc[log.level] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      success: true,
+      data: logs,
+      count: logs.length,
+      byLevel: levelCounts,
+    };
+  }
+
+  /**
+   * Get performance metrics for the system
+   */
+  async getPerformanceMetrics(tenantId: string) {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Get counts from various tables
+    const [
+      contactCount,
+      dealCount,
+      taskCount,
+      activityCount,
+      recentErrors,
+    ] = await Promise.all([
+      this.prisma.contact.count({ where: { tenantId } }),
+      this.prisma.deal.count({ where: { tenantId } }),
+      this.prisma.task.count({ where: { tenantId } }),
+      this.prisma.activity.count({
+        where: { tenantId, createdAt: { gte: thirtyDaysAgo } },
+      }),
+      this.prisma.errorLog.count({
+        where: { tenantId, createdAt: { gte: thirtyDaysAgo } },
+      }),
+    ]);
+
+    // Get token usage for this month
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+
+    const tokenUsage = await this.prisma.tokenUsage.aggregate({
+      where: {
+        tenantId,
+        month: currentMonth,
+        year: currentYear,
+      },
+      _sum: {
+        totalTokens: true,
+        inputTokens: true,
+        outputTokens: true,
+      },
+    });
+
+    return {
+      success: true,
+      metrics: {
+        counts: {
+          contacts: contactCount,
+          deals: dealCount,
+          tasks: taskCount,
+          activitiesLast30Days: activityCount,
+        },
+        errors: {
+          last30Days: recentErrors,
+        },
+        tokenUsage: {
+          month: currentMonth,
+          year: currentYear,
+          totalTokens: tokenUsage._sum.totalTokens || 0,
+          inputTokens: tokenUsage._sum.inputTokens || 0,
+          outputTokens: tokenUsage._sum.outputTokens || 0,
+        },
+        timestamp: now.toISOString(),
+      },
+    };
+  }
+
   async seedMarketing(): Promise<{ success: boolean; message: string; details: string[] }> {
     const details: string[] = [];
 

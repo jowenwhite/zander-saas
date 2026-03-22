@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import OnboardingChecklist from './OnboardingChecklist';
 import TenantSwitcher from './TenantSwitcher';
-import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck, UserCircle2 } from 'lucide-react';
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -77,6 +77,7 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
     { icon: Calendar, label: 'Schedule', href: '/schedule' },
     { icon: ClipboardList, label: 'Forms', href: '/forms' },
     { icon: Bot, label: 'Ask Jordan (CRO)', href: '/ai' },
+    { icon: UserCircle2, label: 'Ask Pam (EA)', href: '/ea' },
   ];
 
   const linkStyle = (active: boolean) => ({

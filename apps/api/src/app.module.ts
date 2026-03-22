@@ -43,6 +43,7 @@ import { AdminModule } from './admin/admin.module';
 import { LegalModule } from './legal/legal.module';
 import { AuditLogModule } from './common/audit-log.module';
 import { AuditLogFeatureModule } from './audit-log/audit-log.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -86,6 +87,7 @@ import { AuditLogFeatureModule } from './audit-log/audit-log.module';
     LegalModule,
     AuditLogModule,        // MEDIUM-4: Global audit logging service
     AuditLogFeatureModule, // MEDIUM-4: Audit log API endpoints
+    TasksModule,           // EA Module: Task management for Pam
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [

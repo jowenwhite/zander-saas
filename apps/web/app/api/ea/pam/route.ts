@@ -513,20 +513,60 @@ async function executeTool(
       }
 
       case 'get_open_tasks': {
-        // Task model doesn't exist yet
+        // Query the Task API
+        const params = new URLSearchParams();
+        if (toolInput.assignedTo) params.append('assignedToId', toolInput.assignedTo as string);
+        if (toolInput.dueBefore) params.append('dueBefore', toolInput.dueBefore as string);
+        if (toolInput.priority) params.append('priority', toolInput.priority as string);
+        // Default to open tasks only
+        params.append('status', 'open');
+
+        const url = `${EA_API_URL}/tasks?${params.toString()}`;
+        const response = await fetch(url, { headers });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[Pam] get_open_tasks error: ${response.status} - ${errorText}`);
+          return {
+            success: true,
+            result: {
+              tasks: [],
+              count: 0,
+              message: 'No tasks found or error fetching tasks',
+              filters: {
+                assignedTo: toolInput.assignedTo,
+                dueBefore: toolInput.dueBefore,
+                priority: toolInput.priority
+              }
+            }
+          };
+        }
+
+        const data = await response.json();
+        const tasks = data.data || [];
+
         return {
           success: true,
           result: {
-            tasks: [],
-            count: 0,
-            message: 'Task management not yet implemented',
-            note: 'Requires Task model in Prisma schema',
-            recommendation: 'Use Activities with type "task" as a workaround',
+            count: tasks.length,
+            total: data.pagination?.total || tasks.length,
             filters: {
               assignedTo: toolInput.assignedTo,
               dueBefore: toolInput.dueBefore,
               priority: toolInput.priority
-            }
+            },
+            tasks: tasks.map((t: Record<string, unknown>) => ({
+              id: t.id,
+              title: t.title,
+              description: t.description,
+              status: t.status,
+              priority: t.priority,
+              dueDate: t.dueDate,
+              daysUntilDue: t.daysUntilDue,
+              assignedToName: t.assignedToName,
+              linkedDealId: t.linkedDealId,
+              linkedContactId: t.linkedContactId
+            }))
           }
         };
       }
@@ -606,36 +646,87 @@ async function executeTool(
 
       // ========== L4 WRITE TOOLS ==========
       case 'create_task': {
-        // Task model doesn't exist - return structured message
+        const url = `${EA_API_URL}/tasks`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            title: toolInput.title,
+            description: toolInput.description,
+            dueDate: toolInput.dueDate,
+            priority: toolInput.priority || 'medium',
+            assignedToUserId: toolInput.assignedToUserId,
+            linkedDealId: toolInput.linkedDealId,
+            linkedContactId: toolInput.linkedContactId
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[Pam] create_task error: ${response.status} - ${errorText}`);
+          return {
+            success: false,
+            error: `Failed to create task: ${response.status}`
+          };
+        }
+
+        const task = await response.json();
         return {
           success: true,
           result: {
-            message: 'Task creation not yet implemented',
-            note: 'Requires Task model in Prisma schema',
-            taskData: {
-              title: toolInput.title,
-              description: toolInput.description,
-              dueDate: toolInput.dueDate,
-              priority: toolInput.priority || 'medium',
-              assignedTo: toolInput.assignedToUserId,
-              linkedDealId: toolInput.linkedDealId,
-              linkedContactId: toolInput.linkedContactId
-            },
-            recommendation: 'Create an Activity with type "task" as a workaround'
+            message: 'Task created successfully',
+            task: {
+              id: task.id,
+              title: task.title,
+              description: task.description,
+              status: task.status,
+              priority: task.priority,
+              dueDate: task.dueDate,
+              assignedToName: task.assignedTo
+                ? `${task.assignedTo.firstName} ${task.assignedTo.lastName}`.trim()
+                : null
+            }
           }
         };
       }
 
       case 'update_task_status': {
-        // Task model doesn't exist
+        const taskId = toolInput.taskId as string;
+        const url = `${EA_API_URL}/tasks/${taskId}`;
+
+        const updateBody: Record<string, unknown> = {
+          status: toolInput.status
+        };
+        if (toolInput.notes) {
+          updateBody.notes = toolInput.notes;
+        }
+
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateBody)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[Pam] update_task_status error: ${response.status} - ${errorText}`);
+          return {
+            success: false,
+            error: `Failed to update task: ${response.status}`
+          };
+        }
+
+        const task = await response.json();
         return {
           success: true,
           result: {
-            message: 'Task update not yet implemented',
-            note: 'Requires Task model in Prisma schema',
-            taskId: toolInput.taskId,
-            requestedStatus: toolInput.status,
-            notes: toolInput.notes
+            message: `Task updated to ${task.status}`,
+            task: {
+              id: task.id,
+              title: task.title,
+              status: task.status,
+              completedAt: task.completedAt
+            }
           }
         };
       }
