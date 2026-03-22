@@ -44,6 +44,7 @@ import { LegalModule } from './legal/legal.module';
 import { AuditLogModule } from './common/audit-log.module';
 import { AuditLogFeatureModule } from './audit-log/audit-log.module';
 import { TasksModule } from './tasks/tasks.module';
+import { AssemblyModule } from './assembly/assembly.module';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { TasksModule } from './tasks/tasks.module';
     AuditLogModule,        // MEDIUM-4: Global audit logging service
     AuditLogFeatureModule, // MEDIUM-4: Audit log API endpoints
     TasksModule,           // EA Module: Task management for Pam
+    AssemblyModule,        // HQ Module: Assembly document generation
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [
