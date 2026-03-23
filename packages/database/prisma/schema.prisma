@@ -1451,6 +1451,106 @@ model ErrorLog {
 }
 
 // ============================================
+// ZANDER PLATFORM MASTER - BUILD & CONFIG
+// ============================================
+
+enum BuildStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum BuildTarget {
+  FRONTEND
+  BACKEND
+  BOTH
+}
+
+model BuildSession {
+  id            String      @id @default(cuid())
+  buildNumber   String      @unique // AUTO-001, AUTO-002, etc.
+  title         String
+  description   String?     @db.Text
+  status        BuildStatus @default(QUEUED)
+  target        BuildTarget @default(BOTH)
+  priority      String      @default("P2") // P1, P2, P3
+  // Git tracking
+  gitBranch     String?
+  gitCommitHash String?
+  // Deployment tracking
+  version       String?     // v22, v23, etc.
+  deployedAt    DateTime?
+  deployedBy    String?     // "zander" or user ID
+  // Parallel build tracking
+  parallelGroup String?     // Groups related parallel builds
+  isParallel    Boolean     @default(false)
+  // Prompts and results
+  borisPrompt   String?     @db.Text
+  buildOutput   String?     @db.Text
+  errorLog      String?     @db.Text
+  // Linked items
+  linkedHeadwindId String?
+  linkedTicketId   String?
+  // Timestamps
+  queuedAt      DateTime    @default(now())
+  startedAt     DateTime?
+  completedAt   DateTime?
+  estimatedMinutes Int?
+  actualMinutes    Int?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status])
+  @@index([parallelGroup])
+  @@index([priority])
+  @@index([target])
+  @@map("build_sessions")
+}
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  category  String   @default("general") // general, briefing, deployment, notifications
+  description String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@map("system_configs")
+}
+
+model ZanderActionLog {
+  id          String   @id @default(cuid())
+  action      String   // Tool name executed
+  level       String   // L1, L2, L3, L4
+  input       Json?    // Tool input parameters
+  output      Json?    // Tool output/result
+  success     Boolean  @default(true)
+  errorMessage String?
+  // Context
+  tenantId    String?  // If tenant-scoped
+  targetUserId String? // If user-scoped
+  // Deployment specific
+  deploymentTarget String? // frontend, backend, both
+  deploymentVersion String?
+  // Timestamps
+  executedAt  DateTime @default(now())
+  durationMs  Int?
+
+  @@index([action])
+  @@index([level])
+  @@index([success])
+  @@index([executedAt])
+  @@index([tenantId])
+  @@map("zander_action_logs")
+}
+
+// ============================================
 // ASSEMBLY MODULE - MULTI-EXECUTIVE COLLABORATION
 // ============================================
 

@@ -2980,4 +2980,875 @@ If at limit:
       details,
     };
   }
+
+  // ============================================
+  // ZANDER PLATFORM MASTER - NEW TOOLS
+  // ============================================
+
+  /**
+   * SECTION 1: Revenue Intelligence
+   */
+
+  async getRevenueSummary() {
+    // Get all tenants with subscription data
+    const tenants = await this.prisma.tenant.findMany({
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionStatus: true,
+        subscriptionTier: true,
+        subscriptionCohort: true,
+        trialEndsAt: true,
+        createdAt: true,
+        _count: {
+          select: { users: true },
+        },
+      },
+    });
+
+    // Define pricing (monthly)
+    const tierPricing: Record<string, number> = {
+      starter: 49,
+      pro: 149,
+      business: 349,
+      enterprise: 799,
+    };
+
+    // Calculate MRR
+    let mrr = 0;
+    const byTier: Record<string, { count: number; mrr: number }> = {};
+    const byCohort: Record<string, { count: number; mrr: number }> = {};
+    let activeCount = 0;
+    let trialCount = 0;
+
+    for (const tenant of tenants) {
+      const tier = tenant.subscriptionTier || 'starter';
+      const cohort = tenant.subscriptionCohort || 'public';
+      const status = tenant.subscriptionStatus || 'unknown';
+      const price = tierPricing[tier] || 0;
+
+      // Initialize tier tracking
+      if (!byTier[tier]) byTier[tier] = { count: 0, mrr: 0 };
+      if (!byCohort[cohort]) byCohort[cohort] = { count: 0, mrr: 0 };
+
+      if (status === 'active') {
+        mrr += price;
+        byTier[tier].count++;
+        byTier[tier].mrr += price;
+        byCohort[cohort].count++;
+        byCohort[cohort].mrr += price;
+        activeCount++;
+      } else if (status === 'trial' || (tenant.trialEndsAt && new Date(tenant.trialEndsAt) > new Date())) {
+        trialCount++;
+      }
+    }
+
+    const arr = mrr * 12;
+
+    // Calculate growth (simplified - compare to last month's estimated MRR)
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const newTenantsThisMonth = tenants.filter(t => new Date(t.createdAt) > thirtyDaysAgo).length;
+
+    return {
+      success: true,
+      data: {
+        mrr,
+        arr,
+        activeSubscriptions: activeCount,
+        trialing: trialCount,
+        totalTenants: tenants.length,
+        byTier,
+        byCohort,
+        newThisMonth: newTenantsThisMonth,
+        growthIndicator: newTenantsThisMonth > 0 ? 'growing' : 'stable',
+        asOf: now.toISOString(),
+      },
+    };
+  }
+
+  async getChurnReport() {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+
+    // Get tenants with various statuses
+    const tenants = await this.prisma.tenant.findMany({
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionStatus: true,
+        subscriptionTier: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    const canceledCount = tenants.filter(t => t.subscriptionStatus === 'canceled').length;
+    const pausedCount = tenants.filter(t => t.subscriptionStatus === 'paused').length;
+    const pastDueCount = tenants.filter(t => t.subscriptionStatus === 'past_due').length;
+    const activeCount = tenants.filter(t => t.subscriptionStatus === 'active').length;
+
+    // Calculate churn rate (simplified)
+    const totalChurned = canceledCount;
+    const churnRate = activeCount > 0 ? ((totalChurned / (activeCount + totalChurned)) * 100).toFixed(2) : '0.00';
+
+    // Get recent activity to identify at-risk accounts
+    const lowActivityTenants = await this.prisma.tenant.findMany({
+      where: {
+        subscriptionStatus: 'active',
+      },
+      select: {
+        id: true,
+        companyName: true,
+        _count: {
+          select: {
+            activities: true,
+          },
+        },
+      },
+    });
+
+    const atRiskCount = lowActivityTenants.filter(t => t._count.activities < 5).length;
+
+    return {
+      success: true,
+      data: {
+        churnRate: `${churnRate}%`,
+        canceled: canceledCount,
+        paused: pausedCount,
+        pastDue: pastDueCount,
+        atRisk: atRiskCount,
+        active: activeCount,
+        retentionRate: `${(100 - parseFloat(churnRate)).toFixed(2)}%`,
+        period: 'all-time',
+        asOf: now.toISOString(),
+      },
+    };
+  }
+
+  async getCACByChannel() {
+    // Since we don't have direct ad spend data, return estimated breakdown
+    // This would integrate with actual marketing spend data in production
+    const waitlistData = await this.prisma.waitlistEntry.findMany({
+      select: {
+        id: true,
+        status: true,
+        depositAmount: true,
+        convertedTenantId: true,
+      },
+    });
+
+    const totalDeposits = waitlistData.filter(w => w.status === 'converted').length;
+    const waitlistConversions = waitlistData.filter(w => w.convertedTenantId).length;
+
+    return {
+      success: true,
+      data: {
+        channels: {
+          organic: {
+            leads: 0,
+            conversions: 0,
+            spend: 0,
+            cac: 'N/A',
+            note: 'Track via UTM parameters',
+          },
+          waitlist: {
+            leads: waitlistData.length,
+            conversions: waitlistConversions,
+            spend: 0,
+            cac: '$0 (organic)',
+            note: 'Founding member waitlist',
+          },
+          referral: {
+            leads: 0,
+            conversions: 0,
+            spend: 0,
+            cac: 'N/A',
+            note: 'Referral program not yet active',
+          },
+          paid: {
+            leads: 0,
+            conversions: 0,
+            spend: 0,
+            cac: 'N/A',
+            note: 'No paid campaigns yet',
+          },
+        },
+        blendedCAC: '$0 (pre-launch)',
+        recommendation: 'Set up UTM tracking and integrate marketing spend data for accurate CAC reporting',
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  async getFoundingMemberStatus() {
+    const waitlistEntries = await this.prisma.waitlistEntry.findMany({
+      orderBy: { spotNumber: 'asc' },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        spotNumber: true,
+        status: true,
+        depositAmount: true,
+        depositPaidAt: true,
+        convertedAt: true,
+        convertedTenantId: true,
+        createdAt: true,
+      },
+    });
+
+    const paid = waitlistEntries.filter(w => w.depositPaidAt);
+    const converted = waitlistEntries.filter(w => w.convertedTenantId);
+    const pending = waitlistEntries.filter(w => w.status === 'pending');
+    const totalDeposits = paid.reduce((sum, w) => sum + (w.depositAmount || 0), 0);
+
+    return {
+      success: true,
+      data: {
+        totalSpots: waitlistEntries.length,
+        depositsPaid: paid.length,
+        converted: converted.length,
+        pending: pending.length,
+        totalDepositsCollected: totalDeposits / 100, // Convert cents to dollars
+        conversionRate: paid.length > 0 ? `${((converted.length / paid.length) * 100).toFixed(1)}%` : '0%',
+        nextSpot: waitlistEntries.length + 1,
+        recentEntries: waitlistEntries.slice(-5).reverse(),
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  /**
+   * SECTION 2: Customer Health Monitoring
+   */
+
+  async getAtRiskAccounts() {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // Get tenants with activity data
+    const tenants = await this.prisma.tenant.findMany({
+      where: {
+        subscriptionStatus: { in: ['active', 'trial'] },
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionStatus: true,
+        subscriptionTier: true,
+        createdAt: true,
+        _count: {
+          select: {
+            users: true,
+            deals: true,
+            contacts: true,
+            activities: true,
+          },
+        },
+        activities: {
+          where: { createdAt: { gte: thirtyDaysAgo } },
+          select: { id: true },
+        },
+      },
+    });
+
+    const atRiskAccounts = tenants
+      .map(t => {
+        const recentActivityCount = t.activities.length;
+        const totalActivities = t._count.activities;
+        const daysSinceCreation = Math.floor((Date.now() - new Date(t.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+
+        // Risk scoring
+        let riskScore = 0;
+        const riskFactors: string[] = [];
+
+        if (recentActivityCount === 0 && daysSinceCreation > 7) {
+          riskScore += 40;
+          riskFactors.push('No activity in 30 days');
+        }
+        if (t._count.contacts === 0) {
+          riskScore += 20;
+          riskFactors.push('No contacts added');
+        }
+        if (t._count.deals === 0) {
+          riskScore += 20;
+          riskFactors.push('No deals created');
+        }
+        if (t._count.users === 1) {
+          riskScore += 10;
+          riskFactors.push('Single user');
+        }
+
+        return {
+          tenantId: t.id,
+          companyName: t.companyName,
+          tier: t.subscriptionTier,
+          status: t.subscriptionStatus,
+          riskScore,
+          riskLevel: riskScore >= 60 ? 'HIGH' : riskScore >= 30 ? 'MEDIUM' : 'LOW',
+          riskFactors,
+          recentActivityCount,
+          totalUsers: t._count.users,
+          totalDeals: t._count.deals,
+          totalContacts: t._count.contacts,
+          daysSinceCreation,
+        };
+      })
+      .filter(t => t.riskScore >= 30)
+      .sort((a, b) => b.riskScore - a.riskScore);
+
+    return {
+      success: true,
+      data: {
+        atRiskCount: atRiskAccounts.length,
+        highRisk: atRiskAccounts.filter(a => a.riskLevel === 'HIGH').length,
+        mediumRisk: atRiskAccounts.filter(a => a.riskLevel === 'MEDIUM').length,
+        accounts: atRiskAccounts.slice(0, 20),
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  async getPowerUsers() {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // Get users with high activity
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        tenantId: true,
+        tenant: {
+          select: {
+            companyName: true,
+            subscriptionTier: true,
+          },
+        },
+        _count: {
+          select: {
+            activities: true,
+            tasksCreated: true,
+            dealsOwned: true,
+            contactsOwned: true,
+          },
+        },
+        activities: {
+          where: { createdAt: { gte: thirtyDaysAgo } },
+          select: { id: true },
+        },
+      },
+    });
+
+    const powerUsers = users
+      .map(u => ({
+        userId: u.id,
+        name: `${u.firstName} ${u.lastName}`,
+        email: u.email,
+        role: u.role,
+        tenantId: u.tenantId,
+        companyName: u.tenant.companyName,
+        tier: u.tenant.subscriptionTier,
+        recentActivities: u.activities.length,
+        totalActivities: u._count.activities,
+        tasksCreated: u._count.tasksCreated,
+        dealsOwned: u._count.dealsOwned,
+        contactsOwned: u._count.contactsOwned,
+        engagementScore: u.activities.length + u._count.tasksCreated + u._count.dealsOwned,
+      }))
+      .filter(u => u.recentActivities > 10 || u.engagementScore > 20)
+      .sort((a, b) => b.engagementScore - a.engagementScore);
+
+    return {
+      success: true,
+      data: {
+        powerUserCount: powerUsers.length,
+        users: powerUsers.slice(0, 20),
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  async getAccountHealthSummary() {
+    const tenants = await this.prisma.tenant.findMany({
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionStatus: true,
+        subscriptionTier: true,
+        _count: {
+          select: {
+            users: true,
+            deals: true,
+            contacts: true,
+            activities: true,
+            tasks: true,
+          },
+        },
+      },
+    });
+
+    const healthScores = tenants.map(t => {
+      // Calculate health score based on engagement
+      let score = 0;
+      if (t._count.users > 1) score += 15;
+      if (t._count.contacts > 10) score += 20;
+      if (t._count.deals > 5) score += 25;
+      if (t._count.activities > 50) score += 25;
+      if (t._count.tasks > 10) score += 15;
+
+      return {
+        tenantId: t.id,
+        companyName: t.companyName,
+        tier: t.subscriptionTier,
+        status: t.subscriptionStatus,
+        healthScore: Math.min(score, 100),
+        metrics: t._count,
+      };
+    });
+
+    const avgHealth = healthScores.length > 0
+      ? healthScores.reduce((sum, t) => sum + t.healthScore, 0) / healthScores.length
+      : 0;
+
+    const healthy = healthScores.filter(t => t.healthScore >= 70).length;
+    const needsAttention = healthScores.filter(t => t.healthScore >= 40 && t.healthScore < 70).length;
+    const critical = healthScores.filter(t => t.healthScore < 40).length;
+
+    return {
+      success: true,
+      data: {
+        totalAccounts: tenants.length,
+        averageHealth: avgHealth.toFixed(1),
+        healthy,
+        needsAttention,
+        critical,
+        distribution: {
+          excellent: healthScores.filter(t => t.healthScore >= 80).length,
+          good: healthScores.filter(t => t.healthScore >= 60 && t.healthScore < 80).length,
+          fair: healthScores.filter(t => t.healthScore >= 40 && t.healthScore < 60).length,
+          poor: healthScores.filter(t => t.healthScore < 40).length,
+        },
+        topAccounts: healthScores.sort((a, b) => b.healthScore - a.healthScore).slice(0, 5),
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  async getTenantActivity(tenantId: string) {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionStatus: true,
+        subscriptionTier: true,
+        createdAt: true,
+        _count: {
+          select: {
+            users: true,
+            deals: true,
+            contacts: true,
+            activities: true,
+            tasks: true,
+            campaigns: true,
+            workflows: true,
+            funnels: true,
+          },
+        },
+      },
+    });
+
+    if (!tenant) {
+      return { success: false, error: 'Tenant not found' };
+    }
+
+    const recentActivities = await this.prisma.activity.findMany({
+      where: { tenantId, createdAt: { gte: thirtyDaysAgo } },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: {
+        id: true,
+        type: true,
+        subject: true,
+        createdAt: true,
+        user: {
+          select: { firstName: true, lastName: true },
+        },
+      },
+    });
+
+    const tokenUsage = await this.prisma.tokenUsage.findMany({
+      where: { tenantId },
+      orderBy: [{ year: 'desc' }, { month: 'desc' }],
+      take: 3,
+    });
+
+    return {
+      success: true,
+      data: {
+        tenant: {
+          id: tenant.id,
+          companyName: tenant.companyName,
+          status: tenant.subscriptionStatus,
+          tier: tenant.subscriptionTier,
+          createdAt: tenant.createdAt,
+        },
+        counts: tenant._count,
+        recentActivities: recentActivities.map(a => ({
+          type: a.type,
+          subject: a.subject,
+          createdAt: a.createdAt,
+          user: a.user ? `${a.user.firstName} ${a.user.lastName}` : 'Unknown',
+        })),
+        tokenUsage,
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  /**
+   * SECTION 3: Morning Briefing
+   */
+
+  async getMorningBriefing() {
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    // Gather all key metrics
+    const [
+      revenue,
+      churn,
+      health,
+      atRisk,
+      openTickets,
+      openHeadwinds,
+      recentErrors,
+      waitlist,
+      tokenUsage,
+    ] = await Promise.all([
+      this.getRevenueSummary(),
+      this.getChurnReport(),
+      this.getAccountHealthSummary(),
+      this.getAtRiskAccounts(),
+      this.prisma.supportTicket.count({ where: { status: { in: ['NEW', 'IN_PROGRESS'] } } }),
+      this.prisma.headwind.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
+      this.prisma.errorLog.count({ where: { createdAt: { gte: yesterday }, level: 'error' } }),
+      this.getFoundingMemberStatus(),
+      this.prisma.tokenUsage.aggregate({
+        where: { month: now.getMonth() + 1, year: now.getFullYear() },
+        _sum: { totalTokens: true },
+      }),
+    ]);
+
+    // Build briefing
+    return {
+      success: true,
+      data: {
+        date: now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+        timestamp: now.toISOString(),
+        sections: {
+          revenue: {
+            mrr: revenue.data?.mrr || 0,
+            arr: revenue.data?.arr || 0,
+            activeSubscriptions: revenue.data?.activeSubscriptions || 0,
+            trialing: revenue.data?.trialing || 0,
+          },
+          customerHealth: {
+            averageHealth: health.data?.averageHealth || 0,
+            atRiskAccounts: atRisk.data?.atRiskCount || 0,
+            highRisk: atRisk.data?.highRisk || 0,
+            churnRate: churn.data?.churnRate || '0%',
+          },
+          support: {
+            openTickets,
+            openHeadwinds,
+            errorsLast24h: recentErrors,
+          },
+          waitlist: {
+            totalSpots: waitlist.data?.totalSpots || 0,
+            depositsPaid: waitlist.data?.depositsPaid || 0,
+            converted: waitlist.data?.converted || 0,
+          },
+          platform: {
+            tokensUsedThisMonth: tokenUsage._sum.totalTokens || 0,
+          },
+        },
+        alerts: [] as string[],
+        recommendations: [] as string[],
+      },
+    };
+  }
+
+  /**
+   * SECTION 4: Development Operations
+   */
+
+  async getBuildQueue() {
+    const builds = await this.prisma.buildSession.findMany({
+      where: { status: { in: ['QUEUED', 'IN_PROGRESS'] } },
+      orderBy: [{ priority: 'asc' }, { queuedAt: 'asc' }],
+    });
+
+    const completed = await this.prisma.buildSession.findMany({
+      where: { status: 'COMPLETED' },
+      orderBy: { completedAt: 'desc' },
+      take: 5,
+    });
+
+    return {
+      success: true,
+      data: {
+        queued: builds.filter(b => b.status === 'QUEUED').length,
+        inProgress: builds.filter(b => b.status === 'IN_PROGRESS').length,
+        builds: builds.map(b => ({
+          id: b.id,
+          buildNumber: b.buildNumber,
+          title: b.title,
+          status: b.status,
+          priority: b.priority,
+          target: b.target,
+          queuedAt: b.queuedAt,
+          startedAt: b.startedAt,
+        })),
+        recentCompleted: completed.map(b => ({
+          buildNumber: b.buildNumber,
+          title: b.title,
+          completedAt: b.completedAt,
+          version: b.version,
+        })),
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  async createBuildSession(data: {
+    title: string;
+    description?: string;
+    priority?: string;
+    target?: string;
+    linkedHeadwindId?: string;
+    linkedTicketId?: string;
+    borisPrompt?: string;
+    isParallel?: boolean;
+    parallelGroup?: string;
+  }) {
+    // Generate build number
+    const lastBuild = await this.prisma.buildSession.findFirst({
+      orderBy: { buildNumber: 'desc' },
+    });
+    const nextNumber = lastBuild
+      ? parseInt(lastBuild.buildNumber.replace('AUTO-', '')) + 1
+      : 1;
+    const buildNumber = `AUTO-${nextNumber.toString().padStart(3, '0')}`;
+
+    const build = await this.prisma.buildSession.create({
+      data: {
+        buildNumber,
+        title: data.title,
+        description: data.description,
+        priority: data.priority || 'P2',
+        target: (data.target as any) || 'BOTH',
+        linkedHeadwindId: data.linkedHeadwindId,
+        linkedTicketId: data.linkedTicketId,
+        borisPrompt: data.borisPrompt,
+        isParallel: data.isParallel || false,
+        parallelGroup: data.parallelGroup,
+        status: 'QUEUED',
+      },
+    });
+
+    return {
+      success: true,
+      data: build,
+    };
+  }
+
+  async updateBuildSession(id: string, data: {
+    status?: string;
+    version?: string;
+    gitBranch?: string;
+    gitCommitHash?: string;
+    buildOutput?: string;
+    errorLog?: string;
+  }) {
+    const updates: any = { ...data };
+
+    if (data.status === 'IN_PROGRESS') {
+      updates.startedAt = new Date();
+    } else if (data.status === 'COMPLETED') {
+      updates.completedAt = new Date();
+      updates.deployedAt = new Date();
+    }
+
+    const build = await this.prisma.buildSession.update({
+      where: { id },
+      data: updates,
+    });
+
+    return { success: true, data: build };
+  }
+
+  async getParallelBuildStatus(parallelGroup: string) {
+    const builds = await this.prisma.buildSession.findMany({
+      where: { parallelGroup },
+      orderBy: { queuedAt: 'asc' },
+    });
+
+    const allComplete = builds.every(b => b.status === 'COMPLETED');
+    const anyFailed = builds.some(b => b.status === 'FAILED');
+    const inProgress = builds.filter(b => b.status === 'IN_PROGRESS').length;
+
+    return {
+      success: true,
+      data: {
+        parallelGroup,
+        totalBuilds: builds.length,
+        completed: builds.filter(b => b.status === 'COMPLETED').length,
+        inProgress,
+        failed: builds.filter(b => b.status === 'FAILED').length,
+        queued: builds.filter(b => b.status === 'QUEUED').length,
+        allComplete,
+        anyFailed,
+        builds: builds.map(b => ({
+          buildNumber: b.buildNumber,
+          title: b.title,
+          status: b.status,
+          completedAt: b.completedAt,
+        })),
+      },
+    };
+  }
+
+  /**
+   * SECTION 8: Action Logging & System Config
+   */
+
+  async logZanderAction(data: {
+    action: string;
+    level: string;
+    input?: any;
+    output?: any;
+    success: boolean;
+    errorMessage?: string;
+    tenantId?: string;
+    targetUserId?: string;
+    deploymentTarget?: string;
+    deploymentVersion?: string;
+    durationMs?: number;
+  }) {
+    const log = await this.prisma.zanderActionLog.create({
+      data: {
+        action: data.action,
+        level: data.level,
+        input: data.input,
+        output: data.output,
+        success: data.success,
+        errorMessage: data.errorMessage,
+        tenantId: data.tenantId,
+        targetUserId: data.targetUserId,
+        deploymentTarget: data.deploymentTarget,
+        deploymentVersion: data.deploymentVersion,
+        durationMs: data.durationMs,
+      },
+    });
+
+    return { success: true, data: log };
+  }
+
+  async getZanderActionLog(limit: number = 50, level?: string, action?: string) {
+    const where: any = {};
+    if (level) where.level = level;
+    if (action) where.action = action;
+
+    const logs = await this.prisma.zanderActionLog.findMany({
+      where,
+      orderBy: { executedAt: 'desc' },
+      take: limit,
+    });
+
+    // Aggregate stats
+    const stats = await this.prisma.zanderActionLog.groupBy({
+      by: ['action', 'level'],
+      _count: true,
+      where: {
+        executedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+      },
+    });
+
+    return {
+      success: true,
+      data: {
+        logs,
+        count: logs.length,
+        last24hStats: stats,
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
+
+  async getSystemConfig(key?: string, category?: string) {
+    const where: any = { isActive: true };
+    if (key) where.key = key;
+    if (category) where.category = category;
+
+    const configs = await this.prisma.systemConfig.findMany({
+      where,
+      orderBy: { key: 'asc' },
+    });
+
+    if (key && configs.length === 1) {
+      return { success: true, data: configs[0] };
+    }
+
+    return { success: true, data: configs };
+  }
+
+  async setSystemConfig(key: string, value: any, category?: string, description?: string) {
+    const config = await this.prisma.systemConfig.upsert({
+      where: { key },
+      update: { value, category, description },
+      create: { key, value, category: category || 'general', description },
+    });
+
+    return { success: true, data: config };
+  }
+
+  async getWaitlistSummary() {
+    const entries = await this.prisma.waitlistEntry.findMany({
+      orderBy: { spotNumber: 'asc' },
+    });
+
+    const byStatus: Record<string, number> = {};
+    for (const entry of entries) {
+      byStatus[entry.status] = (byStatus[entry.status] || 0) + 1;
+    }
+
+    const totalRevenue = entries
+      .filter(e => e.depositPaidAt)
+      .reduce((sum, e) => sum + (e.depositAmount || 0), 0);
+
+    return {
+      success: true,
+      data: {
+        totalSpots: entries.length,
+        byStatus,
+        totalRevenue: totalRevenue / 100,
+        nextSpotNumber: entries.length + 1,
+        recentEntries: entries.slice(-10).reverse().map(e => ({
+          spotNumber: e.spotNumber,
+          name: e.name,
+          status: e.status,
+          createdAt: e.createdAt,
+        })),
+        asOf: new Date().toISOString(),
+      },
+    };
+  }
 }
