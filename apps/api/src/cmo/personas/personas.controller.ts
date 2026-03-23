@@ -12,6 +12,7 @@ import {
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { PersonasService } from './personas.service';
+import { CreatePersonaDto } from './dto/create-persona.dto';
 
 @Controller('cmo/personas')
 export class PersonasController {
@@ -35,22 +36,15 @@ export class PersonasController {
   @Post()
   async create(
     @Request() req,
-    @Body()
-    createData: {
-      name: string;
-      avatar?: string;
-      tagline?: string;
-      demographics?: any;
-      psychographics?: any;
-      behaviors?: any;
-      painPoints?: string[];
-      goals?: string[];
-      preferredChannels?: string[];
-      brandAffinities?: string[];
-      interview?: string;
-      isDefault?: boolean;
-    },
+    @Body() createData: CreatePersonaDto,
   ) {
+    // DIAGNOSTIC: Log what the controller receives after ValidationPipe
+    console.log('[PersonasController.create] Received body:', {
+      tenantId: req.tenantId,
+      bodyKeys: Object.keys(createData || {}),
+      name: createData?.name,
+    });
+
     return this.personasService.create(req.tenantId, createData);
   }
 
@@ -58,21 +52,7 @@ export class PersonasController {
   async update(
     @Param('id') id: string,
     @Request() req,
-    @Body()
-    updateData: {
-      name?: string;
-      avatar?: string;
-      tagline?: string;
-      demographics?: any;
-      psychographics?: any;
-      behaviors?: any;
-      painPoints?: string[];
-      goals?: string[];
-      preferredChannels?: string[];
-      brandAffinities?: string[];
-      interview?: string;
-      isDefault?: boolean;
-    },
+    @Body() updateData: CreatePersonaDto,
   ) {
     return this.personasService.update(id, req.tenantId, updateData);
   }

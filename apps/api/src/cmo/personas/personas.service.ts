@@ -55,6 +55,22 @@ export class PersonasService {
       isDefault?: boolean;
     },
   ) {
+    // DIAGNOSTIC: Log incoming data
+    console.log('[PersonasService.create] Received data:', {
+      tenantId,
+      dataKeys: Object.keys(data),
+      name: data.name,
+      hasName: !!data.name,
+      painPointsCount: data.painPoints?.length,
+      goalsCount: data.goals?.length,
+    });
+
+    // Validate required fields
+    if (!data.name || typeof data.name !== 'string' || data.name.trim() === '') {
+      console.error('[PersonasService.create] VALIDATION FAILED: name is required but got:', data.name);
+      throw new Error('Persona name is required');
+    }
+
     // If this is set as default, unset other defaults
     if (data.isDefault) {
       await this.prisma.persona.updateMany({
@@ -63,23 +79,30 @@ export class PersonasService {
       });
     }
 
-    return this.prisma.persona.create({
-      data: {
-        tenantId,
-        name: data.name,
-        avatar: data.avatar,
-        tagline: data.tagline,
-        demographics: data.demographics || {},
-        psychographics: data.psychographics || {},
-        behaviors: data.behaviors || {},
-        painPoints: data.painPoints || [],
-        goals: data.goals || [],
-        preferredChannels: data.preferredChannels || [],
-        brandAffinities: data.brandAffinities || [],
-        interview: data.interview,
-        isDefault: data.isDefault || false,
-      },
-    });
+    try {
+      const persona = await this.prisma.persona.create({
+        data: {
+          tenantId,
+          name: data.name,
+          avatar: data.avatar,
+          tagline: data.tagline,
+          demographics: data.demographics || {},
+          psychographics: data.psychographics || {},
+          behaviors: data.behaviors || {},
+          painPoints: data.painPoints || [],
+          goals: data.goals || [],
+          preferredChannels: data.preferredChannels || [],
+          brandAffinities: data.brandAffinities || [],
+          interview: data.interview,
+          isDefault: data.isDefault || false,
+        },
+      });
+      console.log('[PersonasService.create] SUCCESS - Created persona:', persona.id, persona.name);
+      return persona;
+    } catch (error) {
+      console.error('[PersonasService.create] PRISMA ERROR:', error);
+      throw error;
+    }
   }
 
   async update(

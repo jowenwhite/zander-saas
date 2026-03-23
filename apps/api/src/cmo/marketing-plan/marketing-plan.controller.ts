@@ -7,6 +7,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { MarketingPlanService } from './marketing-plan.service';
+import { UpsertMarketingPlanDto } from './dto/upsert-marketing-plan.dto';
 
 @Controller('cmo/marketing-plan')
 export class MarketingPlanController {
@@ -43,25 +44,15 @@ export class MarketingPlanController {
   @Post()
   async upsert(
     @Request() req,
-    @Body()
-    data: {
-      status?: string;
-      mission?: string;
-      vision?: string;
-      strategy?: string;
-      goals?: string[];
-      swot?: {
-        strengths: Array<{ id: string; text: string }>;
-        weaknesses: Array<{ id: string; text: string }>;
-        opportunities: Array<{ id: string; text: string }>;
-        threats: Array<{ id: string; text: string }>;
-      };
-      monthlyThemes?: string[];
-      kpis?: Array<{ name: string; target: string }>;
-      budget?: string;
-      timeline?: string;
-    },
+    @Body() data: UpsertMarketingPlanDto,
   ) {
+    // DIAGNOSTIC: Log what the controller receives after ValidationPipe
+    console.log('[MarketingPlanController.upsert] Received body:', {
+      tenantId: req.tenantId,
+      bodyKeys: Object.keys(data || {}),
+      mission: data?.mission?.substring(0, 50),
+    });
+
     return this.marketingPlanService.upsert(req.tenantId, data);
   }
 
@@ -69,19 +60,7 @@ export class MarketingPlanController {
   @Patch()
   async update(
     @Request() req,
-    @Body()
-    data: {
-      status?: string;
-      mission?: string;
-      vision?: string;
-      strategy?: string;
-      goals?: string[];
-      swot?: object;
-      monthlyThemes?: string[];
-      kpis?: object[];
-      budget?: string;
-      timeline?: string;
-    },
+    @Body() data: UpsertMarketingPlanDto,
   ) {
     return this.marketingPlanService.update(req.tenantId, data);
   }
