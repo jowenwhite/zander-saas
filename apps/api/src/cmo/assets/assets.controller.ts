@@ -87,6 +87,33 @@ export class AssetsController {
     return this.assetsService.getFoldersWithCounts(req.tenantId);
   }
 
+  // Brand Profile - MUST be before :id routes to avoid matching 'brand' as an ID
+  @Get('brand')
+  async getBrandProfile(@Request() req) {
+    return this.assetsService.getBrandProfile(req.tenantId);
+  }
+
+  @Patch('brand')
+  async updateBrandProfile(
+    @Request() req,
+    @Body()
+    updateData: {
+      primaryColor?: string;
+      secondaryColor?: string;
+      accentColor?: string;
+      fontPrimary?: string;
+      fontSecondary?: string;
+      logoUrl?: string;
+      logoIconUrl?: string;
+      voiceTone?: string;
+      voiceGuidelines?: string;
+      tagline?: string;
+      mission?: string;
+    },
+  ) {
+    return this.assetsService.updateBrandProfile(req.tenantId, updateData);
+  }
+
   // Get single asset
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
@@ -145,32 +172,5 @@ export class AssetsController {
   @Post(':id/archive')
   async archive(@Param('id') id: string, @Request() req) {
     return this.assetsService.archive(id, req.tenantId);
-  }
-
-  // Brand Profile
-  @Get('brand')
-  async getBrandProfile(@Request() req) {
-    return this.assetsService.getBrandProfile(req.tenantId);
-  }
-
-  @Patch('brand')
-  async updateBrandProfile(
-    @Request() req,
-    @Body()
-    updateData: {
-      primaryColor?: string;
-      secondaryColor?: string;
-      accentColor?: string;
-      fontPrimary?: string;
-      fontSecondary?: string;
-      logoUrl?: string;
-      logoIconUrl?: string;
-      voiceTone?: string;
-      voiceGuidelines?: string;
-      tagline?: string;
-      mission?: string;
-    },
-  ) {
-    return this.assetsService.updateBrandProfile(req.tenantId, updateData);
   }
 }
