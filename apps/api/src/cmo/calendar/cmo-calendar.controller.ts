@@ -13,6 +13,12 @@ import {
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CmoCalendarService } from './cmo-calendar.service';
+import { CreateCalendarEventDto } from './dto/create-calendar-event.dto';
+import { UpdateCalendarEventDto } from './dto/update-calendar-event.dto';
+import { CreateThemeDto } from './dto/create-theme.dto';
+import { UpdateThemeDto } from './dto/update-theme.dto';
+import { CreateIdeaDto } from './dto/create-idea.dto';
+import { UpdateIdeaDto } from './dto/update-idea.dto';
 
 @Controller('cmo/calendar')
 export class CmoCalendarController {
@@ -41,17 +47,7 @@ export class CmoCalendarController {
   @Post('events')
   async createEvent(
     @Request() req,
-    @Body()
-    createData: {
-      title: string;
-      description?: string;
-      startTime: string;
-      endTime?: string;
-      allDay?: boolean;
-      eventType?: string;
-      color?: string;
-      monthlyThemeId?: string;
-    },
+    @Body() createData: CreateCalendarEventDto,
   ) {
     return this.cmoCalendarService.createEvent(
       req.tenantId,
@@ -64,17 +60,7 @@ export class CmoCalendarController {
   async updateEvent(
     @Param('id') id: string,
     @Request() req,
-    @Body()
-    updateData: {
-      title?: string;
-      description?: string;
-      startTime?: string;
-      endTime?: string;
-      allDay?: boolean;
-      eventType?: string;
-      color?: string;
-      monthlyThemeId?: string;
-    },
+    @Body() updateData: UpdateCalendarEventDto,
   ) {
     return this.cmoCalendarService.updateEvent(id, req.tenantId, updateData);
   }
@@ -118,15 +104,7 @@ export class CmoCalendarController {
   @Post('themes')
   async createTheme(
     @Request() req,
-    @Body()
-    createData: {
-      year: number;
-      month: number;
-      name: string;
-      description?: string;
-      focusAreas?: string[];
-      colorCode?: string;
-    },
+    @Body() createData: CreateThemeDto,
   ) {
     return this.cmoCalendarService.createTheme(req.tenantId, createData);
   }
@@ -136,14 +114,7 @@ export class CmoCalendarController {
     @Param('year') year: string,
     @Param('month') month: string,
     @Request() req,
-    @Body()
-    updateData: {
-      name?: string;
-      description?: string;
-      focusAreas?: string[];
-      colorCode?: string;
-      isActive?: boolean;
-    },
+    @Body() updateData: UpdateThemeDto,
   ) {
     return this.cmoCalendarService.updateTheme(
       req.tenantId,
@@ -183,14 +154,7 @@ export class CmoCalendarController {
   @Post('ideas')
   async createIdea(
     @Request() req,
-    @Body()
-    createData: {
-      title: string;
-      description?: string;
-      category?: string;
-      source?: string;
-      priority?: string;
-    },
+    @Body() createData: CreateIdeaDto,
   ) {
     return this.cmoCalendarService.createIdea(req.tenantId, createData);
   }
@@ -199,16 +163,7 @@ export class CmoCalendarController {
   async updateIdea(
     @Param('id') id: string,
     @Request() req,
-    @Body()
-    updateData: {
-      title?: string;
-      description?: string;
-      category?: string;
-      source?: string;
-      priority?: string;
-      status?: string;
-      reviewNotes?: string;
-    },
+    @Body() updateData: UpdateIdeaDto,
   ) {
     return this.cmoCalendarService.updateIdea(id, req.tenantId, updateData);
   }

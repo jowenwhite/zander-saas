@@ -13,6 +13,8 @@ import {
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { TemplatesService } from './templates.service';
+import { CreateTemplateDto } from './dto/create-template.dto';
+import { UpdateTemplateDto } from './dto/update-template.dto';
 
 @Controller('cmo/templates')
 export class TemplatesController {
@@ -50,14 +52,7 @@ export class TemplatesController {
   @Post()
   async create(
     @Request() req,
-    @Body()
-    createData: {
-      name: string;
-      subject?: string;
-      body?: any;
-      category?: string;
-      status?: string;
-    },
+    @Body() createData: CreateTemplateDto,
   ) {
     return this.templatesService.create(req.tenantId, createData);
   }
@@ -77,14 +72,7 @@ export class TemplatesController {
   async update(
     @Param('id') id: string,
     @Request() req,
-    @Body()
-    updateData: {
-      name?: string;
-      subject?: string;
-      body?: any;
-      category?: string;
-      status?: string;
-    },
+    @Body() updateData: UpdateTemplateDto,
   ) {
     return this.templatesService.update(id, req.tenantId, updateData);
   }

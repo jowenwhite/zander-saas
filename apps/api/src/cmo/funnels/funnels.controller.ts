@@ -12,6 +12,8 @@ import {
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { FunnelsService } from './funnels.service';
+import { CreateFunnelDto } from './dto/create-funnel.dto';
+import { UpdateFunnelDto } from './dto/update-funnel.dto';
 
 @Controller('cmo/funnels')
 export class FunnelsController {
@@ -35,18 +37,7 @@ export class FunnelsController {
   @Post()
   async create(
     @Request() req,
-    @Body()
-    createData: {
-      name: string;
-      description?: string;
-      conversionGoal?: string;
-      stages?: {
-        name: string;
-        stageType: string;
-        stageOrder: number;
-        config?: any;
-      }[];
-    },
+    @Body() createData: CreateFunnelDto,
   ) {
     return this.funnelsService.create(req.tenantId, createData);
   }
@@ -55,20 +46,7 @@ export class FunnelsController {
   async update(
     @Param('id') id: string,
     @Request() req,
-    @Body()
-    updateData: {
-      name?: string;
-      description?: string;
-      status?: string;
-      conversionGoal?: string;
-      stages?: {
-        id?: string;
-        name: string;
-        stageType: string;
-        stageOrder: number;
-        config?: any;
-      }[];
-    },
+    @Body() updateData: UpdateFunnelDto,
   ) {
     return this.funnelsService.update(id, req.tenantId, updateData);
   }

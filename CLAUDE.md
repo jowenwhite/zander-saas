@@ -33,3 +33,60 @@ NEVER commit connection strings, passwords, or API keys to this repo.
 ## Database
 MCFOS: Railway PostgreSQL (awake-reprieve project)
 Zander: AWS RDS PostgreSQL
+
+## AI Executive Tool Write Standard
+
+### The Problem
+NestJS ValidationPipe with `whitelist: true` and `forbidNonWhitelisted: true` strips ALL request body properties when controllers use inline types instead of class-validator decorated DTOs. This causes write operations to fail silently.
+
+### The Rule
+ALL NestJS controller methods that accept request bodies MUST use DTOs with class-validator decorators. NEVER use inline types like `@Body() data: { name: string; ... }`.
+
+### Required Pattern
+```typescript
+// GOOD: Use decorated DTO
+import { CreatePersonaDto } from './dto/create-persona.dto';
+
+@Post()
+async create(@Body() data: CreatePersonaDto) { ... }
+
+// BAD: Inline type - properties will be stripped!
+@Post()
+async create(@Body() data: { name: string; age?: number }) { ... }
+```
+
+### DTO Template
+```typescript
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsArray,
+  IsObject,
+} from 'class-validator';
+
+export class CreateExampleDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsArray()
+  @IsOptional()
+  items?: any[];  // Complex nested objects, validated at runtime
+
+  @IsObject()
+  @IsOptional()
+  config?: Record<string, any>;
+}
+```
+
+### Checklist for New AI Executive Tools
+1. Identify the NestJS endpoint the tool calls (e.g., `/cmo/personas`)
+2. Verify the controller uses a DTO class (not inline type)
+3. Verify the DTO has class-validator decorators on ALL properties
+4. For complex nested objects, use `any[]` or `Record<string, any>`
+5. Test the tool end-to-end after implementation

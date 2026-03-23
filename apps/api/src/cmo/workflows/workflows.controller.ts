@@ -12,6 +12,8 @@ import {
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { WorkflowsService } from './workflows.service';
+import { CreateWorkflowDto } from './dto/create-workflow.dto';
+import { UpdateWorkflowDto } from './dto/update-workflow.dto';
 
 @Controller('cmo/workflows')
 export class WorkflowsController {
@@ -30,21 +32,7 @@ export class WorkflowsController {
   @Post()
   async create(
     @Request() req,
-    @Body()
-    createData: {
-      name: string;
-      description?: string;
-      triggerType: string;
-      triggerConfig?: any;
-      nodes?: {
-        nodeType: string;
-        name: string;
-        config?: any;
-        positionX?: number;
-        positionY?: number;
-        sortOrder?: number;
-      }[];
-    },
+    @Body() createData: CreateWorkflowDto,
   ) {
     return this.workflowsService.create(req.tenantId, createData);
   }
@@ -53,25 +41,7 @@ export class WorkflowsController {
   async update(
     @Param('id') id: string,
     @Request() req,
-    @Body()
-    updateData: {
-      name?: string;
-      description?: string;
-      triggerType?: string;
-      triggerConfig?: any;
-      nodes?: {
-        id?: string;
-        nodeType: string;
-        name: string;
-        config?: any;
-        positionX?: number;
-        positionY?: number;
-        nextNodeId?: string;
-        trueBranchId?: string;
-        falseBranchId?: string;
-        sortOrder?: number;
-      }[];
-    },
+    @Body() updateData: UpdateWorkflowDto,
   ) {
     return this.workflowsService.update(id, req.tenantId, updateData);
   }
