@@ -36,6 +36,8 @@ export default function CMOPersonasPage() {
   const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingPersona, setEditingPersona] = useState<Persona | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -115,8 +117,84 @@ export default function CMOPersonasPage() {
     }
   };
 
+  const handleUpdatePersona = async (data: PersonaFormData) => {
+    if (!editingPersona) return;
+
+    try {
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+
+      const response = await fetch(`${apiUrl}/cmo/personas/${editingPersona.id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        showToast('Persona updated successfully!');
+        setEditingPersona(null);
+        fetchPersonas();
+      } else {
+        showToast('Failed to update persona', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating persona:', error);
+      showToast('Failed to update persona', 'error');
+    }
+  };
+
+  const handleDeletePersona = async (personaId: string) => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+
+      const response = await fetch(`${apiUrl}/cmo/personas/${personaId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        showToast('Persona deleted successfully!');
+        setShowDeleteConfirm(null);
+        setEditingPersona(null);
+        if (selectedPersonaId === personaId) {
+          setSelectedPersonaId(null);
+        }
+        fetchPersonas();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        showToast(errorData.message || 'Failed to delete persona', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting persona:', error);
+      showToast('Failed to delete persona', 'error');
+    }
+  };
+
+  const handleCardClick = (persona: Persona) => {
+    setEditingPersona(persona);
+  };
+
   useEffect(() => {
     fetchPersonas();
+  }, [fetchPersonas]);
+
+  // Listen for PEP tool execution events to refresh personas
+  useEffect(() => {
+    const handleToolExecuted = (e: CustomEvent) => {
+      if (e.detail?.tools?.some((t: { tool: string; success: boolean }) =>
+        t.tool === 'create_persona' && t.success
+      )) {
+        fetchPersonas();
+      }
+    };
+    window.addEventListener('pep:tool-executed', handleToolExecuted as EventListener);
+    return () => window.removeEventListener('pep:tool-executed', handleToolExecuted as EventListener);
   }, [fetchPersonas]);
 
   if (loading) {
@@ -183,6 +261,7 @@ export default function CMOPersonasPage() {
                   persona={persona}
                   isSelected={selectedPersonaId === persona.id}
                   onSelect={() => setSelectedPersonaId(persona.id)}
+                  onEdit={() => handleCardClick(persona)}
                 />
               ))}
             </div>
@@ -205,6 +284,44 @@ export default function CMOPersonasPage() {
         onClose={() => setShowCreateModal(false)}
         onSave={handleCreatePersona}
       />
+
+      {/* Edit Persona Modal */}
+      <PersonaModal
+        isOpen={!!editingPersona}
+        onClose={() => setEditingPersona(null)}
+        onSave={handleUpdatePersona}
+        initialData={editingPersona ? {
+          name: editingPersona.name,
+          tagline: editingPersona.tagline || '',
+          painPoints: editingPersona.painPoints || [],
+          goals: editingPersona.goals || [],
+          preferredChannels: editingPersona.preferredChannels || [],
+        } : undefined}
+        onDelete={editingPersona ? () => setShowDeleteConfirm(editingPersona.id) : undefined}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div style={overlayStyle}>
+          <div style={confirmDialogStyle}>
+            <h3 style={{ margin: '0 0 0.5rem', color: '#F0F0F5' }}>Delete Persona?</h3>
+            <p style={{ margin: '0 0 1.5rem', color: '#8888A0', fontSize: '0.9rem' }}>
+              This action cannot be undone. Any contacts linked to this persona will be unlinked.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(null)}>
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => handleDeletePersona(showDeleteConfirm)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </CMOLayout>
   );
 }
@@ -275,4 +392,23 @@ const toastStyle: CSSProperties = {
   fontWeight: '500',
   zIndex: 1200,
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+};
+
+const overlayStyle: CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1100,
+};
+
+const confirmDialogStyle: CSSProperties = {
+  backgroundColor: '#1C1C26',
+  borderRadius: '12px',
+  border: '1px solid #2A2A38',
+  padding: '1.5rem',
+  maxWidth: '400px',
+  width: '90%',
 };

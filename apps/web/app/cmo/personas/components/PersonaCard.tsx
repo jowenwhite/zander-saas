@@ -1,5 +1,6 @@
 'use client';
 import { CSSProperties } from 'react';
+import { Edit2 } from 'lucide-react';
 
 interface Persona {
   id: string;
@@ -16,13 +17,30 @@ interface PersonaCardProps {
   persona: Persona;
   isSelected: boolean;
   onSelect: () => void;
+  onEdit?: () => void;
 }
 
 export default function PersonaCard({
   persona,
   isSelected,
   onSelect,
+  onEdit,
 }: PersonaCardProps) {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // If onEdit is provided, clicking the card opens the edit modal
+    // Otherwise fall back to onSelect
+    if (onEdit) {
+      onEdit();
+    } else {
+      onSelect();
+    }
+  };
+
+  const handleSelectClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSelect();
+  };
+
   return (
     <div
       style={{
@@ -30,7 +48,7 @@ export default function PersonaCard({
         borderColor: isSelected ? 'var(--zander-blue)' : '#2A2A38',
         boxShadow: isSelected ? '0 0 0 2px var(--zander-blue)' : 'none',
       }}
-      onClick={onSelect}
+      onClick={handleCardClick}
     >
       <div style={headerStyle}>
         <div style={avatarStyle}>
@@ -89,6 +107,30 @@ export default function PersonaCard({
         <span style={contactCountStyle}>
           {persona._count?.contacts || 0} contacts
         </span>
+        <div style={actionsStyle}>
+          {onEdit && (
+            <button
+              onClick={handleSelectClick}
+              style={{
+                ...actionButtonStyle,
+                backgroundColor: isSelected ? 'var(--zander-blue)' : '#2A2A38',
+                color: isSelected ? 'white' : '#8888A0',
+              }}
+              title="Select for testing"
+            >
+              {isSelected ? 'Selected' : 'Select'}
+            </button>
+          )}
+          {onEdit && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              style={editIconStyle}
+              title="Edit persona"
+            >
+              <Edit2 size={14} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -201,9 +243,41 @@ const footerStyle: CSSProperties = {
   borderTop: '1px solid #2A2A38',
   paddingTop: '0.75rem',
   marginTop: '0.5rem',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
 };
 
 const contactCountStyle: CSSProperties = {
   fontSize: '0.75rem',
   color: '#8888A0',
+};
+
+const actionsStyle: CSSProperties = {
+  display: 'flex',
+  gap: '0.5rem',
+  alignItems: 'center',
+};
+
+const actionButtonStyle: CSSProperties = {
+  padding: '0.25rem 0.5rem',
+  borderRadius: '4px',
+  border: 'none',
+  fontSize: '0.7rem',
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.15s',
+};
+
+const editIconStyle: CSSProperties = {
+  padding: '0.35rem',
+  borderRadius: '4px',
+  border: 'none',
+  backgroundColor: '#2A2A38',
+  color: '#8888A0',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.15s',
 };

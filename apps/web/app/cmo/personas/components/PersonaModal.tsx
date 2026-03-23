@@ -16,6 +16,7 @@ interface PersonaModalProps {
   onClose: () => void;
   onSave: (data: PersonaFormData) => void;
   initialData?: PersonaFormData;
+  onDelete?: () => void;
 }
 
 const CHANNEL_OPTIONS = [
@@ -34,6 +35,7 @@ export default function PersonaModal({
   onClose,
   onSave,
   initialData,
+  onDelete,
 }: PersonaModalProps) {
   const [name, setName] = useState('');
   const [tagline, setTagline] = useState('');
@@ -99,17 +101,26 @@ export default function PersonaModal({
       subtitle="Define your ideal customer profile"
       size="lg"
       footer={
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
-            disabled={!name.trim() || saving}
-          >
-            {saving ? 'Saving...' : initialData ? 'Save Changes' : 'Create Persona'}
-          </Button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <div>
+            {initialData && onDelete && (
+              <Button variant="danger" onClick={onDelete}>
+                Delete
+              </Button>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+              disabled={!name.trim() || saving}
+            >
+              {saving ? 'Saving...' : initialData ? 'Save Changes' : 'Create Persona'}
+            </Button>
+          </div>
         </div>
       }
     >

@@ -48,6 +48,9 @@ Available Tools:
 - After tool use, summarize what was created
 - Offer to make adjustments or create related items
 
+**Support Tickets:**
+You only create support tickets when the user explicitly asks you to AND confirms they want one created. You never file tickets, escalate issues, or contact support autonomously — even if a tool fails or something goes wrong. If something fails, report it clearly in chat and wait for the user to decide what to do next.
+
 Remember: You're not just an advisor — you're an executive who gets things done.`;
 
 // Tool definitions following Anthropic's schema
@@ -545,22 +548,53 @@ async function executeTool(
       case 'create_persona': {
         const url = `${CMO_API_URL}/cmo/personas`;
         console.log(`[Don Tool] POST ${url}`);
-        const response = await fetch(url, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(toolInput),
-        });
-        const responseText = await response.text();
-        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
-        if (!response.ok) {
-          console.error(`[Don Tool] Failed to create persona: ${response.status} ${responseText}`);
-          return { success: false, error: `Failed to create persona (${response.status}): ${responseText}` };
+        console.log(`[Don Tool] Auth token present: ${!!authToken}, length: ${authToken?.length || 0}`);
+        console.log(`[Don Tool] Request body:`, JSON.stringify(toolInput, null, 2));
+
+        let response: Response;
+        try {
+          response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(toolInput),
+          });
+        } catch (fetchError) {
+          console.error(`[Don Tool] Network error calling ${url}:`, fetchError);
+          return { success: false, error: `Network error: Could not reach the server. Please try again.` };
         }
+
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText.substring(0, 500)}`);
+
+        if (!response.ok) {
+          // Parse error message if possible
+          let errorMessage = `Server returned ${response.status}`;
+          try {
+            const errorJson = JSON.parse(responseText);
+            errorMessage = errorJson.message || errorJson.error || errorMessage;
+          } catch {
+            errorMessage = responseText.substring(0, 200) || errorMessage;
+          }
+          console.error(`[Don Tool] Failed to create persona: ${response.status} - ${errorMessage}`);
+          return {
+            success: false,
+            error: `Failed to create persona: ${errorMessage}`
+          };
+        }
+
         try {
           const result = JSON.parse(responseText);
-          console.log(`[Don Tool] Persona created successfully:`, result);
-          return { success: true, result };
+          console.log(`[Don Tool] Persona created successfully:`, result.id, result.name);
+          return {
+            success: true,
+            result: {
+              id: result.id,
+              name: result.name,
+              message: `Created persona "${result.name}" successfully`
+            }
+          };
         } catch {
+          console.error(`[Don Tool] Persona created but response not valid JSON:`, responseText);
           return { success: true, result: { message: 'Persona created' } };
         }
       }
@@ -1383,15 +1417,23 @@ export async function POST(request: NextRequest) {
 
     // If tools were used, make a follow-up call to get Claude's response about the results
     if (toolResults.length > 0) {
+      const hasFailures = toolResults.some(tr => !tr.success);
       const toolResultsSummary = toolResults
         .map((tr) => {
           if (tr.success) {
             return `✅ Successfully executed ${tr.tool}: ${JSON.stringify(tr.result)}`;
           } else {
-            return `❌ Failed to execute ${tr.tool}: ${tr.error}`;
+            return `❌ FAILED to execute ${tr.tool}: ${tr.error}`;
           }
         })
         .join('\n');
+
+      console.log(`[Don] Tool execution summary (hasFailures=${hasFailures}):`, toolResultsSummary);
+
+      // Build follow-up prompt based on success/failure
+      const followUpPrompt = hasFailures
+        ? `Tool execution results:\n${toolResultsSummary}\n\nIMPORTANT: One or more tools FAILED. You MUST tell the user about the failure and what went wrong. Be direct - say "I wasn't able to create that [item] because [reason]". Offer to try again if appropriate.`
+        : `Tool execution results:\n${toolResultsSummary}\n\nPlease provide a brief, friendly summary of what was created or done. Be specific about what was saved and where the user can find it.`;
 
       // Make follow-up call for Claude to summarize what was done
       const followUpResponse = await fetch(ANTHROPIC_API_URL, {
@@ -1413,7 +1455,7 @@ export async function POST(request: NextRequest) {
             },
             {
               role: 'user',
-              content: `Tool execution results:\n${toolResultsSummary}\n\nPlease provide a brief, friendly summary of what was created or done. Be specific about what was saved and where the user can find it.`,
+              content: followUpPrompt,
             },
           ],
         }),

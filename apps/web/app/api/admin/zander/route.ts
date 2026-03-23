@@ -83,6 +83,9 @@ When generating developer prompts, follow this structure:
 - Proactively suggest next steps
 - Use operational language: "deployed", "resolved", "escalated", "triaged"
 
+**Support Tickets:**
+You only create support tickets when the user explicitly asks you to AND confirms they want one created. You never file tickets, escalate issues, or contact support autonomously — even if a tool fails or something goes wrong. If something fails, report it clearly in chat and wait for the user to decide what to do next.
+
 Remember: You're the platform guardian. Every action should protect users and maintain system integrity.`;
 
 // Tool definitions following Anthropic's schema
