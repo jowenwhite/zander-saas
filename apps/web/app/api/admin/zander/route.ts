@@ -2424,7 +2424,14 @@ ${isTechnical
         if (!response.ok) {
           return { success: false, error: `Failed to fetch revenue summary (${response.status})` };
         }
-        return { success: true, result: await response.json() };
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            ...data,
+            data_source_note: 'Revenue data reflects local database subscription records. Stripe live mode is active but not yet connected to a bank account. Data will reflect real transactions once Mercury bank account is connected to Stripe and first live subscription is created.'
+          }
+        };
       }
 
       case 'get_churn_report': {
@@ -2437,7 +2444,14 @@ ${isTechnical
         if (!response.ok) {
           return { success: false, error: `Failed to fetch churn report (${response.status})` };
         }
-        return { success: true, result: await response.json() };
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            ...data,
+            data_source_note: 'Churn data reflects local database subscription records. Stripe live mode is active but not yet connected to a bank account. Data will reflect real transactions once Mercury bank account is connected to Stripe and first live subscription is created.'
+          }
+        };
       }
 
       case 'get_cac_by_channel': {
@@ -2450,7 +2464,14 @@ ${isTechnical
         if (!response.ok) {
           return { success: false, error: `Failed to fetch CAC data (${response.status})` };
         }
-        return { success: true, result: await response.json() };
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            ...data,
+            data_source_note: 'CAC data reflects local database records. Stripe live mode is active but not yet connected to a bank account. Data will reflect real transactions once Mercury bank account is connected to Stripe and first live subscription is created.'
+          }
+        };
       }
 
       case 'get_founding_member_status': {
@@ -2463,7 +2484,14 @@ ${isTechnical
         if (!response.ok) {
           return { success: false, error: `Failed to fetch founding member status (${response.status})` };
         }
-        return { success: true, result: await response.json() };
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            ...data,
+            data_source_note: 'Waitlist data reflects WaitlistEntry database records. Test/seeded data may be present. Real entries will populate when $49 deposits are processed via live Stripe.'
+          }
+        };
       }
 
       // ========== SECTION 2: CUSTOMER HEALTH MONITORING ==========
