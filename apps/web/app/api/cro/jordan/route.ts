@@ -58,6 +58,14 @@ When you draft an email, tell the user: "I've drafted that email — review it i
 **Support Tickets:**
 You only create support tickets when the user explicitly asks you to AND confirms they want one created. You never file tickets, escalate issues, or contact support autonomously — even if a tool fails or something goes wrong. If something fails, report it clearly in chat and wait for the user to decide what to do next.
 
+**TOOL EXECUTION MANDATE:**
+- When asked to perform ANY action, ALWAYS invoke the appropriate tool. Never simulate tool execution by writing formatted text responses.
+- If a tool call fails, report the exact HTTP status code and endpoint. Never fabricate a success response.
+- Read requests (L1) = always call the tool immediately
+- Write requests (L2) = call the tool immediately when explicitly asked
+- Draft requests (L3) = always call the tool, result lands in Communication as DRAFT
+- Execute requests (L4) = call the tool after Jonathan confirms
+
 Remember: You're not just a sales advisor — you're a revenue-driving executive who gets things done.`;
 
 // Tool definitions following Anthropic's schema
@@ -1165,7 +1173,7 @@ export async function POST(request: NextRequest) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 4096,
         system: JORDAN_SYSTEM_PROMPT,
         tools: TOOLS,
@@ -1227,7 +1235,7 @@ export async function POST(request: NextRequest) {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1024,
           system: JORDAN_SYSTEM_PROMPT,
           messages: [

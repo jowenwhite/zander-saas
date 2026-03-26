@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Maximize2, Minimize2, Send, Bot, Lock } from 'lucide-react';
+import { X, Maximize2, Minimize2, Send, Bot, Lock, SquarePen } from 'lucide-react';
 import { usePEP, Executive, ExecutiveInfo, EXECUTIVES, ZANDER } from './PEPContext';
 import { getActiveTenant } from '../../utils/auth';
 
@@ -208,6 +208,12 @@ export default function PersistentExecutivePanel() {
     setActiveExecutive(exec.id);
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+    const key = getStorageKey(activeExecutive);
+    sessionStorage.removeItem(key);
+  };
+
   // Robot icon - shown when panel is hidden
   if (panelState === 'hidden') {
     return (
@@ -317,6 +323,23 @@ export default function PersistentExecutivePanel() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              onClick={handleNewChat}
+              title="New Conversation"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#8888A0',
+                cursor: 'pointer',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <SquarePen size={18} />
+            </button>
             <button
               onClick={panelState === 'fullscreen' ? exitFullscreen : enterFullscreen}
               title={panelState === 'fullscreen' ? 'Exit fullscreen' : 'Fullscreen'}

@@ -81,4 +81,26 @@ export class CreateCampaignDto {
   @Type(() => CampaignStepDto)
   @IsOptional()
   steps?: CampaignStepDto[];
+
+  // CMO Module fields - must match Prisma Campaign model
+  @IsString()
+  @IsOptional()
+  goal?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  budget?: number;
+
+  @IsString()
+  @IsOptional()
+  startDate?: string;
+
+  @IsString()
+  @IsOptional()
+  endDate?: string;
+
+  @IsString()
+  @IsOptional()
+  targetSegmentId?: string;
 }

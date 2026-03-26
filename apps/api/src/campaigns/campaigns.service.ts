@@ -43,6 +43,12 @@ export class CampaignsService {
     triggerType?: string;
     triggerConfig?: any;
     isFromTreasury?: boolean;
+    // CMO Module fields
+    goal?: string;
+    budget?: number;
+    startDate?: string;
+    endDate?: string;
+    targetSegmentId?: string;
     steps?: {
       order: number;
       channel: string;
@@ -63,6 +69,12 @@ export class CampaignsService {
         triggerType: data.triggerType,
         triggerConfig: data.triggerConfig || {},
         isFromTreasury: data.isFromTreasury || false,
+        // CMO Module fields
+        goal: data.goal,
+        budget: data.budget,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        targetSegmentId: data.targetSegmentId,
       },
     });
 
@@ -93,6 +105,12 @@ export class CampaignsService {
     status?: string;
     triggerType?: string;
     triggerConfig?: any;
+    // CMO Module fields
+    goal?: string;
+    budget?: number;
+    startDate?: string;
+    endDate?: string;
+    targetSegmentId?: string;
     steps?: {
       id?: string;
       order: number;
@@ -121,6 +139,12 @@ export class CampaignsService {
         status: data.status,
         triggerType: data.triggerType,
         triggerConfig: data.triggerConfig,
+        // CMO Module fields
+        goal: data.goal,
+        budget: data.budget,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        targetSegmentId: data.targetSegmentId,
       },
     });
 

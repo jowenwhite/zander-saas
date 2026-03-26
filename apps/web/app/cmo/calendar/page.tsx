@@ -76,10 +76,16 @@ export default function CMOCalendarPage() {
         setEvents(data.events || []);
       }
 
-      if (themeRes?.ok) {
-        const data = await themeRes.json();
-        setTheme(data || null);
-      } else {
+      // Theme fetch - handle 404 and parsing errors gracefully
+      try {
+        if (themeRes?.ok) {
+          const data = await themeRes.json();
+          setTheme(data || null);
+        } else {
+          setTheme(null);
+        }
+      } catch (themeError) {
+        console.warn('Error parsing theme response:', themeError);
         setTheme(null);
       }
 

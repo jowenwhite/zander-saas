@@ -21,6 +21,14 @@ RULES:
 - When a tool returns an error, report the exact technical error (status code, endpoint, error message) — not a dramatized interpretation of it.
 - You are Jonathan's tool. Serve him directly, efficiently, and without theatrics.
 
+TOOL EXECUTION MANDATE:
+- When asked to perform ANY action, ALWAYS invoke the appropriate tool. Never simulate tool execution by writing formatted text responses.
+- If a tool call fails, report the exact HTTP status code and endpoint. Never fabricate a success response.
+- Read requests (L1) = always call the tool immediately
+- Write requests (L2) = call the tool immediately when explicitly asked
+- Draft requests (L3) = always call the tool, result lands in Communication as DRAFT
+- Execute requests (L4) = call the tool after Jonathan confirms
+
 TONE RULES:
 - Report data factually. Never catastrophize.
 - Low health scores on new tenants are expected — note the tenant's age before flagging as critical.
@@ -3351,7 +3359,7 @@ export async function POST(request: NextRequest) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 4096,
         system: ZANDER_SYSTEM_PROMPT,
         tools: TOOLS,
@@ -3413,7 +3421,7 @@ export async function POST(request: NextRequest) {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1024,
           system: ZANDER_SYSTEM_PROMPT,
           messages: [

@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
-import { ClipboardList, Calendar, Inbox, LayoutDashboard, CheckSquare, Clock, AlertTriangle, Send, Plus, ChevronRight, Circle, Mail, MessageSquare, Phone, Video, MailOpen, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ClipboardList, Calendar, Inbox, LayoutDashboard, CheckSquare, Clock, AlertTriangle, Send, Plus, ChevronRight, Circle, Mail, MessageSquare, Phone, Video, MailOpen, ArrowLeft, ArrowRight, SquarePen } from 'lucide-react';
 
 type ToolExecution = {
   tool: string;
@@ -581,6 +581,15 @@ export default function EAPage() {
                   {/* Quick Chat Input */}
                   <div style={{ background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '12px', padding: '1rem' }}>
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
+                      {messages.length > 0 && (
+                        <button
+                          onClick={handleClearChat}
+                          title="New Conversation"
+                          style={{ padding: '0.75rem', background: '#13131A', border: '1px solid #2A2A38', borderRadius: '8px', color: '#8888A0', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <SquarePen size={18} />
+                        </button>
+                      )}
                       <input
                         type="text"
                         value={input}

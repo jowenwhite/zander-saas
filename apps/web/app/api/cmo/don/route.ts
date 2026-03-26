@@ -17,13 +17,19 @@ You have tools to directly create and manage marketing assets. When a user asks 
 
 Available Tools:
 - create_persona: Create customer personas with demographics, pain points, and goals
-- save_marketing_plan: Save a marketing plan with goals and strategies
+- save_marketing_plan: Save a marketing plan with goals, SWOT, KPIs, and strategies
 - create_calendar_event: Add events to the marketing calendar
 - create_email_template: Create email templates for campaigns
 - create_workflow: Create marketing automation workflows
 - create_funnel: Create marketing funnels
-- update_brand_settings: Update brand voice, colors, or guidelines
+- update_brand_settings: Update brand voice, colors, fonts, logos, or guidelines
 - create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
+- create_campaign: Create a new marketing campaign with goals and triggers
+- update_campaign: Update an existing campaign
+- create_monthly_theme: Set a monthly focus theme for the marketing calendar
+- create_parking_lot_idea: Save a marketing idea for later
+- create_contact: Add a contact/lead to the marketing database
+- create_product: Add a product or service to the catalog
 - get_marketing_plan: View the current marketing plan
 - get_campaigns: List marketing campaigns with optional filters
 - get_personas: List all saved customer personas
@@ -31,8 +37,10 @@ Available Tools:
 - get_funnels: List marketing funnels
 - get_analytics_summary: Get marketing performance metrics
 - get_brand_settings: View current brand settings
-- create_campaign: Create a new marketing campaign
-- update_campaign: Update an existing campaign
+- get_monthly_themes: View monthly themes for the calendar
+- get_parking_lot_ideas: View saved marketing ideas
+- get_contacts: List marketing contacts/leads
+- get_products: List products and services
 - draft_campaign_brief: Draft a campaign brief document
 - draft_ad_copy: Generate ad copy variants as a draft
 
@@ -50,6 +58,14 @@ Available Tools:
 
 **Support Tickets:**
 You only create support tickets when the user explicitly asks you to AND confirms they want one created. You never file tickets, escalate issues, or contact support autonomously — even if a tool fails or something goes wrong. If something fails, report it clearly in chat and wait for the user to decide what to do next.
+
+**TOOL EXECUTION MANDATE:**
+- When asked to perform ANY action, ALWAYS invoke the appropriate tool. Never simulate tool execution by writing formatted text responses.
+- If a tool call fails, report the exact HTTP status code and endpoint. Never fabricate a success response.
+- Read requests (L1) = always call the tool immediately
+- Write requests (L2) = call the tool immediately when explicitly asked
+- Draft requests (L3) = always call the tool, result lands in Communication as DRAFT
+- Execute requests (L4) = call the tool after Jonathan confirms
 
 Remember: You're not just an advisor — you're an executive who gets things done.`;
 
@@ -69,6 +85,10 @@ const TOOLS = [
           type: 'string',
           description: 'Brief tagline summarizing this persona (e.g., "Success through simplification")'
         },
+        avatar: {
+          type: 'string',
+          description: 'URL to avatar image for this persona'
+        },
         painPoints: {
           type: 'array',
           items: { type: 'string' },
@@ -82,7 +102,7 @@ const TOOLS = [
         preferredChannels: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Marketing channels this persona prefers (e.g., "Email", "LinkedIn", "Trade Shows")'
+          description: 'Marketing channels this persona prefers (e.g., "Email", "SMS", "Social Media", "Direct Mail", "Phone", "In-Person", "Webinars", "Content Marketing")'
         },
         demographics: {
           type: 'object',
@@ -95,6 +115,19 @@ const TOOLS = [
             role: { type: 'string' }
           },
           description: 'Demographic details about the persona'
+        },
+        psychographics: {
+          type: 'object',
+          description: 'Psychographic details (values, attitudes, interests, lifestyle)'
+        },
+        behaviors: {
+          type: 'object',
+          description: 'Behavioral patterns (buying habits, brand interactions, decision process)'
+        },
+        brandAffinities: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Brands this persona likes or uses'
         }
       },
       required: ['name', 'painPoints', 'goals']
@@ -102,10 +135,15 @@ const TOOLS = [
   },
   {
     name: 'save_marketing_plan',
-    description: 'Save a marketing plan to the CMO Marketing Plan module. Use this when the user asks to create, save, or document a marketing strategy or plan. You can save mission, vision, and strategy separately.',
+    description: 'Save a marketing plan to the CMO Marketing Plan module. Use this when the user asks to create, save, or document a marketing strategy or plan. You can save mission, vision, strategy, goals, SWOT analysis, monthly themes, and KPIs.',
     input_schema: {
       type: 'object',
       properties: {
+        status: {
+          type: 'string',
+          enum: ['draft', 'active', 'complete'],
+          description: 'Plan status'
+        },
         mission: {
           type: 'string',
           description: 'The marketing mission statement - what your marketing team aims to accomplish'
@@ -121,7 +159,33 @@ const TOOLS = [
         goals: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Marketing goals for this plan'
+          description: 'Marketing goals for this plan (up to 3)'
+        },
+        swot: {
+          type: 'object',
+          properties: {
+            strengths: { type: 'array', items: { type: 'string' } },
+            weaknesses: { type: 'array', items: { type: 'string' } },
+            opportunities: { type: 'array', items: { type: 'string' } },
+            threats: { type: 'array', items: { type: 'string' } }
+          },
+          description: 'SWOT analysis'
+        },
+        monthlyThemes: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Monthly themes for Jan-Dec (12 items)'
+        },
+        kpis: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              target: { type: 'string' }
+            }
+          },
+          description: 'Key performance indicators with targets'
         },
         timeline: {
           type: 'string',
@@ -132,7 +196,7 @@ const TOOLS = [
           description: 'Estimated budget for the plan'
         }
       },
-      required: ['mission']
+      required: []
     }
   },
   {
@@ -159,12 +223,25 @@ const TOOLS = [
         },
         eventType: {
           type: 'string',
-          enum: ['campaign', 'content', 'meeting', 'deadline', 'launch', 'review'],
+          enum: ['email', 'social', 'blog', 'campaign', 'webinar', 'other'],
           description: 'Type of marketing event'
+        },
+        status: {
+          type: 'string',
+          enum: ['draft', 'scheduled', 'published', 'cancelled'],
+          description: 'Event status (default: draft)'
+        },
+        allDay: {
+          type: 'boolean',
+          description: 'Whether this is an all-day event'
         },
         color: {
           type: 'string',
           description: 'Color for the event (hex code)'
+        },
+        monthlyThemeId: {
+          type: 'string',
+          description: 'ID of the monthly theme this event belongs to'
         }
       },
       required: ['title', 'startDate']
@@ -190,7 +267,7 @@ const TOOLS = [
         },
         category: {
           type: 'string',
-          enum: ['welcome', 'nurture', 'promotional', 'newsletter', 'transactional', 're-engagement'],
+          enum: ['general', 'onboarding', 'marketing', 'sales', 'events', 'transactional'],
           description: 'Category of email template'
         }
       },
@@ -248,30 +325,56 @@ const TOOLS = [
   },
   {
     name: 'update_brand_settings',
-    description: 'Update brand settings like voice, colors, or guidelines. Use this when the user asks to set, update, or define brand attributes.',
+    description: 'Update brand settings like voice, colors, fonts, logos, or guidelines. Use this when the user asks to set, update, or define brand attributes.',
     input_schema: {
       type: 'object',
       properties: {
-        brandVoice: {
-          type: 'string',
-          description: 'Description of the brand voice and tone'
-        },
         primaryColor: {
           type: 'string',
-          description: 'Primary brand color (hex code)'
+          description: 'Primary brand color (hex code, e.g., #FF5733)'
         },
         secondaryColor: {
           type: 'string',
           description: 'Secondary brand color (hex code)'
         },
+        accentColor: {
+          type: 'string',
+          description: 'Accent brand color (hex code)'
+        },
+        fontPrimary: {
+          type: 'string',
+          enum: ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Playfair Display', 'Merriweather'],
+          description: 'Primary font family'
+        },
+        fontSecondary: {
+          type: 'string',
+          enum: ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Playfair Display', 'Merriweather'],
+          description: 'Secondary font family'
+        },
+        logoUrl: {
+          type: 'string',
+          description: 'URL to the main logo image'
+        },
+        logoIconUrl: {
+          type: 'string',
+          description: 'URL to the logo icon (small/square version)'
+        },
         tagline: {
           type: 'string',
           description: 'Brand tagline'
         },
-        values: {
-          type: 'array',
-          items: { type: 'string' },
-          description: 'Brand values'
+        mission: {
+          type: 'string',
+          description: 'Brand mission statement'
+        },
+        voiceTone: {
+          type: 'string',
+          enum: ['professional', 'friendly', 'authoritative', 'casual', 'playful', 'inspirational'],
+          description: 'Brand voice tone'
+        },
+        voiceGuidelines: {
+          type: 'string',
+          description: 'Detailed brand voice guidelines and writing style notes'
         }
       },
       required: []
@@ -394,7 +497,210 @@ const TOOLS = [
       required: []
     }
   },
+  {
+    name: 'get_monthly_themes',
+    description: 'Get monthly themes for the marketing calendar.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        year: {
+          type: 'number',
+          description: 'Year to get themes for (defaults to current year)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_parking_lot_ideas',
+    description: 'Get ideas from the marketing idea parking lot.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'get_contacts',
+    description: 'Get marketing contacts/leads.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          description: 'Maximum number of contacts to return (default 50)'
+        },
+        search: {
+          type: 'string',
+          description: 'Search by name, email, or company'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_products',
+    description: 'Get products and services from the catalog.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['PHYSICAL', 'SERVICE', 'SUBSCRIPTION', 'DIGITAL', 'ACCESS', 'BUNDLE'],
+          description: 'Filter by product type'
+        },
+        status: {
+          type: 'string',
+          enum: ['ACTIVE', 'DRAFT', 'DISCONTINUED'],
+          description: 'Filter by status'
+        }
+      },
+      required: []
+    }
+  },
   // ========== L2 WRITE TOOLS ==========
+  {
+    name: 'create_monthly_theme',
+    description: 'Create a monthly theme for the marketing calendar. Use this when the user wants to set a focus theme for a specific month.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        year: {
+          type: 'number',
+          description: 'Year for the theme (e.g., 2025)'
+        },
+        month: {
+          type: 'number',
+          description: 'Month number (1-12)'
+        },
+        name: {
+          type: 'string',
+          description: 'Theme name (e.g., "Customer Appreciation Month", "Product Launch Sprint")'
+        },
+        description: {
+          type: 'string',
+          description: 'Description of the theme focus'
+        },
+        focusAreas: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Key focus areas for this month'
+        },
+        colorCode: {
+          type: 'string',
+          description: 'Color code for the theme (hex)'
+        }
+      },
+      required: ['year', 'month', 'name']
+    }
+  },
+  {
+    name: 'create_parking_lot_idea',
+    description: 'Add an idea to the marketing idea parking lot. Use this when the user has a marketing idea to save for later.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'Title of the idea'
+        },
+        description: {
+          type: 'string',
+          description: 'Description of the idea'
+        },
+        category: {
+          type: 'string',
+          enum: ['email', 'social', 'blog', 'campaign', 'webinar', 'other'],
+          description: 'Category of the idea'
+        },
+        priority: {
+          type: 'string',
+          enum: ['high', 'medium', 'low'],
+          description: 'Priority level'
+        }
+      },
+      required: ['title']
+    }
+  },
+  {
+    name: 'create_contact',
+    description: 'Create a new marketing contact/lead. Use this when the user wants to add a contact to the marketing database.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        firstName: {
+          type: 'string',
+          description: 'First name'
+        },
+        lastName: {
+          type: 'string',
+          description: 'Last name'
+        },
+        email: {
+          type: 'string',
+          description: 'Email address'
+        },
+        phone: {
+          type: 'string',
+          description: 'Phone number'
+        },
+        company: {
+          type: 'string',
+          description: 'Company name'
+        },
+        title: {
+          type: 'string',
+          description: 'Job title'
+        }
+      },
+      required: ['firstName', 'lastName', 'email']
+    }
+  },
+  {
+    name: 'create_product',
+    description: 'Create a new product or service in the catalog. Use this when the user wants to add a product for marketing.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Product name'
+        },
+        description: {
+          type: 'string',
+          description: 'Product description'
+        },
+        sku: {
+          type: 'string',
+          description: 'SKU/product code'
+        },
+        category: {
+          type: 'string',
+          description: 'Product category'
+        },
+        type: {
+          type: 'string',
+          enum: ['PHYSICAL', 'SERVICE', 'SUBSCRIPTION', 'DIGITAL', 'ACCESS', 'BUNDLE'],
+          description: 'Product type'
+        },
+        status: {
+          type: 'string',
+          enum: ['ACTIVE', 'DRAFT', 'DISCONTINUED'],
+          description: 'Product status (default: ACTIVE)'
+        },
+        basePrice: {
+          type: 'number',
+          description: 'Base price in dollars'
+        },
+        unit: {
+          type: 'string',
+          enum: ['each', 'linear_ft', 'sq_ft', 'hour', 'day', 'week', 'month', 'year', 'project'],
+          description: 'Unit of measurement'
+        }
+      },
+      required: ['name', 'type']
+    }
+  },
   {
     name: 'create_campaign',
     description: 'Create a new marketing campaign. Use this when launching a new marketing initiative.',
@@ -404,6 +710,15 @@ const TOOLS = [
         name: {
           type: 'string',
           description: 'Campaign name'
+        },
+        description: {
+          type: 'string',
+          description: 'Campaign description'
+        },
+        type: {
+          type: 'string',
+          enum: ['single', 'multi', 'drip', 'event'],
+          description: 'Campaign type (default: multi)'
         },
         channel: {
           type: 'string',
@@ -428,7 +743,16 @@ const TOOLS = [
         },
         targetPersonaId: {
           type: 'string',
-          description: 'ID of target persona'
+          description: 'ID of target persona/segment'
+        },
+        triggerType: {
+          type: 'string',
+          enum: ['manual', 'form_submission', 'tag_added', 'deal_stage_changed'],
+          description: 'What triggers this campaign'
+        },
+        triggerConfig: {
+          type: 'object',
+          description: 'Configuration for the trigger (e.g., form ID, tag name)'
         }
       },
       required: ['name', 'channel']
@@ -603,13 +927,21 @@ async function executeTool(
         const url = `${CMO_API_URL}/cmo/marketing-plan`;
         console.log(`[Don Tool] POST ${url}`);
 
-        // Map Don's tool fields to API fields
+        // Map Don's tool fields to API fields - includes all plan fields
         const planData = {
-          status: 'active',
+          status: (toolInput.status as string) || 'active',
           mission: (toolInput.mission as string) || null,
           vision: (toolInput.vision as string) || null,
           strategy: (toolInput.strategy as string) || null,
           goals: (toolInput.goals as string[]) || [],
+          swot: toolInput.swot ? {
+            strengths: ((toolInput.swot as any).strengths || []).map((text: string, i: number) => ({ id: `strength-${Date.now()}-${i}`, text })),
+            weaknesses: ((toolInput.swot as any).weaknesses || []).map((text: string, i: number) => ({ id: `weakness-${Date.now()}-${i}`, text })),
+            opportunities: ((toolInput.swot as any).opportunities || []).map((text: string, i: number) => ({ id: `opportunity-${Date.now()}-${i}`, text })),
+            threats: ((toolInput.swot as any).threats || []).map((text: string, i: number) => ({ id: `threat-${Date.now()}-${i}`, text })),
+          } : null,
+          monthlyThemes: (toolInput.monthlyThemes as string[]) || null,
+          kpis: (toolInput.kpis as Array<Record<string, unknown>>) || null,
           budget: (toolInput.budget as string) || null,
           timeline: (toolInput.timeline as string) || null,
         };
@@ -647,9 +979,10 @@ async function executeTool(
           description: (toolInput.description as string) || null,
           startTime: toolInput.startDate as string,  // API field name is startTime
           endTime: (toolInput.endDate as string) || (toolInput.startDate as string),  // API field name is endTime
-          eventType: (toolInput.eventType as string) || 'meeting',
+          eventType: (toolInput.eventType as string) || 'campaign',
           color: (toolInput.color as string) || null,
-          allDay: false,
+          allDay: (toolInput.allDay as boolean) || false,
+          monthlyThemeId: (toolInput.monthlyThemeId as string) || null,
         };
 
         console.log(`[Don Tool] Calendar event data:`, JSON.stringify(eventData, null, 2));
@@ -717,7 +1050,6 @@ async function executeTool(
           description: (toolInput.description as string) || null,
           triggerType: toolInput.triggerType as string,
           triggerConfig: (toolInput.triggerConfig as Record<string, unknown>) || {},
-          status: 'draft',
           nodes: [], // Empty nodes - user will add steps in workflow builder
         };
 
@@ -752,7 +1084,6 @@ async function executeTool(
           name: toolInput.name as string,
           description: (toolInput.description as string) || null,
           conversionGoal: (toolInput.conversionGoal as string) || null,
-          status: 'draft',
           stages: [], // Empty stages - user will add stages in funnel builder
         };
 
@@ -782,17 +1113,19 @@ async function executeTool(
         const url = `${CMO_API_URL}/cmo/assets/brand`;
         console.log(`[Don Tool] PATCH ${url}`);
 
-        // Map Don's tool fields to API fields
-        // API expects: voiceTone (not brandVoice)
+        // Build brand data with all supported fields
         const brandData: Record<string, unknown> = {};
-        if (toolInput.brandVoice) brandData.voiceTone = toolInput.brandVoice;
         if (toolInput.primaryColor) brandData.primaryColor = toolInput.primaryColor;
         if (toolInput.secondaryColor) brandData.secondaryColor = toolInput.secondaryColor;
+        if (toolInput.accentColor) brandData.accentColor = toolInput.accentColor;
+        if (toolInput.fontPrimary) brandData.fontPrimary = toolInput.fontPrimary;
+        if (toolInput.fontSecondary) brandData.fontSecondary = toolInput.fontSecondary;
+        if (toolInput.logoUrl) brandData.logoUrl = toolInput.logoUrl;
+        if (toolInput.logoIconUrl) brandData.logoIconUrl = toolInput.logoIconUrl;
         if (toolInput.tagline) brandData.tagline = toolInput.tagline;
-        if (toolInput.values) {
-          // Store values as part of voice guidelines
-          brandData.voiceGuidelines = `Brand Values: ${(toolInput.values as string[]).join(', ')}`;
-        }
+        if (toolInput.mission) brandData.mission = toolInput.mission;
+        if (toolInput.voiceTone) brandData.voiceTone = toolInput.voiceTone;
+        if (toolInput.voiceGuidelines) brandData.voiceGuidelines = toolInput.voiceGuidelines;
 
         console.log(`[Don Tool] Brand settings data:`, JSON.stringify(brandData, null, 2));
 
@@ -1081,6 +1414,141 @@ async function executeTool(
         }
       }
 
+      case 'get_monthly_themes': {
+        const year = (toolInput.year as number) || new Date().getFullYear();
+        const url = `${CMO_API_URL}/cmo/calendar/themes?year=${year}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get monthly themes (${response.status}): ${responseText}` };
+        }
+        try {
+          const themes = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              year,
+              count: themes.length,
+              themes: themes.map((t: Record<string, unknown>) => ({
+                id: t.id,
+                month: t.month,
+                name: t.name,
+                description: t.description,
+                focusAreas: t.focusAreas,
+                colorCode: t.colorCode
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse monthly themes data' };
+        }
+      }
+
+      case 'get_parking_lot_ideas': {
+        const url = `${CMO_API_URL}/cmo/calendar/ideas`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get parking lot ideas (${response.status}): ${responseText}` };
+        }
+        try {
+          const ideas = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: ideas.length,
+              ideas: ideas.map((i: Record<string, unknown>) => ({
+                id: i.id,
+                title: i.title,
+                description: i.description,
+                category: i.category,
+                priority: i.priority,
+                createdAt: i.createdAt
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse parking lot ideas data' };
+        }
+      }
+
+      case 'get_contacts': {
+        const params = new URLSearchParams();
+        if (toolInput.search) params.append('search', toolInput.search as string);
+        const limit = (toolInput.limit as number) || 50;
+        params.append('limit', String(limit));
+
+        const url = `${CMO_API_URL}/cmo/people${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get contacts (${response.status}): ${responseText}` };
+        }
+        try {
+          const contacts = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: contacts.length,
+              contacts: contacts.map((c: Record<string, unknown>) => ({
+                id: c.id,
+                firstName: c.firstName,
+                lastName: c.lastName,
+                email: c.email,
+                phone: c.phone,
+                company: c.company,
+                title: c.title
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse contacts data' };
+        }
+      }
+
+      case 'get_products': {
+        const params = new URLSearchParams();
+        if (toolInput.type) params.append('type', toolInput.type as string);
+        if (toolInput.status) params.append('status', toolInput.status as string);
+
+        const url = `${CMO_API_URL}/cmo/products${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get products (${response.status}): ${responseText}` };
+        }
+        try {
+          const products = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: products.length,
+              products: products.map((p: Record<string, unknown>) => ({
+                id: p.id,
+                name: p.name,
+                description: p.description,
+                sku: p.sku,
+                category: p.category,
+                type: p.type,
+                status: p.status,
+                basePrice: p.basePrice,
+                unit: p.unit
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse products data' };
+        }
+      }
+
       // ========== L2 WRITE TOOLS ==========
       case 'create_campaign': {
         const url = `${CMO_API_URL}/campaigns`;
@@ -1098,13 +1566,16 @@ async function executeTool(
 
         const campaignData = {
           name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          type: (toolInput.type as string) || 'multi',
           channels: channelMap[(toolInput.channel as string) || 'other'] || ['other'],
           budget: (toolInput.budget as number) || null,
           startDate: (toolInput.startDate as string) || null,
           endDate: (toolInput.endDate as string) || null,
           goal: (toolInput.goal as string) || null,
           targetSegmentId: (toolInput.targetPersonaId as string) || null,
-          status: 'draft',
+          triggerType: (toolInput.triggerType as string) || null,
+          triggerConfig: (toolInput.triggerConfig as Record<string, unknown>) || null,
         };
 
         console.log(`[Don Tool] Campaign data:`, JSON.stringify(campaignData, null, 2));
@@ -1147,6 +1618,138 @@ async function executeTool(
           return { success: true, result };
         } catch {
           return { success: true, result: { message: 'Campaign updated' } };
+        }
+      }
+
+      case 'create_monthly_theme': {
+        const url = `${CMO_API_URL}/cmo/calendar/themes`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const themeData = {
+          year: toolInput.year as number,
+          month: toolInput.month as number,
+          name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          focusAreas: (toolInput.focusAreas as string[]) || [],
+          colorCode: (toolInput.colorCode as string) || null,
+        };
+
+        console.log(`[Don Tool] Theme data:`, JSON.stringify(themeData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(themeData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create monthly theme (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Monthly theme created' } };
+        }
+      }
+
+      case 'create_parking_lot_idea': {
+        const url = `${CMO_API_URL}/cmo/calendar/ideas`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const ideaData = {
+          title: toolInput.title as string,
+          description: (toolInput.description as string) || null,
+          category: (toolInput.category as string) || 'other',
+          priority: (toolInput.priority as string) || 'medium',
+        };
+
+        console.log(`[Don Tool] Idea data:`, JSON.stringify(ideaData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(ideaData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create parking lot idea (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Parking lot idea created' } };
+        }
+      }
+
+      case 'create_contact': {
+        const url = `${CMO_API_URL}/cmo/people`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const contactData = {
+          firstName: toolInput.firstName as string,
+          lastName: toolInput.lastName as string,
+          email: toolInput.email as string,
+          phone: (toolInput.phone as string) || null,
+          company: (toolInput.company as string) || null,
+          title: (toolInput.title as string) || null,
+        };
+
+        console.log(`[Don Tool] Contact data:`, JSON.stringify(contactData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(contactData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create contact (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Contact created' } };
+        }
+      }
+
+      case 'create_product': {
+        const url = `${CMO_API_URL}/cmo/products`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const productData = {
+          name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          sku: (toolInput.sku as string) || null,
+          category: (toolInput.category as string) || null,
+          type: toolInput.type as string,
+          status: (toolInput.status as string) || 'ACTIVE',
+          basePrice: (toolInput.basePrice as number) || null,
+          unit: (toolInput.unit as string) || 'each',
+        };
+
+        console.log(`[Don Tool] Product data:`, JSON.stringify(productData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(productData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create product (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Product created' } };
         }
       }
 
@@ -1374,7 +1977,7 @@ export async function POST(request: NextRequest) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 4096,
         system: DON_SYSTEM_PROMPT,
         tools: TOOLS,
@@ -1385,7 +1988,7 @@ export async function POST(request: NextRequest) {
     if (!claudeResponse.ok) {
       const errorText = await claudeResponse.text();
       console.error('Claude API error:', errorText);
-      return NextResponse.json({ error: 'AI service error' }, { status: 500 });
+      return NextResponse.json({ error: errorText }, { status: 500 });
     }
 
     const claudeData = await claudeResponse.json();
@@ -1444,7 +2047,7 @@ export async function POST(request: NextRequest) {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1024,
           system: DON_SYSTEM_PROMPT,
           messages: [

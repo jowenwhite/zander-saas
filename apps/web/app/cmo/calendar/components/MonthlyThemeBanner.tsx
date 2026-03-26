@@ -160,7 +160,7 @@ export default function MonthlyThemeBanner({
             </p>
           )}
 
-          {theme.focusAreas.length > 0 && (
+          {theme.focusAreas && theme.focusAreas.length > 0 && (
             <div style={{ marginBottom: '0.75rem' }}>
               <div
                 style={{
@@ -191,7 +191,7 @@ export default function MonthlyThemeBanner({
             </div>
           )}
 
-          {theme.goals.length > 0 && (
+          {theme.goals && theme.goals.length > 0 && (
             <div>
               <div
                 style={{

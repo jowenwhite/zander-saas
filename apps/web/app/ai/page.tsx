@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
-import { Ticket, AlertTriangle, Lightbulb } from 'lucide-react';
+import { Ticket, AlertTriangle, Lightbulb, SquarePen } from 'lucide-react';
 
 type ToolExecution = {
   tool: string;
@@ -252,17 +252,20 @@ export default function AskJordanPage() {
               {messages.length > 0 && (
                 <button
                   onClick={handleClearChat}
+                  title="New Conversation"
                   style={{
-                    padding: '0.5rem 1rem',
+                    padding: '0.5rem',
                     background: '#1C1C26',
                     border: '1px solid #2A2A38',
                     borderRadius: '6px',
                     color: '#8888A0',
                     cursor: 'pointer',
-                    fontSize: '0.875rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  Clear Chat
+                  <SquarePen size={18} />
                 </button>
               )}
             </div>
