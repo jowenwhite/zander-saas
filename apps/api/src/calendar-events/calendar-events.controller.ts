@@ -233,4 +233,25 @@ export class CalendarEventsController {
     );
   }
 
+  // Sync events FROM Google Calendar into Zander
+  @Post('sync-google')
+  async syncFromGoogle(@Request() req) {
+    try {
+      const result = await this.calendarEventsService.syncFromGoogleCalendar(
+        req.user.userId,
+        req.user.tenantId
+      );
+      return {
+        success: true,
+        message: `Synced ${result.synced} events from Google Calendar`,
+        ...result,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
 }

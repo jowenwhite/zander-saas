@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { ThrottleExceptionFilter } from './common/filters/throttle-exception.filter';
 
@@ -54,6 +55,7 @@ import { AssemblyModule } from './assembly/assembly.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000,  // 60 seconds
       limit: 60,   // 60 requests per minute (global default - generous for authenticated users)

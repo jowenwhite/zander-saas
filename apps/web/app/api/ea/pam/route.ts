@@ -16,6 +16,7 @@ Available Tools:
 - get_open_tasks: View open tasks with filters
 - get_onboarding_status: Check user onboarding progress
 - get_form_status: View form completion status
+- sync_gmail_inbox: Trigger a fresh Gmail sync to pull latest emails into inbox
 - create_task: Create a new task
 - update_task_status: Update task status (open/in-progress/completed/cancelled)
 - book_meeting: Schedule a meeting via Google Calendar (confirmation required)
@@ -150,6 +151,15 @@ const TOOLS = [
           description: 'Specific form ID (omit for all forms)'
         }
       },
+      required: []
+    }
+  },
+  {
+    name: 'sync_gmail_inbox',
+    description: 'Trigger a fresh Gmail sync to pull latest emails into inbox. Use this when the user asks to refresh or check for new emails.',
+    input_schema: {
+      type: 'object',
+      properties: {},
       required: []
     }
   },
@@ -455,6 +465,7 @@ async function executeTool(
             result: {
               messages: [],
               count: 0,
+              lastSynced: null,
               message: 'Inbox query requires /email-messages endpoint',
               note: 'Use Communications module directly for full inbox access'
             }
@@ -462,11 +473,25 @@ async function executeTool(
         }
 
         const messages = await response.json();
+
+        // Get the most recent message timestamp as lastSynced indicator
+        let lastSynced: string | null = null;
+        if (messages.length > 0) {
+          // Find the most recent createdAt timestamp
+          const timestamps = messages
+            .map((m: Record<string, unknown>) => m.createdAt as string)
+            .filter(Boolean)
+            .sort()
+            .reverse();
+          lastSynced = timestamps[0] || null;
+        }
+
         return {
           success: true,
           result: {
             count: messages.length,
             status: status,
+            lastSynced,
             messages: messages.slice(0, limit).map((m: Record<string, unknown>) => ({
               id: m.id,
               subject: m.subject,
@@ -652,6 +677,51 @@ async function executeTool(
         };
       }
 
+      case 'sync_gmail_inbox': {
+        // Trigger Gmail sync via the API
+        const url = `${EA_API_URL}/gmail/sync`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ maxResults: 50 })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[Pam] sync_gmail_inbox error: ${response.status} - ${errorText}`);
+
+          // Check if Gmail is not connected
+          if (response.status === 401 || errorText.includes('not connected')) {
+            return {
+              success: true,
+              result: {
+                message: 'Gmail is not connected',
+                action: 'Connect Gmail in Settings > Integrations to enable inbox sync',
+                connected: false
+              }
+            };
+          }
+
+          return {
+            success: false,
+            error: `Failed to sync Gmail: ${response.status}`
+          };
+        }
+
+        const result = await response.json();
+        return {
+          success: true,
+          result: {
+            message: result.synced > 0
+              ? `Synced ${result.synced} new emails from Gmail`
+              : 'Inbox is up to date — no new emails to sync',
+            synced: result.synced,
+            errors: result.errors,
+            syncedAt: new Date().toISOString()
+          }
+        };
+      }
+
       // ========== L4 WRITE TOOLS ==========
       case 'create_task': {
         const url = `${EA_API_URL}/tasks`;
@@ -803,15 +873,20 @@ async function executeTool(
         }
 
         const event = await response.json();
+        const hasMeetLink = !!event.meetingUrl;
+
         return {
           success: true,
           result: {
-            message: 'Meeting booked successfully',
+            message: hasMeetLink
+              ? `Meeting booked. Google Meet link: ${event.meetingUrl}`
+              : 'Meeting saved to your Zander calendar. Connect Google Calendar in Settings to enable Meet links.',
             eventId: event.id,
             title,
             startTime: startDate.toLocaleString(),
             attendee: attendeeEmail,
-            note: 'Calendar invite will be sent to attendee'
+            meetingUrl: event.meetingUrl || null,
+            meetingPlatform: event.meetingPlatform || null
           }
         };
       }

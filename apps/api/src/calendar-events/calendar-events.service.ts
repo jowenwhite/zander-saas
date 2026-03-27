@@ -1,9 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { GoogleAuthService } from '../auth/google/google-auth.service';
 
 @Injectable()
 export class CalendarEventsService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(CalendarEventsService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private googleAuthService: GoogleAuthService,
+  ) {}
 
   async create(tenantId: string, createdById: string, data: {
     title: string;
@@ -86,6 +92,62 @@ export class CalendarEventsService {
           type: r.type,
           timing: r.timing,
         })),
+      });
+    }
+
+    // Sync to Google Calendar if user has connected Google
+    try {
+      const googleToken = await this.googleAuthService.getTokenByUserId(createdById);
+      if (googleToken) {
+        const calendar = await this.googleAuthService.getCalendarClient(createdById);
+
+        const googleEvent = await calendar.events.insert({
+          calendarId: 'primary',
+          conferenceDataVersion: 1,
+          requestBody: {
+            summary: eventData.title,
+            description: eventData.description || '',
+            start: {
+              dateTime: eventData.startTime.toISOString(),
+              timeZone: eventData.timezone || 'America/New_York',
+            },
+            end: {
+              dateTime: eventData.endTime.toISOString(),
+              timeZone: eventData.timezone || 'America/New_York',
+            },
+            conferenceData: {
+              createRequest: {
+                requestId: event.id,
+                conferenceSolutionKey: { type: 'hangoutsMeet' },
+              },
+            },
+          },
+        });
+
+        // Update internal record with Google Calendar data
+        const hangoutLink = googleEvent.data.hangoutLink;
+        await this.prisma.calendarEvent.update({
+          where: { id: event.id },
+          data: {
+            externalEventId: googleEvent.data.id,
+            externalCalendar: 'google',
+            syncStatus: 'synced',
+            lastSyncedAt: new Date(),
+            meetingUrl: hangoutLink || null,
+            meetingPlatform: hangoutLink ? 'Google Meet' : null,
+          },
+        });
+
+        this.logger.log(`Event ${event.id} synced to Google Calendar: ${googleEvent.data.id}`);
+      }
+    } catch (error) {
+      // Google Calendar sync failed - update status but don't fail the create
+      this.logger.error(`Failed to sync event ${event.id} to Google Calendar: ${error.message}`);
+      await this.prisma.calendarEvent.update({
+        where: { id: event.id },
+        data: {
+          syncStatus: 'failed',
+        },
       });
     }
 
@@ -463,6 +525,85 @@ export class CalendarEventsService {
       },
       orderBy: { startTime: 'asc' },
     });
+  }
+
+  // Sync events FROM Google Calendar into Zander
+  async syncFromGoogleCalendar(userId: string, tenantId: string): Promise<{ synced: number; created: number; updated: number }> {
+    const googleToken = await this.googleAuthService.getTokenByUserId(userId);
+    if (!googleToken) {
+      throw new Error('Google Calendar not connected. Connect in Settings > Integrations.');
+    }
+
+    const calendar = await this.googleAuthService.getCalendarClient(userId);
+
+    // Fetch upcoming events from Google Calendar
+    const response = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: new Date().toISOString(),
+      maxResults: 50,
+      singleEvents: true,
+      orderBy: 'startTime',
+    });
+
+    const googleEvents = response.data.items || [];
+    let created = 0;
+    let updated = 0;
+
+    for (const gEvent of googleEvents) {
+      if (!gEvent.id || !gEvent.start) continue;
+
+      const startTime = gEvent.start.dateTime
+        ? new Date(gEvent.start.dateTime)
+        : new Date(gEvent.start.date || '');
+      const endTime = gEvent.end?.dateTime
+        ? new Date(gEvent.end.dateTime)
+        : new Date(gEvent.end?.date || startTime);
+
+      // Check if event already exists in Zander
+      const existing = await this.prisma.calendarEvent.findFirst({
+        where: { externalEventId: gEvent.id, tenantId },
+      });
+
+      const eventData = {
+        title: gEvent.summary || 'Untitled Event',
+        description: gEvent.description || null,
+        location: gEvent.location || null,
+        startTime,
+        endTime,
+        allDay: !gEvent.start.dateTime,
+        timezone: gEvent.start.timeZone || 'America/New_York',
+        meetingUrl: gEvent.hangoutLink || null,
+        meetingPlatform: gEvent.hangoutLink ? 'Google Meet' : null,
+        externalEventId: gEvent.id,
+        externalCalendar: 'google',
+        syncStatus: 'synced',
+        lastSyncedAt: new Date(),
+        status: gEvent.status === 'cancelled' ? 'cancelled' : 'scheduled',
+      };
+
+      if (existing) {
+        // Update existing event
+        await this.prisma.calendarEvent.update({
+          where: { id: existing.id },
+          data: eventData,
+        });
+        updated++;
+      } else {
+        // Create new event
+        await this.prisma.calendarEvent.create({
+          data: {
+            ...eventData,
+            tenantId,
+            createdById: userId,
+            eventType: 'meeting',
+          },
+        });
+        created++;
+      }
+    }
+
+    this.logger.log(`Google Calendar sync complete: ${created} created, ${updated} updated`);
+    return { synced: created + updated, created, updated };
   }
 
 }
