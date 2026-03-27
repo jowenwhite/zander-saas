@@ -1,22 +1,28 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as Twilio from 'twilio';
 import { getOwnershipFilter } from '../common/utils/ownership-filter.util';
+import { TwilioCredentialsService } from '../integrations/twilio-credentials.service';
 
 @Injectable()
 export class SmsMessagesService {
   private readonly logger = new Logger(SmsMessagesService.name);
-  private twilioClient: Twilio.Twilio | null = null;
+  private fallbackTwilioClient: Twilio.Twilio | null = null;
 
-  constructor(private prisma: PrismaService) {
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => TwilioCredentialsService))
+    private twilioCredentialsService: TwilioCredentialsService,
+  ) {
+    // Fallback client from environment variables (for backward compatibility)
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
 
     if (accountSid && authToken && accountSid !== 'your_account_sid_here') {
-      this.twilioClient = Twilio.default(accountSid, authToken);
-      this.logger.log('Twilio client initialized');
+      this.fallbackTwilioClient = Twilio.default(accountSid, authToken);
+      this.logger.log('Fallback Twilio client initialized from env vars');
     } else {
-      this.logger.warn('Twilio credentials not configured');
+      this.logger.warn('Fallback Twilio credentials not configured');
     }
   }
 
@@ -30,14 +36,21 @@ export class SmsMessagesService {
     userId?: string;
   }) {
     const { tenantId, to, body, contactId, dealId, userId } = params;
-    const fromNumber = process.env.TWILIO_PHONE_NUMBER;
 
-    if (!this.twilioClient) {
-      throw new Error('Twilio not configured');
+    // Try tenant-scoped credentials first, then fall back to env vars
+    const twilioClient = await this.twilioCredentialsService.getTwilioClient(tenantId);
+    const fromNumber = await this.twilioCredentialsService.getFromNumber(tenantId);
+
+    if (!twilioClient) {
+      throw new Error('Twilio not configured. Connect Twilio in Settings > Integrations.');
+    }
+
+    if (!fromNumber) {
+      throw new Error('Twilio phone number not configured');
     }
 
     try {
-      const message = await this.twilioClient.messages.create({
+      const message = await twilioClient.messages.create({
         body,
         from: fromNumber,
         to,

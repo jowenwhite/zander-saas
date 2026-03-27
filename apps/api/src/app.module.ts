@@ -46,6 +46,7 @@ import { AuditLogModule } from './common/audit-log.module';
 import { AuditLogFeatureModule } from './audit-log/audit-log.module';
 import { TasksModule } from './tasks/tasks.module';
 import { AssemblyModule } from './assembly/assembly.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { AssemblyModule } from './assembly/assembly.module';
     AuditLogFeatureModule, // MEDIUM-4: Audit log API endpoints
     TasksModule,           // EA Module: Task management for Pam
     AssemblyModule,        // HQ Module: Assembly document generation
+    IntegrationsModule,    // Tenant-scoped integration credentials (Twilio, Calendly)
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [

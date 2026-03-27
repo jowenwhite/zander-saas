@@ -6,7 +6,7 @@ import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { logout } from '../utils/auth';
-import { User, Building2, Users, BarChart3, Link2, Lock, ScrollText, CreditCard, Database, Mail, Inbox, Send, Cloud, MessageSquare, FileText, Calendar, Clock, FolderOpen, Package, Rocket, BookOpen, CalendarClock, AlertTriangle, Trash2, Check } from 'lucide-react';
+import { User, Building2, Users, BarChart3, Link2, Lock, ScrollText, CreditCard, Database, Mail, Inbox, Send, Cloud, MessageSquare, FileText, Calendar, Clock, FolderOpen, Package, Rocket, BookOpen, CalendarClock, AlertTriangle, Trash2, Check, Phone, Contact, Apple } from 'lucide-react';
 
 // Helper functions for month conversion
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -50,6 +50,9 @@ const getIntegrationIcon = (iconKey: string, size: number = 24): React.ReactNode
     gdrive: <FolderOpen size={size} />,
     dropbox: <Package size={size} />,
     onedrive: <Cloud size={size} />,
+    twilio: <Phone size={size} />,
+    google_contacts: <Contact size={size} />,
+    apple_contacts: <Apple size={size} />,
   };
   return icons[iconKey] || <Cloud size={size} />;
 };
@@ -121,12 +124,31 @@ export default function SettingsPage() {
   const [outlookEmail, setOutlookEmail] = useState<string | null>(null);
   const [syncingOutlook, setSyncingOutlook] = useState(false);
 
+  // Twilio state
+  const [twilioConnected, setTwilioConnected] = useState(false);
+  const [twilioPhone, setTwilioPhone] = useState<string | null>(null);
+  const [showTwilioModal, setShowTwilioModal] = useState(false);
+  const [twilioForm, setTwilioForm] = useState({ accountSid: '', authToken: '', phoneNumber: '' });
+  const [twilioLoading, setTwilioLoading] = useState(false);
+  const [twilioError, setTwilioError] = useState<string | null>(null);
+
+  // Calendly state
+  const [calendlyConnected, setCalendlyConnected] = useState(false);
+  const [showCalendlyModal, setShowCalendlyModal] = useState(false);
+  const [calendlyForm, setCalendlyForm] = useState({ apiKey: '' });
+  const [calendlyLoading, setCalendlyLoading] = useState(false);
+  const [calendlyError, setCalendlyError] = useState<string | null>(null);
+
   // Check Gmail connection status on load
   useEffect(() => {
     const checkGmailStatus = async () => {
       if (!user?.id) return;
+      const token = localStorage.getItem('zander_token');
+      if (!token) return;
       try {
-        const res = await fetch(`https://api.zanderos.com/gmail/status?userId=${user.id}`);
+        const res = await fetch('https://api.zanderos.com/gmail/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await res.json();
         setGmailConnected(data.connected);
         setGmailEmail(data.email);
@@ -149,6 +171,39 @@ export default function SettingsPage() {
       }
     };
     checkOutlookStatus();
+
+    // Check Twilio status
+    const checkTwilioStatus = async () => {
+      const token = localStorage.getItem('zander_token');
+      if (!token) return;
+      try {
+        const res = await fetch('https://api.zanderos.com/integrations/twilio/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setTwilioConnected(data.connected);
+        setTwilioPhone(data.phoneNumber);
+      } catch (error) {
+        console.error('Failed to check Twilio status:', error);
+      }
+    };
+    checkTwilioStatus();
+
+    // Check Calendly status
+    const checkCalendlyStatus = async () => {
+      const token = localStorage.getItem('zander_token');
+      if (!token) return;
+      try {
+        const res = await fetch('https://api.zanderos.com/integrations/calendly/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setCalendlyConnected(data.connected);
+      } catch (error) {
+        console.error('Failed to check Calendly status:', error);
+      }
+    };
+    checkCalendlyStatus();
   }, [user?.id]);
 
   const handleConnectGmail = () => {
@@ -214,7 +269,98 @@ export default function SettingsPage() {
     }
   };
 
+  // Twilio handlers
+  const handleConnectTwilio = async () => {
+    setTwilioLoading(true);
+    setTwilioError(null);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('https://api.zanderos.com/integrations/twilio/connect', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(twilioForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTwilioConnected(true);
+        setTwilioPhone(twilioForm.phoneNumber);
+        setShowTwilioModal(false);
+        setTwilioForm({ accountSid: '', authToken: '', phoneNumber: '' });
+      } else {
+        setTwilioError(data.error || 'Failed to connect Twilio');
+      }
+    } catch (error) {
+      setTwilioError('Failed to connect Twilio');
+    } finally {
+      setTwilioLoading(false);
+    }
+  };
+
+  const handleDisconnectTwilio = async () => {
+    const token = localStorage.getItem('zander_token');
+    try {
+      await fetch('https://api.zanderos.com/integrations/twilio/disconnect', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      setTwilioConnected(false);
+      setTwilioPhone(null);
+    } catch (error) {
+      console.error('Failed to disconnect Twilio:', error);
+    }
+  };
+
+  // Calendly handlers
+  const handleConnectCalendly = async () => {
+    setCalendlyLoading(true);
+    setCalendlyError(null);
+    const token = localStorage.getItem('zander_token');
+    try {
+      const res = await fetch('https://api.zanderos.com/integrations/calendly/connect', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(calendlyForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCalendlyConnected(true);
+        setShowCalendlyModal(false);
+        setCalendlyForm({ apiKey: '' });
+      } else {
+        setCalendlyError(data.error || 'Failed to connect Calendly');
+      }
+    } catch (error) {
+      setCalendlyError('Failed to connect Calendly');
+    } finally {
+      setCalendlyLoading(false);
+    }
+  };
+
+  const handleDisconnectCalendly = async () => {
+    const token = localStorage.getItem('zander_token');
+    try {
+      await fetch('https://api.zanderos.com/integrations/calendly/disconnect', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      setCalendlyConnected(false);
+    } catch (error) {
+      console.error('Failed to disconnect Calendly:', error);
+    }
+  };
+
   const integrations = {
+    phone: [
+      { id: 'twilio', name: 'Twilio', description: twilioPhone ? `Connected: ${twilioPhone}` : 'Send SMS messages via AI executives', status: 'available', connected: twilioConnected },
+      { id: 'google_contacts', name: 'Google Contacts', description: 'Sync contacts from Google', status: 'available', connected: gmailConnected },
+      { id: 'apple_contacts', name: 'Apple Contacts', description: 'Sync contacts from iCloud', status: 'soon', connected: false },
+    ],
     accounting: [
       { id: 'quickbooks', name: 'QuickBooks', description: 'Sync invoices, payments, and financial data', status: 'available', connected: false },
       { id: 'xero', name: 'Xero', description: 'Connect your Xero account', status: 'soon', connected: false },
@@ -238,7 +384,7 @@ export default function SettingsPage() {
     calendar: [
       { id: 'gcal', name: 'Google Calendar', description: 'Sync meetings and events', status: 'available', connected: gmailConnected },
       { id: 'outlook_cal', name: 'Outlook Calendar', description: 'Connect Outlook calendar', status: 'soon', connected: false },
-      { id: 'calendly', name: 'Calendly', description: 'Scheduling integration', status: 'soon', connected: false },
+      { id: 'calendly', name: 'Calendly', description: calendlyConnected ? 'Connected' : 'Scheduling integration', status: 'available', connected: calendlyConnected },
     ],
     storage: [
       { id: 'gdrive', name: 'Google Drive', description: 'Store and access files', status: 'available', connected: gmailConnected },
@@ -1286,7 +1432,7 @@ export default function SettingsPage() {
       {Object.entries(integrations).map(([category, items]) => (
         <div key={category} style={{ marginBottom: '2rem' }}>
           <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem', textTransform: 'capitalize' }}>
-            {category === 'crm' ? 'CRM & Sales' : category === 'email' ? 'Email & Communication' : category === 'calendar' ? 'Calendar & Scheduling' : category === 'storage' ? 'Cloud Storage' : category}
+            {category === 'phone' ? 'Phone & SMS' : category === 'crm' ? 'CRM & Sales' : category === 'email' ? 'Email & Communication' : category === 'calendar' ? 'Calendar & Scheduling' : category === 'storage' ? 'Cloud Storage' : category}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
             {items.map((integration) => (
@@ -1309,13 +1455,25 @@ export default function SettingsPage() {
                           {(integration.id === 'gmail' ? syncingGmail : syncingOutlook) ? 'Syncing...' : 'Sync Now'}
                         </button>
                       )}
-                      {(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive' || integration.id === 'outlook') && (
+                      {(integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive' || integration.id === 'outlook' || integration.id === 'google_contacts') && (
                         <button onClick={integration.id === 'outlook' ? handleDisconnectOutlook : handleDisconnectGmail} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: '#1C1C26', color: '#8888A0', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
+                      )}
+                      {integration.id === 'twilio' && (
+                        <button onClick={handleDisconnectTwilio} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: '#1C1C26', color: '#8888A0', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
+                      )}
+                      {integration.id === 'calendly' && (
+                        <button onClick={handleDisconnectCalendly} style={{ marginLeft: 'auto', padding: '0.35rem 0.75rem', background: '#1C1C26', color: '#8888A0', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>Disconnect</button>
                       )}
                     </div>
                   ) : integration.status === 'available' ? (
-                    <button 
-                      onClick={integration.id === 'outlook' ? handleConnectOutlook : (integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive') ? handleConnectGmail : undefined}
+                    <button
+                      onClick={
+                        integration.id === 'outlook' ? handleConnectOutlook :
+                        (integration.id === 'gmail' || integration.id === 'gcal' || integration.id === 'gdrive' || integration.id === 'google_contacts') ? handleConnectGmail :
+                        integration.id === 'twilio' ? () => setShowTwilioModal(true) :
+                        integration.id === 'calendly' ? () => setShowCalendlyModal(true) :
+                        undefined
+                      }
                       style={{ padding: '0.5rem 1rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}
                     >
                       Connect
@@ -2211,6 +2369,113 @@ export default function SettingsPage() {
                 style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', opacity: (!disable2FAPassword || twoFactorLoading) ? 0.7 : 1 }}
               >
                 {twoFactorLoading ? 'Disabling...' : 'Disable 2FA'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Twilio Connect Modal */}
+      {showTwilioModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '2rem', maxWidth: '480px', width: '90%' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.25rem' }}>Connect Twilio</h3>
+            <p style={{ margin: '0 0 1.5rem 0', color: '#8888A0', fontSize: '0.9rem' }}>
+              Enter your Twilio credentials to enable SMS messaging through AI executives.
+            </p>
+            {twilioError && (
+              <div style={{ background: 'rgba(220, 53, 69, 0.1)', border: '1px solid #DC3545', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem', color: '#DC3545', fontSize: '0.85rem' }}>
+                {twilioError}
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#F0F0F5', fontSize: '0.85rem', fontWeight: '600' }}>Account SID</label>
+                <input
+                  type="text"
+                  value={twilioForm.accountSid}
+                  onChange={(e) => setTwilioForm({ ...twilioForm, accountSid: e.target.value })}
+                  placeholder="AC..."
+                  style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '2px solid #2A2A38', borderRadius: '8px', color: '#F0F0F5', fontSize: '0.9rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#F0F0F5', fontSize: '0.85rem', fontWeight: '600' }}>Auth Token</label>
+                <input
+                  type="password"
+                  value={twilioForm.authToken}
+                  onChange={(e) => setTwilioForm({ ...twilioForm, authToken: e.target.value })}
+                  placeholder="Your auth token"
+                  style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '2px solid #2A2A38', borderRadius: '8px', color: '#F0F0F5', fontSize: '0.9rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#F0F0F5', fontSize: '0.85rem', fontWeight: '600' }}>From Phone Number</label>
+                <input
+                  type="text"
+                  value={twilioForm.phoneNumber}
+                  onChange={(e) => setTwilioForm({ ...twilioForm, phoneNumber: e.target.value })}
+                  placeholder="+1234567890"
+                  style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '2px solid #2A2A38', borderRadius: '8px', color: '#F0F0F5', fontSize: '0.9rem' }}
+                />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowTwilioModal(false); setTwilioError(null); setTwilioForm({ accountSid: '', authToken: '', phoneNumber: '' }); }}
+                style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConnectTwilio}
+                disabled={twilioLoading || !twilioForm.accountSid || !twilioForm.authToken || !twilioForm.phoneNumber}
+                style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', opacity: twilioLoading ? 0.7 : 1 }}
+              >
+                {twilioLoading ? 'Connecting...' : 'Connect'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Calendly Connect Modal */}
+      {showCalendlyModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '2rem', maxWidth: '480px', width: '90%' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.25rem' }}>Connect Calendly</h3>
+            <p style={{ margin: '0 0 1.5rem 0', color: '#8888A0', fontSize: '0.9rem' }}>
+              Enter your Calendly Personal Access Token to enable scheduling through AI executives.
+              <a href="https://calendly.com/integrations/api_webhooks" target="_blank" rel="noopener noreferrer" style={{ color: '#00CCEE', marginLeft: '0.25rem' }}>Get your token →</a>
+            </p>
+            {calendlyError && (
+              <div style={{ background: 'rgba(220, 53, 69, 0.1)', border: '1px solid #DC3545', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem', color: '#DC3545', fontSize: '0.85rem' }}>
+                {calendlyError}
+              </div>
+            )}
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#F0F0F5', fontSize: '0.85rem', fontWeight: '600' }}>Personal Access Token</label>
+              <input
+                type="password"
+                value={calendlyForm.apiKey}
+                onChange={(e) => setCalendlyForm({ ...calendlyForm, apiKey: e.target.value })}
+                placeholder="eyJ..."
+                style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '2px solid #2A2A38', borderRadius: '8px', color: '#F0F0F5', fontSize: '0.9rem' }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowCalendlyModal(false); setCalendlyError(null); setCalendlyForm({ apiKey: '' }); }}
+                style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConnectCalendly}
+                disabled={calendlyLoading || !calendlyForm.apiKey}
+                style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', opacity: calendlyLoading ? 0.7 : 1 }}
+              >
+                {calendlyLoading ? 'Connecting...' : 'Connect'}
               </button>
             </div>
           </div>

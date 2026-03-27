@@ -25,6 +25,9 @@ Available Tools:
 - draft_email_reply: Draft a reply to an existing communication (NEVER sends directly)
 - draft_daily_briefing: Draft a daily briefing email (NEVER sends directly)
 - draft_meeting_agenda: Draft a meeting agenda (NEVER sends directly)
+- send_sms: Send an SMS message (requires Twilio integration, asks for confirmation)
+- get_calendly_events: View upcoming Calendly scheduled events (requires Calendly integration)
+- create_calendly_link: Create a Calendly scheduling link for someone (requires Calendly integration)
 
 **How to Use Tools:**
 1. When asked about schedule — use get_scheduled_events
@@ -369,6 +372,86 @@ const TOOLS = [
         }
       },
       required: ['meetingTitle']
+    }
+  },
+  // ========== INTEGRATION TOOLS (require tenant credentials) ==========
+  {
+    name: 'send_sms',
+    description: 'Send an SMS message to a phone number. Requires Twilio integration to be connected in Settings. Asks for confirmation before sending.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        to: {
+          type: 'string',
+          description: 'Phone number to send to (required, E.164 format preferred e.g., +15551234567)'
+        },
+        body: {
+          type: 'string',
+          description: 'SMS message content (required, max 1600 characters)'
+        },
+        contactId: {
+          type: 'string',
+          description: 'Optional contact ID to link the SMS to'
+        },
+        confirmed: {
+          type: 'boolean',
+          description: 'Set to true after user confirms sending'
+        }
+      },
+      required: ['to', 'body']
+    }
+  },
+  {
+    name: 'get_calendly_events',
+    description: 'View upcoming scheduled Calendly events. Requires Calendly integration to be connected in Settings.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['active', 'canceled'],
+          description: 'Filter by event status (default: active)'
+        },
+        minStartTime: {
+          type: 'string',
+          description: 'Start of date range (ISO 8601 datetime, default: now)'
+        },
+        maxStartTime: {
+          type: 'string',
+          description: 'End of date range (ISO 8601 datetime, default: 7 days from now)'
+        },
+        count: {
+          type: 'number',
+          description: 'Maximum number of events to return (default: 20)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'create_calendly_link',
+    description: 'Create a single-use Calendly scheduling link for someone. Requires Calendly integration to be connected in Settings.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        eventTypeUri: {
+          type: 'string',
+          description: 'Calendly event type URI (required - get from get_calendly_events or ask user)'
+        },
+        inviteeName: {
+          type: 'string',
+          description: 'Name of the person being invited (required)'
+        },
+        inviteeEmail: {
+          type: 'string',
+          description: 'Email of the person being invited (required)'
+        },
+        maxEventCount: {
+          type: 'number',
+          description: 'Maximum number of bookings allowed (default: 1)'
+        }
+      },
+      required: ['eventTypeUri', 'inviteeName', 'inviteeEmail']
     }
   }
 ];
@@ -1266,6 +1349,240 @@ _Space for meeting notes..._
             draftId: draft.draft?.id,
             meetingTitle,
             preview: agendaContent.substring(0, 200) + '...'
+          }
+        };
+      }
+
+      // ========== INTEGRATION TOOLS ==========
+      case 'send_sms': {
+        const { to, body, contactId, confirmed } = toolInput as {
+          to: string;
+          body: string;
+          contactId?: string;
+          confirmed?: boolean;
+        };
+
+        // Check if Twilio is connected
+        const twilioStatusUrl = `${EA_API_URL}/integrations/twilio/status`;
+        const twilioStatusRes = await fetch(twilioStatusUrl, { headers });
+
+        if (!twilioStatusRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Twilio integration is not connected',
+              action: 'Connect Twilio in Settings > Integrations to send SMS messages',
+              connected: false
+            }
+          };
+        }
+
+        const twilioStatus = await twilioStatusRes.json();
+        if (!twilioStatus.connected) {
+          return {
+            success: true,
+            result: {
+              message: 'Twilio integration is not connected',
+              action: 'Connect Twilio in Settings > Integrations to send SMS messages',
+              connected: false
+            }
+          };
+        }
+
+        // Confirmation step
+        if (!confirmed) {
+          return {
+            success: true,
+            result: {
+              confirmationRequired: true,
+              message: `I'll send the following SMS — shall I confirm?`,
+              smsDetails: {
+                to,
+                body: body.length > 100 ? body.substring(0, 100) + '...' : body,
+                bodyLength: body.length,
+                from: twilioStatus.phoneNumber || 'Your Twilio number'
+              },
+              instruction: 'Reply "yes" or call this tool again with confirmed: true to send'
+            }
+          };
+        }
+
+        // Send the SMS
+        const smsUrl = `${EA_API_URL}/sms-messages`;
+        const smsResponse = await fetch(smsUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            tenantId,
+            to,
+            body,
+            contactId
+          })
+        });
+
+        if (!smsResponse.ok) {
+          const errorText = await smsResponse.text();
+          console.error(`[Pam] send_sms error: ${smsResponse.status} - ${errorText}`);
+          return {
+            success: false,
+            error: `Failed to send SMS: ${smsResponse.status}`
+          };
+        }
+
+        const smsResult = await smsResponse.json();
+        return {
+          success: true,
+          result: {
+            message: `SMS sent successfully to ${to}`,
+            messageId: smsResult.messageId,
+            sid: smsResult.sid,
+            to,
+            bodyPreview: body.length > 50 ? body.substring(0, 50) + '...' : body
+          }
+        };
+      }
+
+      case 'get_calendly_events': {
+        const { status = 'active', minStartTime, maxStartTime, count = 20 } = toolInput as {
+          status?: string;
+          minStartTime?: string;
+          maxStartTime?: string;
+          count?: number;
+        };
+
+        // Check if Calendly is connected
+        const calendlyStatusUrl = `${EA_API_URL}/integrations/calendly/status`;
+        const calendlyStatusRes = await fetch(calendlyStatusUrl, { headers });
+
+        if (!calendlyStatusRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Calendly integration is not connected',
+              action: 'Connect Calendly in Settings > Integrations to view scheduled events',
+              connected: false
+            }
+          };
+        }
+
+        const calendlyStatus = await calendlyStatusRes.json();
+        if (!calendlyStatus.connected) {
+          return {
+            success: true,
+            result: {
+              message: 'Calendly integration is not connected',
+              action: 'Connect Calendly in Settings > Integrations to view scheduled events',
+              connected: false
+            }
+          };
+        }
+
+        // Get events
+        const params = new URLSearchParams();
+        params.append('status', status);
+        params.append('count', String(count));
+        if (minStartTime) params.append('minStartTime', minStartTime);
+        if (maxStartTime) params.append('maxStartTime', maxStartTime);
+
+        const eventsUrl = `${EA_API_URL}/integrations/calendly/events?${params.toString()}`;
+        const eventsResponse = await fetch(eventsUrl, { headers });
+
+        if (!eventsResponse.ok) {
+          const errorText = await eventsResponse.text();
+          console.error(`[Pam] get_calendly_events error: ${eventsResponse.status} - ${errorText}`);
+          return {
+            success: false,
+            error: `Failed to fetch Calendly events: ${eventsResponse.status}`
+          };
+        }
+
+        const eventsData = await eventsResponse.json();
+        const events = eventsData.events || [];
+
+        return {
+          success: true,
+          result: {
+            count: events.length,
+            status,
+            events: events.map((e: Record<string, unknown>) => ({
+              name: e.name,
+              status: e.status,
+              startTime: e.start_time,
+              endTime: e.end_time,
+              location: e.location,
+              inviteesCount: (e.invitees_counter as Record<string, number>)?.total || 0,
+              uri: e.uri
+            }))
+          }
+        };
+      }
+
+      case 'create_calendly_link': {
+        const { eventTypeUri, inviteeName, inviteeEmail, maxEventCount = 1 } = toolInput as {
+          eventTypeUri: string;
+          inviteeName: string;
+          inviteeEmail: string;
+          maxEventCount?: number;
+        };
+
+        // Check if Calendly is connected
+        const calendlyStatusUrl = `${EA_API_URL}/integrations/calendly/status`;
+        const calendlyStatusRes = await fetch(calendlyStatusUrl, { headers });
+
+        if (!calendlyStatusRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Calendly integration is not connected',
+              action: 'Connect Calendly in Settings > Integrations to create scheduling links',
+              connected: false
+            }
+          };
+        }
+
+        const calendlyStatus = await calendlyStatusRes.json();
+        if (!calendlyStatus.connected) {
+          return {
+            success: true,
+            result: {
+              message: 'Calendly integration is not connected',
+              action: 'Connect Calendly in Settings > Integrations to create scheduling links',
+              connected: false
+            }
+          };
+        }
+
+        // Create scheduling link
+        const linkUrl = `${EA_API_URL}/integrations/calendly/scheduling-link`;
+        const linkResponse = await fetch(linkUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            eventTypeUri,
+            inviteeName,
+            inviteeEmail,
+            maxEventCount
+          })
+        });
+
+        if (!linkResponse.ok) {
+          const errorText = await linkResponse.text();
+          console.error(`[Pam] create_calendly_link error: ${linkResponse.status} - ${errorText}`);
+          return {
+            success: false,
+            error: `Failed to create Calendly link: ${linkResponse.status}`
+          };
+        }
+
+        const linkData = await linkResponse.json();
+        return {
+          success: true,
+          result: {
+            message: `Scheduling link created for ${inviteeName}`,
+            bookingUrl: linkData.booking_url,
+            inviteeName,
+            inviteeEmail,
+            maxEventCount: linkData.max_event_count
           }
         };
       }

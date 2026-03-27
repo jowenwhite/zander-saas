@@ -36,6 +36,7 @@ Available Tools:
 - tag_contact: Add marketing tags to a contact
 - set_deal_priority: Set priority level on a deal (LOW, MEDIUM, HIGH, CRITICAL)
 - draft_follow_up_email: Create a contextual follow-up email draft
+- send_outreach_sms: Send an SMS for sales outreach (requires Twilio integration, asks for confirmation)
 
 **How to Use Tools:**
 1. When a user mentions a call, meeting, or interaction — log it with create_activity
@@ -570,6 +571,37 @@ const TOOLS = [
       },
       required: ['to', 'subject', 'body']
     }
+  },
+  // ========== INTEGRATION TOOLS ==========
+  {
+    name: 'send_outreach_sms',
+    description: 'Send an SMS message for sales outreach. Requires Twilio integration to be connected in Settings. Asks for confirmation before sending. Great for quick follow-ups and appointment confirmations.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        to: {
+          type: 'string',
+          description: 'Phone number to send to (required, E.164 format preferred e.g., +15551234567)'
+        },
+        body: {
+          type: 'string',
+          description: 'SMS message content (required, max 1600 characters). Keep it professional and action-oriented.'
+        },
+        contactId: {
+          type: 'string',
+          description: 'Contact ID to link the SMS to (for tracking)'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Deal ID to link the SMS to (for tracking)'
+        },
+        confirmed: {
+          type: 'boolean',
+          description: 'Set to true after user confirms sending'
+        }
+      },
+      required: ['to', 'body']
+    }
   }
 ];
 
@@ -577,11 +609,13 @@ const TOOLS = [
 async function executeTool(
   toolName: string,
   toolInput: Record<string, unknown>,
-  authToken: string
+  authToken: string,
+  tenantId: string
 ): Promise<{ success: boolean; result?: unknown; error?: string }> {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${authToken}`,
+    'x-tenant-id': tenantId,
   };
 
   console.log(`[Jordan Tool] Executing ${toolName} with input:`, JSON.stringify(toolInput, null, 2));
@@ -1123,6 +1157,103 @@ async function executeTool(
         }
       }
 
+      // ========== INTEGRATION TOOLS ==========
+      case 'send_outreach_sms': {
+        const { to, body, contactId, dealId, confirmed } = toolInput as {
+          to: string;
+          body: string;
+          contactId?: string;
+          dealId?: string;
+          confirmed?: boolean;
+        };
+
+        // Check if Twilio is connected
+        const twilioStatusUrl = `${CRO_API_URL}/integrations/twilio/status`;
+        console.log(`[Jordan Tool] GET ${twilioStatusUrl} (checking Twilio connection)`);
+        const twilioStatusRes = await fetch(twilioStatusUrl, { headers });
+
+        if (!twilioStatusRes.ok) {
+          return {
+            success: true,
+            result: {
+              message: 'Twilio integration is not connected',
+              action: 'Connect Twilio in Settings > Integrations to send SMS messages',
+              connected: false
+            }
+          };
+        }
+
+        const twilioStatus = await twilioStatusRes.json();
+        if (!twilioStatus.connected) {
+          return {
+            success: true,
+            result: {
+              message: 'Twilio integration is not connected',
+              action: 'Connect Twilio in Settings > Integrations to send SMS messages',
+              connected: false
+            }
+          };
+        }
+
+        // Confirmation step
+        if (!confirmed) {
+          return {
+            success: true,
+            result: {
+              confirmationRequired: true,
+              message: `I'll send the following outreach SMS — shall I confirm?`,
+              smsDetails: {
+                to,
+                body: body.length > 100 ? body.substring(0, 100) + '...' : body,
+                bodyLength: body.length,
+                from: twilioStatus.phoneNumber || 'Your Twilio number',
+                linkedContact: contactId || null,
+                linkedDeal: dealId || null
+              },
+              instruction: 'Reply "yes" or "send it" to confirm'
+            }
+          };
+        }
+
+        // Send the SMS
+        const smsUrl = `${CRO_API_URL}/sms-messages`;
+        console.log(`[Jordan Tool] POST ${smsUrl}`);
+        const smsResponse = await fetch(smsUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            tenantId,
+            to,
+            body,
+            contactId,
+            dealId
+          })
+        });
+
+        if (!smsResponse.ok) {
+          const errorText = await smsResponse.text();
+          console.error(`[Jordan Tool] send_outreach_sms error: ${smsResponse.status} - ${errorText}`);
+          return {
+            success: false,
+            error: `Failed to send SMS: ${smsResponse.status}`
+          };
+        }
+
+        const smsResult = await smsResponse.json();
+        return {
+          success: true,
+          result: {
+            message: `Outreach SMS sent successfully to ${to}`,
+            messageId: smsResult.messageId,
+            sid: smsResult.sid,
+            to,
+            bodyPreview: body.length > 50 ? body.substring(0, 50) + '...' : body,
+            linkedContact: contactId,
+            linkedDeal: dealId
+          }
+        };
+      }
+
       default:
         return { success: false, error: `Unknown tool: ${toolName}` };
     }
@@ -1141,8 +1272,17 @@ export async function POST(request: NextRequest) {
     }
     const authToken = authHeader.replace('Bearer ', '');
 
+    // Get tenant ID from header
+    const tenantHeader = request.headers.get('x-tenant-id');
+
     // Parse request body
-    const { message, conversationHistory = [] } = await request.json();
+    const body = await request.json();
+    const { message, conversationHistory = [], tenantId: bodyTenantId } = body;
+
+    const tenantId = bodyTenantId || tenantHeader;
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID required' }, { status: 400 });
+    }
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -1205,7 +1345,7 @@ export async function POST(request: NextRequest) {
       } else if (block.type === 'tool_use') {
         // Execute the tool
         console.log(`Executing tool: ${block.name}`, block.input);
-        const toolResult = await executeTool(block.name, block.input, authToken);
+        const toolResult = await executeTool(block.name, block.input, authToken, tenantId);
         toolResults.push({
           tool: block.name,
           input: block.input,
