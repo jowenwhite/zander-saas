@@ -1,5 +1,40 @@
 # CLAUDE.md — Zander Institutional Memory
 
+## Session Handoff — March 28, 2026
+
+### v31 Deployed and Live
+- **ECS**: zander-cluster/zander-api-service running task definition zander-api:37
+- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v31
+- **Health**: https://api.zanderos.com/health returns `{"status":"ok"}`
+- **IntegrationsModule**: Working — `/integrations/twilio/status` returns 401 (route exists)
+
+### Integration Status
+
+#### Zander Inc Tenant (Jordan)
+- **Twilio**: Connected via sub-account, phone +1 (844) 853-6236
+- **Google Contacts**: Connected via OAuth
+- **Calendly**: Account created at calendly.com/jonathan-zanderos
+  - "Founding 50 Discovery Call" event type needs renaming and configuration
+  - API key needs to be connected to tenant via `/integrations/calendly/connect`
+
+#### MCF Tenant (Pam)
+- **Twilio**: Sub-account NOT yet created (waiting on parent account access)
+- **Calendly**: Account waiting on mycabinetfactory.com domain release from Railway
+
+### Code Changes This Session
+- `apps/api/tsconfig.json`: Added `rootDir: "./src"` and include/exclude patterns
+  - Fixed TypeScript compilation outputting to `dist/src/` instead of `dist/`
+  - This was causing ECS container crashes: "Cannot find module '/app/dist/main.js'"
+- Prisma schema: `TwilioCredential` and `CalendlyCredential` models already present
+
+### Next Session Priorities
+1. Connect Calendly API key to Zander Inc tenant
+2. Create MCF Twilio sub-account
+3. Token caps and subscription gating
+4. Don CMO checklist items 8-30
+
+---
+
 ## AI Executive Execution Framework
 
 This framework applies to ALL AI executives in Zander, now and forever.
