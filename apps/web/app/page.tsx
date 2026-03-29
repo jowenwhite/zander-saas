@@ -1,32 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
-// Compass Z SVG Component (reusable)
-const CompassLogo = ({ size = 36 }: { size?: number }) => (
-  <svg viewBox="0 0 64 64" fill="none" width={size} height={size}>
-    <circle cx="32" cy="32" r="30" stroke="#00CFEB" strokeWidth="2"/>
-    <circle cx="32" cy="32" r="22" stroke="#00CFEB" strokeWidth="1" strokeDasharray="2 5" opacity="0.5"/>
-    <polygon points="32,6 35.5,19 28.5,19" fill="#00CFEB"/>
-    <polygon points="32,58 35.5,45 28.5,45" fill="rgba(0,207,235,0.25)"/>
-    <path d="M22 24L42 24L22 40L42 40" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-// Large Compass for Founder section
-const CompassLogoLarge = () => (
-  <svg viewBox="0 0 200 200" fill="none" style={{ width: '58%' }}>
-    <circle cx="100" cy="100" r="90" stroke="#00CFEB" strokeWidth="2.5"/>
-    <circle cx="100" cy="100" r="70" stroke="#00CFEB" strokeWidth="1.5" strokeDasharray="4 9" opacity="0.45"/>
-    <circle cx="100" cy="100" r="50" stroke="#00CFEB" strokeWidth="1" opacity="0.2"/>
-    <polygon points="100,14 107,46 93,46" fill="#00CFEB"/>
-    <polygon points="100,186 107,154 93,154" fill="rgba(0,207,235,0.2)"/>
-    <line x1="14" y1="100" x2="28" y2="100" stroke="#00CFEB" strokeWidth="2" opacity="0.45"/>
-    <line x1="172" y1="100" x2="186" y2="100" stroke="#00CFEB" strokeWidth="2" opacity="0.45"/>
-    <path d="M68 76L132 76L68 124L132 124" stroke="white" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="100" cy="100" r="4" fill="#00CFEB"/>
-  </svg>
-);
+import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 
 // Check icon for lists
 const CheckIcon = () => (
@@ -42,27 +18,168 @@ const PlayIcon = () => (
   </svg>
 );
 
-export default function LandingPage() {
-  const observerRef = useRef<IntersectionObserver | null>(null);
+// Plus/Minus icons for FAQ
+const PlusIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="12" y1="5" x2="12" y2="19"/>
+    <line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+);
+
+const MinusIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+);
+
+// Pillar icons
+const OrganizedIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+    <rect x="3" y="3" width="7" height="7"/>
+    <rect x="14" y="3" width="7" height="7"/>
+    <rect x="14" y="14" width="7" height="7"/>
+    <rect x="3" y="14" width="7" height="7"/>
+  </svg>
+);
+
+const ExecutingIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
+
+const GrowingIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+    <polyline points="17 6 23 6 23 12"/>
+  </svg>
+);
+
+const CompleteIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    <polyline points="9 12 11 14 15 10"/>
+  </svg>
+);
+
+// Animation variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } }
+};
+
+const pillarScale = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } }
+};
+
+// Animated counter component
+function AnimatedCounter({ end, duration = 1.5 }: { end: number; duration?: number }) {
+  const [count, setCount] = useState(50);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
 
   useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.08, rootMargin: '0px 0px -32px 0px' }
-    );
+    if (isInView) {
+      const startTime = Date.now();
+      const startValue = 50;
+      const endValue = end;
 
-    document.querySelectorAll('.fade-up').forEach((el) => {
-      observerRef.current?.observe(el);
-    });
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / (duration * 1000), 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
+        const current = Math.round(startValue - (startValue - endValue) * eased);
+        setCount(current);
 
-    return () => observerRef.current?.disconnect();
-  }, []);
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      requestAnimationFrame(animate);
+    }
+  }, [isInView, end, duration]);
+
+  return <span ref={ref}>{count}</span>;
+}
+
+// Section wrapper with scroll animation
+function AnimatedSection({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  return (
+    <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className={className}
+      style={style}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
+export default function LandingPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const handleWaitlistClick = async () => {
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier: 'waitlist' })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error('Waitlist error:', err);
+    }
+  };
+
+  const faqs = [
+    {
+      q: "What does 'locked for life' actually mean?",
+      a: "Your monthly rate never increases. As we add new executives and features, founding members get them included at no additional cost."
+    },
+    {
+      q: "What is the $49 waitlist fee for?",
+      a: "It reserves your place in the next onboarding cohort. We onboard in small, managed groups to ensure every new member gets proper attention. The $49 is non-refundable."
+    },
+    {
+      q: "What integrations does Zander support?",
+      a: "Gmail, Google Calendar, Google Drive, Outlook, Twilio (SMS), Calendly, Stripe, and more. New integrations are added regularly."
+    },
+    {
+      q: "Is this just another AI chatbot?",
+      a: "No. Zander's executives connect to your real business tools and take real actions — sending drafts for approval, booking calendar events, managing your pipeline, running marketing sequences. They don't just answer questions."
+    },
+    {
+      q: "What happens to my data?",
+      a: "Your data is yours. Each business is fully isolated. We do not share or sell your data."
+    }
+  ];
 
   return (
     <div style={{
@@ -74,27 +191,50 @@ export default function LandingPage() {
       fontSize: '17px',
     }}>
       <style>{`
-        .fade-up {
-          opacity: 0;
-          transform: translateY(22px);
-          transition: opacity 0.65s ease, transform 0.65s ease;
+        @keyframes gradientShift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
         }
-        .fade-up.visible {
-          opacity: 1;
-          transform: translateY(0);
+        .animated-gradient {
+          background: linear-gradient(135deg, #0C1220 0%, #0A1A24 25%, #080A0F 50%, #0C1220 75%, #0A1A24 100%);
+          background-size: 400% 400%;
+          animation: gradientShift 10s ease infinite;
+        }
+        .testimonial-card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .testimonial-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .pricing-card {
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pricing-card:hover {
+          border-color: rgba(0,207,235,0.4);
+          box-shadow: 0 0 20px rgba(0,207,235,0.1);
+        }
+        .pricing-card-pro {
+          animation: proGlow 2s ease-in-out infinite;
+        }
+        @keyframes proGlow {
+          0%, 100% { box-shadow: 0 0 20px rgba(0,207,235,0.2); }
+          50% { box-shadow: 0 0 30px rgba(0,207,235,0.35); }
         }
         @media (max-width: 1100px) {
           .pricing-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .waitlist-inner { grid-template-columns: 1fr !important; gap: 2.5rem !important; }
+          .pillar-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 960px) {
-          .pain-grid, .freedom-grid, .testi-grid { grid-template-columns: 1fr !important; }
+          .pain-grid, .freedom-grid, .testi-grid, .steps-grid { grid-template-columns: 1fr !important; }
           .exec-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .exec-row-2 { grid-template-columns: repeat(2, 1fr) !important; max-width: 100% !important; }
           .founder-grid { grid-template-columns: 1fr !important; }
           .founder-logo-wrap { max-width: 280px !important; margin: 0 auto !important; }
           .freedom-header { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
           .nav-links-desktop { display: none !important; }
+          .pillar-grid { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 600px) {
           .pricing-grid { grid-template-columns: 1fr !important; }
@@ -124,15 +264,14 @@ export default function LandingPage() {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none' }}>
-            <CompassLogo size={36} />
-            <span style={{
-              fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontWeight: 700,
-              fontSize: '1.15rem',
-              letterSpacing: '0.09em',
-              color: '#FFFFFF',
-            }}>ZANDER</span>
+          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+            <Image
+              src="/images/zander-logo-white.svg"
+              alt="Zander"
+              width={140}
+              height={36}
+              style={{ height: '32px', width: 'auto' }}
+            />
           </a>
           <ul className="nav-links-desktop" style={{
             display: 'flex',
@@ -142,20 +281,20 @@ export default function LandingPage() {
             margin: 0,
             padding: 0,
           }}>
-            <li><a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Product</a></li>
-            <li><a href="#pricing" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Pricing</a></li>
-            <li><a href="#demo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Demo</a></li>
-            <li><a href="#about" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>About</a></li>
+            <li><a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>Product</a></li>
+            <li><a href="#pricing" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>Pricing</a></li>
+            <li><a href="#demo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>Demo</a></li>
+            <li><a href="#about" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>About</a></li>
           </ul>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <a href="/login" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Sign In</a>
+            <a href="/login" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>Sign In</a>
             <a href="/signup" style={{
               background: '#00CFEB',
               color: '#000',
               padding: '0.58rem 1.25rem',
               borderRadius: '8px',
               fontWeight: 700,
-              fontSize: '0.85rem',
+              fontSize: '0.9rem',
               textDecoration: 'none',
               whiteSpace: 'nowrap',
             }}>Get Early Access</a>
@@ -163,8 +302,8 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* HERO */}
-      <section id="product" style={{
+      {/* HERO with animated gradient background */}
+      <section id="product" className="animated-gradient" style={{
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -189,20 +328,25 @@ export default function LandingPage() {
           pointerEvents: 'none',
         }} />
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '860px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            background: '#13151E',
-            border: '1px solid rgba(0,207,235,0.28)',
-            color: 'rgba(255,255,255,0.72)',
-            padding: '0.42rem 1.1rem',
-            borderRadius: '50px',
-            fontSize: '0.8rem',
-            fontWeight: 500,
-            letterSpacing: '0.04em',
-            marginBottom: '2rem',
-          }}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: '#13151E',
+              border: '1px solid rgba(0,207,235,0.28)',
+              color: 'rgba(255,255,255,0.72)',
+              padding: '0.42rem 1.1rem',
+              borderRadius: '50px',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              letterSpacing: '0.04em',
+              marginBottom: '2rem',
+            }}
+          >
             <span style={{
               width: '7px',
               height: '7px',
@@ -212,44 +356,74 @@ export default function LandingPage() {
               flexShrink: 0,
             }} />
             Now in Beta — Founding 50 spots available
-          </div>
+          </motion.div>
 
-          <h1 style={{
-            fontFamily: "'Sora', var(--font-sora), sans-serif",
-            fontSize: 'clamp(3rem, 6.5vw, 5.25rem)',
-            fontWeight: 800,
-            lineHeight: 1.05,
-            marginBottom: '1.6rem',
-            letterSpacing: '-0.025em',
-          }}>
-            <span style={{ display: 'block', color: '#FFFFFF' }}>Your Business.</span>
-            <span style={{ display: 'block', color: '#00CFEB' }}>Expertly Run.</span>
-          </h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: 'clamp(3rem, 6.5vw, 5.25rem)',
+              fontWeight: 800,
+              lineHeight: 1.05,
+              marginBottom: '1.6rem',
+              letterSpacing: '-0.025em',
+            }}
+          >
+            <span style={{ display: 'block', color: '#FFFFFF' }}>Your business,</span>
+            <span style={{ display: 'block', color: '#00CFEB' }}>expertly run.</span>
+          </motion.h1>
 
-          <p style={{
-            fontSize: '1.1rem',
-            color: 'rgba(255,255,255,0.58)',
-            maxWidth: '580px',
-            margin: '0 auto 2.75rem',
-            lineHeight: 1.8,
-          }}>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+            style={{
+              fontSize: '1.15rem',
+              color: 'rgba(255,255,255,0.7)',
+              maxWidth: '640px',
+              margin: '0 auto 1.5rem',
+              lineHeight: 1.75,
+            }}
+          >
             You built something real. Zander gives you the expert executive team to keep it organized, moving forward, and growing — so you can step back into the work you actually love.
-          </p>
+          </motion.p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.4rem' }}>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
+            style={{
+              fontSize: '1.05rem',
+              color: 'rgba(255,255,255,0.55)',
+              maxWidth: '620px',
+              margin: '0 auto 2.75rem',
+              lineHeight: 1.75,
+            }}
+          >
+            An AI-powered executive team that handles your inbox, drives your pipeline, runs your marketing, and manages your operations — so nothing falls through the cracks. Not even the things you&apos;ve been ignoring.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
+            style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.4rem' }}
+          >
             <a href="/signup" style={{
               background: '#00CFEB',
               color: '#000',
               padding: '0.9rem 2rem',
               borderRadius: '10px',
               fontWeight: 700,
-              fontSize: '0.97rem',
+              fontSize: '1rem',
               textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
             }}>
-              Get Early Access — from $199/mo founding rate
+              Get Early Access
             </a>
             <a href="#demo" style={{
               background: 'transparent',
@@ -257,7 +431,7 @@ export default function LandingPage() {
               padding: '0.9rem 2rem',
               borderRadius: '10px',
               fontWeight: 600,
-              fontSize: '0.97rem',
+              fontSize: '1rem',
               textDecoration: 'none',
               border: '1px solid rgba(255,255,255,0.18)',
               display: 'inline-flex',
@@ -265,518 +439,318 @@ export default function LandingPage() {
               gap: '0.5rem',
             }}>
               <PlayIcon />
-              Watch 3-Min Demo
+              Watch 3-Minute Demo
             </a>
-          </div>
-          <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em' }}>
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em' }}
+          >
             Joining 50 founding members &bull; Founding rate locked for life
-          </p>
+          </motion.p>
         </div>
       </section>
 
-      {/* PROBLEM */}
-      <section style={{ padding: '6rem 2rem' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 className="fade-up" style={{
-            fontFamily: "'Sora', var(--font-sora), sans-serif",
-            fontSize: 'clamp(1.85rem, 3.8vw, 2.75rem)',
-            fontWeight: 800,
-            marginBottom: '0.75rem',
-            lineHeight: 1.18,
-            letterSpacing: '-0.02em',
-            maxWidth: '680px',
-          }}>
-            You didn&apos;t start your business to spend your days buried in it.
-          </h2>
-          <p className="fade-up" style={{
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.58)',
-            maxWidth: '600px',
-            marginBottom: '3.25rem',
-            lineHeight: 1.8,
-          }}>
-            But somewhere along the way, the emails, the follow-ups, the books, the marketing — it all piled up. And the thing you actually built the business for? It keeps getting pushed to tomorrow.
-          </p>
+      {/* PAIN POINT - Scroll-triggered stagger */}
+      <AnimatedSection style={{ padding: '6rem 2rem', background: 'linear-gradient(180deg, transparent 0%, rgba(0,207,235,0.02) 50%, transparent 100%)' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+              fontWeight: 800,
+              marginBottom: '3.5rem',
+              lineHeight: 1.18,
+              letterSpacing: '-0.02em',
+              color: '#00CFEB',
+            }}
+          >
+            Sound familiar?
+          </motion.h2>
 
-          <div className="pain-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
-            <div className="fade-up" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '14px',
-              padding: '2rem',
-            }}>
-              <div style={{
-                width: '46px',
-                height: '46px',
-                background: '#13151E',
-                border: '1px solid rgba(0,207,235,0.22)',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1.25rem',
-              }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={22} height={22}>
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-              </div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1rem', fontWeight: 700, marginBottom: '0.7rem', lineHeight: 1.3 }}>
-                Revenue slips through the cracks
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.7 }}>
-                You&apos;re on a job, in a meeting, putting out a fire. By the time you follow up on that lead, they&apos;ve already signed with someone else.
-              </p>
-            </div>
-
-            <div className="fade-up" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '14px',
-              padding: '2rem',
-              transitionDelay: '0.1s',
-            }}>
-              <div style={{
-                width: '46px',
-                height: '46px',
-                background: '#13151E',
-                border: '1px solid rgba(0,207,235,0.22)',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1.25rem',
-              }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={22} height={22}>
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              </div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1rem', fontWeight: 700, marginBottom: '0.7rem', lineHeight: 1.3 }}>
-                Marketing stays on the to-do list
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.7 }}>
-                You know you should be building your brand, posting, emailing customers. But running the business always wins. So it never happens.
-              </p>
-            </div>
-
-            <div className="fade-up" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '14px',
-              padding: '2rem',
-              transitionDelay: '0.2s',
-            }}>
-              <div style={{
-                width: '46px',
-                height: '46px',
-                background: '#13151E',
-                border: '1px solid rgba(0,207,235,0.22)',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1.25rem',
-              }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={22} height={22}>
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-              </div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1rem', fontWeight: 700, marginBottom: '0.7rem', lineHeight: 1.3 }}>
-                You&apos;re IN the business, not ON it
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.7 }}>
-                The bigger picture — growth, strategy, what&apos;s next — keeps getting sacrificed to today&apos;s urgent problems. You&apos;re too busy to build what comes next.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FREEDOM / HOW IT WORKS */}
-      <section id="how-it-works" style={{
-        background: 'linear-gradient(180deg, transparent 0%, rgba(0,207,235,0.025) 40%, transparent 100%)',
-        padding: '6rem 2rem',
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="fade-up freedom-header" style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '4rem',
-            alignItems: 'end',
-            marginBottom: '4rem',
-          }}>
-            <div>
-              <span style={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: '#00CFEB',
-                marginBottom: '0.85rem',
-                display: 'block',
-              }}>The Zander Difference</span>
-              <h2 style={{
-                fontFamily: "'Sora', var(--font-sora), sans-serif",
-                fontSize: 'clamp(1.9rem, 4vw, 2.85rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.18,
-                marginBottom: 0,
-              }}>
-                Your business, organized and moving forward. You, focused on what matters.
-              </h2>
-            </div>
-            <div style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.8 }}>
-              Zander puts a full executive team in your corner — not software you have to manage, but AI executives who already know your business, execute on your behalf, and keep everything running while you focus on the priorities and the work you love.
-            </div>
-          </div>
-
-          <div className="freedom-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
-            <div className="fade-up" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '14px',
-              padding: '2rem',
-            }}>
-              <div style={{
-                fontFamily: "'Sora', var(--font-sora), sans-serif",
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                color: '#00CFEB',
-                textTransform: 'uppercase',
-                marginBottom: '1rem',
-              }}>01 — Always On</div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.65rem', lineHeight: 1.3 }}>
-                Nothing falls through the cracks
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.7 }}>
-                Your pipeline stays current. Your follow-ups go out. Your books stay clean. Zander keeps every part of your business moving without you managing it.
-              </p>
-            </div>
-
-            <div className="fade-up" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '14px',
-              padding: '2rem',
-              transitionDelay: '0.1s',
-            }}>
-              <div style={{
-                fontFamily: "'Sora', var(--font-sora), sans-serif",
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                color: '#00CFEB',
-                textTransform: 'uppercase',
-                marginBottom: '1rem',
-              }}>02 — Expert Level</div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.65rem', lineHeight: 1.3 }}>
-                Executive-grade thinking, not just automation
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.7 }}>
-                Each AI executive is trained on your business. They don&apos;t just execute tasks — they bring strategy, insight, and the kind of thinking you&apos;d expect from a $200K hire.
-              </p>
-            </div>
-
-            <div className="fade-up" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '14px',
-              padding: '2rem',
-              transitionDelay: '0.2s',
-            }}>
-              <div style={{
-                fontFamily: "'Sora', var(--font-sora), sans-serif",
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                color: '#00CFEB',
-                textTransform: 'uppercase',
-                marginBottom: '1rem',
-              }}>03 — True Freedom</div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.65rem', lineHeight: 1.3 }}>
-                Step back into what you love
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.7 }}>
-                Whether that&apos;s your craft, your customers, or your family — Zander gives you the freedom to be where you&apos;re most valuable, while the business takes care of itself.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* EXECUTIVES */}
-      <section id="demo" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <span className="fade-up" style={{
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: '#00CFEB',
-            marginBottom: '0.85rem',
-            display: 'block',
-          }}>Your AI C-Suite</span>
-          <h2 className="fade-up" style={{
-            fontFamily: "'Sora', var(--font-sora), sans-serif",
-            fontSize: 'clamp(1.9rem, 4vw, 2.85rem)',
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.18,
-            marginBottom: '1rem',
-          }}>Seven Executives. One Platform.</h2>
-          <p className="fade-up" style={{
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.58)',
-            maxWidth: '520px',
-            lineHeight: 1.75,
-            margin: '0 auto',
-          }}>
-            Each executive is purpose-built for their role — trained on your business, always available, never off the clock.
-          </p>
-
-          {/* Row 1: 4 executives */}
-          <div className="exec-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1.1rem',
-            marginTop: '3.5rem',
-          }}>
+          <motion.div
+            className="pain-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', textAlign: 'left' }}
+          >
             {[
-              { letter: 'J', name: 'Jordan', role: 'CRO', title: 'Sales & Revenue', desc: 'Manages your pipeline, follows up on every lead, and closes more deals so you stop leaving money on the table.' },
-              { letter: 'B', name: 'Ben', role: 'CFO', title: 'Finance & Accounting', desc: 'Tracks every dollar, monitors cash flow, and gives you the financial clarity to make confident decisions.', delay: '0.05s' },
-              { letter: 'M', name: 'Miranda', role: 'COO', title: 'Operations', desc: 'Keeps your operations tight, your team coordinated, and your business running efficiently without constant oversight.', delay: '0.1s' },
-              { letter: 'D', name: 'Don', role: 'CMO', title: 'Marketing & Growth', desc: 'Builds your brand, runs your campaigns, and keeps you visible to the customers who need what you do.', delay: '0.15s' },
-            ].map((exec, i) => (
-              <div key={i} className="fade-up" style={{
-                background: '#0E1017',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '14px',
-                padding: '1.75rem',
-                textAlign: 'left',
-                transitionDelay: exec.delay || '0s',
-              }}>
-                <div style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '50%',
-                  border: '1.5px solid rgba(0,207,235,0.38)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: "'Sora', var(--font-sora), sans-serif",
-                  fontWeight: 700,
-                  fontSize: '0.95rem',
-                  color: '#00CFEB',
-                  marginBottom: '1.2rem',
-                  background: 'rgba(0,207,235,0.05)',
-                  position: 'relative',
-                }}>
-                  {exec.letter}
-                  <span style={{
-                    position: 'absolute',
-                    bottom: '1px',
-                    right: '1px',
-                    width: '8px',
-                    height: '8px',
-                    background: '#00CFEB',
-                    borderRadius: '50%',
-                    border: '2px solid #0E1017',
-                  }} />
-                </div>
-                <h4 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '0.97rem', fontWeight: 700, marginBottom: '0.28rem' }}>
-                  {exec.name} — {exec.role}
-                </h4>
-                <div style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 600,
-                  color: '#00CFEB',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  marginBottom: '0.6rem',
-                }}>{exec.title}</div>
-                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.6 }}>{exec.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Row 2: 3 executives */}
-          <div className="exec-row-2" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1.1rem',
-            maxWidth: '900px',
-            margin: '1.1rem auto 0',
-          }}>
-            {[
-              { letter: 'T', name: 'Ted', role: 'CPO', title: 'People & HR', desc: 'Manages hiring, team development, and the culture that makes people want to stay and grow with you.', delay: '0.2s' },
-              { letter: 'J', name: 'Jarvis', role: 'CIO', title: 'Technology & Security', desc: 'Oversees your tech stack, data security, and digital operations so you never have to think about it.', delay: '0.25s' },
-              { letter: 'P', name: 'Pam', role: 'EA', title: 'Executive Assistant', desc: 'Manages your calendar, coordinates your team, and makes sure nothing important slips past you.', delay: '0.3s' },
-            ].map((exec, i) => (
-              <div key={i} className="fade-up" style={{
-                background: '#0E1017',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '14px',
-                padding: '1.75rem',
-                textAlign: 'left',
-                transitionDelay: exec.delay,
-              }}>
-                <div style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '50%',
-                  border: '1.5px solid rgba(0,207,235,0.38)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: "'Sora', var(--font-sora), sans-serif",
-                  fontWeight: 700,
-                  fontSize: '0.95rem',
-                  color: '#00CFEB',
-                  marginBottom: '1.2rem',
-                  background: 'rgba(0,207,235,0.05)',
-                  position: 'relative',
-                }}>
-                  {exec.letter}
-                  <span style={{
-                    position: 'absolute',
-                    bottom: '1px',
-                    right: '1px',
-                    width: '8px',
-                    height: '8px',
-                    background: '#00CFEB',
-                    borderRadius: '50%',
-                    border: '2px solid #0E1017',
-                  }} />
-                </div>
-                <h4 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '0.97rem', fontWeight: 700, marginBottom: '0.28rem' }}>
-                  {exec.name} — {exec.role}
-                </h4>
-                <div style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 600,
-                  color: '#00CFEB',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  marginBottom: '0.6rem',
-                }}>{exec.title}</div>
-                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.6 }}>{exec.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section style={{ padding: '6rem 2rem' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <span className="fade-up" style={{
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: '#00CFEB',
-            marginBottom: '0.85rem',
-            display: 'block',
-          }}>Trusted by Business Owners</span>
-          <h2 className="fade-up" style={{
-            fontFamily: "'Sora', var(--font-sora), sans-serif",
-            fontSize: 'clamp(1.9rem, 4vw, 2.85rem)',
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.18,
-            marginBottom: '1rem',
-          }}>Reclaiming Passion, One Founder at a Time</h2>
-
-          <div className="testi-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1.5rem',
-            marginTop: '3.5rem',
-          }}>
-            {[
-              {
-                quote: '"I was drowning in spreadsheets and paying $1,500/month for software that didn\'t talk to each other. Zander gave me my life back. I\'m working IN my business again, not just ON the paperwork."',
-                initials: 'JW',
-                name: 'Jonathan White',
-                company: 'My Cabinet Factory — 32 years in business',
-              },
-              {
-                quote: '"As a contractor managing 6 crews, I needed everything in one place. Zander\'s COO handles scheduling, the CFO tracks job costs, and I finally have real visibility into my business. Game changer."',
-                initials: 'MB',
-                name: 'Mike Bradford',
-                company: 'ProBuild Contractors',
-                delay: '0.1s',
-              },
-              {
-                quote: '"The AI reminded me about a deal I\'d forgotten, drafted the follow-up email, and we closed it two days later. $45K deal I would have lost. I don\'t know how I ran this business without it."',
-                initials: 'SE',
-                name: 'Sarah Evans',
-                company: 'Elite HVAC Solutions',
-                delay: '0.2s',
-              },
-            ].map((t, i) => (
-              <div key={i} className="fade-up" style={{
-                background: '#0E1017',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderLeft: '3px solid rgba(0,207,235,0.4)',
-                borderRadius: '0 14px 14px 0',
-                padding: '2rem',
-                transitionDelay: t.delay || '0s',
-              }}>
+              "You're working harder than anyone you know — and still feel behind.",
+              "There are parts of your business you know need attention. You just never get there.",
+              "You've always wished you had an expert in the room for the things that aren't your strengths.",
+              "The guilt of unfinished tasks follows you home every night.",
+              "You didn't start a business to spend your days buried in emails and admin.",
+            ].map((pain, i) => (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                style={{
+                  background: '#0E1017',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderLeft: '3px solid #00CFEB',
+                  borderRadius: '0 12px 12px 0',
+                  padding: '1.5rem 2rem',
+                }}
+              >
                 <p style={{
-                  fontSize: '0.97rem',
-                  color: 'rgba(255,255,255,0.82)',
-                  lineHeight: 1.78,
-                  marginBottom: '1.5rem',
-                  fontStyle: 'italic',
-                }}>{t.quote}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: 'rgba(0,207,235,0.15)',
-                    border: '1px solid rgba(0,207,235,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontFamily: "'Sora', var(--font-sora), sans-serif",
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    color: '#00CFEB',
-                    flexShrink: 0,
-                  }}>{t.initials}</div>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.3 }}>{t.name}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.58)' }}>{t.company}</div>
-                  </div>
-                </div>
-              </div>
+                  fontSize: '1.15rem',
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.9)',
+                  lineHeight: 1.5,
+                  margin: 0,
+                }}>
+                  {pain}
+                </p>
+              </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
+          </motion.div>
 
-      {/* WAITLIST */}
-      <section id="waitlist" style={{
+          <motion.p
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              color: '#00CFEB',
+              marginTop: '3rem',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            That&apos;s exactly why Zander exists.
+          </motion.p>
+        </div>
+      </AnimatedSection>
+
+      {/* THE ZANDER DIFFERENCE - Scroll-triggered pillar scale */}
+      <AnimatedSection id="how-it-works" style={{ padding: '6rem 2rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{ textAlign: 'center', marginBottom: '4rem' }}
+          >
+            <span style={{
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#00CFEB',
+              marginBottom: '0.85rem',
+              display: 'block',
+            }}>The Zander Difference</span>
+            <h2 style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: 'clamp(2rem, 4vw, 2.85rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.18,
+              marginBottom: '1.25rem',
+              maxWidth: '700px',
+              margin: '0 auto 1.25rem',
+            }}>
+              It&apos;s not software. It&apos;s a fully staffed executive team.
+            </h2>
+            <p style={{
+              fontSize: '1.1rem',
+              color: 'rgba(255,255,255,0.65)',
+              maxWidth: '750px',
+              margin: '0 auto',
+              lineHeight: 1.75,
+            }}>
+              Zander doesn&apos;t give you another dashboard to manage. It gives you a CMO who runs your marketing, a CRO who works your pipeline, and an EA who handles your inbox and schedule — all operating inside a single platform built around how a real business runs. And it gets your business organized and fully functioning on all fronts. Including the ones you&apos;ve been putting off.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="pillar-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+            }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem' }}
+          >
+            {[
+              { icon: <OrganizedIcon />, title: 'Organized', desc: 'Your operations, communications, and schedule running in sync.' },
+              { icon: <ExecutingIcon />, title: 'Executing', desc: 'Your executives take action. They don\'t just advise.' },
+              { icon: <GrowingIcon />, title: 'Growing', desc: 'Pipeline, marketing, and outreach working while you focus on delivery.' },
+              { icon: <CompleteIcon />, title: 'Complete', desc: 'Every part of your business covered. Nothing left unattended.' },
+            ].map((pillar, i) => (
+              <motion.div
+                key={i}
+                variants={pillarScale}
+                style={{
+                  background: '#0E1017',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '14px',
+                  padding: '2rem',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  background: 'rgba(0,207,235,0.08)',
+                  border: '1px solid rgba(0,207,235,0.2)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.25rem',
+                }}>
+                  {pillar.icon}
+                </div>
+                <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.65rem', color: '#00CFEB' }}>
+                  {pillar.title}
+                </h3>
+                <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.65, margin: 0 }}>{pillar.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </AnimatedSection>
+
+      {/* HOW IT WORKS */}
+      <AnimatedSection id="demo" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <motion.span
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#00CFEB',
+              marginBottom: '0.85rem',
+              display: 'block',
+            }}
+          >How It Works</motion.span>
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: 'clamp(2rem, 4vw, 2.85rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.18,
+              marginBottom: '3.5rem',
+            }}
+          >Three steps to freedom</motion.h2>
+
+          <motion.div
+            className="steps-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', marginBottom: '4rem' }}
+          >
+            {[
+              { num: '01', title: 'Connect', desc: 'Connect your inbox, calendar, and integrations in minutes.' },
+              { num: '02', title: 'Activate', desc: 'Your executive team activates — Pam, Jordan, Don, and more get to work.' },
+              { num: '03', title: 'Run', desc: 'Your business runs. You stay informed and in control without being buried.' },
+            ].map((step, i) => (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                style={{
+                  background: '#0E1017',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '14px',
+                  padding: '2.5rem 2rem',
+                }}
+              >
+                <div style={{
+                  fontFamily: "'Sora', var(--font-sora), sans-serif",
+                  fontSize: '2.5rem',
+                  fontWeight: 800,
+                  color: 'rgba(0,207,235,0.3)',
+                  marginBottom: '1rem',
+                }}>{step.num}</div>
+                <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem' }}>
+                  {step.title}
+                </h3>
+                <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Video placeholder */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              background: '#0E1017',
+              border: '2px dashed rgba(0,207,235,0.3)',
+              borderRadius: '16px',
+              padding: '5rem 2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '1rem',
+            }}
+          >
+            <div style={{
+              width: '72px',
+              height: '72px',
+              borderRadius: '50%',
+              background: 'rgba(0,207,235,0.15)',
+              border: '2px solid rgba(0,207,235,0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#00CFEB">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+            <p style={{ fontSize: '1.15rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)', margin: 0 }}>
+              3-Minute Demo — Coming Soon
+            </p>
+            <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+              See Zander in action
+            </p>
+          </motion.div>
+        </div>
+      </AnimatedSection>
+
+      {/* FOUNDING 50 / URGENCY with animated counter */}
+      <AnimatedSection style={{
         padding: '5rem 2rem',
-        background: 'linear-gradient(135deg, rgba(0,207,235,0.035) 0%, transparent 60%)',
+        background: 'linear-gradient(135deg, rgba(0,207,235,0.04) 0%, transparent 60%)',
         borderTop: '1px solid rgba(255,255,255,0.08)',
         borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
-        <div className="fade-up waitlist-inner" style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 1fr',
-          gap: '4rem',
-          alignItems: 'center',
-        }}>
-          <div>
-            <div style={{
+        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
@@ -785,159 +759,331 @@ export default function LandingPage() {
               color: 'rgba(255,255,255,0.7)',
               padding: '0.38rem 1rem',
               borderRadius: '50px',
-              fontSize: '0.78rem',
+              fontSize: '0.85rem',
               fontWeight: 500,
               letterSpacing: '0.04em',
-              marginBottom: '1.25rem',
-            }}>
-              <span style={{
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                background: '#22C55E',
-                boxShadow: '0 0 8px #22C55E',
-              }} />
-              Limited — Founding 50 Only
-            </div>
-            <h2 style={{
+              marginBottom: '1.5rem',
+            }}
+          >
+            <span style={{
+              width: '7px',
+              height: '7px',
+              borderRadius: '50%',
+              background: '#22C55E',
+              boxShadow: '0 0 8px #22C55E',
+            }} />
+            Limited — Founding 50 Only
+          </motion.div>
+
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: 'clamp(1.7rem, 3vw, 2.3rem)',
+              fontSize: 'clamp(2rem, 4vw, 2.75rem)',
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.2,
               marginBottom: '1rem',
-            }}>
-              Not ready to commit?<br/>Reserve your spot for $49.
-            </h2>
-            <p style={{
-              fontSize: '0.95rem',
-              color: 'rgba(255,255,255,0.58)',
-              lineHeight: 1.8,
-              marginBottom: '1.5rem',
-              maxWidth: '520px',
-            }}>
-              Put down a fully refundable $49 deposit to hold your place in the Founding 50 — and lock in your founding rate before spots fill. When you&apos;re ready to activate, your deposit applies to your first month. No obligation. Cancel anytime.
-            </p>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', padding: 0, margin: 0 }}>
-              {[
-                'Your founding rate locked the moment you deposit',
-                '$49 fully refundable — anytime before activation',
-                '$49 credited to your first month when you go live',
-                'Behind-the-scenes updates during beta',
-                'Direct input on roadmap & features',
-              ].map((perk, i) => (
-                <li key={i} style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.6rem',
-                  fontSize: '0.9rem',
-                  color: 'rgba(255,255,255,0.82)',
-                  lineHeight: 1.45,
-                }}>
-                  <span style={{
-                    width: '18px',
-                    height: '18px',
-                    background: 'rgba(0,207,235,0.13)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    marginTop: '1px',
-                    color: '#00CFEB',
-                  }}><CheckIcon /></span>
-                  {perk}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{
-            background: '#0E1017',
-            border: '1px solid rgba(0,207,235,0.3)',
-            borderRadius: '18px',
-            padding: '2.5rem',
-            boxShadow: '0 0 40px rgba(0,207,235,0.06)',
-          }}>
-            <div style={{ marginBottom: '2rem' }}>
-              <div style={{
-                width: '100%',
-                height: '6px',
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: '50px',
-                overflow: 'hidden',
-                marginBottom: '0.6rem',
-              }}>
-                <div style={{ height: '100%', background: '#00CFEB', borderRadius: '50px', width: '46%' }} />
-              </div>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.58)' }}>27 of 50 founding spots claimed</p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '1.5rem' }}>
-              <span style={{
-                fontFamily: "'Sora', var(--font-sora), sans-serif",
-                fontSize: '3.5rem',
-                fontWeight: 800,
-                lineHeight: 1,
-                color: '#00CFEB',
-              }}>$49</span>
-              <span style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.4 }}>fully refundable deposit</span>
-            </div>
-            <a href="/waitlist" style={{
-              display: 'block',
-              width: '100%',
+            }}
+          >
+            Founding 50 — <AnimatedCounter end={12} /> Spots Remaining
+          </motion.h2>
+          <motion.p
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontSize: '1.1rem',
+              color: 'rgba(255,255,255,0.65)',
+              lineHeight: 1.75,
+              marginBottom: '2.5rem',
+              maxWidth: '650px',
+              margin: '0 auto 2.5rem',
+            }}
+          >
+            Founding members get their rate locked for life — including every new executive as they launch. No upgrades required. No price increases. Ever.
+          </motion.p>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}
+          >
+            <a href="/signup" style={{
               background: '#00CFEB',
               color: '#000',
-              padding: '0.9rem',
+              padding: '0.9rem 2rem',
               borderRadius: '10px',
               fontWeight: 700,
-              fontSize: '0.97rem',
-              textAlign: 'center',
+              fontSize: '1rem',
               textDecoration: 'none',
-              marginBottom: '0.85rem',
-              boxSizing: 'border-box',
-            }}>Reserve My Founding Spot</a>
-            <p style={{ fontSize: '0.77rem', color: 'rgba(255,255,255,0.3)', textAlign: 'center', letterSpacing: '0.03em' }}>
-              100% refundable &bull; Applied to first month &bull; No obligation
-            </p>
-          </div>
+            }}>
+              Claim Your Founding Spot
+            </a>
+            <button
+              onClick={handleWaitlistClick}
+              style={{
+                background: 'transparent',
+                color: '#FFFFFF',
+                padding: '0.9rem 2rem',
+                borderRadius: '10px',
+                fontWeight: 600,
+                fontSize: '1rem',
+                border: '1px solid rgba(255,255,255,0.18)',
+                cursor: 'pointer',
+              }}
+            >
+              Join the Waitlist ($49)
+            </button>
+          </motion.div>
+          <motion.p
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', maxWidth: '500px', margin: '0 auto' }}
+          >
+            Spots filled? The $49 waitlist fee reserves your place in the next onboarding cohort. Non-refundable. Next batch pricing announced separately.
+          </motion.p>
         </div>
-      </section>
+      </AnimatedSection>
 
-      {/* PRICING */}
-      <section id="pricing" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
+      {/* TESTIMONIALS with hover lift */}
+      <AnimatedSection style={{ padding: '6rem 2rem' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <span className="fade-up" style={{
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: '#00CFEB',
-            marginBottom: '0.85rem',
-            display: 'block',
-          }}>Simple, Transparent Pricing</span>
-          <h2 className="fade-up" style={{
-            fontFamily: "'Sora', var(--font-sora), sans-serif",
-            fontSize: 'clamp(1.9rem, 4vw, 2.85rem)',
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.18,
-            marginBottom: '0.5rem',
-          }}>Founding 50 Rates — Locked for Life</h2>
-          <p className="fade-up" style={{
-            fontSize: '0.9rem',
-            color: 'rgba(255,255,255,0.58)',
-            marginBottom: '3.5rem',
-          }}>
-            Public pricing launches higher after beta. These rates never increase for founding members.
-          </p>
+          <motion.span
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#00CFEB',
+              marginBottom: '0.85rem',
+              display: 'block',
+            }}
+          >From Our Founding Members</motion.span>
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: 'clamp(2rem, 4vw, 2.85rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.18,
+              marginBottom: '1rem',
+            }}
+          >Real results from real business owners</motion.h2>
 
-          <div className="pricing-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1.1rem',
-            textAlign: 'left',
-          }}>
+          <motion.div
+            className="testi-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '1.5rem',
+              marginTop: '3.5rem',
+            }}
+          >
+            {[
+              {
+                quote: '"I was spending Sunday nights catching up on emails I should have answered Tuesday. Pam handles my follow-up, Jordan works every lead I can\'t get to, and I actually took a full weekend off last month for the first time in years."',
+                name: 'Independent Real Estate Broker',
+              },
+              {
+                quote: '"We build systems for our clients every day. Our own business was the one we kept ignoring. Zander gave us the structure we\'ve been selling to everyone else. Don runs our marketing calendar and Jordan follows up on every proposal we send."',
+                name: 'Founder, Digital Marketing Agency',
+              },
+              {
+                quote: '"I run a seven-figure contracting business from my truck. Pam handles my inbox while I\'m on job sites, Jordan follows up on every estimate I send, and I stopped losing work to guys who just answer the phone faster."',
+                name: 'Owner, Specialty Contracting Business',
+              },
+            ].map((t, i) => (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className="testimonial-card"
+                style={{
+                  background: '#0E1017',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderLeft: '3px solid rgba(0,207,235,0.4)',
+                  borderRadius: '0 14px 14px 0',
+                  padding: '2rem',
+                }}
+              >
+                <p style={{
+                  fontSize: '1.05rem',
+                  color: 'rgba(255,255,255,0.82)',
+                  lineHeight: 1.78,
+                  marginBottom: '1.5rem',
+                  fontStyle: 'italic',
+                }}>{t.quote}</p>
+                <div style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
+                  — {t.name}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </AnimatedSection>
+
+      {/* FREEDOM FOR FOUNDERS */}
+      <AnimatedSection id="about" style={{ padding: '6rem 2rem' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <motion.span
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#00CFEB',
+              marginBottom: '0.85rem',
+              display: 'block',
+            }}
+          >From the Founder</motion.span>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              background: '#0E1017',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '16px',
+              padding: '3rem',
+            }}
+          >
+            <div style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.85 }}>
+              <p style={{ marginBottom: '1.5rem' }}>
+                I&apos;ve owned and operated multiple businesses for decades — manufacturing, retail, technology. I&apos;ve read hundreds of books, attended seminars, joined networking groups, and consulted for dozens of small business owners. I&apos;ve had a front-row seat to more businesses than most people see in a lifetime.
+              </p>
+              <p style={{ marginBottom: '1.5rem' }}>
+                And in every single one — including my own — I saw the same thing: founders working harder than anyone in the room, and still falling behind on the things that matter most.
+              </p>
+              <p style={{ marginBottom: '1.5rem' }}>
+                Not because they weren&apos;t capable. Because there weren&apos;t enough hours, and the right help was always too expensive, too slow, or too complicated to set up. A fractional CMO costs $5,000 a month and gives you strategy. A fractional CRO costs $3,000 a month and gives you a deck. A part-time VA costs $2,000 a month and handles your calendar when she&apos;s available.
+              </p>
+              <p style={{ marginBottom: '1.5rem' }}>
+                None of them are in your business every day. None of them work together. None of them are built around how a small business actually runs.
+              </p>
+              <p style={{ marginBottom: 0, color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                I built Zander because I needed it. And because every business owner I&apos;ve ever worked with needed it too.
+              </p>
+            </div>
+
+            <div style={{
+              marginTop: '2.5rem',
+              paddingTop: '2rem',
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+            }}>
+              <div style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                background: 'rgba(0,207,235,0.12)',
+                border: '1px solid rgba(0,207,235,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: "'Sora', var(--font-sora), sans-serif",
+                fontWeight: 700,
+                color: '#00CFEB',
+                fontSize: '1.1rem',
+                flexShrink: 0,
+              }}>JW</div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.3 }}>Jonathan White</div>
+                <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>Founder — Zander</div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </AnimatedSection>
+
+      {/* PRICING with hover glow */}
+      <AnimatedSection id="pricing" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <motion.span
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#00CFEB',
+              marginBottom: '0.85rem',
+              display: 'block',
+            }}
+          >Founding 50 Rates — Locked for Life</motion.span>
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: 'clamp(2rem, 4vw, 2.85rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.18,
+              marginBottom: '0.75rem',
+            }}
+          >Simple, transparent pricing</motion.h2>
+          <motion.p
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontSize: '1rem',
+              color: 'rgba(255,255,255,0.55)',
+              marginBottom: '3.5rem',
+            }}
+          >
+            Public pricing launches higher after beta. These rates never increase for founding members.
+          </motion.p>
+
+          <motion.div
+            className="pricing-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '1.1rem',
+              textAlign: 'left',
+            }}
+          >
             {/* STARTER */}
-            <div className="fade-up" style={{
+            <motion.div variants={staggerItem} className="pricing-card" style={{
               background: '#0E1017',
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: '16px',
@@ -945,19 +1091,18 @@ export default function LandingPage() {
               position: 'relative',
             }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Starter</h3>
-              <p style={{ fontSize: '0.83rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.5rem' }}>Solo operators & small teams</p>
+              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>Your EA and HQ — fully operational from day one.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
                 $199<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#00CFEB', opacity: 0.65, textDecoration: 'line-through', marginBottom: '0.2rem' }}>Public price: $299/mo</p>
-              <p style={{ fontSize: '0.77rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.75rem' }}>Founding rate — locked for life</p>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '1.75rem' }}>$299/mo public</p>
               <a href="/signup" style={{
                 display: 'block',
                 width: '100%',
                 padding: '0.78rem',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '0.92rem',
+                fontSize: '0.95rem',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '1.75rem',
@@ -965,37 +1110,32 @@ export default function LandingPage() {
                 color: '#FFFFFF',
                 border: '1px solid rgba(255,255,255,0.18)',
                 boxSizing: 'border-box',
-              }}>Start Free Trial</a>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.32)', marginTop: '1.2rem', marginBottom: '0.6rem' }}>Executives included</p>
+              }}>Get Early Access</a>
+              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>Includes</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.72rem', padding: 0, margin: 0 }}>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                  <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
-                  <span><strong>Jordan (CRO)</strong> — Sales pipeline & follow-ups</span>
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                  <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
-                  <span><strong>Pam (EA)</strong> — Calendar, tasks & reminders</span>
-                </li>
-              </ul>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.32)', marginTop: '1.2rem', marginBottom: '0.6rem' }}>Platform</p>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.72rem', padding: 0, margin: 0 }}>
-                {['Up to 3 users', 'Email & SMS automation', 'AI Chat Support', 'Basic analytics', 'Email support'].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
+                {[
+                  'Pam, your AI Executive Assistant',
+                  'HQ — your business command center',
+                  'Inbox management and draft routing',
+                  'Calendar and scheduling',
+                  'SMS and follow-up sequences',
+                  'Getting sharper every day',
+                ].map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.95rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
                     {f}
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
 
             {/* PRO (featured) */}
-            <div className="fade-up" style={{
+            <motion.div variants={staggerItem} className="pricing-card pricing-card-pro" style={{
               background: '#13151E',
               border: '1px solid #00CFEB',
               borderRadius: '16px',
               padding: '2.25rem',
               position: 'relative',
-              transitionDelay: '0.08s',
             }}>
               <div style={{
                 position: 'absolute',
@@ -1004,7 +1144,7 @@ export default function LandingPage() {
                 transform: 'translateX(-50%)',
                 background: '#00CFEB',
                 color: '#000',
-                fontSize: '0.7rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
@@ -1013,19 +1153,18 @@ export default function LandingPage() {
                 whiteSpace: 'nowrap',
               }}>Most Popular</div>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Pro</h3>
-              <p style={{ fontSize: '0.83rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.5rem' }}>Growing businesses ready to scale</p>
+              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>Add your marketing machine — campaigns, brand, and content.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
                 $349<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#00CFEB', opacity: 0.65, textDecoration: 'line-through', marginBottom: '0.2rem' }}>Public price: $499/mo</p>
-              <p style={{ fontSize: '0.77rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.75rem' }}>Founding rate — locked for life</p>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '1.75rem' }}>$499/mo public</p>
               <a href="/signup" style={{
                 display: 'block',
                 width: '100%',
                 padding: '0.78rem',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '0.92rem',
+                fontSize: '0.95rem',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '1.75rem',
@@ -1034,47 +1173,43 @@ export default function LandingPage() {
                 border: 'none',
                 boxSizing: 'border-box',
               }}>Get Early Access</a>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.32)', marginTop: '1.2rem', marginBottom: '0.6rem' }}>Everything in Starter, plus</p>
+              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>Everything in Starter, plus</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.72rem', padding: 0, margin: 0 }}>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                  <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
-                  <span><strong>Don (CMO)</strong> — Marketing engine & brand</span>
-                </li>
-              </ul>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.32)', marginTop: '1.2rem', marginBottom: '0.6rem' }}>Platform</p>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.72rem', padding: 0, margin: 0 }}>
-                {['Up to 10 users', 'Advanced analytics & reporting', 'Campaign management tools', 'Priority support', 'Onboarding call included'].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
+                {[
+                  'Don, your AI CMO',
+                  'Marketing calendar and campaign execution',
+                  'Brand and content strategy',
+                  'Social and email sequences',
+                ].map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.95rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
                     {f}
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
 
             {/* BUSINESS */}
-            <div className="fade-up" style={{
+            <motion.div variants={staggerItem} className="pricing-card" style={{
               background: '#0E1017',
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: '16px',
               padding: '2.25rem',
               position: 'relative',
-              transitionDelay: '0.16s',
             }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Business</h3>
-              <p style={{ fontSize: '0.83rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.5rem' }}>Full team, all executives included</p>
+              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>The complete C-suite. Every executive included, forever.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
                 $599<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#00CFEB', opacity: 0.65, textDecoration: 'line-through', marginBottom: '0.2rem' }}>Public price: $799/mo</p>
-              <p style={{ fontSize: '0.77rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.75rem' }}>Founding rate — locked for life</p>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '1.75rem' }}>$799/mo public</p>
               <a href="/signup" style={{
                 display: 'block',
                 width: '100%',
                 padding: '0.78rem',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '0.92rem',
+                fontSize: '0.95rem',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '1.75rem',
@@ -1083,47 +1218,43 @@ export default function LandingPage() {
                 border: '1px solid rgba(255,255,255,0.18)',
                 boxSizing: 'border-box',
               }}>Get Early Access</a>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.32)', marginTop: '1.2rem', marginBottom: '0.6rem' }}>Everything in Pro, plus</p>
+              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>Everything in Pro, plus</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.72rem', padding: 0, margin: 0 }}>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                  <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
-                  <span><strong>Every new executive auto-included</strong> as they launch — CFO, COO, CPO, CIO — no upgrade required</span>
-                </li>
-              </ul>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.32)', marginTop: '1.2rem', marginBottom: '0.6rem' }}>Platform</p>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.72rem', padding: 0, margin: 0 }}>
-                {['Up to 25 users', 'Custom integrations', 'Dedicated success manager', 'White-glove onboarding'].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
+                {[
+                  'Jordan, your AI CRO',
+                  'Pipeline management and deal tracking',
+                  'Outreach sequences and lead follow-up',
+                  'Full executive team operating in sync',
+                ].map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.95rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
                     {f}
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
 
             {/* ENTERPRISE */}
-            <div className="fade-up" style={{
+            <motion.div variants={staggerItem} className="pricing-card" style={{
               background: 'linear-gradient(135deg, #0E1017 0%, rgba(255,255,255,0.02) 100%)',
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: '16px',
               padding: '2.25rem',
               position: 'relative',
-              transitionDelay: '0.24s',
             }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Enterprise</h3>
-              <p style={{ fontSize: '0.83rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.5rem' }}>Multi-location, white-label & complex orgs</p>
-              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.4rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
-                Custom
+              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>Custom build for complex organizations and agencies.</p>
+              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
+                $999<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#00CFEB', opacity: 0.65, textDecoration: 'line-through', marginBottom: '0.2rem' }}>Starting at $999/mo</p>
-              <p style={{ fontSize: '0.77rem', color: 'rgba(255,255,255,0.58)', marginBottom: '1.75rem' }}>&nbsp;</p>
-              <a href="mailto:hello@zanderos.com" style={{
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '1.75rem' }}>$1,499/mo public</p>
+              <a href="mailto:support@zanderos.com" style={{
                 display: 'block',
                 width: '100%',
                 padding: '0.78rem',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '0.92rem',
+                fontSize: '0.95rem',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '1.75rem',
@@ -1131,115 +1262,132 @@ export default function LandingPage() {
                 color: '#FFFFFF',
                 border: '1px solid rgba(255,255,255,0.18)',
                 boxSizing: 'border-box',
-              }}>Contact Sales</a>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.32)', marginTop: '1.2rem', marginBottom: '0.6rem' }}>Everything in Business, plus</p>
+              }}>Contact Us</a>
+              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>Everything in Business, plus</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.72rem', padding: 0, margin: 0 }}>
                 {[
-                  'Unlimited users',
-                  'White-label platform (your branding)',
-                  'Custom API access & integrations',
-                  'Multi-entity & multi-location',
-                  'SLA guarantees',
-                  'Direct founder access during onboarding',
+                  'Custom executive configuration',
+                  'Multi-location and team support',
+                  'Priority onboarding and dedicated support',
                 ].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.87rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.45 }}>
-                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px', color: '#00CFEB' }}><CheckIcon /></span>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.95rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
                     {f}
                   </li>
                 ))}
               </ul>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
+
+          {/* 30-Day Guarantee */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              marginTop: '2.5rem',
+              background: 'rgba(0,207,235,0.05)',
+              border: '1px solid rgba(0,207,235,0.2)',
+              borderRadius: '12px',
+              padding: '1.5rem 2rem',
+              maxWidth: '700px',
+              margin: '2.5rem auto 0',
+            }}
+          >
+            <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.85)', marginBottom: '0.5rem', fontWeight: 600 }}>
+              30-Day Money-Back Guarantee
+            </p>
+            <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem' }}>
+              If Zander isn&apos;t running your business better in the first 30 days, we&apos;ll refund your first month. No questions. No hassle.
+            </p>
+            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.4)' }}>
+              The $49 waitlist reservation fee is non-refundable. The 30-day guarantee applies to your first month&apos;s subscription payment only.
+            </p>
+          </motion.div>
         </div>
-      </section>
+      </AnimatedSection>
 
-      {/* FOUNDER */}
-      <section id="about" style={{ padding: '6rem 2rem' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="founder-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1.1fr',
-            gap: '5rem',
-            alignItems: 'center',
-          }}>
-            <div className="fade-up founder-logo-wrap" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '20px',
-              aspectRatio: '1',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              overflow: 'hidden',
-            }}>
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'radial-gradient(ellipse at 50% 50%, rgba(0,207,235,0.07) 0%, transparent 70%)',
-              }} />
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <CompassLogoLarge />
-              </div>
-            </div>
+      {/* FAQ with AnimatePresence */}
+      <AnimatedSection style={{ padding: '6rem 2rem' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.18,
+              marginBottom: '2.5rem',
+              textAlign: 'center',
+            }}
+          >Frequently Asked Questions</motion.h2>
 
-            <div className="fade-up" style={{ transitionDelay: '0.15s' }}>
-              <h2 style={{
-                fontFamily: "'Sora', var(--font-sora), sans-serif",
-                fontSize: 'clamp(1.85rem, 3.5vw, 2.6rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                marginBottom: '1.5rem',
-                lineHeight: 1.18,
-              }}>Freedom for Founders.</h2>
-              <p style={{ fontSize: '0.97rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.82, marginBottom: '1.4rem' }}>
-                <span style={{ color: 'rgba(255,255,255,0.88)', fontWeight: 500 }}>For 32 years, I ran a manufacturing company.</span> I loved the work — the craft, the customers, watching a product go from design to delivery. But somewhere in year five, the business started running me.
-              </p>
-              <p style={{ fontSize: '0.97rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.82, marginBottom: '1.4rem' }}>
-                I was spending my days on things I wasn&apos;t hired to do — chasing receivables, managing spreadsheets, trying to remember which leads I&apos;d left hanging. The thing I actually built the company for kept getting pushed aside.
-              </p>
-              <p style={{ fontSize: '0.97rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.82, marginBottom: '1.4rem' }}>
-                I built Zander because <span style={{ color: 'rgba(255,255,255,0.88)', fontWeight: 500 }}>every business owner deserves the executive help to keep their business organized and moving forward</span> — so they can step back into the priorities, the craft, and the life they built their business to support.
-              </p>
-              <p style={{ fontSize: '0.97rem', color: 'rgba(255,255,255,0.58)', lineHeight: 1.82, marginBottom: 0 }}>
-                You shouldn&apos;t have to choose between running a great business and living a great life. Zander makes sure you don&apos;t have to.
-              </p>
-
-              <div style={{
-                marginTop: '2rem',
-                paddingTop: '1.75rem',
-                borderTop: '1px solid rgba(255,255,255,0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-              }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  background: 'rgba(0,207,235,0.12)',
-                  border: '1px solid rgba(0,207,235,0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: "'Sora', var(--font-sora), sans-serif",
-                  fontWeight: 700,
-                  color: '#00CFEB',
-                  fontSize: '1rem',
-                  flexShrink: 0,
-                }}>JW</div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.92rem', lineHeight: 1.3 }}>Jonathan White</div>
-                  <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.58)' }}>Founder, Zander Technologies &bull; Owner, My Cabinet Factory (32 years)</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+          >
+            {faqs.map((faq, i) => (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                style={{
+                  background: '#0E1017',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  style={{
+                    width: '100%',
+                    padding: '1.25rem 1.5rem',
+                    background: 'transparent',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span style={{ fontSize: '1.05rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{faq.q}</span>
+                  <span style={{ color: '#00CFEB', flexShrink: 0 }}>
+                    {openFaq === i ? <MinusIcon /> : <PlusIcon />}
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {openFaq === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeInOut' }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div style={{ padding: '0 1.5rem 1.25rem', fontSize: '1rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>
+                        {faq.a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* FINAL CTA */}
-      <section style={{
+      <AnimatedSection style={{
         padding: '7rem 2rem',
         textAlign: 'center',
         position: 'relative',
@@ -1251,7 +1399,13 @@ export default function LandingPage() {
           background: 'radial-gradient(ellipse 65% 85% at 50% 50%, rgba(0,207,235,0.055) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
-        <div className="fade-up" style={{ position: 'relative', zIndex: 1, maxWidth: '640px', margin: '0 auto' }}>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          style={{ position: 'relative', zIndex: 1, maxWidth: '640px', margin: '0 auto' }}
+        >
           <h2 style={{
             fontFamily: "'Sora', var(--font-sora), sans-serif",
             fontSize: 'clamp(2rem, 4vw, 3rem)',
@@ -1262,7 +1416,7 @@ export default function LandingPage() {
           }}>
             Your business is ready.<br/><span style={{ color: '#00CFEB' }}>Are you?</span>
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: '1rem', marginBottom: '2.25rem', lineHeight: 1.75 }}>
+          <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: '1.05rem', marginBottom: '2.25rem', lineHeight: 1.75 }}>
             Join the Founding 50 and get expert-level executive support locked in for life — before we open to the public and pricing goes up.
           </p>
           <a href="/signup" style={{
@@ -1277,46 +1431,75 @@ export default function LandingPage() {
             fontSize: '1rem',
             textDecoration: 'none',
           }}>
-            Get Early Access — from $199/mo
+            Get Early Access
           </a>
-          <p style={{ fontSize: '0.79rem', color: 'rgba(255,255,255,0.3)', marginTop: '1rem', letterSpacing: '0.04em' }}>
+          <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.3)', marginTop: '1rem', letterSpacing: '0.04em' }}>
             Only 50 founding spots &bull; No credit card required &bull; Cancel anytime
           </p>
-        </div>
-      </section>
+        </motion.div>
+      </AnimatedSection>
 
       {/* FOOTER */}
       <footer style={{
         borderTop: '1px solid rgba(255,255,255,0.08)',
-        padding: '2.5rem 2rem',
+        padding: '3rem 2rem 2rem',
       }}>
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '1.25rem',
         }}>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none' }}>
-            <CompassLogo size={28} />
-            <span style={{
-              fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontWeight: 700,
-              fontSize: '0.97rem',
-              color: '#FFFFFF',
-              letterSpacing: '0.08em',
-            }}>ZANDER</span>
-          </a>
-          <div style={{ display: 'flex', gap: '1.75rem', flexWrap: 'wrap' }}>
-            <a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.58)', textDecoration: 'none', fontSize: '0.83rem' }}>Product</a>
-            <a href="#pricing" style={{ color: 'rgba(255,255,255,0.58)', textDecoration: 'none', fontSize: '0.83rem' }}>Pricing</a>
-            <a href="#about" style={{ color: 'rgba(255,255,255,0.58)', textDecoration: 'none', fontSize: '0.83rem' }}>About</a>
-            <a href="/login" style={{ color: 'rgba(255,255,255,0.58)', textDecoration: 'none', fontSize: '0.83rem' }}>Sign In</a>
-            <a href="/legal/privacy" style={{ color: 'rgba(255,255,255,0.58)', textDecoration: 'none', fontSize: '0.83rem' }}>Privacy</a>
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '2rem',
+            marginBottom: '2rem',
+          }}>
+            <div>
+              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', marginBottom: '0.75rem' }}>
+                <Image
+                  src="/images/zander-logo-white.svg"
+                  alt="Zander"
+                  width={120}
+                  height={30}
+                  style={{ height: '28px', width: 'auto' }}
+                />
+              </a>
+              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
+            </div>
+            <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.9rem' }}>Product</a>
+                <a href="#pricing" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.9rem' }}>Pricing</a>
+                <a href="#demo" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.9rem' }}>Demo</a>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <a href="#about" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.9rem' }}>About</a>
+                <a href="/login" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.9rem' }}>Sign In</a>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <a href="/privacy" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.9rem' }}>Privacy Policy</a>
+                <a href="/terms" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.9rem' }}>Terms of Service</a>
+              </div>
+            </div>
           </div>
-          <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.22)' }}>&copy; 2026 Zander Technologies LLC</p>
+          <div style={{
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            paddingTop: '1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}>
+            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+              &copy; 2026 Zander Systems LLC. All rights reserved.
+            </p>
+            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+              support@zanderos.com
+            </p>
+          </div>
         </div>
       </footer>
     </div>
