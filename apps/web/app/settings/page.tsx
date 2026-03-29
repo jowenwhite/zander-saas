@@ -207,13 +207,28 @@ export default function SettingsPage() {
   }, [user?.id]);
 
   const handleConnectGmail = () => {
-    if (!user?.id) return;
-    window.location.href = `https://api.zanderos.com/auth/google?state=${user.id}`;
+    const token = localStorage.getItem('zander_token');
+    if (!token) return;
+    window.location.href = `https://api.zanderos.com/auth/google?token=${token}`;
   };
 
   const handleDisconnectGmail = async () => {
-    if (!user?.id) return;
-    window.location.href = `https://api.zanderos.com/auth/google/disconnect?userId=${user.id}`;
+    const token = localStorage.getItem('zander_token');
+    if (!token) return;
+    try {
+      const res = await fetch('https://api.zanderos.com/auth/google/disconnect', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (res.ok || res.redirected) {
+        setGmailConnected(false);
+        setGmailEmail(null);
+      } else {
+        console.error('Failed to disconnect Gmail:', res.status);
+      }
+    } catch (error) {
+      console.error('Failed to disconnect Gmail:', error);
+    }
   };
 
   const handleSyncGmail = async () => {
