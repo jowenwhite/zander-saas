@@ -232,17 +232,20 @@ export default function SettingsPage() {
   };
 
   const handleSyncGmail = async () => {
-    if (!user?.id) return;
+    const token = localStorage.getItem('zander_token');
+    if (!token) return;
     setSyncingGmail(true);
     try {
-      const res = await fetch(`https://api.zanderos.com/gmail/sync`, {
+      const res = await fetch('https://api.zanderos.com/gmail/sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, maxResults: 50 }),
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ maxResults: 50 }),
       });
       const data = await res.json();
-      if (data.success) {
-      } else {
+      if (!data.success) {
         alert('Sync failed: ' + data.error);
       }
     } catch (error) {
