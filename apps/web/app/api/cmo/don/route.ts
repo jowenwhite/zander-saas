@@ -1841,7 +1841,7 @@ async function executeTool(
         const recipientEmail = contactEmail || '';
 
         if (!resolvedContactId && contactEmail) {
-          resolvedContactId = await findContactByEmail(contactEmail, tenantId, headers);
+          resolvedContactId = await findContactByEmail(contactEmail, tenantId, headers) ?? undefined;
         }
 
         // Create scheduled communication with needsApproval=true
