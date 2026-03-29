@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
-export default function WaitlistConfirmedPage() {
+function WaitlistContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
-  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     // In a production app, you'd verify the session and get customer details
@@ -150,5 +149,29 @@ export default function WaitlistConfirmedPage() {
         </a>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div style={{
+      fontFamily: "'Inter', var(--font-inter), sans-serif",
+      background: '#080A0F',
+      color: '#FFFFFF',
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <p style={{ color: 'rgba(255,255,255,0.6)' }}>Loading...</p>
+    </div>
+  );
+}
+
+export default function WaitlistConfirmedPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <WaitlistContent />
+    </Suspense>
   );
 }

@@ -863,7 +863,7 @@ async function executeTool(
         const recipientEmail = contactEmail || '';
 
         if (!resolvedContactId && contactEmail) {
-          resolvedContactId = await findContactByEmail(contactEmail, tenantId, headers);
+          resolvedContactId = await findContactByEmail(contactEmail, tenantId, headers) ?? undefined;
         }
 
         // Create scheduled communication with needsApproval=true
@@ -926,7 +926,7 @@ async function executeTool(
         // Try to resolve contactId from email if not provided
         let resolvedContactId = contactId;
         if (!resolvedContactId && to) {
-          resolvedContactId = await findContactByEmail(to, tenantId, headers);
+          resolvedContactId = await findContactByEmail(to, tenantId, headers) ?? undefined;
         }
 
         // Create scheduled communication with needsApproval=true
@@ -1261,7 +1261,7 @@ async function executeTool(
         // Try to resolve contactId from email if not provided
         let resolvedContactId = contactId;
         if (!resolvedContactId && to) {
-          resolvedContactId = await findContactByEmail(to, tenantId, headers);
+          resolvedContactId = await findContactByEmail(to, tenantId, headers) ?? undefined;
         }
 
         // Create scheduled communication with needsApproval=true
