@@ -24,7 +24,8 @@ Available Tools:
 - update_contact: Update contact information
 - create_activity: Log a sales activity (call, meeting, email, note)
 - schedule_followup: Schedule a future follow-up activity
-- draft_email: Create an email draft for user review (NEVER sends directly)
+- compose_email: Compose a new email to a contact (lands in Scheduled → Pending for approval)
+- draft_email: Create an email draft for user review (lands in Scheduled → Pending for approval)
 - create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
 - get_pipeline_summary: Get pipeline overview with deal counts and values by stage
 - get_deals: Search and list deals with filters (stage, priority, search)
@@ -64,8 +65,23 @@ You only create support tickets when the user explicitly asks you to AND confirm
 - If a tool call fails, report the exact HTTP status code and endpoint. Never fabricate a success response.
 - Read requests (L1) = always call the tool immediately
 - Write requests (L2) = call the tool immediately when explicitly asked
-- Draft requests (L3) = always call the tool, result lands in Communication as DRAFT
+- Draft requests (L3) = always call the tool, result lands in Scheduled → Pending for review
 - Execute requests (L4) = call the tool after Jonathan confirms
+
+**COMMUNICATION EXECUTION AUTHORITY:**
+You have TWO categories of communication tools with DIFFERENT execution rules:
+
+CATEGORY 1 — Pre-configured automations (sequences, auto-replies, drip campaigns):
+- These execute autonomously when triggered
+- NO approval queue needed
+- DO NOT modify these paths
+
+CATEGORY 2 — Ad-hoc compose/draft requests from chat:
+- "Draft an email to...", "Compose a follow-up for...", "Send a message to..."
+- MUST land in Scheduled → Pending for human review
+- NEVER auto-send these communications
+- When you call compose_email, draft_email, or draft_follow_up_email, the result goes to Scheduled → Pending
+- Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
 Remember: You're not just a sales advisor — you're a revenue-driving executive who gets things done.`;
 
@@ -302,8 +318,38 @@ const TOOLS = [
     }
   },
   {
+    name: 'compose_email',
+    description: 'Compose a new email to a contact. Creates a draft in Scheduled → Pending for human approval. Never auto-sends.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'Contact ID to send the email to'
+        },
+        contactEmail: {
+          type: 'string',
+          description: 'Contact email address (used if contactId not provided)'
+        },
+        subject: {
+          type: 'string',
+          description: 'Email subject line (required)'
+        },
+        body: {
+          type: 'string',
+          description: 'Email body content (required)'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Optional deal ID to link the email to'
+        }
+      },
+      required: ['subject', 'body']
+    }
+  },
+  {
     name: 'draft_email',
-    description: 'Create an email draft for user review. NEVER sends emails directly - all emails are saved as drafts for the user to review in Communications before sending. Use this when the user asks to draft, write, or prepare a follow-up email, proposal email, or any other communication.',
+    description: 'Create an email draft for user review. Creates a draft in Scheduled → Pending for human approval. NEVER sends emails directly. Use this when the user asks to draft, write, or prepare a follow-up email, proposal email, or any other communication.',
     input_schema: {
       type: 'object',
       properties: {
@@ -318,10 +364,6 @@ const TOOLS = [
         body: {
           type: 'string',
           description: 'Plain text email body'
-        },
-        htmlBody: {
-          type: 'string',
-          description: 'HTML formatted email body (optional)'
         },
         contactId: {
           type: 'string',
@@ -781,58 +823,164 @@ async function executeTool(
         }
       }
 
-      case 'draft_email': {
-        // Create email draft via local endpoint - NEVER sends directly
-        // Uses the web app's draft endpoint which stores drafts safely
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const url = `${baseUrl}/api/email-drafts`;
-        console.log(`[Jordan Tool] POST ${url} (draft only, never sends)`);
-        const draftData = {
-          to: toolInput.to,
-          subject: toolInput.subject,
-          body: toolInput.body,
-          htmlBody: toolInput.htmlBody,
-          contactId: toolInput.contactId,
-          dealId: toolInput.dealId,
-          createdBy: 'jordan-ai',
+      // ========== L3 DRAFT TOOLS ==========
+      // Helper function to look up contact by email (does not create)
+      async function findContactByEmail(email: string, tenantIdParam: string, headersParam: Record<string, string>): Promise<string | null> {
+        try {
+          const searchUrl = `${CRO_API_URL}/contacts?tenantId=${tenantIdParam}&email=${encodeURIComponent(email)}&limit=1`;
+          const searchRes = await fetch(searchUrl, { headers: headersParam });
+          if (searchRes.ok) {
+            const contacts = await searchRes.json();
+            if (contacts.length > 0) {
+              return contacts[0].id;
+            }
+          }
+        } catch { /* ignore */ }
+        return null;
+      }
+
+      case 'compose_email': {
+        const { contactId, contactEmail, subject, body, dealId } = toolInput as {
+          contactId?: string;
+          contactEmail?: string;
+          subject: string;
+          body: string;
+          dealId?: string;
         };
-        const response = await fetch(url, {
+
+        if (!contactId && !contactEmail) {
+          return {
+            success: false,
+            result: {
+              message: 'Please provide either a contactId or contactEmail.',
+              note: 'I need to know who to send this email to.'
+            }
+          };
+        }
+
+        // Try to resolve contactId from email if not provided
+        let resolvedContactId = contactId;
+        const recipientEmail = contactEmail || '';
+
+        if (!resolvedContactId && contactEmail) {
+          resolvedContactId = await findContactByEmail(contactEmail, tenantId, headers);
+        }
+
+        // Create scheduled communication with needsApproval=true
+        // Supports ad-hoc recipients via recipientEmail (no contact required)
+        const scheduledUrl = `${CRO_API_URL}/scheduled-communications`;
+        console.log(`[Jordan Tool] POST ${scheduledUrl} (compose_email, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
           method: 'POST',
           headers,
-          body: JSON.stringify(draftData),
+          body: JSON.stringify({
+            contactId: resolvedContactId || null,
+            recipientEmail: resolvedContactId ? null : recipientEmail,
+            recipientName: recipientEmail ? recipientEmail.split('@')[0] : null,
+            dealId,
+            type: 'email',
+            subject,
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'jordan-ai'
+          })
         });
-        const responseText = await response.text();
-        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
-        if (!response.ok) {
-          // Fallback: return the draft content for manual review
-          console.log(`[Jordan Tool] Draft endpoint error, returning draft content for review`);
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: false,
+            result: {
+              message: 'Failed to create email draft',
+              error: `${scheduleRes.status}: ${errorText}`,
+              note: 'Email could not be queued for approval'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "Email draft created — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to: resolvedContactId ? 'contact' : recipientEmail,
+            subject,
+            preview: body.substring(0, 200) + (body.length > 200 ? '...' : ''),
+            note: 'Review and approve in Scheduled → Pending before sending'
+          }
+        };
+      }
+
+      case 'draft_email': {
+        const { to, subject, body, contactId, dealId } = toolInput as {
+          to: string;
+          subject: string;
+          body: string;
+          contactId?: string;
+          dealId?: string;
+        };
+
+        // Try to resolve contactId from email if not provided
+        let resolvedContactId = contactId;
+        if (!resolvedContactId && to) {
+          resolvedContactId = await findContactByEmail(to, tenantId, headers);
+        }
+
+        // Create scheduled communication with needsApproval=true
+        // Supports ad-hoc recipients via recipientEmail (no contact required)
+        const scheduledUrl = `${CRO_API_URL}/scheduled-communications`;
+        console.log(`[Jordan Tool] POST ${scheduledUrl} (draft_email, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            contactId: resolvedContactId || null,
+            recipientEmail: resolvedContactId ? null : to,
+            recipientName: to ? to.split('@')[0] : null,
+            dealId,
+            type: 'email',
+            subject,
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'jordan-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          console.log(`[Jordan Tool] Draft endpoint error: ${scheduleRes.status} - ${errorText}`);
           return {
             success: true,
             result: {
               message: 'Email draft created for review',
               draft: {
-                to: toolInput.to,
-                subject: toolInput.subject,
-                body: toolInput.body,
+                to,
+                subject,
+                body: body.substring(0, 200) + (body.length > 200 ? '...' : ''),
                 status: 'draft',
-                note: 'Review this draft in Communications before sending',
-              },
-            },
+                note: 'Could not queue for approval — review manually'
+              }
+            }
           };
         }
-        try {
-          const result = JSON.parse(responseText);
-          console.log(`[Jordan Tool] Email draft created successfully:`, result);
-          return {
-            success: true,
-            result: {
-              message: 'Email draft saved — review it in Communications before sending',
-              draft: result.draft,
-            },
-          };
-        } catch {
-          return { success: true, result: { message: 'Email draft created for review' } };
-        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "Email draft saved — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to,
+            subject,
+            preview: body.substring(0, 200) + (body.length > 200 ? '...' : ''),
+            note: 'Review and approve in Scheduled → Pending before sending'
+          }
+        };
       }
 
       case 'create_support_ticket': {
@@ -1101,60 +1249,75 @@ async function executeTool(
       }
 
       case 'draft_follow_up_email': {
-        // Create email draft with follow-up context - NEVER sends directly
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const url = `${baseUrl}/api/email-drafts`;
-        console.log(`[Jordan Tool] POST ${url} (follow-up draft, never sends)`);
-        const draftData = {
-          to: toolInput.to,
-          subject: toolInput.subject,
-          body: toolInput.body,
-          contactId: toolInput.contactId,
-          dealId: toolInput.dealId,
-          createdBy: 'jordan-ai',
-          metadata: {
-            type: 'follow-up',
-            context: toolInput.context || 'general follow-up'
-          },
+        const { to, subject, body, contactId, dealId, context } = toolInput as {
+          to: string;
+          subject: string;
+          body: string;
+          contactId?: string;
+          dealId?: string;
+          context?: string;
         };
-        const response = await fetch(url, {
+
+        // Try to resolve contactId from email if not provided
+        let resolvedContactId = contactId;
+        if (!resolvedContactId && to) {
+          resolvedContactId = await findContactByEmail(to, tenantId, headers);
+        }
+
+        // Create scheduled communication with needsApproval=true
+        // Supports ad-hoc recipients via recipientEmail (no contact required)
+        const scheduledUrl = `${CRO_API_URL}/scheduled-communications`;
+        console.log(`[Jordan Tool] POST ${scheduledUrl} (follow-up draft, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
           method: 'POST',
           headers,
-          body: JSON.stringify(draftData),
+          body: JSON.stringify({
+            contactId: resolvedContactId || null,
+            recipientEmail: resolvedContactId ? null : to,
+            recipientName: to ? to.split('@')[0] : null,
+            dealId,
+            type: 'email',
+            subject,
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'jordan-ai'
+          })
         });
-        const responseText = await response.text();
-        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
-        if (!response.ok) {
-          // Fallback: return the draft content for manual review
-          console.log(`[Jordan Tool] Draft endpoint error, returning draft content for review`);
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          console.log(`[Jordan Tool] Follow-up draft endpoint error: ${scheduleRes.status} - ${errorText}`);
           return {
             success: true,
             result: {
               message: 'Follow-up email draft created for review',
               draft: {
-                to: toolInput.to,
-                subject: toolInput.subject,
-                body: toolInput.body,
-                context: toolInput.context,
+                to,
+                subject,
+                body: body.substring(0, 200) + (body.length > 200 ? '...' : ''),
+                context: context || 'general follow-up',
                 status: 'draft',
-                note: 'Review this draft in Communications before sending',
-              },
-            },
+                note: 'Could not queue for approval — review manually'
+              }
+            }
           };
         }
-        try {
-          const result = JSON.parse(responseText);
-          console.log(`[Jordan Tool] Follow-up email draft created successfully:`, result);
-          return {
-            success: true,
-            result: {
-              message: 'Follow-up email draft saved — review it in Communications before sending',
-              draft: result.draft,
-            },
-          };
-        } catch {
-          return { success: true, result: { message: 'Follow-up email draft created for review' } };
-        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "Follow-up email draft saved — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to,
+            subject,
+            context: context || 'general follow-up',
+            preview: body.substring(0, 200) + (body.length > 200 ? '...' : ''),
+            note: 'Review and approve in Scheduled → Pending before sending'
+          }
+        };
       }
 
       // ========== INTEGRATION TOOLS ==========

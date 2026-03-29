@@ -118,6 +118,8 @@ model Tenant {
   // Integration credentials (tenant-scoped)
   twilioCredential        TwilioCredential?
   calendlyCredential      CalendlyCredential?
+  googleTokens            GoogleToken[]
+  emailSignatures         EmailSignature[]
 
   @@map("tenants")
 }
@@ -183,6 +185,9 @@ model User {
   // EA Module - Task relations
   tasksAssigned Task[] @relation("TaskAssignee")
   tasksCreated  Task[] @relation("TaskCreator")
+
+  // Email Signatures
+  emailSignatures EmailSignature[]
 
   @@map("users")
 }
@@ -486,22 +491,25 @@ model SequenceEnrollment {
 }
 
 model ScheduledCommunication {
-  id            String    @id @default(cuid())
-  tenantId      String
-  contactId     String
-  dealId        String?
-  templateId    String?
-  type          String // email, sms, call
-  subject       String?
-  body          String?
-  scheduledFor  DateTime
-  status        String    @default("pending") // pending, approved, sent, cancelled
-  needsApproval Boolean   @default(false)
-  sentAt        DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  tenant        Tenant    @relation(fields: [tenantId], references: [id])
-  contact       Contact   @relation(fields: [contactId], references: [id])
+  id             String    @id @default(cuid())
+  tenantId       String
+  contactId      String?   // Nullable for ad-hoc recipients (vendors, support, external parties)
+  recipientEmail String?   // Stores email for ad-hoc communications when contactId is null
+  recipientName  String?   // Optional name for ad-hoc recipients
+  dealId         String?
+  templateId     String?
+  type           String    // email, sms, call
+  subject        String?
+  body           String?
+  scheduledFor   DateTime
+  status         String    @default("pending") // pending, approved, sent, cancelled
+  needsApproval  Boolean   @default(false)
+  sentAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  createdBy      String?   // Track which AI executive created this (e.g., "pam-ai", "jordan-ai")
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  contact        Contact?  @relation(fields: [contactId], references: [id])
 
   @@map("scheduled_communications")
 }
@@ -539,6 +547,24 @@ model EmailMessage {
   @@index([threadId])
   @@index([messageId])
   @@map("email_messages")
+}
+
+model EmailSignature {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  name      String   // e.g., "Jonathan White - MCF" or "Jonathan White - Zander"
+  body      String   // Rich text/HTML signature content
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([userId])
+  @@index([tenantId])
+  @@unique([userId, name]) // Prevent duplicate signature names per user
+  @@map("email_signatures")
 }
 
 model SmsMessage {
@@ -716,6 +742,7 @@ model EventReminder {
 model GoogleToken {
   id           String    @id @default(cuid())
   userId       String    @unique
+  tenantId     String
   email        String
   accessToken  String    @db.Text
   refreshToken String?   @db.Text
@@ -724,8 +751,10 @@ model GoogleToken {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant       Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([tenantId])
   @@map("google_tokens")
 }
 

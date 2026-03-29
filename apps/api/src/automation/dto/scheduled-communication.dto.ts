@@ -16,8 +16,16 @@ export enum CommunicationStatus {
 
 export class CreateScheduledCommunicationDto {
   @IsString()
-  @IsNotEmpty({ message: 'Contact ID is required' })
-  contactId: string;
+  @IsOptional()
+  contactId?: string; // Optional - use recipientEmail for ad-hoc recipients
+
+  @IsString()
+  @IsOptional()
+  recipientEmail?: string; // For ad-hoc recipients not in contacts (vendors, support, external parties)
+
+  @IsString()
+  @IsOptional()
+  recipientName?: string; // Optional name for ad-hoc recipients
 
   @IsString()
   @IsOptional()
@@ -46,12 +54,24 @@ export class CreateScheduledCommunicationDto {
   @IsBoolean()
   @IsOptional()
   needsApproval?: boolean;
+
+  @IsString()
+  @IsOptional()
+  createdBy?: string; // Track which AI executive created this (e.g., "pam-ai", "jordan-ai")
 }
 
 export class UpdateScheduledCommunicationDto {
   @IsString()
   @IsOptional()
   contactId?: string;
+
+  @IsString()
+  @IsOptional()
+  recipientEmail?: string;
+
+  @IsString()
+  @IsOptional()
+  recipientName?: string;
 
   @IsString()
   @IsOptional()
@@ -84,4 +104,8 @@ export class UpdateScheduledCommunicationDto {
   @IsBoolean()
   @IsOptional()
   needsApproval?: boolean;
+
+  @IsString()
+  @IsOptional()
+  createdBy?: string;
 }

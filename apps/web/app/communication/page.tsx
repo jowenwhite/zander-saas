@@ -242,6 +242,14 @@ export default function CommunicationsPage() {
   const [templateForm, setTemplateForm] = useState({ name: '', subject: '', body: '', type: 'email', category: '', stage: '', status: 'draft' });
   const [sequenceForm, setSequenceForm] = useState({ name: '', description: '', status: 'draft' });
   const [saving, setSaving] = useState(false);
+
+  // Email Signatures
+  const [signatures, setSignatures] = useState<{ id: string; name: string; body: string; isDefault: boolean }[]>([]);
+  const [selectedSignatureId, setSelectedSignatureId] = useState<string>('');
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+  const [signatureForm, setSignatureForm] = useState({ name: '', body: '', isDefault: false });
+  const [editingSignature, setEditingSignature] = useState<{ id: string; name: string; body: string; isDefault: boolean } | null>(null);
+  const [savingSignature, setSavingSignature] = useState(false);
   // Send Email Modal
   const [showSendModal, setShowSendModal] = useState(false);
   const [sendingTemplate, setSendingTemplate] = useState<Template | null>(null);
@@ -422,7 +430,7 @@ export default function CommunicationsPage() {
         ? `?tenantIds=${selectedTenantIds.join(',')}`
         : '';
       
-      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes, unreadCountRes, campaignsRes] = await Promise.all([
+      const [templatesRes, sequencesRes, commsRes, emailsRes, contactsRes, smsRes, callLogsRes, unreadCountRes, campaignsRes, signaturesRes] = await Promise.all([
         fetch(`${API_URL}/templates`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/sequences`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/scheduled-communications`, { headers: getAuthHeaders() }),
@@ -432,6 +440,7 @@ export default function CommunicationsPage() {
         fetch(`${API_URL}/call-logs${tenantQuery}`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/email-messages/unread-count`, { headers: getAuthHeaders() }),
         fetch(`${API_URL}/campaigns`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/email-signatures`, { headers: getAuthHeaders() }),
       ]);
       if (templatesRes.ok) setTemplates(await templatesRes.json());
       if (sequencesRes.ok) setSequences(await sequencesRes.json());
@@ -442,6 +451,12 @@ export default function CommunicationsPage() {
       if (callLogsRes && callLogsRes.ok) setCallLogs(await callLogsRes.json());
       if (unreadCountRes && unreadCountRes.ok) { const data = await unreadCountRes.json(); setUnreadCount(data.unreadCount || 0); }
       if (campaignsRes && campaignsRes.ok) setCampaigns(await campaignsRes.json());
+      if (signaturesRes && signaturesRes.ok) {
+        const sigs = await signaturesRes.json();
+        setSignatures(sigs);
+        const defaultSig = sigs.find((s: any) => s.isDefault);
+        if (defaultSig) setSelectedSignatureId(defaultSig.id);
+      }
     } catch (err) {
       console.error('Failed to fetch automation data:', err);
     } finally {
@@ -487,6 +502,74 @@ export default function CommunicationsPage() {
       setTemplates(templates.filter(t => t.id !== id));
     } catch (err) {
       alert('Failed to delete template');
+    }
+  };
+
+  // Email Signature CRUD
+  const handleSaveSignature = async () => {
+    setSavingSignature(true);
+    try {
+      const url = editingSignature
+        ? `${API_URL}/email-signatures/${editingSignature.id}`
+        : `${API_URL}/email-signatures`;
+      const method = editingSignature ? 'PATCH' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: getAuthHeaders(),
+        body: JSON.stringify(signatureForm)
+      });
+
+      if (response.ok) {
+        const signaturesRes = await fetch(`${API_URL}/email-signatures`, { headers: getAuthHeaders() });
+        if (signaturesRes.ok) {
+          const sigs = await signaturesRes.json();
+          setSignatures(sigs);
+          const defaultSig = sigs.find((s: any) => s.isDefault);
+          if (defaultSig) setSelectedSignatureId(defaultSig.id);
+        }
+        setShowSignatureModal(false);
+        setEditingSignature(null);
+        setSignatureForm({ name: '', body: '', isDefault: false });
+      } else {
+        const err = await response.json();
+        alert('Failed: ' + (err.message || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Failed to save signature');
+    } finally {
+      setSavingSignature(false);
+    }
+  };
+
+  const handleDeleteSignature = async (id: string) => {
+    if (!confirm('Delete this signature?')) return;
+    try {
+      await fetch(`${API_URL}/email-signatures/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      setSignatures(signatures.filter(s => s.id !== id));
+      if (selectedSignatureId === id) {
+        const remaining = signatures.filter(s => s.id !== id);
+        const newDefault = remaining.find(s => s.isDefault) || remaining[0];
+        setSelectedSignatureId(newDefault?.id || '');
+      }
+    } catch (err) {
+      alert('Failed to delete signature');
+    }
+  };
+
+  const handleSetDefaultSignature = async (id: string) => {
+    try {
+      await fetch(`${API_URL}/email-signatures/${id}/set-default`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      setSignatures(signatures.map(s => ({ ...s, isDefault: s.id === id })));
+      setSelectedSignatureId(id);
+    } catch (err) {
+      alert('Failed to set default signature');
     }
   };
 
@@ -925,8 +1008,8 @@ export default function CommunicationsPage() {
                 style={{
                   padding: '0.5rem 1rem',
                   background: viewMode === 'single' ? '#13131A' : 'transparent',
-                  color: viewMode === 'single' ? 'white' : '#13131A',
-                  border: viewMode === 'single' ? 'none' : '1px solid #2A2A38',
+                  color: viewMode === 'single' ? 'white' : 'rgba(255, 255, 255, 0.85)',
+                  border: viewMode === 'single' ? 'none' : '1px solid rgba(255, 255, 255, 0.35)',
                   borderRadius: '6px',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -948,8 +1031,8 @@ export default function CommunicationsPage() {
                     style={{
                       padding: '0.5rem 1rem',
                       background: isSelected ? colors.bg : 'transparent',
-                      color: isSelected ? colors.text : '#13131A',
-                      border: isSelected ? 'none' : '1px solid #2A2A38',
+                      color: isSelected ? colors.text : 'rgba(255, 255, 255, 0.85)',
+                      border: isSelected ? 'none' : '1px solid rgba(255, 255, 255, 0.35)',
                       borderRadius: '6px',
                       fontWeight: '600',
                       cursor: 'pointer',
@@ -971,8 +1054,8 @@ export default function CommunicationsPage() {
                 style={{
                   padding: '0.5rem 1rem',
                   background: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#00CCEE' : 'transparent',
-                  color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#13131A' : '#13131A',
-                  border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid #2A2A38',
+                  color: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? '#13131A' : 'rgba(255, 255, 255, 0.85)',
+                  border: viewMode === 'all' && selectedTenantIds.length === accessibleTenants.length ? 'none' : '1px solid rgba(255, 255, 255, 0.35)',
                   borderRadius: '6px',
                   fontWeight: '700',
                   cursor: 'pointer',
@@ -1384,7 +1467,7 @@ export default function CommunicationsPage() {
                               <button
                                 onClick={() => handleMarkAsUnread(email.id)}
                                 title="Mark as unread"
-                                style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                                style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.35)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.85)' }}
                               >
                                 ○
                               </button>
@@ -1392,7 +1475,7 @@ export default function CommunicationsPage() {
                               <button
                                 onClick={() => handleMarkAsRead(email.id)}
                                 title="Mark as read"
-                                style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                                style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.35)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.85)' }}
                               >
                                 ●
                               </button>
@@ -1400,14 +1483,14 @@ export default function CommunicationsPage() {
                             <button
                               onClick={() => handleArchiveEmail(email.id)}
                               title="Archive"
-                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', display: 'flex', alignItems: 'center' }}
+                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.35)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', display: 'flex', alignItems: 'center', color: 'rgba(255, 255, 255, 0.85)' }}
                             >
                               <Package size={12} />
                             </button>
                             <button
                               onClick={() => handleDeleteEmail(email.id)}
                               title="Delete"
-                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: '#00CCEE' }}
+                              style={{ padding: '0.25rem 0.4rem', background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.35)', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.85)' }}
                             >
                               <Trash2 size={12} />
                             </button>
@@ -2076,10 +2159,16 @@ export default function CommunicationsPage() {
               e.preventDefault();
               setSending(true);
               try {
+                // Get selected signature body
+                const selectedSignature = signatures.find(s => s.id === selectedSignatureId);
+                const signatureText = selectedSignature ? `\n\n${selectedSignature.body}` : '';
+                const fullBody = composeForm.body + signatureText;
+                const fullHtmlBody = '<div style="font-family: Arial, sans-serif;">' + composeForm.body.replace(/\n/g, '<br>') + (selectedSignature ? '<br><br>' + selectedSignature.body.replace(/\n/g, '<br>') : '') + '</div>';
+
                 const response = await fetch(`${API_URL}/email-messages/send`, {
                   method: 'POST',
                   headers: getAuthHeaders(),
-                  body: JSON.stringify({ to: composeForm.to, contactId: composeForm.contactId || undefined, subject: composeForm.subject, body: composeForm.body, htmlBody: '<div style="font-family: Arial, sans-serif;">' + composeForm.body.replace(/\n/g, '<br>') + '</div>' })
+                  body: JSON.stringify({ to: composeForm.to, contactId: composeForm.contactId || undefined, subject: composeForm.subject, body: fullBody, htmlBody: fullHtmlBody })
                 });
                 if (response.ok) { setShowComposeModal(false); setComposeForm({ to: '', contactId: '', subject: '', body: '' }); fetchData(); }
                 else { const err = await response.json(); alert('Failed: ' + (err.message || 'Unknown error')); }
@@ -2098,9 +2187,24 @@ export default function CommunicationsPage() {
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Subject</label>
                 <input type="text" value={composeForm.subject} onChange={(e) => setComposeForm({ ...composeForm, subject: e.target.value })} required style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px' }} />
               </div>
-              <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Message</label>
                 <textarea value={composeForm.body} onChange={(e) => setComposeForm({ ...composeForm, body: e.target.value })} required rows={10} style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', resize: 'vertical' }} />
+              </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{ fontWeight: '500', color: '#F0F0F5' }}>Signature</label>
+                  <button type="button" onClick={() => setShowSignatureModal(true)} style={{ background: 'none', border: 'none', color: '#00CCEE', cursor: 'pointer', fontSize: '0.85rem' }}>Manage Signatures</button>
+                </div>
+                <select value={selectedSignatureId} onChange={(e) => setSelectedSignatureId(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', background: '#13131A', color: '#F0F0F5' }}>
+                  <option value="">No signature</option>
+                  {signatures.map(s => <option key={s.id} value={s.id}>{s.name}{s.isDefault ? ' (Default)' : ''}</option>)}
+                </select>
+                {selectedSignatureId && (
+                  <div style={{ marginTop: '0.5rem', padding: '0.75rem', background: '#13131A', borderRadius: '6px', fontSize: '0.85rem', color: '#8888A0', whiteSpace: 'pre-wrap' }}>
+                    {signatures.find(s => s.id === selectedSignatureId)?.body}
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowComposeModal(false)} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
@@ -2110,6 +2214,114 @@ export default function CommunicationsPage() {
           </div>
         </div>
       )}
+
+      {/* Signature Management Modal */}
+      {showSignatureModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1001 }}>
+          <div style={{ background: '#1C1C26', borderRadius: '12px', width: '700px', maxHeight: '85vh', overflow: 'auto' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #2A2A38', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#F0F0F5' }}>Email Signatures</h2>
+              <button onClick={() => { setShowSignatureModal(false); setEditingSignature(null); setSignatureForm({ name: '', body: '', isDefault: false }); }} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#F0F0F5' }}>×</button>
+            </div>
+            <div style={{ padding: '1.5rem' }}>
+              {/* Signature List */}
+              {!editingSignature && signatureForm.name === '' && (
+                <>
+                  <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: '#8888A0' }}>{signatures.length} signature{signatures.length !== 1 ? 's' : ''}</span>
+                    <button onClick={() => setSignatureForm({ name: '', body: '', isDefault: signatures.length === 0 })} style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: '#13131A', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>+ New Signature</button>
+                  </div>
+                  {signatures.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
+                      <Mail size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                      <p>No signatures yet</p>
+                      <p style={{ fontSize: '0.85rem' }}>Create your first email signature to auto-append to outgoing emails</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {signatures.map(sig => (
+                        <div key={sig.id} style={{ background: '#13131A', borderRadius: '8px', padding: '1rem', border: sig.isDefault ? '2px solid #00CCEE' : '1px solid #2A2A38' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                            <div>
+                              <span style={{ fontWeight: '600', color: '#F0F0F5' }}>{sig.name}</span>
+                              {sig.isDefault && <span style={{ marginLeft: '0.5rem', fontSize: '0.7rem', background: '#00CCEE', color: '#13131A', padding: '0.15rem 0.4rem', borderRadius: '4px' }}>DEFAULT</span>}
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              {!sig.isDefault && (
+                                <button onClick={() => handleSetDefaultSignature(sig.id)} title="Set as default" style={{ padding: '0.35rem', background: 'transparent', border: '1px solid #2A2A38', borderRadius: '4px', cursor: 'pointer', color: '#8888A0' }}>
+                                  <Check size={14} />
+                                </button>
+                              )}
+                              <button onClick={() => { setEditingSignature(sig); setSignatureForm({ name: sig.name, body: sig.body, isDefault: sig.isDefault }); }} style={{ padding: '0.35rem', background: 'transparent', border: '1px solid #2A2A38', borderRadius: '4px', cursor: 'pointer', color: '#8888A0' }}>Edit</button>
+                              <button onClick={() => handleDeleteSignature(sig.id)} style={{ padding: '0.35rem', background: 'transparent', border: '1px solid #2A2A38', borderRadius: '4px', cursor: 'pointer', color: '#00CCEE' }}>
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </div>
+                          <div style={{ fontSize: '0.85rem', color: '#8888A0', whiteSpace: 'pre-wrap', maxHeight: '80px', overflow: 'hidden' }}>{sig.body}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Create/Edit Signature Form */}
+              {(editingSignature || signatureForm.name !== '' || signatures.length === 0 && signatureForm.body === '') && signatureForm.name !== '' && (
+                <div>
+                  <button onClick={() => { setEditingSignature(null); setSignatureForm({ name: '', body: '', isDefault: false }); }} style={{ marginBottom: '1rem', background: 'none', border: 'none', color: '#00CCEE', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>← Back to list</button>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Signature Name</label>
+                    <input type="text" value={signatureForm.name} onChange={(e) => setSignatureForm({ ...signatureForm, name: e.target.value })} placeholder="e.g., Jonathan White - Zander" style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', background: '#13131A', color: '#F0F0F5' }} />
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Signature Content</label>
+                    <textarea value={signatureForm.body} onChange={(e) => setSignatureForm({ ...signatureForm, body: e.target.value })} placeholder="Best regards,&#10;Jonathan White&#10;Co-Founder & CEO&#10;jonathan@zanderos.com" rows={6} style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', background: '#13131A', color: '#F0F0F5', resize: 'vertical' }} />
+                  </div>
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={signatureForm.isDefault} onChange={(e) => setSignatureForm({ ...signatureForm, isDefault: e.target.checked })} style={{ accentColor: '#00CCEE' }} />
+                      <span style={{ color: '#F0F0F5' }}>Set as default signature</span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                    <button type="button" onClick={() => { setEditingSignature(null); setSignatureForm({ name: '', body: '', isDefault: false }); }} style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', cursor: 'pointer', color: '#F0F0F5' }}>Cancel</button>
+                    <button onClick={handleSaveSignature} disabled={savingSignature || !signatureForm.name || !signatureForm.body} style={{ padding: '0.75rem 1.5rem', background: savingSignature || !signatureForm.name || !signatureForm.body ? '#8888A0' : '#00CCEE', color: '#13131A', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingSignature || !signatureForm.name || !signatureForm.body ? 'not-allowed' : 'pointer' }}>
+                      {savingSignature ? 'Saving...' : editingSignature ? 'Update Signature' : 'Create Signature'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Initial empty form state */}
+              {!editingSignature && signatureForm.name === '' && signatures.length === 0 && (
+                <div style={{ marginTop: '1rem' }}>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Signature Name</label>
+                    <input type="text" value={signatureForm.name} onChange={(e) => setSignatureForm({ ...signatureForm, name: e.target.value })} placeholder="e.g., Jonathan White - Zander" style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', background: '#13131A', color: '#F0F0F5' }} />
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#F0F0F5' }}>Signature Content</label>
+                    <textarea value={signatureForm.body} onChange={(e) => setSignatureForm({ ...signatureForm, body: e.target.value })} placeholder="Best regards,&#10;Jonathan White&#10;Co-Founder & CEO&#10;jonathan@zanderos.com" rows={6} style={{ width: '100%', padding: '0.75rem', border: '1px solid #2A2A38', borderRadius: '6px', background: '#13131A', color: '#F0F0F5', resize: 'vertical' }} />
+                  </div>
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={signatureForm.isDefault} onChange={(e) => setSignatureForm({ ...signatureForm, isDefault: e.target.checked })} style={{ accentColor: '#00CCEE' }} />
+                      <span style={{ color: '#F0F0F5' }}>Set as default signature</span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <button onClick={handleSaveSignature} disabled={savingSignature || !signatureForm.name || !signatureForm.body} style={{ padding: '0.75rem 1.5rem', background: savingSignature || !signatureForm.name || !signatureForm.body ? '#8888A0' : '#00CCEE', color: '#13131A', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: savingSignature || !signatureForm.name || !signatureForm.body ? 'not-allowed' : 'pointer' }}>
+                      {savingSignature ? 'Saving...' : 'Create Signature'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SMS Compose Modal */}
       {showSmsCompose && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>

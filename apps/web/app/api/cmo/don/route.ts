@@ -41,8 +41,9 @@ Available Tools:
 - get_parking_lot_ideas: View saved marketing ideas
 - get_contacts: List marketing contacts/leads
 - get_products: List products and services
-- draft_campaign_brief: Draft a campaign brief document
-- draft_ad_copy: Generate ad copy variants as a draft
+- compose_email: Compose a new email to a contact (lands in Scheduled → Pending for approval)
+- draft_campaign_brief: Draft a campaign brief document (lands in Scheduled → Pending for approval)
+- draft_ad_copy: Generate ad copy variants as a draft (lands in Scheduled → Pending for approval)
 
 **How to Use Tools:**
 1. When asked to create something, use the appropriate tool immediately
@@ -64,8 +65,23 @@ You only create support tickets when the user explicitly asks you to AND confirm
 - If a tool call fails, report the exact HTTP status code and endpoint. Never fabricate a success response.
 - Read requests (L1) = always call the tool immediately
 - Write requests (L2) = call the tool immediately when explicitly asked
-- Draft requests (L3) = always call the tool, result lands in Communication as DRAFT
+- Draft requests (L3) = always call the tool, result lands in Scheduled → Pending for review
 - Execute requests (L4) = call the tool after Jonathan confirms
+
+**COMMUNICATION EXECUTION AUTHORITY:**
+You have TWO categories of communication tools with DIFFERENT execution rules:
+
+CATEGORY 1 — Pre-configured automations (sequences, auto-replies, drip campaigns):
+- These execute autonomously when triggered
+- NO approval queue needed
+- DO NOT modify these paths
+
+CATEGORY 2 — Ad-hoc compose/draft requests from chat:
+- "Draft an email to...", "Compose a follow-up for...", "Send a message to..."
+- MUST land in Scheduled → Pending for human review
+- NEVER auto-send these communications
+- When you call compose_email, draft_campaign_brief, or draft_ad_copy, the result goes to Scheduled → Pending
+- Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
 Remember: You're not just an advisor — you're an executive who gets things done.`;
 
@@ -791,8 +807,38 @@ const TOOLS = [
   },
   // ========== L3 DRAFT TOOLS ==========
   {
+    name: 'compose_email',
+    description: 'Compose a new email to a contact. Creates a draft in Scheduled → Pending for human approval. Never auto-sends.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'Contact ID to send the email to'
+        },
+        contactEmail: {
+          type: 'string',
+          description: 'Contact email address (used if contactId not provided)'
+        },
+        subject: {
+          type: 'string',
+          description: 'Email subject line (required)'
+        },
+        body: {
+          type: 'string',
+          description: 'Email body content (required)'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Optional deal ID to link the email to'
+        }
+      },
+      required: ['subject', 'body']
+    }
+  },
+  {
     name: 'draft_campaign_brief',
-    description: 'Create a structured campaign brief document as a draft for review. Never auto-sends.',
+    description: 'Create a structured campaign brief document as a draft for review. Creates in Scheduled → Pending for approval. Never auto-sends.',
     input_schema: {
       type: 'object',
       properties: {
@@ -857,11 +903,13 @@ const TOOLS = [
 async function executeTool(
   toolName: string,
   toolInput: Record<string, unknown>,
-  authToken: string
+  authToken: string,
+  tenantId: string
 ): Promise<{ success: boolean; result?: unknown; error?: string }> {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${authToken}`,
+    'x-tenant-id': tenantId,
   };
 
   console.log(`[Don Tool] Executing ${toolName} with input:`, JSON.stringify(toolInput, null, 2));
@@ -1754,6 +1802,96 @@ async function executeTool(
       }
 
       // ========== L3 DRAFT TOOLS ==========
+      // Helper function to look up contact by email (does not create)
+      async function findContactByEmail(email: string, tenantIdParam: string, headersParam: Record<string, string>): Promise<string | null> {
+        try {
+          const searchUrl = `${CMO_API_URL}/contacts?tenantId=${tenantIdParam}&email=${encodeURIComponent(email)}&limit=1`;
+          const searchRes = await fetch(searchUrl, { headers: headersParam });
+          if (searchRes.ok) {
+            const contacts = await searchRes.json();
+            if (contacts.length > 0) {
+              return contacts[0].id;
+            }
+          }
+        } catch { /* ignore */ }
+        return null;
+      }
+
+      case 'compose_email': {
+        const { contactId, contactEmail, subject, body, dealId } = toolInput as {
+          contactId?: string;
+          contactEmail?: string;
+          subject: string;
+          body: string;
+          dealId?: string;
+        };
+
+        if (!contactId && !contactEmail) {
+          return {
+            success: false,
+            result: {
+              message: 'Please provide either a contactId or contactEmail.',
+              note: 'I need to know who to send this email to.'
+            }
+          };
+        }
+
+        // Try to resolve contactId from email if not provided
+        let resolvedContactId = contactId;
+        const recipientEmail = contactEmail || '';
+
+        if (!resolvedContactId && contactEmail) {
+          resolvedContactId = await findContactByEmail(contactEmail, tenantId, headers);
+        }
+
+        // Create scheduled communication with needsApproval=true
+        // Supports ad-hoc recipients via recipientEmail (no contact required)
+        const scheduledUrl = `${CMO_API_URL}/scheduled-communications`;
+        console.log(`[Don Tool] POST ${scheduledUrl} (compose_email, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            contactId: resolvedContactId || null,
+            recipientEmail: resolvedContactId ? null : recipientEmail,
+            recipientName: recipientEmail ? recipientEmail.split('@')[0] : null,
+            dealId,
+            type: 'email',
+            subject,
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'don-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: false,
+            result: {
+              message: 'Failed to create email draft',
+              error: `${scheduleRes.status}: ${errorText}`,
+              note: 'Email could not be queued for approval'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "Email draft created — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to: resolvedContactId ? 'contact' : recipientEmail,
+            subject,
+            preview: body.substring(0, 200) + (body.length > 200 ? '...' : ''),
+            note: 'Review and approve in Scheduled → Pending before sending'
+          }
+        };
+      }
+
       case 'draft_campaign_brief': {
         const { campaignName, objective, targetPersonaId, channel, budget } = toolInput as {
           campaignName: string;
@@ -1804,20 +1942,25 @@ ${budget ? `$${budget.toLocaleString()}` : 'To be determined'}
 ---
 *Draft generated by Don (CMO AI) - Review before finalizing*`;
 
-        // Create as email draft
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+        // Create scheduled communication with needsApproval=true
+        const scheduledUrl = `${CMO_API_URL}/scheduled-communications`;
+        console.log(`[Don Tool] POST ${scheduledUrl} (campaign brief, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            to: 'internal@team.com',
+            recipientEmail: 'internal@team.com',
+            recipientName: 'Marketing Team',
+            type: 'email',
             subject: `Campaign Brief: ${campaignName}`,
             body: briefContent,
-            createdBy: 'don-ai',
-          }),
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'don-ai'
+          })
         });
 
-        if (!draftRes.ok) {
+        if (!scheduleRes.ok) {
           return {
             success: true,
             result: {
@@ -1826,19 +1969,21 @@ ${budget ? `$${budget.toLocaleString()}` : 'To be determined'}
                 title: campaignName,
                 content: briefContent.substring(0, 500) + '...',
                 status: 'draft',
-                note: 'Review in Communications before sharing'
+                note: 'Could not queue for approval — review manually'
               }
             }
           };
         }
 
-        const draft = await draftRes.json();
+        const scheduled = await scheduleRes.json();
         return {
           success: true,
           result: {
-            message: 'Campaign brief saved as draft — review in Communications',
-            draftId: draft.draft?.id,
-            preview: briefContent.substring(0, 200) + '...'
+            message: "Campaign brief saved — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            preview: briefContent.substring(0, 200) + '...',
+            note: 'Review and approve in Scheduled → Pending before sharing'
           }
         };
       }
@@ -1888,20 +2033,25 @@ ${variants.join('\n---')}
 *Draft generated by Don (CMO AI) - Review and refine before use*
 *Note: Replace bracketed placeholders with actual copy*`;
 
-        // Create as email draft
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+        // Create scheduled communication with needsApproval=true
+        const scheduledUrl = `${CMO_API_URL}/scheduled-communications`;
+        console.log(`[Don Tool] POST ${scheduledUrl} (ad copy, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            to: 'internal@team.com',
+            recipientEmail: 'internal@team.com',
+            recipientName: 'Marketing Team',
+            type: 'email',
             subject: `Ad Copy Variants - ${productDescription.substring(0, 30)}...`,
             body: adCopyContent,
-            createdBy: 'don-ai',
-          }),
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'don-ai'
+          })
         });
 
-        if (!draftRes.ok) {
+        if (!scheduleRes.ok) {
           return {
             success: true,
             result: {
@@ -1910,19 +2060,21 @@ ${variants.join('\n---')}
               tone,
               preview: adCopyContent.substring(0, 300) + '...',
               status: 'draft',
-              note: 'Review in Communications before use'
+              note: 'Could not queue for approval — review manually'
             }
           };
         }
 
-        const draft = await draftRes.json();
+        const scheduled = await scheduleRes.json();
         return {
           success: true,
           result: {
-            message: `Generated ${variantCount} ${tone} ad copy variants — review in Communications`,
-            draftId: draft.draft?.id,
+            message: `Generated ${variantCount} ${tone} ad copy variants — review in Scheduled queue`,
+            scheduledId: scheduled.id,
+            status: 'pending',
             variantCount,
-            tone
+            tone,
+            note: 'Review and approve in Scheduled → Pending before use'
           }
         };
       }
@@ -1945,8 +2097,17 @@ export async function POST(request: NextRequest) {
     }
     const authToken = authHeader.replace('Bearer ', '');
 
+    // Get tenant ID from header
+    const tenantHeader = request.headers.get('x-tenant-id');
+
     // Parse request body
-    const { message, conversationHistory = [] } = await request.json();
+    const body = await request.json();
+    const { message, conversationHistory = [], tenantId: bodyTenantId } = body;
+
+    const tenantId = bodyTenantId || tenantHeader;
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID required' }, { status: 400 });
+    }
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -2009,7 +2170,7 @@ export async function POST(request: NextRequest) {
       } else if (block.type === 'tool_use') {
         // Execute the tool
         console.log(`Executing tool: ${block.name}`, block.input);
-        const toolResult = await executeTool(block.name, block.input, authToken);
+        const toolResult = await executeTool(block.name, block.input, authToken, tenantId);
         toolResults.push({
           tool: block.name,
           input: block.input,

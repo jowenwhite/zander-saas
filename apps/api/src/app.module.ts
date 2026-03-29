@@ -27,6 +27,7 @@ import { AutomationModule } from './automation/automation.module';
 import { AiModule } from './ai/ai.module';
 import { EmailModule } from './integrations/email/email.module';
 import { EmailMessagesModule } from './email-messages/email-messages.module';
+import { EmailSignaturesModule } from './email-signatures/email-signatures.module';
 import { SmsMessagesModule } from './sms-messages/sms-messages.module';
 import { CallLogsModule } from './call-logs/call-logs.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
@@ -75,6 +76,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
     AiModule,
     EmailModule,
     EmailMessagesModule,
+    EmailSignaturesModule,  // User email signatures for compose
     SmsMessagesModule,
     CallLogsModule,
     CalendarEventsModule,

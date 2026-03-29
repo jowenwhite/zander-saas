@@ -178,7 +178,9 @@ export class AutomationService {
     return this.prisma.scheduledCommunication.create({
       data: {
         tenantId,
-        contactId: data.contactId,
+        contactId: data.contactId || null, // Nullable for ad-hoc recipients
+        recipientEmail: data.recipientEmail || null, // For ad-hoc recipients not in contacts
+        recipientName: data.recipientName || null,
         dealId: data.dealId,
         templateId: data.templateId,
         type: data.type || 'email',
@@ -187,6 +189,7 @@ export class AutomationService {
         scheduledFor: new Date(data.scheduledFor),
         status: data.status || 'pending',
         needsApproval: data.needsApproval || false,
+        createdBy: data.createdBy || null, // Track which AI executive created this
       },
       include: { contact: true },
     });

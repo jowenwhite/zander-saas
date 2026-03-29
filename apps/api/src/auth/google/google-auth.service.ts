@@ -31,7 +31,7 @@ export class GoogleAuthService {
     };
   }
 
-  async saveTokens(userId: string, tokens: { email: string; accessToken: string; refreshToken?: string }) {
+  async saveTokens(userId: string, tenantId: string, tokens: { email: string; accessToken: string; refreshToken?: string }) {
     const expiresAt = new Date(Date.now() + 3600 * 1000); // 1 hour from now
 
     return this.prisma.googleToken.upsert({
@@ -41,9 +41,11 @@ export class GoogleAuthService {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken || undefined,
         expiresAt,
+        tenantId,
       },
       create: {
         userId,
+        tenantId,
         email: tokens.email,
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,

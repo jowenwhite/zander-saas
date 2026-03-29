@@ -22,9 +22,10 @@ Available Tools:
 - book_meeting: Schedule a meeting via Google Calendar (confirmation required)
 - mark_communication_read: Mark communications as read
 - flag_communication_priority: Set priority flag on communications
-- draft_email_reply: Draft a reply to an existing communication (NEVER sends directly)
-- draft_daily_briefing: Draft a daily briefing email (NEVER sends directly)
-- draft_meeting_agenda: Draft a meeting agenda (NEVER sends directly)
+- compose_email: Compose a new email to a contact (lands in Scheduled → Pending for approval)
+- draft_email_reply: Draft a reply to an existing communication (lands in Scheduled → Pending for approval)
+- draft_daily_briefing: Draft a daily briefing email (lands in Scheduled → Pending for approval)
+- draft_meeting_agenda: Draft a meeting agenda (lands in Scheduled → Pending for approval)
 - send_sms: Send an SMS message (requires Twilio integration, asks for confirmation)
 - get_calendly_events: View upcoming Calendly scheduled events (requires Calendly integration)
 - create_calendly_link: Create a Calendly scheduling link for someone (requires Calendly integration)
@@ -57,8 +58,23 @@ First call returns a confirmation prompt, user confirms, then you create the eve
 - If a tool call fails, report the exact HTTP status code and endpoint. Never fabricate a success response.
 - Read requests (L1) = always call the tool immediately
 - Write requests (L2) = call the tool immediately when explicitly asked
-- Draft requests (L3) = always call the tool, result lands in Communication as DRAFT
+- Draft requests (L3) = always call the tool, result lands in Scheduled → Pending for review
 - Execute requests (L4) = call the tool after Jonathan confirms
+
+**COMMUNICATION EXECUTION AUTHORITY:**
+You have TWO categories of communication tools with DIFFERENT execution rules:
+
+CATEGORY 1 — Pre-configured automations (sequences, auto-replies, drip campaigns):
+- These execute autonomously when triggered
+- NO approval queue needed
+- DO NOT modify these paths
+
+CATEGORY 2 — Ad-hoc compose/draft requests from chat:
+- "Draft a reply to...", "Compose an email to...", "Send a message to..."
+- MUST land in Scheduled → Pending for human review
+- NEVER auto-send these communications
+- When you call draft_email_reply, compose_email, or similar tools, the result goes to Scheduled → Pending
+- Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
 Remember: You're the organizational backbone. Everything flows through you, and you make it look effortless.`;
 
@@ -310,8 +326,38 @@ const TOOLS = [
   },
   // ========== L3 DRAFT TOOLS ==========
   {
+    name: 'compose_email',
+    description: 'Compose a new email to a contact. Creates a draft in Scheduled → Pending for human approval. Never auto-sends.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'Contact ID to send the email to'
+        },
+        contactEmail: {
+          type: 'string',
+          description: 'Contact email address (used if contactId not provided)'
+        },
+        subject: {
+          type: 'string',
+          description: 'Email subject line (required)'
+        },
+        body: {
+          type: 'string',
+          description: 'Email body content (required)'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Optional deal ID to link the email to'
+        }
+      },
+      required: ['subject', 'body']
+    }
+  },
+  {
     name: 'draft_email_reply',
-    description: 'Draft a reply to an existing communication. Never auto-sends.',
+    description: 'Draft a reply to an existing communication. Creates a draft in Scheduled → Pending for human approval. Never auto-sends.',
     input_schema: {
       type: 'object',
       properties: {
@@ -1081,6 +1127,95 @@ async function executeTool(
       }
 
       // ========== L3 DRAFT TOOLS ==========
+      // Helper function to look up contact by email (does not create)
+      async function findContactByEmail(email: string, tenantIdParam: string, headersParam: Record<string, string>): Promise<string | null> {
+        try {
+          const searchUrl = `${EA_API_URL}/contacts?tenantId=${tenantIdParam}&email=${encodeURIComponent(email)}&limit=1`;
+          const searchRes = await fetch(searchUrl, { headers: headersParam });
+          if (searchRes.ok) {
+            const contacts = await searchRes.json();
+            if (contacts.length > 0) {
+              return contacts[0].id;
+            }
+          }
+        } catch { /* ignore */ }
+        return null;
+      }
+
+      case 'compose_email': {
+        const { contactId, contactEmail, subject, body, dealId } = toolInput as {
+          contactId?: string;
+          contactEmail?: string;
+          subject: string;
+          body: string;
+          dealId?: string;
+        };
+
+        if (!contactId && !contactEmail) {
+          return {
+            success: false,
+            result: {
+              message: 'Please provide either a contactId or contactEmail.',
+              note: 'I need to know who to send this email to.'
+            }
+          };
+        }
+
+        // Try to resolve contactId from email if not provided
+        let resolvedContactId = contactId;
+        const recipientEmail = contactEmail || '';
+
+        if (!resolvedContactId && contactEmail) {
+          resolvedContactId = await findContactByEmail(contactEmail, tenantId, headers);
+        }
+
+        // Create scheduled communication with needsApproval=true
+        // Now supports ad-hoc recipients via recipientEmail (no contact required)
+        const scheduledUrl = `${EA_API_URL}/scheduled-communications`;
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            contactId: resolvedContactId || null,
+            recipientEmail: resolvedContactId ? null : recipientEmail, // Use recipientEmail if no contact
+            recipientName: recipientEmail ? recipientEmail.split('@')[0] : null,
+            dealId,
+            type: 'email',
+            subject,
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'pam-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: false,
+            result: {
+              message: 'Failed to create email draft',
+              error: `${scheduleRes.status}: ${errorText}`,
+              note: 'Email could not be queued for approval'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "Email draft created — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to: resolvedContactId ? 'contact' : recipientEmail,
+            subject,
+            preview: body.substring(0, 200) + (body.length > 200 ? '...' : ''),
+            note: 'Review and approve in Scheduled → Pending before sending'
+          }
+        };
+      }
+
       case 'draft_email_reply': {
         const { communicationId, tone = 'warm', keyPoints } = toolInput as {
           communicationId: string;
@@ -1092,7 +1227,7 @@ async function executeTool(
         const originalUrl = `${EA_API_URL}/email-messages/${communicationId}`;
         const originalRes = await fetch(originalUrl, { headers });
 
-        let originalMessage = null;
+        let originalMessage: Record<string, unknown> | null = null;
         if (originalRes.ok) {
           originalMessage = await originalRes.json();
         }
@@ -1104,7 +1239,9 @@ async function executeTool(
           brief: 'concise and to-the-point'
         };
 
-        let replyBody = `Dear ${originalMessage?.fromAddress || 'recipient'},\n\n`;
+        const fromAddress = originalMessage?.fromAddress as string || '';
+        const senderName = fromAddress ? fromAddress.split('@')[0] : 'there';
+        let replyBody = `Dear ${senderName},\n\n`;
 
         if (keyPoints && keyPoints.length > 0) {
           replyBody += keyPoints.map(p => `- ${p}`).join('\n') + '\n\n';
@@ -1115,49 +1252,62 @@ async function executeTool(
         replyBody += `Best regards`;
 
         const subject = originalMessage?.subject
-          ? `Re: ${originalMessage.subject.replace(/^Re: /i, '')}`
+          ? `Re: ${(originalMessage.subject as string).replace(/^Re: /i, '')}`
           : 'Re: Your message';
 
-        // Create as draft
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+        // Try to find existing contact for this email
+        let resolvedContactId: string | null = null;
+        if (fromAddress) {
+          resolvedContactId = await findContactByEmail(fromAddress, tenantId, headers);
+        }
+
+        // Create scheduled communication with needsApproval=true
+        // Supports ad-hoc recipients via recipientEmail (no contact required)
+        const scheduledUrl = `${EA_API_URL}/scheduled-communications`;
+        const scheduleRes = await fetch(scheduledUrl, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            to: originalMessage?.fromAddress || '',
+            contactId: resolvedContactId || null,
+            recipientEmail: resolvedContactId ? null : fromAddress,
+            recipientName: senderName,
+            type: 'email',
             subject,
             body: replyBody,
-            inReplyTo: communicationId,
-            createdBy: 'pam-ai',
-            tenantId
-          }),
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'pam-ai'
+          })
         });
 
-        if (!draftRes.ok) {
+        if (!scheduleRes.ok) {
           return {
             success: true,
             result: {
               message: 'Reply drafted for review',
               draft: {
-                to: originalMessage?.fromAddress,
+                to: fromAddress,
                 subject,
                 body: replyBody.substring(0, 200) + '...',
                 tone: toneInstructions[tone],
                 status: 'draft'
               },
-              note: 'Review in Communications before sending'
+              note: 'Could not queue for approval — review manually'
             }
           };
         }
 
-        const draft = await draftRes.json();
+        const scheduled = await scheduleRes.json();
         return {
           success: true,
           result: {
-            message: 'Reply draft saved — review in Communications before sending',
-            draftId: draft.draft?.id,
+            message: "Reply draft saved — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to: fromAddress,
             subject,
-            preview: replyBody.substring(0, 200) + '...'
+            preview: replyBody.substring(0, 200) + '...',
+            note: 'Review and approve in Scheduled → Pending before sending'
           }
         };
       }
@@ -1218,21 +1368,24 @@ ${highPriorityHeadwinds.length > 0
 *Have a productive day!*
 *— Pam*`;
 
-        // Create as draft
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+        // Create scheduled communication with needsApproval=true
+        const scheduledUrl = `${EA_API_URL}/scheduled-communications`;
+        const scheduleRes = await fetch(scheduledUrl, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            to: 'me@zanderos.com',
+            recipientEmail: 'me@zanderos.com', // Self-addressed briefing
+            recipientName: 'Jonathan',
+            type: 'email',
             subject: `Daily Briefing — ${today.toLocaleDateString()}`,
             body: briefingContent,
-            createdBy: 'pam-ai',
-            tenantId
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'pam-ai'
           }),
         });
 
-        if (!draftRes.ok) {
+        if (!scheduleRes.ok) {
           return {
             success: true,
             result: {
@@ -1244,22 +1397,25 @@ ${highPriorityHeadwinds.length > 0
                 highPriority: highPriorityHeadwinds.length
               },
               preview: briefingContent.substring(0, 300) + '...',
-              status: 'draft'
+              status: 'draft',
+              note: 'Could not queue for approval — review manually'
             }
           };
         }
 
-        const draft = await draftRes.json();
+        const scheduled = await scheduleRes.json();
         return {
           success: true,
           result: {
-            message: 'Daily briefing draft saved — review in Communications',
-            draftId: draft.draft?.id,
+            message: "Daily briefing saved — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
             summary: {
               eventsToday: events.length,
               unreadMessages: unreadCount,
               openHeadwinds: headwinds.length
-            }
+            },
+            note: 'Review and approve in Scheduled → Pending before sending'
           }
         };
       }
@@ -1313,21 +1469,26 @@ _Space for meeting notes..._
 
 *Prepared by Pam*`;
 
-        // Create as draft
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const draftRes = await fetch(`${baseUrl}/api/email-drafts`, {
+        // Create scheduled communication with needsApproval=true
+        const recipientEmail = attendees.length > 0 ? attendees[0] : 'attendees@meeting.com';
+        const scheduledUrl = `${EA_API_URL}/scheduled-communications`;
+        const scheduleRes = await fetch(scheduledUrl, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            to: attendees.join(', ') || 'attendees@meeting.com',
+            recipientEmail,
+            recipientName: attendees.length > 0 ? attendees.join(', ') : 'Meeting Attendees',
+            dealId: linkedDealId || null,
+            type: 'email',
             subject: `Agenda: ${meetingTitle}`,
             body: agendaContent,
-            createdBy: 'pam-ai',
-            tenantId
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'pam-ai'
           }),
         });
 
-        if (!draftRes.ok) {
+        if (!scheduleRes.ok) {
           return {
             success: true,
             result: {
@@ -1336,19 +1497,23 @@ _Space for meeting notes..._
               attendees,
               topicCount: topics.length,
               preview: agendaContent.substring(0, 300) + '...',
-              status: 'draft'
+              status: 'draft',
+              note: 'Could not queue for approval — review manually'
             }
           };
         }
 
-        const draft = await draftRes.json();
+        const scheduled = await scheduleRes.json();
         return {
           success: true,
           result: {
-            message: 'Meeting agenda draft saved — review in Communications',
-            draftId: draft.draft?.id,
+            message: "Meeting agenda saved — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
             meetingTitle,
-            preview: agendaContent.substring(0, 200) + '...'
+            to: recipientEmail,
+            preview: agendaContent.substring(0, 200) + '...',
+            note: 'Review and approve in Scheduled → Pending before sending'
           }
         };
       }
