@@ -123,7 +123,7 @@ function AnimatedCounter({ end, duration = 1.5 }: { end: number; duration?: numb
 // Section wrapper with scroll animation
 function AnimatedSection({ children, className, style, id }: { children: React.ReactNode; className?: string; style?: React.CSSProperties; id?: string }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
     <motion.section
@@ -200,6 +200,8 @@ export default function LandingPage() {
           background: linear-gradient(135deg, #0C1220 0%, #0A1A24 25%, #080A0F 50%, #0C1220 75%, #0A1A24 100%);
           background-size: 400% 400%;
           animation: gradientShift 10s ease infinite;
+          will-change: background-position;
+          transform: translateZ(0);
         }
         .testimonial-card {
           transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -267,11 +269,12 @@ export default function LandingPage() {
         }}>
           <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
             <Image
-              src="/images/zander-logo-white.svg"
+              src="/images/zander-logo.svg"
               alt="Zander"
-              width={140}
-              height={36}
-              style={{ height: '32px', width: 'auto' }}
+              width={200}
+              height={50}
+              priority
+              style={{ height: '50px', width: 'auto', minWidth: '160px' }}
             />
           </a>
           <ul className="nav-links-desktop" style={{
@@ -365,11 +368,11 @@ export default function LandingPage() {
             transition={{ duration: 0.6, ease: 'easeOut' }}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: 'clamp(3rem, 6.5vw, 5.25rem)',
+              fontSize: 'clamp(3rem, 10vw, 7rem)',
               fontWeight: 800,
-              lineHeight: 1.05,
+              lineHeight: 1.0,
               marginBottom: '1.6rem',
-              letterSpacing: '-0.025em',
+              letterSpacing: '-0.03em',
             }}
           >
             <span style={{ display: 'block', color: '#FFFFFF' }}>Your business,</span>
@@ -460,7 +463,7 @@ export default function LandingPage() {
           <motion.h2
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
@@ -479,7 +482,7 @@ export default function LandingPage() {
             className="pain-grid"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
             style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', textAlign: 'left' }}
           >
@@ -517,7 +520,7 @@ export default function LandingPage() {
           <motion.p
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontSize: '1.25rem',
@@ -538,7 +541,7 @@ export default function LandingPage() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{ textAlign: 'center', marginBottom: '4rem' }}
           >
@@ -578,7 +581,7 @@ export default function LandingPage() {
             className="pillar-grid"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={{
               hidden: { opacity: 0 },
               visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
@@ -631,7 +634,7 @@ export default function LandingPage() {
           <motion.span
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontSize: '0.8rem',
@@ -646,7 +649,7 @@ export default function LandingPage() {
           <motion.h2
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
@@ -662,7 +665,7 @@ export default function LandingPage() {
             className="steps-grid"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
             style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', marginBottom: '4rem' }}
           >
@@ -700,7 +703,7 @@ export default function LandingPage() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               background: '#0E1017',
@@ -749,7 +752,7 @@ export default function LandingPage() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               display: 'inline-flex',
@@ -779,7 +782,7 @@ export default function LandingPage() {
           <motion.h2
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
@@ -795,7 +798,7 @@ export default function LandingPage() {
           <motion.p
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontSize: '1.1rem',
@@ -812,7 +815,7 @@ export default function LandingPage() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}
           >
@@ -846,7 +849,7 @@ export default function LandingPage() {
           <motion.p
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', maxWidth: '500px', margin: '0 auto' }}
           >
@@ -861,7 +864,7 @@ export default function LandingPage() {
           <motion.span
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontSize: '0.8rem',
@@ -876,7 +879,7 @@ export default function LandingPage() {
           <motion.h2
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
@@ -892,7 +895,7 @@ export default function LandingPage() {
             className="testi-grid"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
             style={{
               display: 'grid',
@@ -949,7 +952,7 @@ export default function LandingPage() {
           <motion.span
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontSize: '0.8rem',
@@ -965,7 +968,7 @@ export default function LandingPage() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               background: '#0E1017',
@@ -1030,7 +1033,7 @@ export default function LandingPage() {
           <motion.span
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontSize: '0.8rem',
@@ -1045,7 +1048,7 @@ export default function LandingPage() {
           <motion.h2
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
@@ -1059,7 +1062,7 @@ export default function LandingPage() {
           <motion.p
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontSize: '1rem',
@@ -1074,7 +1077,7 @@ export default function LandingPage() {
             className="pricing-grid"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
             style={{
               display: 'grid',
@@ -1284,7 +1287,7 @@ export default function LandingPage() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               marginTop: '2.5rem',
@@ -1315,7 +1318,7 @@ export default function LandingPage() {
           <motion.h2
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
@@ -1331,7 +1334,7 @@ export default function LandingPage() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
             style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
           >
@@ -1403,7 +1406,7 @@ export default function LandingPage() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.1 }}
           variants={fadeInUp}
           style={{ position: 'relative', zIndex: 1, maxWidth: '640px', margin: '0 auto' }}
         >
@@ -1460,11 +1463,11 @@ export default function LandingPage() {
             <div>
               <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', marginBottom: '0.75rem' }}>
                 <Image
-                  src="/images/zander-logo-white.svg"
+                  src="/images/zander-logo.svg"
                   alt="Zander"
-                  width={120}
-                  height={30}
-                  style={{ height: '28px', width: 'auto' }}
+                  width={160}
+                  height={40}
+                  style={{ height: '40px', width: 'auto' }}
                 />
               </a>
               <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
