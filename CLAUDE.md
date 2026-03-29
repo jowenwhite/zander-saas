@@ -1,37 +1,44 @@
 # CLAUDE.md — Zander Institutional Memory
 
-## Session Handoff — March 28, 2026
+## Session Handoff — March 29, 2026
 
-### v31 Deployed and Live
-- **ECS**: zander-cluster/zander-api-service running task definition zander-api:37
-- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v31
+### v35 Deployed and Live
+- **ECS**: zander-cluster/zander-api-service running task definition zander-api:41
+- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v35
+- **Commit**: `01addac`
 - **Health**: https://api.zanderos.com/health returns `{"status":"ok"}`
-- **IntegrationsModule**: Working — `/integrations/twilio/status` returns 401 (route exists)
+- **Database**: Schema in sync, `email_signatures` table exists
+
+### What Shipped in v35
+1. **Email Signatures Module**: Full CRUD API, UI integration in Communications page
+2. **ScheduledCommunication**: contactId nullable, recipientEmail/Name for ad-hoc, createdBy field
+3. **Pam (EA)**: compose_email tool, clarified draft routing to Scheduled → Pending
+4. **Google Auth**: Signed state parameter, calendar scope improvements
+
+### Pam Bug Fixes Status
+| Bug | Status |
+|-----|--------|
+| Calendar Identity | IN v35 |
+| Draft Routing | IN v35 |
+| Bulk Mark-Read | PENDING - needs multi-select UI |
 
 ### Integration Status
 
 #### Zander Inc Tenant (Jordan)
 - **Twilio**: Connected via sub-account, phone +1 (844) 853-6236
 - **Google Contacts**: Connected via OAuth
-- **Calendly**: Account created at calendly.com/jonathan-zanderos
-  - "Founding 50 Discovery Call" event type needs renaming and configuration
-  - API key needs to be connected to tenant via `/integrations/calendly/connect`
+- **Gmail**: Connected, auto-sync every 5 min
+- **Calendly**: Account at calendly.com/jonathan-zanderos, needs API key connection
 
 #### MCF Tenant (Pam)
 - **Twilio**: Sub-account NOT yet created (waiting on parent account access)
 - **Calendly**: Account waiting on mycabinetfactory.com domain release from Railway
 
-### Code Changes This Session
-- `apps/api/tsconfig.json`: Added `rootDir: "./src"` and include/exclude patterns
-  - Fixed TypeScript compilation outputting to `dist/src/` instead of `dist/`
-  - This was causing ECS container crashes: "Cannot find module '/app/dist/main.js'"
-- Prisma schema: `TwilioCredential` and `CalendlyCredential` models already present
-
 ### Next Session Priorities
-1. Connect Calendly API key to Zander Inc tenant
-2. Create MCF Twilio sub-account
-3. Token caps and subscription gating
-4. Don CMO checklist items 8-30
+1. Verify and test all Pam fixes in live app
+2. Token caps + subscription gating (Beta Blocker #1)
+3. Landing page build session (use the brief doc)
+4. /privacy and /terms pages
 
 ---
 
