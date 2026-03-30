@@ -291,7 +291,7 @@ export default function LandingPage() {
           justifyContent: 'space-between',
         }}>
           <a href="#" style={{ display: 'block', textDecoration: 'none' }}>
-            <img src="/images/zander-logo-color.svg" alt="Zander" style={{ height: '80px', width: 'auto', display: 'block' }} />
+            <img src="/images/zander-logo-color.svg" alt="Zander" style={{ width: '400px', height: 'auto', display: 'block' }} />
           </a>
           <ul className="nav-links-desktop" style={{
             display: 'flex',
@@ -336,17 +336,11 @@ export default function LandingPage() {
         position: 'relative',
         overflow: 'visible',
       }}>
-        {/* Rotating conic gradient - transform-only animation for zero jank */}
+        {/* Static gradient background - no rotation/animation */}
         <div style={{
           position: 'absolute',
-          top: '-50%',
-          left: '-50%',
-          width: '200%',
-          height: '200%',
-          background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(0,193,254,0.07) 60deg, rgba(1,96,210,0.09) 120deg, transparent 180deg, rgba(0,150,180,0.06) 240deg, transparent 360deg)',
-          animation: 'rotateGradient 20s linear infinite',
-          willChange: 'transform',
-          transform: 'translateZ(0)',
+          inset: 0,
+          background: 'radial-gradient(ellipse at 30% 20%, rgba(1, 193, 254, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(1, 96, 210, 0.1) 0%, transparent 50%)',
           pointerEvents: 'none',
           zIndex: 0,
         }} />
@@ -390,8 +384,8 @@ export default function LandingPage() {
               marginBottom: '40px',
             }}
           >
-            <span style={{ display: 'block', color: '#FFFFFF', fontSize: '120px', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em' }}>Your business,</span>
-            <span style={{ display: 'block', color: '#00CFEB', fontSize: '120px', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em' }}>expertly run.</span>
+            <span style={{ display: 'block', color: '#FFFFFF', fontSize: '120px', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.04em', paddingTop: '0.1em' }}>Your business,</span>
+            <span style={{ display: 'block', color: '#00CFEB', fontSize: '120px', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.04em' }}>expertly run.</span>
           </motion.h1>
 
           <motion.p
@@ -1514,7 +1508,7 @@ export default function LandingPage() {
           }}>
             <div>
               <a href="#" style={{ display: 'block', textDecoration: 'none', marginBottom: '12px' }}>
-                <img src="/images/zander-logo-color.svg" alt="Zander" style={{ height: '56px', width: 'auto', display: 'block' }} />
+                <img src="/images/zander-logo-color.svg" alt="Zander" style={{ width: '280px', height: 'auto', display: 'block' }} />
               </a>
               <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
             </div>

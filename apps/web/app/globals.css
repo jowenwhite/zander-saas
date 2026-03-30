@@ -496,12 +496,8 @@ hr, [class*="divider"], [class*="Divider"] {
    FONT VARIABLES (for Next.js font loading)
    -------------------------------------------------------------------------- */
 /* --------------------------------------------------------------------------
-   HERO GRADIENT ANIMATION - Transform-only for zero jank
+   HERO GRADIENT - Static (rotation removed for performance/accessibility)
    -------------------------------------------------------------------------- */
-@keyframes rotateGradient {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
 
 :root {
   --font-inter: 'Inter', system-ui, sans-serif;
