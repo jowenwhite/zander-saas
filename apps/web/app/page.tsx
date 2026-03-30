@@ -291,7 +291,7 @@ export default function LandingPage() {
           justifyContent: 'space-between',
         }}>
           <a href="#" style={{ display: 'block', textDecoration: 'none' }}>
-            <img src="/images/zander-logo-white.svg" alt="Zander" style={{ height: '64px', width: 'auto' }} />
+            <img src="/images/zander-logo-color.svg" alt="Zander" style={{ height: '80px', width: 'auto', display: 'block' }} />
           </a>
           <ul className="nav-links-desktop" style={{
             display: 'flex',
@@ -322,45 +322,35 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* HERO with layered gradient background */}
+      {/* HERO with rotating gradient background */}
       <section id="product" style={{
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        paddingTop: '120px',
+        paddingTop: '160px',
         paddingLeft: '2rem',
         paddingRight: '2rem',
         paddingBottom: '80px',
         position: 'relative',
         overflow: 'visible',
       }}>
-        {/* Layer 1 (bottom): static base */}
+        {/* Rotating conic gradient - transform-only animation for zero jank */}
         <div style={{
           position: 'absolute',
-          inset: 0,
-          background: '#0a1628',
-          pointerEvents: 'none',
-        }} />
-        {/* Layer 2: static radial gradients */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(ellipse at 20% 50%, rgba(0, 188, 212, 0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(0, 82, 120, 0.15) 0%, transparent 50%)',
-          pointerEvents: 'none',
-        }} />
-        {/* Layer 3: animated opacity radial gradients */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(ellipse at 70% 80%, rgba(0, 150, 180, 0.1) 0%, transparent 55%), radial-gradient(ellipse at 30% 30%, rgba(0, 60, 100, 0.12) 0%, transparent 50%)',
-          animation: 'ambientPulse 12s ease-in-out infinite',
-          willChange: 'opacity',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(0,193,254,0.07) 60deg, rgba(1,96,210,0.09) 120deg, transparent 180deg, rgba(0,150,180,0.06) 240deg, transparent 360deg)',
+          animation: 'rotateGradient 20s linear infinite',
+          willChange: 'transform',
           transform: 'translateZ(0)',
           pointerEvents: 'none',
+          zIndex: 0,
         }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1000px' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1000px' }}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -956,7 +946,8 @@ export default function LandingPage() {
               <motion.div
                 key={i}
                 variants={staggerItem}
-                className="testimonial-card"
+                whileHover={{ y: -6, boxShadow: '0 12px 40px rgba(0,193,254,0.15)' }}
+                transition={{ duration: 0.2 }}
                 style={{
                   background: '#0E1017',
                   border: '1px solid rgba(255,255,255,0.08)',
@@ -1125,14 +1116,18 @@ export default function LandingPage() {
             }}
           >
             {/* STARTER */}
-            <motion.div variants={staggerItem} className="pricing-card" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderTop: `3px solid ${BRAND_COLORS.teal}`,
-              borderRadius: '16px',
-              padding: '2.25rem',
-              position: 'relative',
-            }}>
+            <motion.div
+              variants={staggerItem}
+              whileHover={{ boxShadow: '0 0 30px rgba(0,193,254,0.2)' }}
+              transition={{ duration: 0.2 }}
+              style={{
+                background: '#0E1017',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderTop: `3px solid ${BRAND_COLORS.teal}`,
+                borderRadius: '16px',
+                padding: '2.25rem',
+                position: 'relative',
+              }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '28px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.teal }}>Starter</h3>
               <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Your EA and HQ — fully operational from day one.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '52px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
@@ -1173,14 +1168,19 @@ export default function LandingPage() {
             </motion.div>
 
             {/* PRO (featured) */}
-            <motion.div variants={staggerItem} className="pricing-card pricing-card-pro" style={{
-              background: '#13151E',
-              border: `1px solid ${BRAND_COLORS.amber}`,
-              borderTop: `3px solid ${BRAND_COLORS.amber}`,
-              borderRadius: '16px',
-              padding: '2.25rem',
-              position: 'relative',
-            }}>
+            <motion.div
+              variants={staggerItem}
+              animate={{ boxShadow: ['0 0 20px rgba(0,193,254,0.1)', '0 0 35px rgba(0,193,254,0.25)', '0 0 20px rgba(0,193,254,0.1)'] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              whileHover={{ boxShadow: '0 0 40px rgba(0,193,254,0.35)' }}
+              style={{
+                background: '#13151E',
+                border: `1px solid ${BRAND_COLORS.amber}`,
+                borderTop: `3px solid ${BRAND_COLORS.amber}`,
+                borderRadius: '16px',
+                padding: '2.25rem',
+                position: 'relative',
+              }}>
               <div style={{
                 position: 'absolute',
                 top: '-13px',
@@ -1234,14 +1234,19 @@ export default function LandingPage() {
             </motion.div>
 
             {/* BUSINESS */}
-            <motion.div variants={staggerItem} className="pricing-card" style={{
-              background: '#0E1017',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderTop: `3px solid ${BRAND_COLORS.green}`,
-              borderRadius: '16px',
-              padding: '2.25rem',
-              position: 'relative',
-            }}>
+            <motion.div
+              variants={staggerItem}
+              whileHover={{ boxShadow: '0 0 30px rgba(0,193,254,0.2)' }}
+              transition={{ duration: 0.2 }}
+              className="pricing-card"
+              style={{
+                background: '#0E1017',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderTop: `3px solid ${BRAND_COLORS.green}`,
+                borderRadius: '16px',
+                padding: '2.25rem',
+                position: 'relative',
+              }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '28px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.green }}>Business</h3>
               <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>The complete C-suite. Every executive included, forever.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '52px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
@@ -1280,14 +1285,19 @@ export default function LandingPage() {
             </motion.div>
 
             {/* ENTERPRISE */}
-            <motion.div variants={staggerItem} className="pricing-card" style={{
-              background: 'linear-gradient(135deg, #0E1017 0%, rgba(255,255,255,0.02) 100%)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderTop: `3px solid ${BRAND_COLORS.purple}`,
-              borderRadius: '16px',
-              padding: '2.25rem',
-              position: 'relative',
-            }}>
+            <motion.div
+              variants={staggerItem}
+              whileHover={{ boxShadow: '0 0 30px rgba(0,193,254,0.2)' }}
+              transition={{ duration: 0.2 }}
+              className="pricing-card"
+              style={{
+                background: 'linear-gradient(135deg, #0E1017 0%, rgba(255,255,255,0.02) 100%)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderTop: `3px solid ${BRAND_COLORS.purple}`,
+                borderRadius: '16px',
+                padding: '2.25rem',
+                position: 'relative',
+              }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '28px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.purple }}>Enterprise</h3>
               <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Custom build for complex organizations and agencies.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '52px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
@@ -1437,7 +1447,7 @@ export default function LandingPage() {
         padding: '7rem 2rem',
         textAlign: 'center',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'visible',
       }}>
         <div style={{
           position: 'absolute',
@@ -1504,7 +1514,7 @@ export default function LandingPage() {
           }}>
             <div>
               <a href="#" style={{ display: 'block', textDecoration: 'none', marginBottom: '12px' }}>
-                <img src="/images/zander-logo-white.svg" alt="Zander" style={{ height: '48px', width: 'auto' }} />
+                <img src="/images/zander-logo-color.svg" alt="Zander" style={{ height: '56px', width: 'auto', display: 'block' }} />
               </a>
               <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
             </div>
