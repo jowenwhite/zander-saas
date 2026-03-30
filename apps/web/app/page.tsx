@@ -32,9 +32,17 @@ const MinusIcon = () => (
   </svg>
 );
 
-// Pillar icons
+// Brand colors for executives
+const BRAND_COLORS = {
+  teal: '#00CFEB',
+  amber: '#F57C00',
+  green: '#2E7D32',
+  purple: '#5E35B1',
+};
+
+// Pillar icons with unique colors
 const OrganizedIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+  <svg viewBox="0 0 24 24" fill="none" stroke={BRAND_COLORS.teal} strokeWidth="2" strokeLinecap="round" width={28} height={28}>
     <rect x="3" y="3" width="7" height="7"/>
     <rect x="14" y="3" width="7" height="7"/>
     <rect x="14" y="14" width="7" height="7"/>
@@ -43,24 +51,35 @@ const OrganizedIcon = () => (
 );
 
 const ExecutingIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+  <svg viewBox="0 0 24 24" fill="none" stroke={BRAND_COLORS.amber} strokeWidth="2" strokeLinecap="round" width={28} height={28}>
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
     <polyline points="22 4 12 14.01 9 11.01"/>
   </svg>
 );
 
 const GrowingIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+  <svg viewBox="0 0 24 24" fill="none" stroke={BRAND_COLORS.green} strokeWidth="2" strokeLinecap="round" width={28} height={28}>
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
     <polyline points="17 6 23 6 23 12"/>
   </svg>
 );
 
 const CompleteIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#00CFEB" strokeWidth="2" strokeLinecap="round" width={28} height={28}>
+  <svg viewBox="0 0 24 24" fill="none" stroke={BRAND_COLORS.purple} strokeWidth="2" strokeLinecap="round" width={28} height={28}>
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
     <polyline points="9 12 11 14 15 10"/>
   </svg>
+);
+
+// Section divider component
+const SectionDivider = () => (
+  <div style={{
+    width: '100%',
+    height: '1px',
+    background: 'linear-gradient(90deg, transparent 0%, rgba(0,207,235,0.4) 50%, transparent 100%)',
+    margin: '0 auto',
+    maxWidth: '600px',
+  }} />
 );
 
 // Animation variants - using cubic bezier for easeOut
@@ -90,7 +109,7 @@ const pillarScale = {
 };
 
 // Animated counter component
-function AnimatedCounter({ end, duration = 1.5 }: { end: number; duration?: number }) {
+function AnimatedCounter({ end, duration = 1.5, highlight = false }: { end: number; duration?: number; highlight?: boolean }) {
   const [count, setCount] = useState(50);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -117,7 +136,18 @@ function AnimatedCounter({ end, duration = 1.5 }: { end: number; duration?: numb
     }
   }, [isInView, end, duration]);
 
-  return <span ref={ref}>{count}</span>;
+  return (
+    <span
+      ref={ref}
+      style={highlight ? {
+        color: '#00CFEB',
+        fontSize: '1.2em',
+        fontWeight: 900,
+      } : undefined}
+    >
+      {count}
+    </span>
+  );
 }
 
 // Section wrapper with scroll animation
@@ -221,8 +251,8 @@ export default function LandingPage() {
           animation: proGlow 2s ease-in-out infinite;
         }
         @keyframes proGlow {
-          0%, 100% { box-shadow: 0 0 20px rgba(0,207,235,0.2); }
-          50% { box-shadow: 0 0 30px rgba(0,207,235,0.35); }
+          0%, 100% { box-shadow: 0 0 20px rgba(245,124,0,0.2); }
+          50% { box-shadow: 0 0 30px rgba(245,124,0,0.35); }
         }
         @media (max-width: 1100px) {
           .pricing-grid { grid-template-columns: repeat(2, 1fr) !important; }
@@ -267,15 +297,34 @@ export default function LandingPage() {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-            <Image
-              src="/images/zander-logo.svg"
-              alt="Zander"
-              width={200}
-              height={50}
-              priority
-              style={{ height: '50px', width: 'auto', minWidth: '160px' }}
-            />
+          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+            {/* Circular Z icon */}
+            <div style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #00CFEB 0%, #0088AA 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '1.4rem',
+              fontWeight: 800,
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              flexShrink: 0,
+            }}>
+              Z
+            </div>
+            {/* ZANDER wordmark */}
+            <span style={{
+              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontSize: '1.75rem',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: '#FFFFFF',
+            }}>
+              ZANDER
+            </span>
           </a>
           <ul className="nav-links-desktop" style={{
             display: 'flex',
@@ -368,11 +417,11 @@ export default function LandingPage() {
             transition={{ duration: 0.6, ease: 'easeOut' }}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: 'clamp(3rem, 10vw, 7rem)',
-              fontWeight: 800,
-              lineHeight: 1.0,
+              fontSize: 'clamp(3.75rem, 12vw, 9rem)',
+              fontWeight: 900,
+              lineHeight: 0.95,
               marginBottom: '1.6rem',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.04em',
             }}
           >
             <span style={{ display: 'block', color: '#FFFFFF' }}>Your business,</span>
@@ -492,29 +541,32 @@ export default function LandingPage() {
               "You've always wished you had an expert in the room for the things that aren't your strengths.",
               "The guilt of unfinished tasks follows you home every night.",
               "You didn't start a business to spend your days buried in emails and admin.",
-            ].map((pain, i) => (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                style={{
-                  background: '#0E1017',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderLeft: '3px solid #00CFEB',
-                  borderRadius: '0 12px 12px 0',
-                  padding: '1.5rem 2rem',
-                }}
-              >
-                <p style={{
-                  fontSize: '1.15rem',
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.9)',
-                  lineHeight: 1.5,
-                  margin: 0,
-                }}>
-                  {pain}
-                </p>
-              </motion.div>
-            ))}
+            ].map((pain, i) => {
+              const borderColors = [BRAND_COLORS.teal, BRAND_COLORS.amber, BRAND_COLORS.teal, BRAND_COLORS.amber, BRAND_COLORS.teal];
+              return (
+                <motion.div
+                  key={i}
+                  variants={staggerItem}
+                  style={{
+                    background: '#0E1017',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderLeft: `3px solid ${borderColors[i]}`,
+                    borderRadius: '0 12px 12px 0',
+                    padding: '1.5rem 2rem',
+                  }}
+                >
+                  <p style={{
+                    fontSize: '1.15rem',
+                    fontWeight: 600,
+                    color: 'rgba(255,255,255,0.9)',
+                    lineHeight: 1.5,
+                    margin: 0,
+                  }}>
+                    {pain}
+                  </p>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           <motion.p
@@ -534,6 +586,9 @@ export default function LandingPage() {
           </motion.p>
         </div>
       </AnimatedSection>
+
+      {/* Section Divider */}
+      <SectionDivider />
 
       {/* THE ZANDER DIFFERENCE - Scroll-triggered pillar scale */}
       <AnimatedSection id="how-it-works" style={{ padding: '6rem 2rem' }}>
@@ -741,12 +796,13 @@ export default function LandingPage() {
         </div>
       </AnimatedSection>
 
+      {/* Section Divider */}
+      <SectionDivider />
+
       {/* FOUNDING 50 / URGENCY with animated counter */}
       <AnimatedSection style={{
         padding: '5rem 2rem',
         background: 'linear-gradient(135deg, rgba(0,207,235,0.04) 0%, transparent 60%)',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
           <motion.div
@@ -793,7 +849,7 @@ export default function LandingPage() {
               marginBottom: '1rem',
             }}
           >
-            Founding 50 — <AnimatedCounter end={12} /> Spots Remaining
+            Founding 50 — <AnimatedCounter end={12} highlight /> Spots Remaining
           </motion.h2>
           <motion.p
             initial="hidden"
@@ -857,6 +913,9 @@ export default function LandingPage() {
           </motion.p>
         </div>
       </AnimatedSection>
+
+      {/* Section Divider */}
+      <SectionDivider />
 
       {/* TESTIMONIALS with hover lift */}
       <AnimatedSection style={{ padding: '6rem 2rem' }}>
@@ -925,8 +984,8 @@ export default function LandingPage() {
                 style={{
                   background: '#0E1017',
                   border: '1px solid rgba(255,255,255,0.08)',
-                  borderLeft: '3px solid rgba(0,207,235,0.4)',
-                  borderRadius: '0 14px 14px 0',
+                  borderTop: '2px solid rgba(0,207,235,0.4)',
+                  borderRadius: '14px',
                   padding: '2rem',
                 }}
               >
@@ -1027,6 +1086,9 @@ export default function LandingPage() {
         </div>
       </AnimatedSection>
 
+      {/* Section Divider */}
+      <SectionDivider />
+
       {/* PRICING with hover glow */}
       <AnimatedSection id="pricing" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -1090,11 +1152,12 @@ export default function LandingPage() {
             <motion.div variants={staggerItem} className="pricing-card" style={{
               background: '#0E1017',
               border: '1px solid rgba(255,255,255,0.08)',
+              borderTop: `3px solid ${BRAND_COLORS.teal}`,
               borderRadius: '16px',
               padding: '2.25rem',
               position: 'relative',
             }}>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Starter</h3>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem', color: BRAND_COLORS.teal }}>Starter</h3>
               <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>Your EA and HQ — fully operational from day one.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
                 $199<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
@@ -1136,7 +1199,8 @@ export default function LandingPage() {
             {/* PRO (featured) */}
             <motion.div variants={staggerItem} className="pricing-card pricing-card-pro" style={{
               background: '#13151E',
-              border: '1px solid #00CFEB',
+              border: `1px solid ${BRAND_COLORS.amber}`,
+              borderTop: `3px solid ${BRAND_COLORS.amber}`,
               borderRadius: '16px',
               padding: '2.25rem',
               position: 'relative',
@@ -1146,7 +1210,7 @@ export default function LandingPage() {
                 top: '-13px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                background: '#00CFEB',
+                background: BRAND_COLORS.amber,
                 color: '#000',
                 fontSize: '0.72rem',
                 fontWeight: 700,
@@ -1156,7 +1220,7 @@ export default function LandingPage() {
                 borderRadius: '50px',
                 whiteSpace: 'nowrap',
               }}>Most Popular</div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Pro</h3>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem', color: BRAND_COLORS.amber }}>Pro</h3>
               <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>Add your marketing machine — campaigns, brand, and content.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
                 $349<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
@@ -1172,7 +1236,7 @@ export default function LandingPage() {
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '1.75rem',
-                background: '#00CFEB',
+                background: BRAND_COLORS.amber,
                 color: '#000',
                 border: 'none',
                 boxSizing: 'border-box',
@@ -1186,7 +1250,7 @@ export default function LandingPage() {
                   'Social and email sequences',
                 ].map((f, i) => (
                   <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.95rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
-                    <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
+                    <span style={{ width: '18px', height: '18px', background: 'rgba(245,124,0,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: BRAND_COLORS.amber }}><CheckIcon /></span>
                     {f}
                   </li>
                 ))}
@@ -1197,11 +1261,12 @@ export default function LandingPage() {
             <motion.div variants={staggerItem} className="pricing-card" style={{
               background: '#0E1017',
               border: '1px solid rgba(255,255,255,0.08)',
+              borderTop: `3px solid ${BRAND_COLORS.green}`,
               borderRadius: '16px',
               padding: '2.25rem',
               position: 'relative',
             }}>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Business</h3>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem', color: BRAND_COLORS.green }}>Business</h3>
               <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>The complete C-suite. Every executive included, forever.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
                 $599<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
@@ -1242,11 +1307,12 @@ export default function LandingPage() {
             <motion.div variants={staggerItem} className="pricing-card" style={{
               background: 'linear-gradient(135deg, #0E1017 0%, rgba(255,255,255,0.02) 100%)',
               border: '1px solid rgba(255,255,255,0.08)',
+              borderTop: `3px solid ${BRAND_COLORS.purple}`,
               borderRadius: '16px',
               padding: '2.25rem',
               position: 'relative',
             }}>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem' }}>Enterprise</h3>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.28rem', color: BRAND_COLORS.purple }}>Enterprise</h3>
               <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', lineHeight: 1.5 }}>Custom build for complex organizations and agencies.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '2.9rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.25rem' }}>
                 $999<span style={{ fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
@@ -1461,14 +1527,34 @@ export default function LandingPage() {
             marginBottom: '2rem',
           }}>
             <div>
-              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', marginBottom: '0.75rem' }}>
-                <Image
-                  src="/images/zander-logo.svg"
-                  alt="Zander"
-                  width={160}
-                  height={40}
-                  style={{ height: '40px', width: 'auto' }}
-                />
+              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none', marginBottom: '0.75rem' }}>
+                {/* Circular Z icon */}
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '8px',
+                  background: 'linear-gradient(135deg, #00CFEB 0%, #0088AA 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '1.1rem',
+                  fontWeight: 800,
+                  fontFamily: "'Sora', var(--font-sora), sans-serif",
+                  flexShrink: 0,
+                }}>
+                  Z
+                </div>
+                {/* ZANDER wordmark */}
+                <span style={{
+                  fontFamily: "'Sora', var(--font-sora), sans-serif",
+                  fontSize: '1.4rem',
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  color: '#FFFFFF',
+                }}>
+                  ZANDER
+                </span>
               </a>
               <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
             </div>
