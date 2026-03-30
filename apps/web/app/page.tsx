@@ -222,16 +222,9 @@ export default function LandingPage() {
       fontSize: '20px',
     }}>
       <style>{`
-        @keyframes gradientShift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        .animated-gradient {
-          background: linear-gradient(135deg, #0C1220 0%, #0A1A24 25%, #080A0F 50%, #0C1220 75%, #0A1A24 100%);
-          background-size: 400% 400%;
-          animation: gradientShift 10s ease infinite;
-          will-change: background-position;
-          transform: translateZ(0);
+        @keyframes ambientPulse {
+          0%, 100% { opacity: 0; }
+          50% { opacity: 1; }
         }
         .testimonial-card {
           transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -297,34 +290,8 @@ export default function LandingPage() {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '16px', textDecoration: 'none' }}>
-            {/* Circular Z icon */}
-            <div style={{
-              width: '72px',
-              height: '72px',
-              borderRadius: '14px',
-              background: 'linear-gradient(135deg, #00CFEB 0%, #0088AA 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '36px',
-              fontWeight: 800,
-              fontFamily: "'Sora', var(--font-sora), sans-serif",
-              flexShrink: 0,
-            }}>
-              Z
-            </div>
-            {/* ZANDER wordmark */}
-            <span style={{
-              fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '32px',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: '#FFFFFF',
-            }}>
-              ZANDER
-            </span>
+          <a href="#" style={{ display: 'block', textDecoration: 'none' }}>
+            <img src="/images/zander-logo-white.svg" alt="Zander" style={{ height: '64px', width: 'auto' }} />
           </a>
           <ul className="nav-links-desktop" style={{
             display: 'flex',
@@ -355,29 +322,42 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* HERO with animated gradient background */}
-      <section id="product" className="animated-gradient" style={{
+      {/* HERO with layered gradient background */}
+      <section id="product" style={{
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        padding: '140px 2rem 80px',
+        paddingTop: '120px',
+        paddingLeft: '2rem',
+        paddingRight: '2rem',
+        paddingBottom: '80px',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'visible',
       }}>
+        {/* Layer 1 (bottom): static base */}
         <div style={{
-          content: '""',
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse 80% 65% at 50% 25%, rgba(0,207,235,0.07) 0%, transparent 65%), radial-gradient(ellipse 45% 45% at 15% 85%, rgba(0,207,235,0.04) 0%, transparent 60%)',
+          background: '#0a1628',
           pointerEvents: 'none',
         }} />
+        {/* Layer 2: static radial gradients */}
         <div style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
+          background: 'radial-gradient(ellipse at 20% 50%, rgba(0, 188, 212, 0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(0, 82, 120, 0.15) 0%, transparent 50%)',
+          pointerEvents: 'none',
+        }} />
+        {/* Layer 3: animated opacity radial gradients */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(ellipse at 70% 80%, rgba(0, 150, 180, 0.1) 0%, transparent 55%), radial-gradient(ellipse at 30% 30%, rgba(0, 60, 100, 0.12) 0%, transparent 50%)',
+          animation: 'ambientPulse 12s ease-in-out infinite',
+          willChange: 'opacity',
+          transform: 'translateZ(0)',
           pointerEvents: 'none',
         }} />
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '1000px' }}>
@@ -1523,34 +1503,8 @@ export default function LandingPage() {
             marginBottom: '2rem',
           }}>
             <div>
-              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', marginBottom: '12px' }}>
-                {/* Circular Z icon */}
-                <div style={{
-                  width: '56px',
-                  height: '56px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #00CFEB 0%, #0088AA 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '28px',
-                  fontWeight: 800,
-                  fontFamily: "'Sora', var(--font-sora), sans-serif",
-                  flexShrink: 0,
-                }}>
-                  Z
-                </div>
-                {/* ZANDER wordmark */}
-                <span style={{
-                  fontFamily: "'Sora', var(--font-sora), sans-serif",
-                  fontSize: '28px',
-                  fontWeight: 800,
-                  letterSpacing: '-0.02em',
-                  color: '#FFFFFF',
-                }}>
-                  ZANDER
-                </span>
+              <a href="#" style={{ display: 'block', textDecoration: 'none', marginBottom: '12px' }}>
+                <img src="/images/zander-logo-white.svg" alt="Zander" style={{ height: '48px', width: 'auto' }} />
               </a>
               <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
             </div>
