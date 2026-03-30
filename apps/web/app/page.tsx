@@ -219,7 +219,7 @@ export default function LandingPage() {
       color: '#FFFFFF',
       lineHeight: 1.65,
       WebkitFontSmoothing: 'antialiased',
-      fontSize: '20px',
+      fontSize: '30px',
     }}>
       <style>{`
         @keyframes ambientPulse {
@@ -267,15 +267,15 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* NAV */}
+      {/* NAV - 25% reduced height, 75% larger text */}
       <nav style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 100,
-        minHeight: '100px',
-        padding: '28px 2rem',
+        minHeight: '75px',
+        padding: '21px 2rem',
         display: 'flex',
         alignItems: 'center',
         background: 'rgba(8,10,15,0.88)',
@@ -301,20 +301,20 @@ export default function LandingPage() {
             margin: 0,
             padding: 0,
           }}>
-            <li><a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '20px', fontWeight: 500 }}>Product</a></li>
-            <li><a href="#pricing" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '20px', fontWeight: 500 }}>Pricing</a></li>
-            <li><a href="#demo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '20px', fontWeight: 500 }}>Demo</a></li>
-            <li><a href="#about" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '20px', fontWeight: 500 }}>About</a></li>
+            <li><a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Product</a></li>
+            <li><a href="#pricing" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Pricing</a></li>
+            <li><a href="#demo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Demo</a></li>
+            <li><a href="#about" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>About</a></li>
           </ul>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <a href="/login" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '20px', fontWeight: 500 }}>Sign In</a>
+            <a href="/login" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Sign In</a>
             <a href="/signup" style={{
               background: '#00CFEB',
               color: '#000',
               padding: '16px 32px',
               borderRadius: '10px',
               fontWeight: 700,
-              fontSize: '20px',
+              fontSize: '35px',
               textDecoration: 'none',
               whiteSpace: 'nowrap',
             }}>Get Early Access</a>
@@ -344,7 +344,7 @@ export default function LandingPage() {
           pointerEvents: 'none',
           zIndex: 0,
         }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1000px' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -358,7 +358,7 @@ export default function LandingPage() {
               color: 'rgba(255,255,255,0.72)',
               padding: '10px 20px',
               borderRadius: '50px',
-              fontSize: '18px',
+              fontSize: '27px',
               fontWeight: 500,
               letterSpacing: '0.04em',
               marginBottom: '2.5rem',
@@ -384,8 +384,8 @@ export default function LandingPage() {
               marginBottom: '40px',
             }}
           >
-            <span style={{ display: 'block', color: '#FFFFFF', fontSize: '120px', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.04em', paddingTop: '0.1em' }}>Your business,</span>
-            <span style={{ display: 'block', color: '#00CFEB', fontSize: '120px', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.04em' }}>expertly run.</span>
+            <span style={{ display: 'block', color: '#FFFFFF', fontSize: '180px', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.04em', paddingTop: '0.15em' }}>Your business,</span>
+            <span style={{ display: 'block', color: '#00CFEB', fontSize: '180px', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.04em' }}>expertly run.</span>
           </motion.h1>
 
           <motion.p
@@ -393,11 +393,12 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
             style={{
-              fontSize: '26px',
+              fontSize: '39px',
               color: 'rgba(255,255,255,0.7)',
-              maxWidth: '700px',
+              maxWidth: '900px',
               margin: '0 auto 24px',
               lineHeight: 1.6,
+              textAlign: 'center',
             }}
           >
             You built something real. Zander gives you the expert executive team to keep it organized, moving forward, and growing — so you can step back into the work you actually love.
@@ -408,11 +409,12 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
             style={{
-              fontSize: '22px',
+              fontSize: '33px',
               color: 'rgba(255,255,255,0.55)',
-              maxWidth: '680px',
+              maxWidth: '900px',
               margin: '0 auto 48px',
               lineHeight: 1.7,
+              textAlign: 'center',
             }}
           >
             An AI-powered executive team that handles your inbox, drives your pipeline, runs your marketing, and manages your operations — so nothing falls through the cracks. Not even the things you&apos;ve been ignoring.
@@ -430,7 +432,7 @@ export default function LandingPage() {
               padding: '20px 48px',
               borderRadius: '12px',
               fontWeight: 700,
-              fontSize: '22px',
+              fontSize: '33px',
               textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
@@ -444,7 +446,7 @@ export default function LandingPage() {
               padding: '20px 40px',
               borderRadius: '12px',
               fontWeight: 600,
-              fontSize: '22px',
+              fontSize: '33px',
               textDecoration: 'none',
               border: '1px solid rgba(255,255,255,0.18)',
               display: 'inline-flex',
@@ -459,7 +461,7 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            style={{ fontSize: '18px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em' }}
+            style={{ fontSize: '27px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em', textAlign: 'center' }}
           >
             Joining 50 founding members &bull; Founding rate locked for life
           </motion.p>
@@ -476,7 +478,7 @@ export default function LandingPage() {
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '56px',
+              fontSize: '84px',
               fontWeight: 800,
               marginBottom: '56px',
               lineHeight: 1.18,
@@ -516,7 +518,7 @@ export default function LandingPage() {
                   }}
                 >
                   <p style={{
-                    fontSize: '26px',
+                    fontSize: '39px',
                     fontWeight: 600,
                     color: 'rgba(255,255,255,0.9)',
                     lineHeight: 1.5,
@@ -535,7 +537,7 @@ export default function LandingPage() {
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
-              fontSize: '26px',
+              fontSize: '39px',
               fontWeight: 600,
               color: '#00CFEB',
               marginTop: '48px',
@@ -561,7 +563,7 @@ export default function LandingPage() {
             style={{ textAlign: 'center', marginBottom: '4rem' }}
           >
             <span style={{
-              fontSize: '16px',
+              fontSize: '24px',
               fontWeight: 600,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -571,20 +573,20 @@ export default function LandingPage() {
             }}>The Zander Difference</span>
             <h2 style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '52px',
+              fontSize: '78px',
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.18,
               marginBottom: '24px',
-              maxWidth: '700px',
+              maxWidth: '900px',
               margin: '0 auto 24px',
             }}>
               It&apos;s not software. It&apos;s a fully staffed executive team.
             </h2>
             <p style={{
-              fontSize: '22px',
+              fontSize: '33px',
               color: 'rgba(255,255,255,0.65)',
-              maxWidth: '750px',
+              maxWidth: '950px',
               margin: '0 auto',
               lineHeight: 1.75,
             }}>
@@ -633,10 +635,10 @@ export default function LandingPage() {
                 }}>
                   {pillar.icon}
                 </div>
-                <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '26px', fontWeight: 700, marginBottom: '12px', color: '#00CFEB' }}>
+                <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '39px', fontWeight: 700, marginBottom: '12px', color: '#00CFEB' }}>
                   {pillar.title}
                 </h3>
-                <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.65, margin: 0 }}>{pillar.desc}</p>
+                <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.65, margin: 0 }}>{pillar.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -652,7 +654,7 @@ export default function LandingPage() {
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
-              fontSize: '16px',
+              fontSize: '24px',
               fontWeight: 600,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -668,7 +670,7 @@ export default function LandingPage() {
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '52px',
+              fontSize: '78px',
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.18,
@@ -701,15 +703,15 @@ export default function LandingPage() {
               >
                 <div style={{
                   fontFamily: "'Sora', var(--font-sora), sans-serif",
-                  fontSize: '2.5rem',
+                  fontSize: '60px',
                   fontWeight: 800,
                   color: 'rgba(0,207,235,0.3)',
                   marginBottom: '1rem',
                 }}>{step.num}</div>
-                <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '26px', fontWeight: 700, marginBottom: '12px' }}>
+                <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '39px', fontWeight: 700, marginBottom: '12px' }}>
                   {step.title}
                 </h3>
-                <p style={{ fontSize: '22px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
+                <p style={{ fontSize: '33px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -746,10 +748,10 @@ export default function LandingPage() {
                 <path d="M8 5v14l11-7z"/>
               </svg>
             </div>
-            <p style={{ fontSize: '1.15rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)', margin: 0 }}>
+            <p style={{ fontSize: '28px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', margin: 0 }}>
               3-Minute Demo — Coming Soon
             </p>
-            <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+            <p style={{ fontSize: '23px', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
               See Zander in action
             </p>
           </motion.div>
@@ -779,7 +781,7 @@ export default function LandingPage() {
               color: 'rgba(255,255,255,0.7)',
               padding: '8px 20px',
               borderRadius: '50px',
-              fontSize: '16px',
+              fontSize: '24px',
               fontWeight: 500,
               letterSpacing: '0.04em',
               marginBottom: '24px',
@@ -802,7 +804,7 @@ export default function LandingPage() {
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '64px',
+              fontSize: '96px',
               fontWeight: 900,
               letterSpacing: '-0.02em',
               lineHeight: 1.2,
@@ -817,12 +819,13 @@ export default function LandingPage() {
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
-              fontSize: '24px',
+              fontSize: '36px',
               color: 'rgba(255,255,255,0.65)',
               lineHeight: 1.75,
               marginBottom: '40px',
-              maxWidth: '650px',
+              maxWidth: '850px',
               margin: '0 auto 40px',
+              textAlign: 'center',
             }}
           >
             Founding members get their rate locked for life — including every new executive as they launch. No upgrades required. No price increases. Ever.
@@ -841,7 +844,7 @@ export default function LandingPage() {
               padding: '18px 40px',
               borderRadius: '10px',
               fontWeight: 700,
-              fontSize: '22px',
+              fontSize: '33px',
               textDecoration: 'none',
             }}>
               Claim Your Founding Spot
@@ -854,7 +857,7 @@ export default function LandingPage() {
                 padding: '18px 40px',
                 borderRadius: '10px',
                 fontWeight: 600,
-                fontSize: '22px',
+                fontSize: '33px',
                 border: '1px solid rgba(255,255,255,0.18)',
                 cursor: 'pointer',
               }}
@@ -867,7 +870,7 @@ export default function LandingPage() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
-            style={{ fontSize: '16px', color: 'rgba(255,255,255,0.4)', maxWidth: '500px', margin: '0 auto' }}
+            style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}
           >
             Spots filled? The $49 waitlist fee reserves your place in the next onboarding cohort. Non-refundable. Next batch pricing announced separately.
           </motion.p>
@@ -886,7 +889,7 @@ export default function LandingPage() {
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
-              fontSize: '16px',
+              fontSize: '24px',
               fontWeight: 600,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -902,7 +905,7 @@ export default function LandingPage() {
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '52px',
+              fontSize: '78px',
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.18,
@@ -951,13 +954,13 @@ export default function LandingPage() {
                 }}
               >
                 <p style={{
-                  fontSize: '22px',
+                  fontSize: '33px',
                   color: 'rgba(255,255,255,0.82)',
                   lineHeight: 1.78,
                   marginBottom: '24px',
                   fontStyle: 'italic',
                 }}>{t.quote}</p>
-                <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
+                <div style={{ fontSize: '27px', color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
                   — {t.name}
                 </div>
               </motion.div>
@@ -975,7 +978,7 @@ export default function LandingPage() {
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
-              fontSize: '18px',
+              fontSize: '27px',
               fontWeight: 600,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -997,7 +1000,7 @@ export default function LandingPage() {
               padding: '3rem',
             }}
           >
-            <div style={{ fontSize: '22px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.85 }}>
+            <div style={{ fontSize: '33px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.85 }}>
               <p style={{ marginBottom: '24px' }}>
                 I&apos;ve owned and operated multiple businesses for decades — manufacturing, retail, technology. I&apos;ve read hundreds of books, attended seminars, joined networking groups, and consulted for dozens of small business owners. I&apos;ve had a front-row seat to more businesses than most people see in a lifetime.
               </p>
@@ -1035,12 +1038,12 @@ export default function LandingPage() {
                 fontFamily: "'Sora', var(--font-sora), sans-serif",
                 fontWeight: 700,
                 color: '#00CFEB',
-                fontSize: '22px',
+                fontSize: '33px',
                 flexShrink: 0,
               }}>JW</div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: '22px', lineHeight: 1.3 }}>Jonathan White</div>
-                <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.5)' }}>Founder — Zander</div>
+                <div style={{ fontWeight: 700, fontSize: '33px', lineHeight: 1.3 }}>Jonathan White</div>
+                <div style={{ fontSize: '27px', color: 'rgba(255,255,255,0.5)' }}>Founder — Zander</div>
               </div>
             </div>
           </motion.div>
@@ -1059,7 +1062,7 @@ export default function LandingPage() {
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
-              fontSize: '16px',
+              fontSize: '24px',
               fontWeight: 600,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -1075,7 +1078,7 @@ export default function LandingPage() {
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '56px',
+              fontSize: '84px',
               fontWeight: 900,
               letterSpacing: '-0.02em',
               lineHeight: 1.18,
@@ -1088,7 +1091,7 @@ export default function LandingPage() {
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
             style={{
-              fontSize: '22px',
+              fontSize: '33px',
               color: 'rgba(255,255,255,0.55)',
               marginBottom: '56px',
             }}
@@ -1122,19 +1125,19 @@ export default function LandingPage() {
                 padding: '2.25rem',
                 position: 'relative',
               }}>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '28px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.teal }}>Starter</h3>
-              <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Your EA and HQ — fully operational from day one.</p>
-              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '52px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
-                $199<span style={{ fontSize: '20px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.teal }}>Starter</h3>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Your EA and HQ — fully operational from day one.</p>
+              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
+                $199<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$299/mo public</p>
+              <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$299/mo public</p>
               <a href="/signup" style={{
                 display: 'block',
                 width: '100%',
                 padding: '14px',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '20px',
+                fontSize: '30px',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '28px',
@@ -1143,7 +1146,7 @@ export default function LandingPage() {
                 border: '1px solid rgba(255,255,255,0.18)',
                 boxSizing: 'border-box',
               }}>Get Early Access</a>
-              <p style={{ fontSize: '14px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Includes</p>
+              <p style={{ fontSize: '21px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Includes</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', padding: 0, margin: 0 }}>
                 {[
                   'Pam, your AI Executive Assistant',
@@ -1153,7 +1156,7 @@ export default function LandingPage() {
                   'SMS and follow-up sequences',
                   'Getting sharper every day',
                 ].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '18px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '27px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
                     <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
                     {f}
                   </li>
@@ -1182,7 +1185,7 @@ export default function LandingPage() {
                 transform: 'translateX(-50%)',
                 background: BRAND_COLORS.amber,
                 color: '#000',
-                fontSize: '0.72rem',
+                fontSize: '17px',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
@@ -1190,19 +1193,19 @@ export default function LandingPage() {
                 borderRadius: '50px',
                 whiteSpace: 'nowrap',
               }}>Most Popular</div>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '28px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.amber }}>Pro</h3>
-              <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Add your marketing machine — campaigns, brand, and content.</p>
-              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '52px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
-                $349<span style={{ fontSize: '20px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.amber }}>Pro</h3>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Add your marketing machine — campaigns, brand, and content.</p>
+              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
+                $349<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$499/mo public</p>
+              <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$499/mo public</p>
               <a href="/signup" style={{
                 display: 'block',
                 width: '100%',
                 padding: '14px',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '20px',
+                fontSize: '30px',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '28px',
@@ -1211,7 +1214,7 @@ export default function LandingPage() {
                 border: 'none',
                 boxSizing: 'border-box',
               }}>Get Early Access</a>
-              <p style={{ fontSize: '14px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Everything in Starter, plus</p>
+              <p style={{ fontSize: '21px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Everything in Starter, plus</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', padding: 0, margin: 0 }}>
                 {[
                   'Don, your AI CMO',
@@ -1219,7 +1222,7 @@ export default function LandingPage() {
                   'Brand and content strategy',
                   'Social and email sequences',
                 ].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '18px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '27px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
                     <span style={{ width: '18px', height: '18px', background: 'rgba(245,124,0,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: BRAND_COLORS.amber }}><CheckIcon /></span>
                     {f}
                   </li>
@@ -1241,19 +1244,19 @@ export default function LandingPage() {
                 padding: '2.25rem',
                 position: 'relative',
               }}>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '28px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.green }}>Business</h3>
-              <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>The complete C-suite. Every executive included, forever.</p>
-              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '52px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
-                $599<span style={{ fontSize: '20px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.green }}>Business</h3>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>The complete C-suite. Every executive included, forever.</p>
+              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
+                $599<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$799/mo public</p>
+              <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$799/mo public</p>
               <a href="/signup" style={{
                 display: 'block',
                 width: '100%',
                 padding: '14px',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '20px',
+                fontSize: '30px',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '28px',
@@ -1262,7 +1265,7 @@ export default function LandingPage() {
                 border: '1px solid rgba(255,255,255,0.18)',
                 boxSizing: 'border-box',
               }}>Get Early Access</a>
-              <p style={{ fontSize: '14px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Everything in Pro, plus</p>
+              <p style={{ fontSize: '21px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Everything in Pro, plus</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', padding: 0, margin: 0 }}>
                 {[
                   'Jordan, your AI CRO',
@@ -1270,7 +1273,7 @@ export default function LandingPage() {
                   'Outreach sequences and lead follow-up',
                   'Full executive team operating in sync',
                 ].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '18px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '27px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
                     <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
                     {f}
                   </li>
@@ -1292,19 +1295,19 @@ export default function LandingPage() {
                 padding: '2.25rem',
                 position: 'relative',
               }}>
-              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '28px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.purple }}>Enterprise</h3>
-              <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Custom build for complex organizations and agencies.</p>
-              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '52px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
-                $999<span style={{ fontSize: '20px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
+              <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.purple }}>Enterprise</h3>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Custom build for complex organizations and agencies.</p>
+              <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
+                $999<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$1,499/mo public</p>
+              <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$1,499/mo public</p>
               <a href="mailto:support@zanderos.com" style={{
                 display: 'block',
                 width: '100%',
                 padding: '14px',
                 borderRadius: '9px',
                 fontWeight: 700,
-                fontSize: '20px',
+                fontSize: '30px',
                 textAlign: 'center',
                 textDecoration: 'none',
                 marginBottom: '28px',
@@ -1313,14 +1316,14 @@ export default function LandingPage() {
                 border: '1px solid rgba(255,255,255,0.18)',
                 boxSizing: 'border-box',
               }}>Contact Us</a>
-              <p style={{ fontSize: '14px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Everything in Business, plus</p>
+              <p style={{ fontSize: '21px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>Everything in Business, plus</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', padding: 0, margin: 0 }}>
                 {[
                   'Custom executive configuration',
                   'Multi-location and team support',
                   'Priority onboarding and dedicated support',
                 ].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '18px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '27px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.45 }}>
                     <span style={{ width: '18px', height: '18px', background: 'rgba(0,207,235,0.13)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px', color: '#00CFEB' }}><CheckIcon /></span>
                     {f}
                   </li>
@@ -1345,13 +1348,13 @@ export default function LandingPage() {
               margin: '40px auto 0',
             }}
           >
-            <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.85)', marginBottom: '8px', fontWeight: 600 }}>
+            <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.85)', marginBottom: '8px', fontWeight: 600 }}>
               30-Day Money-Back Guarantee
             </p>
-            <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px' }}>
+            <p style={{ fontSize: '27px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px' }}>
               If Zander isn&apos;t running your business better in the first 30 days, we&apos;ll refund your first month. No questions. No hassle.
             </p>
-            <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.4)' }}>
+            <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)' }}>
               The $49 waitlist reservation fee is non-refundable. The 30-day guarantee applies to your first month&apos;s subscription payment only.
             </p>
           </motion.div>
@@ -1360,7 +1363,7 @@ export default function LandingPage() {
 
       {/* FAQ with AnimatePresence */}
       <AnimatedSection style={{ padding: '6rem 2rem' }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <motion.h2
             initial="hidden"
             whileInView="visible"
@@ -1368,7 +1371,7 @@ export default function LandingPage() {
             variants={fadeInUp}
             style={{
               fontFamily: "'Sora', var(--font-sora), sans-serif",
-              fontSize: '52px',
+              fontSize: '78px',
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.18,
@@ -1410,7 +1413,7 @@ export default function LandingPage() {
                     textAlign: 'left',
                   }}
                 >
-                  <span style={{ fontSize: '22px', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{faq.q}</span>
+                  <span style={{ fontSize: '33px', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{faq.q}</span>
                   <span style={{ color: '#00CFEB', flexShrink: 0 }}>
                     {openFaq === i ? <MinusIcon /> : <PlusIcon />}
                   </span>
@@ -1424,7 +1427,7 @@ export default function LandingPage() {
                       transition={{ duration: 0.2, ease: 'easeInOut' }}
                       style={{ overflow: 'hidden' }}
                     >
-                      <div style={{ padding: '0 24px 20px', fontSize: '20px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>
+                      <div style={{ padding: '0 24px 20px', fontSize: '30px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>
                         {faq.a}
                       </div>
                     </motion.div>
@@ -1458,7 +1461,7 @@ export default function LandingPage() {
         >
           <h2 style={{
             fontFamily: "'Sora', var(--font-sora), sans-serif",
-            fontSize: '56px',
+            fontSize: '84px',
             fontWeight: 800,
             letterSpacing: '-0.02em',
             marginBottom: '20px',
@@ -1466,7 +1469,7 @@ export default function LandingPage() {
           }}>
             Your business is ready.<br/><span style={{ color: '#00CFEB' }}>Are you?</span>
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: '22px', marginBottom: '36px', lineHeight: 1.75 }}>
+          <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: '33px', marginBottom: '36px', lineHeight: 1.75, textAlign: 'center' }}>
             Join the Founding 50 and get expert-level executive support locked in for life — before we open to the public and pricing goes up.
           </p>
           <a href="/signup" style={{
@@ -1478,12 +1481,12 @@ export default function LandingPage() {
             padding: '20px 48px',
             borderRadius: '10px',
             fontWeight: 700,
-            fontSize: '22px',
+            fontSize: '33px',
             textDecoration: 'none',
           }}>
             Get Early Access
           </a>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.3)', marginTop: '16px', letterSpacing: '0.04em' }}>
+          <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.3)', marginTop: '16px', letterSpacing: '0.04em', textAlign: 'center' }}>
             Only 50 founding spots &bull; No credit card required &bull; Cancel anytime
           </p>
         </motion.div>
@@ -1510,21 +1513,21 @@ export default function LandingPage() {
               <a href="#" style={{ display: 'block', textDecoration: 'none', marginBottom: '12px' }}>
                 <img src="/images/zander-logo-color.svg" alt="Zander" style={{ width: '280px', height: 'auto', display: 'block' }} />
               </a>
-              <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.5)' }}>Your business, expertly run.</p>
             </div>
             <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '18px' }}>Product</a>
-                <a href="#pricing" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '18px' }}>Pricing</a>
-                <a href="#demo" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '18px' }}>Demo</a>
+                <a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '27px' }}>Product</a>
+                <a href="#pricing" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '27px' }}>Pricing</a>
+                <a href="#demo" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '27px' }}>Demo</a>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <a href="#about" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '18px' }}>About</a>
-                <a href="/login" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '18px' }}>Sign In</a>
+                <a href="#about" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '27px' }}>About</a>
+                <a href="/login" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '27px' }}>Sign In</a>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <a href="/privacy" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '18px' }}>Privacy Policy</a>
-                <a href="/terms" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '18px' }}>Terms of Service</a>
+                <a href="/privacy" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '27px' }}>Privacy Policy</a>
+                <a href="/terms" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '27px' }}>Terms of Service</a>
               </div>
             </div>
           </div>
@@ -1537,10 +1540,10 @@ export default function LandingPage() {
             flexWrap: 'wrap',
             gap: '16px',
           }}>
-            <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+            <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
               &copy; 2026 Zander Systems LLC. All rights reserved.
             </p>
-            <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+            <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
               support@zanderos.com
             </p>
           </div>
