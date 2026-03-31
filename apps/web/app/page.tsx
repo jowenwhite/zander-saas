@@ -926,7 +926,7 @@ export default function LandingPage() {
                 name: 'Marcus Ellison, Independent Real Estate Broker',
               },
               {
-                quote: 'We had a CRM, a project management tool, an email platform, a spreadsheet for our content calendar, and a whiteboard for everything else. Five tools, none of them talking to each other, and half of them out of date. Zander put everything in one place — our campaigns, our pipeline, our schedule, our client communication. I can actually see my whole business now. That alone was worth it.'ve been selling to everyone else. Don runs our marketing calendar and Jordan follows up on every proposal we send."',
+                quote: '"We had a CRM, a project management tool, an email platform, a spreadsheet for our content calendar, and a whiteboard for everything else. Five tools, none of them talking to each other, and half of them out of date. Zander put everything in one place — our campaigns, our pipeline, our schedule, our client communication. I can actually see my whole business now. That alone was worth it."',
                 name: 'Rachel Simmons, Founder, Digital Marketing Agency',
               },
               {
