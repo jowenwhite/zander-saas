@@ -53,6 +53,25 @@ interface MeetingTemplate {
   duration?: string;
 }
 
+interface HQGoal {
+  id: string;
+  title: string;
+  description?: string;
+  scope: 'PERSONAL' | 'QUARTERLY' | 'ANNUAL';
+  status: 'ACTIVE' | 'COMPLETED' | 'DEFERRED' | 'CANCELLED';
+  priority?: 'P1' | 'P2' | 'P3';
+  progress: number;
+  targetValue?: number;
+  currentValue?: number;
+  ownerId?: string;
+  ownerName?: string;
+  dueDate?: string;
+  quarter?: string;
+  year?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function HeadquartersPage() {
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -92,11 +111,21 @@ export default function HeadquartersPage() {
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [templatesError, setTemplatesError] = useState<string | null>(null);
 
+  // HQ Goals state
+  const [personalGoals, setPersonalGoals] = useState<HQGoal[]>([]);
+  const [quarterlyGoals, setQuarterlyGoals] = useState<HQGoal[]>([]);
+  const [annualGoals, setAnnualGoals] = useState<HQGoal[]>([]);
+  const [goalsLoading, setGoalsLoading] = useState(true);
+  const [goalsError, setGoalsError] = useState<string | null>(null);
+
   // Form states
   const [showHeadwindForm, setShowHeadwindForm] = useState(false);
   const [showHorizonForm, setShowHorizonForm] = useState(false);
+  const [showGoalForm, setShowGoalForm] = useState(false);
+  const [newGoalScope, setNewGoalScope] = useState<'PERSONAL' | 'QUARTERLY' | 'ANNUAL'>('PERSONAL');
   const [newHeadwind, setNewHeadwind] = useState<{ title: string; description: string; priority: 'P1' | 'P2' | 'P3'; category: 'BUG' | 'REBUILD' | 'NEW_BUILD' | 'ENHANCEMENT' | 'TASK' }>({ title: '', description: '', priority: 'P2', category: 'TASK' });
   const [newHorizonItem, setNewHorizonItem] = useState({ title: '', description: '', category: '' });
+  const [newGoal, setNewGoal] = useState({ title: '', description: '', priority: 'P2' as 'P1' | 'P2' | 'P3', targetValue: '', currentValue: '', dueDate: '', ownerName: '' });
   const [submitting, setSubmitting] = useState(false);
 
   // Load auth data on mount
@@ -235,6 +264,53 @@ export default function HeadquartersPage() {
     }
   }, [authData.token, authData.tenantId]);
 
+  const fetchGoals = useCallback(async () => {
+    if (!authData.token) return;
+    setGoalsLoading(true);
+    setGoalsError(null);
+    try {
+      // Fetch all three scopes in parallel
+      const [personalRes, quarterlyRes, annualRes] = await Promise.all([
+        fetch('/api/hq-goals?scope=PERSONAL&status=ACTIVE', {
+          headers: {
+            'Authorization': `Bearer ${authData.token}`,
+            'x-tenant-id': authData.tenantId || '',
+          },
+        }),
+        fetch('/api/hq-goals?scope=QUARTERLY&status=ACTIVE', {
+          headers: {
+            'Authorization': `Bearer ${authData.token}`,
+            'x-tenant-id': authData.tenantId || '',
+          },
+        }),
+        fetch('/api/hq-goals?scope=ANNUAL&status=ACTIVE', {
+          headers: {
+            'Authorization': `Bearer ${authData.token}`,
+            'x-tenant-id': authData.tenantId || '',
+          },
+        }),
+      ]);
+
+      if (!personalRes.ok || !quarterlyRes.ok || !annualRes.ok) {
+        throw new Error('Failed to fetch goals');
+      }
+
+      const [personalData, quarterlyData, annualData] = await Promise.all([
+        personalRes.json(),
+        quarterlyRes.json(),
+        annualRes.json(),
+      ]);
+
+      setPersonalGoals(Array.isArray(personalData) ? personalData : []);
+      setQuarterlyGoals(Array.isArray(quarterlyData) ? quarterlyData : []);
+      setAnnualGoals(Array.isArray(annualData) ? annualData : []);
+    } catch (error) {
+      setGoalsError(error instanceof Error ? error.message : 'Failed to load goals');
+    } finally {
+      setGoalsLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
   // Fetch all data when auth is available
   useEffect(() => {
     if (authData.token) {
@@ -244,8 +320,9 @@ export default function HeadquartersPage() {
       fetchUpcomingMeetings();
       fetchPastMeetings();
       fetchMeetingTemplates();
+      fetchGoals();
     }
-  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates]);
+  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates, fetchGoals]);
 
   // ============ CRUD FUNCTIONS ============
 
@@ -365,6 +442,60 @@ export default function HeadquartersPage() {
     }
   };
 
+  const createGoal = async () => {
+    if (!authData.token || !newGoal.title.trim()) return;
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/hq-goals', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: newGoal.title,
+          description: newGoal.description,
+          scope: newGoalScope,
+          priority: newGoal.priority,
+          progress: 0,
+          targetValue: newGoal.targetValue ? parseFloat(newGoal.targetValue) : undefined,
+          currentValue: newGoal.currentValue ? parseFloat(newGoal.currentValue) : undefined,
+          dueDate: newGoal.dueDate || undefined,
+          ownerName: newGoal.ownerName || undefined,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to create goal');
+      setNewGoal({ title: '', description: '', priority: 'P2', targetValue: '', currentValue: '', dueDate: '', ownerName: '' });
+      setShowGoalForm(false);
+      fetchGoals();
+    } catch (error) {
+      console.error('Error creating goal:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const updateGoalProgress = async (goalId: string, progress: number) => {
+    if (!authData.token) return;
+    try {
+      const status = progress >= 100 ? 'COMPLETED' : 'ACTIVE';
+      const response = await fetch(`/api/hq-goals/${goalId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ progress, status }),
+      });
+      if (!response.ok) throw new Error('Failed to update goal');
+      fetchGoals();
+    } catch (error) {
+      console.error('Error updating goal:', error);
+    }
+  };
+
   // ============ ICON MAPPING ============
   const iconMap: Record<string, React.ReactNode> = {
     briefcase: <Briefcase size={20} />,
@@ -445,25 +576,7 @@ export default function HeadquartersPage() {
     attendees: 5
   };
 
-  const myCampaignItems = [
-    { id: 1, title: 'Close 3 deals this quarter', progress: 66, target: '3 deals', current: '2 deals', dueDate: 'Dec 31' },
-    { id: 2, title: 'Launch email automation sequence', progress: 80, target: 'Complete', current: '4/5 sequences', dueDate: 'Dec 20' },
-    { id: 3, title: 'Complete team training on new CRM', progress: 100, target: '100%', current: 'Done', dueDate: 'Dec 15' },
-  ];
-
-  const quarterlyCampaigns = [
-    { id: 1, title: 'Increase pipeline value by 25%', progress: 72, owner: 'Sales Team', status: 'on-track' },
-    { id: 2, title: 'Reduce delivery time to under 4 weeks', progress: 85, owner: 'Operations', status: 'ahead' },
-    { id: 3, title: 'Launch new website redesign', progress: 45, owner: 'Marketing', status: 'at-risk' },
-    { id: 4, title: 'Hire and onboard 2 new team members', progress: 100, owner: 'HR', status: 'complete' },
-  ];
-
-  const annualCampaigns = [
-    { id: 1, title: 'Reach $3M in annual revenue', progress: 78, target: '$3,000,000', current: '$2,340,000' },
-    { id: 2, title: 'Expand team to 30 employees', progress: 80, target: '30', current: '24' },
-    { id: 3, title: 'Achieve 95% customer satisfaction', progress: 88, target: '95%', current: '94%' },
-    { id: 4, title: 'Launch Zander V1.0', progress: 65, target: 'April 1', current: 'In Development' },
-  ];
+  // Campaign items now fetched from API via personalGoals, quarterlyGoals, annualGoals state
 
   const foundingPrinciples = {
     vision: 'To empower every small business owner to reclaim their passion by providing AI-powered tools that handle the complexity of running a business.',
@@ -747,22 +860,38 @@ export default function HeadquartersPage() {
               <h3 style={{ margin: 0, color: '#F0F0F5' }}>My Campaign</h3>
               <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Your personal priorities for this quarter</p>
             </div>
-            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Priority</button>
+            <button onClick={() => { setNewGoalScope('PERSONAL'); setShowGoalForm(true); }} style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Priority</button>
           </div>
-          {myCampaignItems.map((item) => (
-            <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${item.progress === 100 ? '#28A745' : '#00CCEE'}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                <div>
-                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {item.target} • Current: {item.current} • Due: {item.dueDate}</div>
-                </div>
-                <span style={{ fontSize: '1.25rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
-              </div>
-              <div style={{ height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
-                <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '5px', transition: 'width 0.3s ease' }} />
-              </div>
+          {goalsLoading ? (
+            <LoadingSpinner text="Loading goals..." />
+          ) : goalsError ? (
+            <ErrorMessage message={goalsError} onRetry={fetchGoals} />
+          ) : personalGoals.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0', background: '#09090F', borderRadius: '10px' }}>
+              <Target size={32} style={{ opacity: 0.5, marginBottom: '0.5rem' }} />
+              <div>No personal goals yet</div>
+              <button onClick={() => { setNewGoalScope('PERSONAL'); setShowGoalForm(true); }} style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Add Your First Goal</button>
             </div>
-          ))}
+          ) : (
+            personalGoals.map((item) => (
+              <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${item.progress === 100 ? '#28A745' : '#00CCEE'}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  <div>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
+                      {item.targetValue && `Target: ${item.targetValue}`}
+                      {item.currentValue && ` • Current: ${item.currentValue}`}
+                      {item.dueDate && ` • Due: ${formatDate(item.dueDate)}`}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '1.25rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
+                </div>
+                <div style={{ height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
+                  <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '5px', transition: 'width 0.3s ease' }} />
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -771,30 +900,44 @@ export default function HeadquartersPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
-              <h3 style={{ margin: 0, color: '#F0F0F5' }}>Q4 2024 Campaigns</h3>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>Quarterly Campaigns</h3>
               <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Team-wide quarterly priorities</p>
             </div>
+            <button onClick={() => { setNewGoalScope('QUARTERLY'); setShowGoalForm(true); }} style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Campaign</button>
           </div>
-          {quarterlyCampaigns.map((item) => {
-            const statusStyle = getStatusStyle(item.status);
-            return (
-              <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Owner: {item.owner}</div>
+          {goalsLoading ? (
+            <LoadingSpinner text="Loading campaigns..." />
+          ) : goalsError ? (
+            <ErrorMessage message={goalsError} onRetry={fetchGoals} />
+          ) : quarterlyGoals.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0', background: '#09090F', borderRadius: '10px' }}>
+              <Rocket size={32} style={{ opacity: 0.5, marginBottom: '0.5rem' }} />
+              <div>No quarterly campaigns yet</div>
+              <button onClick={() => { setNewGoalScope('QUARTERLY'); setShowGoalForm(true); }} style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Add First Campaign</button>
+            </div>
+          ) : (
+            quarterlyGoals.map((item) => {
+              const statusLabel = item.progress >= 100 ? 'Complete' : item.progress >= 75 ? 'On Track' : item.progress >= 50 ? 'In Progress' : 'At Risk';
+              const statusColor = item.progress >= 100 ? '#28A745' : item.progress >= 75 ? '#28A745' : item.progress >= 50 ? '#F0B323' : '#DC3545';
+              return (
+                <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{item.ownerName ? `Owner: ${item.ownerName}` : item.quarter ? `${item.quarter} ${item.year || ''}` : ''}</div>
+                    </div>
+                    <span style={{ fontSize: '0.7rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: `${statusColor}22`, color: statusColor }}>{statusLabel}</span>
                   </div>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: statusStyle.bg, color: statusStyle.color }}>{statusStyle.label}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ flex: 1, height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
-                    <div style={{ width: item.progress + '%', height: '100%', background: item.status === 'complete' || item.status === 'ahead' ? '#28A745' : item.status === 'at-risk' ? '#DC3545' : '#13131A', borderRadius: '5px' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ flex: 1, height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
+                      <div style={{ width: item.progress + '%', height: '100%', background: statusColor, borderRadius: '5px' }} />
+                    </div>
+                    <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#F0F0F5', minWidth: '45px' }}>{item.progress}%</span>
                   </div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#F0F0F5', minWidth: '45px' }}>{item.progress}%</span>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       )}
 
@@ -803,24 +946,40 @@ export default function HeadquartersPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
-              <h3 style={{ margin: 0, color: '#F0F0F5' }}>2024 Annual Campaign</h3>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>Annual Campaign</h3>
               <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Company-wide annual objectives</p>
             </div>
+            <button onClick={() => { setNewGoalScope('ANNUAL'); setShowGoalForm(true); }} style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Objective</button>
           </div>
-          {annualCampaigns.map((item) => (
-            <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {item.target} • Current: {item.current}</div>
-                </div>
-                <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>{item.progress}%</span>
-              </div>
-              <div style={{ height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
-                <div style={{ width: item.progress + '%', height: '100%', background: item.progress >= 75 ? '#28A745' : item.progress >= 50 ? '#F0B323' : '#DC3545', borderRadius: '5px' }} />
-              </div>
+          {goalsLoading ? (
+            <LoadingSpinner text="Loading objectives..." />
+          ) : goalsError ? (
+            <ErrorMessage message={goalsError} onRetry={fetchGoals} />
+          ) : annualGoals.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0', background: '#09090F', borderRadius: '10px' }}>
+              <Star size={32} style={{ opacity: 0.5, marginBottom: '0.5rem' }} />
+              <div>No annual objectives yet</div>
+              <button onClick={() => { setNewGoalScope('ANNUAL'); setShowGoalForm(true); }} style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Add First Objective</button>
             </div>
-          ))}
+          ) : (
+            annualGoals.map((item) => (
+              <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
+                      {item.targetValue && `Target: ${item.targetValue}`}
+                      {item.currentValue && ` • Current: ${item.currentValue}`}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5' }}>{item.progress}%</span>
+                </div>
+                <div style={{ height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
+                  <div style={{ width: item.progress + '%', height: '100%', background: item.progress >= 75 ? '#28A745' : item.progress >= 50 ? '#F0B323' : '#DC3545', borderRadius: '5px' }} />
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
@@ -1438,17 +1597,25 @@ export default function HeadquartersPage() {
                 </h3>
                 <button onClick={() => handleModalOpen('campaigns')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
-              {myCampaignItems.map((item) => (
-                <div key={item.id} style={{ marginBottom: '0.75rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                    <span style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
+              {goalsLoading ? (
+                <LoadingSpinner text="Loading..." />
+              ) : goalsError ? (
+                <ErrorMessage message={goalsError} onRetry={fetchGoals} />
+              ) : personalGoals.length === 0 ? (
+                <div style={{ padding: '1rem', textAlign: 'center', color: '#8888A0', fontSize: '0.85rem' }}>No personal goals yet</div>
+              ) : (
+                personalGoals.slice(0, 3).map((item) => (
+                  <div key={item.id} style={{ marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                      <span style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
+                    </div>
+                    <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '4px', transition: 'width 0.3s ease' }} />
+                    </div>
                   </div>
-                  <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '4px', transition: 'width 0.3s ease' }} />
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Recent Victories */}
@@ -1479,6 +1646,122 @@ export default function HeadquartersPage() {
             </div>
           </div>
         </main>
+
+        {/* Goal Creation Modal */}
+        {showGoalForm && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000
+          }} onClick={() => setShowGoalForm(false)}>
+            <div style={{
+              background: '#1C1C26',
+              borderRadius: '16px',
+              width: '90%',
+              maxWidth: '500px',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            }} onClick={(e) => e.stopPropagation()}>
+              <div style={{
+                background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
+                padding: '1.25rem 1.5rem',
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderTopLeftRadius: '16px',
+                borderTopRightRadius: '16px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Target size={24} style={{ color: '#00CCEE' }} />
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>
+                    New {newGoalScope === 'PERSONAL' ? 'Personal Goal' : newGoalScope === 'QUARTERLY' ? 'Quarterly Campaign' : 'Annual Objective'}
+                  </h3>
+                </div>
+                <button onClick={() => setShowGoalForm(false)} style={{ background: 'none', border: 'none', color: '#8888A0', cursor: 'pointer' }}><X size={24} /></button>
+              </div>
+              <div style={{ padding: '1.5rem' }}>
+                <input
+                  type="text"
+                  placeholder="Goal title..."
+                  value={newGoal.title}
+                  onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })}
+                  style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.75rem', fontSize: '0.9rem' }}
+                />
+                <textarea
+                  placeholder="Description (optional)..."
+                  value={newGoal.description}
+                  onChange={(e) => setNewGoal({ ...newGoal, description: e.target.value })}
+                  style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.75rem', fontSize: '0.9rem', minHeight: '60px', resize: 'vertical' }}
+                />
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <input
+                    type="text"
+                    placeholder="Target value"
+                    value={newGoal.targetValue}
+                    onChange={(e) => setNewGoal({ ...newGoal, targetValue: e.target.value })}
+                    style={{ flex: 1, padding: '0.5rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', fontSize: '0.9rem' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Current value"
+                    value={newGoal.currentValue}
+                    onChange={(e) => setNewGoal({ ...newGoal, currentValue: e.target.value })}
+                    style={{ flex: 1, padding: '0.5rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', fontSize: '0.9rem' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <select
+                    value={newGoal.priority}
+                    onChange={(e) => setNewGoal({ ...newGoal, priority: e.target.value as 'P1' | 'P2' | 'P3' })}
+                    style={{ flex: 1, padding: '0.5rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5' }}
+                  >
+                    <option value="P1">P1 - Critical</option>
+                    <option value="P2">P2 - High</option>
+                    <option value="P3">P3 - Normal</option>
+                  </select>
+                  <input
+                    type="date"
+                    placeholder="Due date"
+                    value={newGoal.dueDate}
+                    onChange={(e) => setNewGoal({ ...newGoal, dueDate: e.target.value })}
+                    style={{ flex: 1, padding: '0.5rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5' }}
+                  />
+                </div>
+                {newGoalScope !== 'PERSONAL' && (
+                  <input
+                    type="text"
+                    placeholder="Owner name"
+                    value={newGoal.ownerName}
+                    onChange={(e) => setNewGoal({ ...newGoal, ownerName: e.target.value })}
+                    style={{ width: '100%', padding: '0.5rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.75rem', fontSize: '0.9rem' }}
+                  />
+                )}
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+                  <button
+                    onClick={() => setShowGoalForm(false)}
+                    style={{ flex: 1, padding: '0.75rem', background: '#2A2A38', color: '#F0F0F5', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={createGoal}
+                    disabled={!newGoal.title.trim() || submitting}
+                    style={{ flex: 1, padding: '0.75rem', background: newGoal.title.trim() ? '#00CCEE' : '#2A2A38', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: newGoal.title.trim() ? 'pointer' : 'not-allowed' }}
+                  >
+                    {submitting ? 'Creating...' : 'Create Goal'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Modal Overlay */}
         {activeModal && (

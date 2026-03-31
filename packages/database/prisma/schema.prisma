@@ -115,6 +115,8 @@ model Tenant {
   tokenUsage              TokenUsage[]
   // Assembly Module relations
   assemblies              Assembly[]
+  // HQ Goals Module relations
+  hqGoals                 HQGoal[]
   // Integration credentials (tenant-scoped)
   twilioCredential        TwilioCredential?
   calendlyCredential      CalendlyCredential?
@@ -1688,4 +1690,36 @@ model AssemblySection {
   @@index([assemblyId])
   @@index([status])
   @@map("assembly_sections")
+}
+
+// ============================================
+// HQ MODULE - GOALS (My Campaign, Quarterly, Annual)
+// ============================================
+
+model HQGoal {
+  id           String    @id @default(cuid())
+  tenantId     String
+  title        String
+  description  String?
+  scope        String    // PERSONAL, QUARTERLY, ANNUAL
+  status       String    @default("ACTIVE") // ACTIVE, COMPLETED, DEFERRED, CANCELLED
+  priority     String?   // P1, P2, P3
+  progress     Int       @default(0) // 0-100
+  targetValue  Float?
+  currentValue Float?
+  ownerId      String?
+  ownerName    String?
+  dueDate      DateTime?
+  quarter      String?   // Q1, Q2, Q3, Q4
+  year         Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([scope])
+  @@index([status])
+  @@index([quarter, year])
+  @@map("hq_goals")
 }

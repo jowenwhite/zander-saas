@@ -38,6 +38,7 @@ import { BillingModule } from './billing/billing.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { HeadwindsModule } from './headwinds/headwinds.module';
+import { HQGoalsModule } from './hq-goals/hq-goals.module';
 import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { CmoModule } from './cmo/cmo.module';
@@ -87,6 +88,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
     CampaignsModule,
     TreasuryModule,
     HeadwindsModule,
+    HQGoalsModule,         // HQ Module: Goals (Personal, Quarterly, Annual campaigns)
     SupportTicketsModule,
     KnowledgeModule,
     CmoModule,
