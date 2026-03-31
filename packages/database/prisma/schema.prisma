@@ -120,6 +120,9 @@ model Tenant {
   // HQ Keystones & Ledger relations
   keystones               Keystone[]
   ledgerEntries           LedgerEntry[]
+  // HQ Founding & Legacy relations
+  foundingDocument        FoundingDocument?
+  legacyMilestones        LegacyMilestone[]
   // Integration credentials (tenant-scoped)
   twilioCredential        TwilioCredential?
   calendlyCredential      CalendlyCredential?
@@ -1784,4 +1787,48 @@ model LedgerEntry {
   @@index([category])
   @@index([status])
   @@map("ledger_entries")
+}
+
+// ============================================
+// HQ MODULE - FOUNDING DOCUMENT (Vision/Mission/Values)
+// ============================================
+
+model FoundingDocument {
+  id        String   @id @default(cuid())
+  tenantId  String   @unique // One document per tenant - singleton pattern
+  vision    String?  @db.Text
+  mission   String?  @db.Text
+  values    Json?    // Array of { title: string, description: string }
+  story     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("founding_documents")
+}
+
+// ============================================
+// HQ MODULE - LEGACY MILESTONES (3-5 Year Roadmap)
+// ============================================
+
+model LegacyMilestone {
+  id          String   @id @default(cuid())
+  tenantId    String
+  year        Int      // 2026, 2027, 2028, etc.
+  title       String
+  description String?  @db.Text
+  goals       Json?    // Array of { text: string, completed: boolean }
+  progress    Int      @default(0) // 0-100
+  status      String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, DEFERRED
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([year])
+  @@index([status])
+  @@map("legacy_milestones")
 }

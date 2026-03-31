@@ -104,6 +104,35 @@ interface LedgerEntry {
   sortOrder: number;
 }
 
+interface FoundingValue {
+  title: string;
+  description: string;
+}
+
+interface FoundingDocument {
+  id: string;
+  vision?: string;
+  mission?: string;
+  values?: FoundingValue[];
+  story?: string;
+}
+
+interface LegacyGoal {
+  text: string;
+  completed?: boolean;
+}
+
+interface LegacyMilestone {
+  id: string;
+  year: number;
+  title: string;
+  description?: string;
+  goals?: LegacyGoal[];
+  progress: number;
+  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'DEFERRED';
+  sortOrder: number;
+}
+
 export default function HeadquartersPage() {
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -164,6 +193,21 @@ export default function HeadquartersPage() {
   const [ledgerTab, setLedgerTab] = useState<'COMPANY' | 'TEAM' | 'PERSONAL'>('COMPANY');
   const [showLedgerForm, setShowLedgerForm] = useState(false);
   const [newLedgerEntry, setNewLedgerEntry] = useState({ name: '', value: '', target: '', owner: '', progress: 0 });
+
+  // Founding Document state
+  const [foundingDoc, setFoundingDoc] = useState<FoundingDocument | null>(null);
+  const [foundingLoading, setFoundingLoading] = useState(true);
+  const [foundingError, setFoundingError] = useState<string | null>(null);
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [editFieldValue, setEditFieldValue] = useState('');
+  const [editingValues, setEditingValues] = useState<FoundingValue[]>([]);
+
+  // Legacy Milestones state
+  const [legacyMilestones, setLegacyMilestones] = useState<LegacyMilestone[]>([]);
+  const [legacyLoading, setLegacyLoading] = useState(true);
+  const [legacyError, setLegacyError] = useState<string | null>(null);
+  const [showMilestoneForm, setShowMilestoneForm] = useState(false);
+  const [newMilestone, setNewMilestone] = useState({ year: new Date().getFullYear() + 1, title: '', description: '', goals: '' });
 
   // Form states
   const [showHeadwindForm, setShowHeadwindForm] = useState(false);
@@ -400,6 +444,48 @@ export default function HeadquartersPage() {
     }
   }, [authData.token, authData.tenantId]);
 
+  const fetchFoundingDocument = useCallback(async () => {
+    if (!authData.token) return;
+    setFoundingLoading(true);
+    setFoundingError(null);
+    try {
+      const response = await fetch('/api/founding', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch founding document');
+      const data = await response.json();
+      setFoundingDoc(data);
+    } catch (error) {
+      setFoundingError(error instanceof Error ? error.message : 'Failed to load founding document');
+    } finally {
+      setFoundingLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  const fetchLegacyMilestones = useCallback(async () => {
+    if (!authData.token) return;
+    setLegacyLoading(true);
+    setLegacyError(null);
+    try {
+      const response = await fetch('/api/legacy', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch legacy milestones');
+      const data = await response.json();
+      setLegacyMilestones(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setLegacyError(error instanceof Error ? error.message : 'Failed to load legacy milestones');
+    } finally {
+      setLegacyLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
   // Fetch all data when auth is available
   useEffect(() => {
     if (authData.token) {
@@ -412,8 +498,10 @@ export default function HeadquartersPage() {
       fetchGoals();
       fetchKeystones();
       fetchLedgerEntries();
+      fetchFoundingDocument();
+      fetchLegacyMilestones();
     }
-  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates, fetchGoals, fetchKeystones, fetchLedgerEntries]);
+  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates, fetchGoals, fetchKeystones, fetchLedgerEntries, fetchFoundingDocument, fetchLegacyMilestones]);
 
   // ============ CRUD FUNCTIONS ============
 
@@ -675,6 +763,132 @@ export default function HeadquartersPage() {
     }
   };
 
+  // ============ FOUNDING DOCUMENT FUNCTIONS ============
+
+  const updateFoundingField = async (field: string, value: string | FoundingValue[]) => {
+    if (!authData.token) return;
+    try {
+      const body = field === 'values' ? { values: value } : { value };
+      const response = await fetch(`/api/founding/${field}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) throw new Error(`Failed to update ${field}`);
+      fetchFoundingDocument();
+      setEditingField(null);
+      setEditFieldValue('');
+    } catch (error) {
+      console.error('Error updating founding field:', error);
+    }
+  };
+
+  const saveFoundingValues = async () => {
+    await updateFoundingField('values', editingValues);
+  };
+
+  const addFoundingValue = () => {
+    setEditingValues([...editingValues, { title: '', description: '' }]);
+  };
+
+  const removeFoundingValue = (index: number) => {
+    setEditingValues(editingValues.filter((_, i) => i !== index));
+  };
+
+  const updateFoundingValueField = (index: number, field: 'title' | 'description', value: string) => {
+    const updated = [...editingValues];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditingValues(updated);
+  };
+
+  // ============ LEGACY MILESTONE FUNCTIONS ============
+
+  const createMilestone = async () => {
+    if (!authData.token || !newMilestone.title.trim()) return;
+    setSubmitting(true);
+    try {
+      const goals = newMilestone.goals.split('\n').filter(g => g.trim()).map(text => ({ text: text.trim(), completed: false }));
+      const response = await fetch('/api/legacy', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          year: newMilestone.year,
+          title: newMilestone.title,
+          description: newMilestone.description,
+          goals,
+          status: 'PLANNED',
+          progress: 0,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to create milestone');
+      fetchLegacyMilestones();
+      setShowMilestoneForm(false);
+      setNewMilestone({ year: new Date().getFullYear() + 1, title: '', description: '', goals: '' });
+    } catch (error) {
+      console.error('Error creating milestone:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const updateMilestone = async (milestoneId: string, updates: Partial<LegacyMilestone>) => {
+    if (!authData.token) return;
+    try {
+      const response = await fetch(`/api/legacy/${milestoneId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) throw new Error('Failed to update milestone');
+      fetchLegacyMilestones();
+    } catch (error) {
+      console.error('Error updating milestone:', error);
+    }
+  };
+
+  const toggleGoalCompletion = async (milestoneId: string, goalIndex: number) => {
+    const milestone = legacyMilestones.find(m => m.id === milestoneId);
+    if (!milestone || !milestone.goals) return;
+
+    const updatedGoals = milestone.goals.map((g, i) =>
+      i === goalIndex ? { ...g, completed: !g.completed } : g
+    );
+
+    const completedCount = updatedGoals.filter(g => g.completed).length;
+    const progress = Math.round((completedCount / updatedGoals.length) * 100);
+
+    await updateMilestone(milestoneId, { goals: updatedGoals, progress });
+  };
+
+  const deleteMilestone = async (milestoneId: string) => {
+    if (!authData.token) return;
+    try {
+      const response = await fetch(`/api/legacy/${milestoneId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to delete milestone');
+      fetchLegacyMilestones();
+    } catch (error) {
+      console.error('Error deleting milestone:', error);
+    }
+  };
+
   // ============ ICON MAPPING ============
   const iconMap: Record<string, React.ReactNode> = {
     briefcase: <Briefcase size={20} />,
@@ -748,27 +962,8 @@ export default function HeadquartersPage() {
   };
 
   // Campaign items now fetched from API via personalGoals, quarterlyGoals, annualGoals state
-
-  const foundingPrinciples = {
-    vision: 'To empower every small business owner to reclaim their passion by providing AI-powered tools that handle the complexity of running a business.',
-    mission: 'We build simple, robust software that gives small business owners the executive team they deserve - without the executive price tag.',
-    values: [
-      { id: 1, title: 'Simplicity Over Complexity', description: 'We choose the straightforward path. If it\'s complicated, we haven\'t found the right solution yet.' },
-      { id: 2, title: 'Execution Beats Perfection', description: 'Done is better than perfect. We ship, learn, and iterate.' },
-      { id: 3, title: 'Empowerment Through Ownership', description: 'Everyone owns their number. Clear accountability drives results.' },
-      { id: 4, title: 'Relentless Resourcefulness', description: 'We find a way or make one. Obstacles are just problems waiting to be solved.' },
-    ],
-    story: 'In 1772, a devastating hurricane struck St. Croix at 64° West longitude. A young Alexander Hamilton wrote about the destruction with such clarity that his community funded his passage to the American colonies. That moment of crisis became the catalyst for a legacy that shaped a nation. At 64 West, we believe every business owner has their own hurricane moment - that overwhelming complexity that threatens to destroy their passion. We\'re here to help them not just survive, but transform that chaos into clarity.'
-  };
-
-  const legacyMilestones = [
-    { id: 1, year: '2025', title: 'Foundation', goals: ['Launch Zander CRO Module', 'Reach 100 customers', 'Build core team to 10'], progress: 45 },
-    { id: 2, year: '2026', title: 'Growth', goals: ['Launch all 7 AI Executives', 'Reach 500 customers', 'Expand to 25 employees'], progress: 0 },
-    { id: 3, year: '2027', title: 'Scale', goals: ['Reach 2,000 customers', '$5M ARR', 'National recognition'], progress: 0 },
-    { id: 4, year: '2028', title: 'Market Leader', goals: ['10,000+ customers', 'Industry standard for SMB AI', 'IPO readiness'], progress: 0 },
-  ];
-
-  const legacyVision = 'By 2028, Zander will be the default operating system for small businesses across America. Every entrepreneur will have access to the same strategic capabilities as Fortune 500 companies - AI-powered executives that work 24/7 to help them succeed. We\'re not just building software; we\'re democratizing business excellence.';
+  // Founding document now fetched from API via foundingDoc state
+  // Legacy milestones now fetched from API via legacyMilestones state
 
   // Ledger entries now fetched from API via ledgerEntries state
 
@@ -1407,127 +1602,402 @@ export default function HeadquartersPage() {
     </div>
   );
 
-  const renderFoundingContent = () => (
-    <div>
-      {/* Vision */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ color: '#00CCEE' }}><Target size={28} /></span>
-          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Vision</h3>
-        </div>
-        <div style={{ padding: '1.5rem', background: '#1C1C26', borderRadius: '10px', borderLeft: '4px solid #00CCEE' }}>
-          <p style={{ margin: 0, fontSize: '1.1rem', color: '#F0F0F5', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.vision}"</p>
-        </div>
-      </div>
+  const renderFoundingContent = () => {
+    if (foundingLoading) {
+      return <LoadingSpinner text="Loading founding document..." />;
+    }
 
-      {/* Mission */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ color: '#00CCEE' }}><Rocket size={28} /></span>
-          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Mission</h3>
-        </div>
-        <div style={{ padding: '1.5rem', background: '#1C1C26', borderRadius: '10px', borderLeft: '4px solid #00CCEE' }}>
-          <p style={{ margin: 0, fontSize: '1.1rem', color: '#F0F0F5', lineHeight: '1.6', fontStyle: 'italic' }}>"{foundingPrinciples.mission}"</p>
-        </div>
-      </div>
+    if (foundingError) {
+      return <ErrorMessage message={foundingError} onRetry={fetchFoundingDocument} />;
+    }
 
-      {/* Core Values */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ color: '#00CCEE' }}><Scale size={28} /></span>
-          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Core Values</h3>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          {foundingPrinciples.values.map((value) => (
-            <div key={value.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', borderTop: '3px solid #00CCEE' }}>
-              <div style={{ fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem', fontSize: '1rem' }}>{value.title}</div>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#8888A0', lineHeight: '1.5' }}>{value.description}</p>
+    const renderEditableSection = (field: 'vision' | 'mission' | 'story', icon: React.ReactNode, title: string, placeholder: string) => {
+      const value = foundingDoc?.[field] || '';
+      const isEditing = editingField === field;
+
+      return (
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ color: '#00CCEE' }}>{icon}</span>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>{title}</h3>
             </div>
-          ))}
+            <button
+              onClick={() => {
+                if (isEditing) {
+                  updateFoundingField(field, editFieldValue);
+                } else {
+                  setEditingField(field);
+                  setEditFieldValue(value);
+                }
+              }}
+              style={{
+                background: isEditing ? '#00CCEE' : 'transparent',
+                color: isEditing ? 'white' : '#00CCEE',
+                border: isEditing ? 'none' : '1px solid #00CCEE',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                fontWeight: '600'
+              }}
+            >
+              {isEditing ? 'Save' : 'Edit'}
+            </button>
+          </div>
+          <div style={{ padding: '1.5rem', background: field === 'story' ? 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)' : '#1C1C26', borderRadius: '10px', borderLeft: field !== 'story' ? '4px solid #00CCEE' : 'none' }}>
+            {isEditing ? (
+              <textarea
+                value={editFieldValue}
+                onChange={(e) => setEditFieldValue(e.target.value)}
+                placeholder={placeholder}
+                style={{
+                  width: '100%',
+                  minHeight: field === 'story' ? '150px' : '80px',
+                  background: '#09090F',
+                  border: '1px solid #2A2A38',
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  color: '#F0F0F5',
+                  fontSize: '1rem',
+                  lineHeight: '1.6',
+                  resize: 'vertical'
+                }}
+              />
+            ) : value ? (
+              <p style={{ margin: 0, fontSize: field === 'story' ? '1rem' : '1.1rem', color: field === 'story' ? 'white' : '#F0F0F5', lineHeight: field === 'story' ? '1.8' : '1.6', fontStyle: field !== 'story' ? 'italic' : 'normal' }}>
+                {field !== 'story' ? `"${value}"` : value}
+              </p>
+            ) : (
+              <p style={{ margin: 0, color: '#8888A0', fontStyle: 'italic' }}>{placeholder}</p>
+            )}
+          </div>
         </div>
-      </div>
+      );
+    };
 
-      {/* Our Story */}
+    const values = (foundingDoc?.values as FoundingValue[]) || [];
+    const isEditingValues = editingField === 'values';
+
+    return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ color: '#00CCEE' }}><BookOpen size={28} /></span>
-          <h3 style={{ margin: 0, color: '#F0F0F5' }}>Our Story</h3>
-        </div>
-        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '10px', color: 'white' }}>
-          <p style={{ margin: 0, fontSize: '1rem', lineHeight: '1.8' }}>{foundingPrinciples.story}</p>
-        </div>
-      </div>
-    </div>
-  );
+        {renderEditableSection('vision', <Target size={28} />, 'Vision', 'What is your company\'s vision? What future are you creating?')}
+        {renderEditableSection('mission', <Rocket size={28} />, 'Mission', 'What is your company\'s mission? What do you do and for whom?')}
 
-  const renderLegacyContent = () => (
-    <div>
-      {/* Legacy Vision */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ color: '#00CCEE' }}><Star size={28} /></span>
-          <h3 style={{ margin: 0, color: '#F0F0F5' }}>The Legacy We're Building</h3>
-        </div>
-        <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '10px', color: 'white' }}>
-          <p style={{ margin: 0, fontSize: '1.05rem', lineHeight: '1.7' }}>{legacyVision}</p>
-        </div>
-      </div>
+        {/* Core Values */}
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ color: '#00CCEE' }}><Scale size={28} /></span>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>Core Values</h3>
+            </div>
+            <button
+              onClick={() => {
+                if (isEditingValues) {
+                  saveFoundingValues();
+                } else {
+                  setEditingField('values');
+                  setEditingValues([...values]);
+                }
+              }}
+              style={{
+                background: isEditingValues ? '#00CCEE' : 'transparent',
+                color: isEditingValues ? 'white' : '#00CCEE',
+                border: isEditingValues ? 'none' : '1px solid #00CCEE',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                fontWeight: '600'
+              }}
+            >
+              {isEditingValues ? 'Save' : 'Edit'}
+            </button>
+          </div>
 
-      {/* 3-5 Year Roadmap */}
+          {isEditingValues ? (
+            <div>
+              {editingValues.map((value, index) => (
+                <div key={index} style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1 }}>
+                    <input
+                      value={value.title}
+                      onChange={(e) => updateFoundingValueField(index, 'title', e.target.value)}
+                      placeholder="Value title..."
+                      style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.5rem' }}
+                    />
+                    <textarea
+                      value={value.description}
+                      onChange={(e) => updateFoundingValueField(index, 'description', e.target.value)}
+                      placeholder="Description..."
+                      rows={2}
+                      style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', resize: 'vertical' }}
+                    />
+                  </div>
+                  <button onClick={() => removeFoundingValue(index)} style={{ background: '#DC3545', color: 'white', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}>
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+              <button onClick={addFoundingValue} style={{ background: '#1C1C26', border: '2px dashed #2A2A38', color: '#8888A0', padding: '1rem', borderRadius: '8px', width: '100%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                <Plus size={18} /> Add Value
+              </button>
+            </div>
+          ) : values.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              {values.map((value, index) => (
+                <div key={index} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', borderTop: '3px solid #00CCEE' }}>
+                  <div style={{ fontWeight: '700', color: '#F0F0F5', marginBottom: '0.5rem', fontSize: '1rem' }}>{value.title}</div>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: '#8888A0', lineHeight: '1.5' }}>{value.description}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0', background: '#1C1C26', borderRadius: '10px' }}>
+              No values defined yet. Click Edit to add your company's core values.
+            </div>
+          )}
+        </div>
+
+        {renderEditableSection('story', <BookOpen size={28} />, 'Our Story', 'Tell your company\'s origin story. What drives you?')}
+      </div>
+    );
+  };
+
+  const renderLegacyContent = () => {
+    if (legacyLoading) {
+      return <LoadingSpinner text="Loading legacy roadmap..." />;
+    }
+
+    if (legacyError) {
+      return <ErrorMessage message={legacyError} onRetry={fetchLegacyMilestones} />;
+    }
+
+    const getStatusBadge = (status: string) => {
+      const styles: Record<string, { bg: string; color: string }> = {
+        PLANNED: { bg: 'rgba(108, 117, 125, 0.2)', color: '#6C757D' },
+        IN_PROGRESS: { bg: 'rgba(0, 204, 238, 0.2)', color: '#00CCEE' },
+        COMPLETED: { bg: 'rgba(40, 167, 69, 0.2)', color: '#28A745' },
+        DEFERRED: { bg: 'rgba(240, 179, 35, 0.2)', color: '#F0B323' },
+      };
+      const style = styles[status] || styles.PLANNED;
+      return (
+        <span style={{ background: style.bg, color: style.color, padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
+          {status}
+        </span>
+      );
+    };
+
+    return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ color: '#00CCEE' }}><Map size={28} /></span>
-          <h3 style={{ margin: 0, color: '#F0F0F5' }}>3-5 Year Roadmap</h3>
+        {/* Legacy Vision - pulled from Founding Document */}
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <span style={{ color: '#00CCEE' }}><Star size={28} /></span>
+            <h3 style={{ margin: 0, color: '#F0F0F5' }}>The Legacy We're Building</h3>
+          </div>
+          <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '10px', color: 'white' }}>
+            {foundingDoc?.vision ? (
+              <p style={{ margin: 0, fontSize: '1.05rem', lineHeight: '1.7' }}>{foundingDoc.vision}</p>
+            ) : (
+              <p style={{ margin: 0, color: '#8888A0', fontStyle: 'italic' }}>Define your vision in the Founding Principles to see it here as your north star.</p>
+            )}
+          </div>
         </div>
-        <div style={{ position: 'relative' }}>
-          {/* Timeline line */}
-          <div style={{ position: 'absolute', left: '24px', top: '40px', bottom: '40px', width: '2px', background: 'var(--zander-border-gray)' }} />
 
-          {legacyMilestones.map((milestone, index) => (
-            <div key={milestone.id} style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', position: 'relative' }}>
-              {/* Year circle */}
-              <div style={{
-                width: '50px',
-                height: '50px',
-                borderRadius: '50%',
-                background: milestone.progress > 0 ? '#00CCEE' : 'var(--zander-border-gray)',
+        {/* 3-5 Year Roadmap */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ color: '#00CCEE' }}><Map size={28} /></span>
+              <h3 style={{ margin: 0, color: '#F0F0F5' }}>3-5 Year Roadmap</h3>
+            </div>
+            <button
+              onClick={() => setShowMilestoneForm(!showMilestoneForm)}
+              style={{
+                background: showMilestoneForm ? '#DC3545' : '#00CCEE',
                 color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: '700',
-                fontSize: '0.85rem',
-                flexShrink: 0,
-                zIndex: 1
-              }}>
-                {milestone.year}
-              </div>
+                gap: '0.5rem',
+                fontWeight: '600'
+              }}
+            >
+              {showMilestoneForm ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add Milestone</>}
+            </button>
+          </div>
 
-              {/* Content */}
-              <div style={{ flex: 1, padding: '1rem 1.25rem', background: '#09090F', borderRadius: '10px', borderLeft: `4px solid ${milestone.progress > 0 ? '#00CCEE' : 'var(--zander-border-gray)'}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <div style={{ fontWeight: '700', color: '#F0F0F5', fontSize: '1.1rem' }}>{milestone.title}</div>
-                  {milestone.progress > 0 && (
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#00CCEE' }}>{milestone.progress}% Complete</span>
-                  )}
+          {/* Add Milestone Form */}
+          {showMilestoneForm && (
+            <div style={{ background: '#1C1C26', borderRadius: '10px', padding: '1.5rem', marginBottom: '1.5rem', border: '2px solid #00CCEE' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', color: '#8888A0', fontSize: '0.85rem' }}>Year</label>
+                  <input
+                    type="number"
+                    value={newMilestone.year}
+                    onChange={(e) => setNewMilestone({ ...newMilestone, year: parseInt(e.target.value) })}
+                    min={2024}
+                    max={2100}
+                    style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5' }}
+                  />
                 </div>
-                <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                  {milestone.goals.map((goal, i) => (
-                    <li key={i} style={{ fontSize: '0.9rem', color: '#8888A0', marginBottom: '0.25rem' }}>{goal}</li>
-                  ))}
-                </ul>
-                {milestone.progress > 0 && (
-                  <div style={{ marginTop: '0.75rem', height: '6px', background: '#1C1C26', borderRadius: '3px', overflow: 'hidden' }}>
-                    <div style={{ width: milestone.progress + '%', height: '100%', background: '#00CCEE', borderRadius: '3px' }} />
-                  </div>
-                )}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', color: '#8888A0', fontSize: '0.85rem' }}>Title</label>
+                  <input
+                    value={newMilestone.title}
+                    onChange={(e) => setNewMilestone({ ...newMilestone, title: e.target.value })}
+                    placeholder="e.g., Market Expansion"
+                    style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5' }}
+                  />
+                </div>
               </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#8888A0', fontSize: '0.85rem' }}>Description (optional)</label>
+                <input
+                  value={newMilestone.description}
+                  onChange={(e) => setNewMilestone({ ...newMilestone, description: e.target.value })}
+                  placeholder="Brief description of this milestone..."
+                  style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5' }}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#8888A0', fontSize: '0.85rem' }}>Goals (one per line)</label>
+                <textarea
+                  value={newMilestone.goals}
+                  onChange={(e) => setNewMilestone({ ...newMilestone, goals: e.target.value })}
+                  placeholder="Reach 1,000 customers&#10;Launch mobile app&#10;Expand to 3 new markets"
+                  rows={4}
+                  style={{ width: '100%', padding: '0.75rem', background: '#09090F', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', resize: 'vertical' }}
+                />
+              </div>
+              <button
+                onClick={createMilestone}
+                disabled={submitting || !newMilestone.title.trim()}
+                style={{
+                  background: '#00CCEE',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  opacity: submitting || !newMilestone.title.trim() ? 0.5 : 1
+                }}
+              >
+                {submitting ? 'Creating...' : 'Create Milestone'}
+              </button>
             </div>
-          ))}
+          )}
+
+          {legacyMilestones.length === 0 ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#8888A0', background: '#1C1C26', borderRadius: '10px' }}>
+              <Map size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+              <p style={{ margin: 0 }}>No milestones yet. Add your first milestone to start building your legacy roadmap.</p>
+            </div>
+          ) : (
+            <div style={{ position: 'relative' }}>
+              {/* Timeline line */}
+              <div style={{ position: 'absolute', left: '24px', top: '40px', bottom: '40px', width: '2px', background: 'var(--zander-border-gray)' }} />
+
+              {legacyMilestones.map((milestone) => (
+                <div key={milestone.id} style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', position: 'relative' }}>
+                  {/* Year circle */}
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
+                    background: milestone.status === 'COMPLETED' ? '#28A745' : milestone.progress > 0 ? '#00CCEE' : 'var(--zander-border-gray)',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '700',
+                    fontSize: '0.85rem',
+                    flexShrink: 0,
+                    zIndex: 1
+                  }}>
+                    {milestone.year}
+                  </div>
+
+                  {/* Content */}
+                  <div style={{ flex: 1, padding: '1rem 1.25rem', background: '#09090F', borderRadius: '10px', borderLeft: `4px solid ${milestone.status === 'COMPLETED' ? '#28A745' : milestone.progress > 0 ? '#00CCEE' : 'var(--zander-border-gray)'}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <span style={{ fontWeight: '700', color: '#F0F0F5', fontSize: '1.1rem' }}>{milestone.title}</span>
+                        {getStatusBadge(milestone.status)}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        {milestone.progress > 0 && (
+                          <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#00CCEE' }}>{milestone.progress}%</span>
+                        )}
+                        <button
+                          onClick={() => deleteMilestone(milestone.id)}
+                          style={{ background: 'transparent', border: 'none', color: '#DC3545', cursor: 'pointer', padding: '0.25rem' }}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {milestone.description && (
+                      <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.9rem', color: '#8888A0' }}>{milestone.description}</p>
+                    )}
+
+                    {milestone.goals && milestone.goals.length > 0 && (
+                      <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                        {milestone.goals.map((goal, i) => (
+                          <li
+                            key={i}
+                            onClick={() => toggleGoalCompletion(milestone.id, i)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              fontSize: '0.9rem',
+                              color: goal.completed ? '#28A745' : '#8888A0',
+                              marginBottom: '0.35rem',
+                              cursor: 'pointer',
+                              textDecoration: goal.completed ? 'line-through' : 'none'
+                            }}
+                          >
+                            <span style={{
+                              width: '18px',
+                              height: '18px',
+                              borderRadius: '4px',
+                              border: goal.completed ? '2px solid #28A745' : '2px solid #2A2A38',
+                              background: goal.completed ? '#28A745' : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}>
+                              {goal.completed && <Check size={12} color="white" />}
+                            </span>
+                            {goal.text}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {milestone.progress > 0 && (
+                      <div style={{ marginTop: '0.75rem', height: '6px', background: '#1C1C26', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{ width: milestone.progress + '%', height: '100%', background: milestone.status === 'COMPLETED' ? '#28A745' : '#00CCEE', borderRadius: '3px' }} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderLedgerContent = () => {
     const companyEntries = getFilteredLedgerEntries('COMPANY');
