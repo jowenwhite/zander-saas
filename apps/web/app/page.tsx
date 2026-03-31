@@ -274,8 +274,7 @@ export default function LandingPage() {
         left: 0,
         right: 0,
         zIndex: 100,
-        minHeight: '34px',
-        padding: '10px 2rem',
+        padding: '12px 2rem',
         display: 'flex',
         alignItems: 'center',
         background: 'rgba(8,10,15,0.88)',
@@ -283,38 +282,33 @@ export default function LandingPage() {
         borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
         <div style={{
-          maxWidth: '1200px',
+          maxWidth: '1400px',
           margin: '0 auto',
           width: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <a href="#" style={{ display: 'block', textDecoration: 'none' }}>
-            <img src="/images/zander-logo-color.svg" alt="Zander" style={{ width: '400px', height: 'auto', display: 'block' }} />
+          <a href="#" style={{ display: 'block', textDecoration: 'none', flexShrink: 0 }}>
+            <img src="/images/zander-logo-color.svg" alt="Zander" style={{ width: '280px', height: 'auto', display: 'block' }} />
           </a>
-          <ul className="nav-links-desktop" style={{
+          <div className="nav-links-desktop" style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '2.5rem',
-            listStyle: 'none',
-            margin: 0,
-            padding: 0,
+            gap: '3rem',
           }}>
-            <li><a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Product</a></li>
-            <li><a href="#pricing" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Pricing</a></li>
-            <li><a href="#demo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Demo</a></li>
-            <li><a href="#about" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>About</a></li>
-          </ul>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            <a href="/login" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Sign In</a>
+            <a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '28px', fontWeight: 500 }}>Product</a>
+            <a href="#pricing" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '28px', fontWeight: 500 }}>Pricing</a>
+            <a href="#demo" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '28px', fontWeight: 500 }}>Demo</a>
+            <a href="#about" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '28px', fontWeight: 500 }}>About</a>
+            <a href="/login" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '28px', fontWeight: 500 }}>Sign In</a>
             <a href="/signup" style={{
               background: '#00CFEB',
               color: '#000',
-              padding: '18px 40px',
-              borderRadius: '12px',
+              padding: '14px 32px',
+              borderRadius: '8px',
               fontWeight: 700,
-              fontSize: '52px',
+              fontSize: '28px',
               textDecoration: 'none',
               whiteSpace: 'nowrap',
             }}>Get Early Access</a>
