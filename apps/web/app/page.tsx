@@ -296,25 +296,25 @@ export default function LandingPage() {
           <ul className="nav-links-desktop" style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '2.25rem',
+            gap: '2.5rem',
             listStyle: 'none',
             margin: 0,
             padding: 0,
           }}>
-            <li><a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Product</a></li>
-            <li><a href="#pricing" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Pricing</a></li>
-            <li><a href="#demo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Demo</a></li>
-            <li><a href="#about" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>About</a></li>
+            <li><a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Product</a></li>
+            <li><a href="#pricing" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Pricing</a></li>
+            <li><a href="#demo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Demo</a></li>
+            <li><a href="#about" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>About</a></li>
           </ul>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <a href="/login" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '35px', fontWeight: 500 }}>Sign In</a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+            <a href="/login" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: '52px', fontWeight: 500 }}>Sign In</a>
             <a href="/signup" style={{
               background: '#00CFEB',
               color: '#000',
-              padding: '16px 32px',
-              borderRadius: '10px',
+              padding: '18px 40px',
+              borderRadius: '12px',
               fontWeight: 700,
-              fontSize: '35px',
+              fontSize: '52px',
               textDecoration: 'none',
               whiteSpace: 'nowrap',
             }}>Get Early Access</a>
