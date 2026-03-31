@@ -52,7 +52,7 @@ export class LegacyService {
         year: data.year,
         title: data.title,
         description: data.description,
-        goals: data.goals || [],
+        goals: (data.goals || []) as any,
         progress: data.progress ?? 0,
         status: data.status ?? 'PLANNED',
         sortOrder: data.sortOrder ?? (maxOrder._max.sortOrder ?? 0) + 1,

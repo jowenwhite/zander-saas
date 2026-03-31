@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { KeystonesService } from '../keystones/keystones.service';
 import { FoundingService } from '../founding/founding.service';
 
-interface DashboardSummary {
+export interface DashboardSummary {
   activeHeadwinds: number;
   completedThisMonth: number;
   totalVictories: number;
@@ -16,7 +16,7 @@ interface DashboardSummary {
   upcomingMilestoneYear?: number;
 }
 
-interface DashboardPayload {
+export interface DashboardPayload {
   summary: DashboardSummary;
   keystones: any[];
   headwinds: any[];
@@ -90,8 +90,8 @@ export class HQDashboardService {
         take: 20,
       }),
 
-      // Horizon items
-      this.prisma.horizonItem.findMany({
+      // Horizon items (IdeaParkingLot)
+      this.prisma.ideaParkingLot.findMany({
         where: { tenantId },
         orderBy: { createdAt: 'desc' },
         take: 20,
@@ -117,9 +117,9 @@ export class HQDashboardService {
         take: 10,
       }),
 
-      // Meeting templates
-      this.prisma.meetingTemplate.findMany({
-        where: { tenantId },
+      // Meeting templates (TreasuryItem with type 'assembly' - global templates, no tenantId)
+      this.prisma.treasuryItem.findMany({
+        where: { type: 'assembly' },
         orderBy: { name: 'asc' },
       }),
 

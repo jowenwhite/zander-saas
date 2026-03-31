@@ -40,14 +40,14 @@ export class FoundingService {
       update: {
         vision: data.vision,
         mission: data.mission,
-        values: data.values,
+        values: data.values as any,
         story: data.story,
       },
       create: {
         tenantId,
         vision: data.vision,
         mission: data.mission,
-        values: data.values || [],
+        values: (data.values || []) as any,
         story: data.story,
       },
     });
@@ -88,7 +88,7 @@ export class FoundingService {
 
     return this.prisma.foundingDocument.update({
       where: { tenantId },
-      data: { values },
+      data: { values: values as any },
     });
   }
 
