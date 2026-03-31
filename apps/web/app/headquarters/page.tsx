@@ -72,6 +72,38 @@ interface HQGoal {
   updatedAt: string;
 }
 
+interface Keystone {
+  id: string;
+  executive: string;
+  label: string;
+  value: string;
+  numericValue?: number;
+  target?: string;
+  numericTarget?: number;
+  trend?: 'UP' | 'DOWN' | 'FLAT';
+  trendValue?: string;
+  color?: string;
+  icon?: string;
+  sortOrder: number;
+}
+
+interface LedgerEntry {
+  id: string;
+  category: 'COMPANY' | 'TEAM' | 'PERSONAL';
+  name: string;
+  keystone?: string;
+  value: string;
+  numericValue?: number;
+  target?: string;
+  numericTarget?: number;
+  progress?: number;
+  trend?: 'UP' | 'DOWN' | 'FLAT';
+  owner?: string;
+  status: 'ON_TRACK' | 'AT_RISK' | 'BEHIND' | 'EXCEEDED';
+  period?: string;
+  sortOrder: number;
+}
+
 export default function HeadquartersPage() {
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -117,6 +149,21 @@ export default function HeadquartersPage() {
   const [annualGoals, setAnnualGoals] = useState<HQGoal[]>([]);
   const [goalsLoading, setGoalsLoading] = useState(true);
   const [goalsError, setGoalsError] = useState<string | null>(null);
+
+  // Keystones state
+  const [keystones, setKeystones] = useState<Keystone[]>([]);
+  const [keystonesLoading, setKeystonesLoading] = useState(true);
+  const [keystonesError, setKeystonesError] = useState<string | null>(null);
+  const [editingKeystone, setEditingKeystone] = useState<string | null>(null);
+  const [keystoneEditValue, setKeystoneEditValue] = useState('');
+
+  // Ledger state
+  const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([]);
+  const [ledgerLoading, setLedgerLoading] = useState(true);
+  const [ledgerError, setLedgerError] = useState<string | null>(null);
+  const [ledgerTab, setLedgerTab] = useState<'COMPANY' | 'TEAM' | 'PERSONAL'>('COMPANY');
+  const [showLedgerForm, setShowLedgerForm] = useState(false);
+  const [newLedgerEntry, setNewLedgerEntry] = useState({ name: '', value: '', target: '', owner: '', progress: 0 });
 
   // Form states
   const [showHeadwindForm, setShowHeadwindForm] = useState(false);
@@ -311,6 +358,48 @@ export default function HeadquartersPage() {
     }
   }, [authData.token, authData.tenantId]);
 
+  const fetchKeystones = useCallback(async () => {
+    if (!authData.token) return;
+    setKeystonesLoading(true);
+    setKeystonesError(null);
+    try {
+      const response = await fetch('/api/keystones', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch keystones');
+      const data = await response.json();
+      setKeystones(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setKeystonesError(error instanceof Error ? error.message : 'Failed to load keystones');
+    } finally {
+      setKeystonesLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  const fetchLedgerEntries = useCallback(async () => {
+    if (!authData.token) return;
+    setLedgerLoading(true);
+    setLedgerError(null);
+    try {
+      const response = await fetch('/api/ledger', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch ledger entries');
+      const data = await response.json();
+      setLedgerEntries(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setLedgerError(error instanceof Error ? error.message : 'Failed to load ledger');
+    } finally {
+      setLedgerLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
   // Fetch all data when auth is available
   useEffect(() => {
     if (authData.token) {
@@ -321,8 +410,10 @@ export default function HeadquartersPage() {
       fetchPastMeetings();
       fetchMeetingTemplates();
       fetchGoals();
+      fetchKeystones();
+      fetchLedgerEntries();
     }
-  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates, fetchGoals]);
+  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates, fetchGoals, fetchKeystones, fetchLedgerEntries]);
 
   // ============ CRUD FUNCTIONS ============
 
@@ -496,6 +587,94 @@ export default function HeadquartersPage() {
     }
   };
 
+  const updateKeystone = async (keystoneId: string, value: string) => {
+    if (!authData.token) return;
+    try {
+      const response = await fetch(`/api/keystones/${keystoneId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ value }),
+      });
+      if (!response.ok) throw new Error('Failed to update keystone');
+      setEditingKeystone(null);
+      fetchKeystones();
+    } catch (error) {
+      console.error('Error updating keystone:', error);
+    }
+  };
+
+  const createLedgerEntry = async () => {
+    if (!authData.token || !newLedgerEntry.name.trim()) return;
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/ledger', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          category: ledgerTab,
+          name: newLedgerEntry.name,
+          value: newLedgerEntry.value,
+          target: newLedgerEntry.target || undefined,
+          owner: newLedgerEntry.owner || undefined,
+          progress: newLedgerEntry.progress || 0,
+          status: 'ON_TRACK',
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to create ledger entry');
+      setNewLedgerEntry({ name: '', value: '', target: '', owner: '', progress: 0 });
+      setShowLedgerForm(false);
+      fetchLedgerEntries();
+    } catch (error) {
+      console.error('Error creating ledger entry:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const updateLedgerEntry = async (entryId: string, updates: Partial<LedgerEntry>) => {
+    if (!authData.token) return;
+    try {
+      const response = await fetch(`/api/ledger/${entryId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) throw new Error('Failed to update ledger entry');
+      fetchLedgerEntries();
+    } catch (error) {
+      console.error('Error updating ledger entry:', error);
+    }
+  };
+
+  const deleteLedgerEntry = async (entryId: string) => {
+    if (!authData.token) return;
+    try {
+      const response = await fetch(`/api/ledger/${entryId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to delete ledger entry');
+      fetchLedgerEntries();
+    } catch (error) {
+      console.error('Error deleting ledger entry:', error);
+    }
+  };
+
   // ============ ICON MAPPING ============
   const iconMap: Record<string, React.ReactNode> = {
     briefcase: <Briefcase size={20} />,
@@ -550,15 +729,7 @@ export default function HeadquartersPage() {
 
   // ============ STATIC DATA (for non-API sections) ============
 
-  const keystoneMetrics = [
-    { id: 'cro', icon: 'briefcase', label: 'Pipeline Value', value: '$139,000', trend: 'up', trendValue: '12%', module: 'CRO', color: '#00CCEE' },
-    { id: 'cfo', icon: 'barChart', label: 'Cash on Hand', value: '$47,500', trend: 'down', trendValue: '3%', module: 'CFO', color: '#2E7D32' },
-    { id: 'coo', icon: 'settings', label: 'On-Time Delivery', value: '94%', trend: 'flat', trendValue: '', module: 'COO', color: '#5E35B1' },
-    { id: 'cmo', icon: 'palette', label: 'Leads This Month', value: '12', trend: 'up', trendValue: '8%', module: 'CMO', color: '#F57C00' },
-    { id: 'cpo', icon: 'users', label: 'Team Satisfaction', value: '4.2/5', trend: 'up', trendValue: '0.3', module: 'CPO', color: '#0288D1' },
-    { id: 'cio', icon: 'monitor', label: 'System Uptime', value: '99.9%', trend: 'flat', trendValue: '', module: 'CIO', color: '#455A64' },
-    { id: 'ea', icon: 'clipboard', label: 'Tasks Completed', value: '23/28', trend: 'up', trendValue: '82%', module: 'EA', color: '#C2185B' },
-  ];
+  // Keystones now fetched from API via keystones state
 
   const quickNavButtons = [
     { id: 'assembly', icon: 'building', label: 'Assembly', description: 'Meetings & Agendas' },
@@ -599,21 +770,22 @@ export default function HeadquartersPage() {
 
   const legacyVision = 'By 2028, Zander will be the default operating system for small businesses across America. Every entrepreneur will have access to the same strategic capabilities as Fortune 500 companies - AI-powered executives that work 24/7 to help them succeed. We\'re not just building software; we\'re democratizing business excellence.';
 
-  const ledgerMetrics = {
-    company: [
-      { id: 1, name: 'Revenue (YTD)', value: '$2,340,000', target: '$3,000,000', progress: 78, trend: 'up' },
-      { id: 2, name: 'Gross Margin', value: '42%', target: '45%', progress: 93, trend: 'flat' },
-      { id: 3, name: 'Customer Count', value: '127', target: '150', progress: 85, trend: 'up' },
-      { id: 4, name: 'Employee Count', value: '24', target: '30', progress: 80, trend: 'up' },
-      { id: 5, name: 'NPS Score', value: '72', target: '75', progress: 96, trend: 'up' },
-    ],
-    team: [
-      { id: 1, name: 'Sales', keystone: 'Pipeline Value', value: '$139,000', owner: 'Jonathan W.', status: 'green' },
-      { id: 2, name: 'Finance', keystone: 'Cash on Hand', value: '$47,500', owner: 'CFO', status: 'yellow' },
-      { id: 3, name: 'Operations', keystone: 'On-Time Delivery', value: '94%', owner: 'Operations Mgr', status: 'green' },
-      { id: 4, name: 'Marketing', keystone: 'Leads/Month', value: '12', owner: 'Marketing Lead', status: 'green' },
-      { id: 5, name: 'HR', keystone: 'Team Satisfaction', value: '4.2/5', owner: 'HR Lead', status: 'green' },
-    ]
+  // Ledger entries now fetched from API via ledgerEntries state
+
+  // Helper to filter ledger entries by category
+  const getFilteredLedgerEntries = (category: 'COMPANY' | 'TEAM' | 'PERSONAL') => {
+    return ledgerEntries.filter(entry => entry.category === category);
+  };
+
+  // Helper to get status style for ledger entries
+  const getLedgerStatusStyle = (status: string) => {
+    switch (status) {
+      case 'ON_TRACK': return { color: '#28A745', bg: 'rgba(40, 167, 69, 0.15)', label: 'On Track' };
+      case 'AT_RISK': return { color: '#F0B323', bg: 'rgba(240, 179, 35, 0.15)', label: 'At Risk' };
+      case 'BEHIND': return { color: '#DC3545', bg: 'rgba(220, 53, 69, 0.15)', label: 'Behind' };
+      case 'EXCEEDED': return { color: '#0288D1', bg: 'rgba(2, 136, 209, 0.15)', label: 'Exceeded' };
+      default: return { color: '#8888A0', bg: 'rgba(136, 136, 160, 0.15)', label: status };
+    }
   };
 
   // ============ HELPER FUNCTIONS ============
@@ -1357,92 +1529,180 @@ export default function HeadquartersPage() {
     </div>
   );
 
-  const renderLedgerContent = () => (
-    <div>
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #2A2A38', paddingBottom: '1rem' }}>
-        {[
-          { id: 'company', label: 'Company Ledger' },
-          { id: 'team', label: 'Team Ledger' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: '0.75rem 1.25rem',
-              background: activeTab === tab.id ? '#00CCEE' : 'transparent',
-              color: activeTab === tab.id ? 'white' : '#8888A0',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+  const renderLedgerContent = () => {
+    const companyEntries = getFilteredLedgerEntries('COMPANY');
+    const teamEntries = getFilteredLedgerEntries('TEAM');
+    const personalEntries = getFilteredLedgerEntries('PERSONAL');
 
-      {/* Company Ledger */}
-      {activeTab === 'company' && (
-        <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Company Performance</h3>
-          {ledgerMetrics.company.map((metric) => (
-            <div key={metric.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <div>
-                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{metric.name}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {metric.target}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>{metric.value}</div>
-                  <div style={{ fontSize: '0.8rem', color: getTrendColor(metric.trend), fontWeight: '600' }}>
-                    {getTrendIcon(metric.trend)} {metric.progress}% of goal
-                  </div>
-                </div>
-              </div>
-              <div style={{ height: '8px', background: '#1C1C26', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: Math.min(metric.progress, 100) + '%', height: '100%', background: metric.progress >= 90 ? '#28A745' : metric.progress >= 70 ? '#F0B323' : '#DC3545', borderRadius: '4px' }} />
-              </div>
-            </div>
+    return (
+      <div>
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #2A2A38', paddingBottom: '1rem' }}>
+          {[
+            { id: 'COMPANY', label: 'Company', count: companyEntries.length },
+            { id: 'TEAM', label: 'Team', count: teamEntries.length },
+            { id: 'PERSONAL', label: 'Personal', count: personalEntries.length },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setLedgerTab(tab.id as 'COMPANY' | 'TEAM' | 'PERSONAL')}
+              style={{
+                padding: '0.75rem 1.25rem',
+                background: ledgerTab === tab.id ? '#00CCEE' : 'transparent',
+                color: ledgerTab === tab.id ? 'white' : '#8888A0',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              {tab.label}
+              <span style={{
+                background: ledgerTab === tab.id ? 'rgba(255,255,255,0.2)' : '#2A2A38',
+                padding: '0.15rem 0.5rem',
+                borderRadius: '10px',
+                fontSize: '0.75rem'
+              }}>
+                {tab.count}
+              </span>
+            </button>
           ))}
         </div>
-      )}
 
-      {/* Team Ledger */}
-      {activeTab === 'team' && (
-        <div>
-          <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Team Keystones</h3>
-          <div style={{ background: '#09090F', borderRadius: '10px', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '0.75rem 1rem', background: '#13131A', color: 'white', fontWeight: '600', fontSize: '0.8rem' }}>
-              <div>Team</div>
-              <div>Keystone</div>
-              <div>Current</div>
-              <div>Owner</div>
-              <div style={{ textAlign: 'center' }}>Status</div>
-            </div>
-            {ledgerMetrics.team.map((team) => (
-              <div key={team.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '1rem', borderBottom: '1px solid #2A2A38', alignItems: 'center' }}>
-                <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{team.name}</div>
-                <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{team.keystone}</div>
-                <div style={{ fontWeight: '700', color: '#F0F0F5' }}>{team.value}</div>
-                <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{team.owner}</div>
-                <div style={{ textAlign: 'center' }}>
-                  <span style={{
-                    display: 'inline-block',
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    background: getStatusDot(team.status)
-                  }} />
-                </div>
+        {ledgerLoading ? (
+          <LoadingSpinner text="Loading ledger..." />
+        ) : ledgerError ? (
+          <ErrorMessage message={ledgerError} onRetry={fetchLedgerEntries} />
+        ) : (
+          <>
+            {/* Company Ledger */}
+            {ledgerTab === 'COMPANY' && (
+              <div>
+                <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Company Performance</h3>
+                {companyEntries.length === 0 ? (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0', background: '#09090F', borderRadius: '10px' }}>
+                    No company metrics yet. Add your first metric above.
+                  </div>
+                ) : (
+                  companyEntries.map((entry) => (
+                    <div key={entry.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                        <div>
+                          <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{entry.name}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {entry.target || 'Not set'}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>{entry.value}</div>
+                          <div style={{ fontSize: '0.8rem', color: getTrendColor(entry.trend || 'FLAT'), fontWeight: '600' }}>
+                            {getTrendIcon(entry.trend || 'FLAT')} {entry.progress || 0}% of goal
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ height: '8px', background: '#1C1C26', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{
+                          width: Math.min(entry.progress || 0, 100) + '%',
+                          height: '100%',
+                          background: (entry.progress || 0) >= 90 ? '#28A745' : (entry.progress || 0) >= 70 ? '#F0B323' : '#DC3545',
+                          borderRadius: '4px'
+                        }} />
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+            )}
+
+            {/* Team Ledger */}
+            {ledgerTab === 'TEAM' && (
+              <div>
+                <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Team Keystones</h3>
+                {teamEntries.length === 0 ? (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0', background: '#09090F', borderRadius: '10px' }}>
+                    No team metrics yet. Add your first metric above.
+                  </div>
+                ) : (
+                  <div style={{ background: '#09090F', borderRadius: '10px', overflow: 'hidden' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '0.75rem 1rem', background: '#13131A', color: 'white', fontWeight: '600', fontSize: '0.8rem' }}>
+                      <div>Name</div>
+                      <div>Keystone</div>
+                      <div>Current</div>
+                      <div>Owner</div>
+                      <div style={{ textAlign: 'center' }}>Status</div>
+                    </div>
+                    {teamEntries.map((entry) => (
+                      <div key={entry.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 80px', padding: '1rem', borderBottom: '1px solid #2A2A38', alignItems: 'center' }}>
+                        <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{entry.name}</div>
+                        <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{entry.keystone || '-'}</div>
+                        <div style={{ fontWeight: '700', color: '#F0F0F5' }}>{entry.value}</div>
+                        <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>{entry.owner || '-'}</div>
+                        <div style={{ textAlign: 'center' }}>
+                          <span style={{
+                            display: 'inline-block',
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            background: getStatusDot(entry.status)
+                          }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Personal Ledger */}
+            {ledgerTab === 'PERSONAL' && (
+              <div>
+                <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Personal Goals</h3>
+                {personalEntries.length === 0 ? (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0', background: '#09090F', borderRadius: '10px' }}>
+                    No personal goals yet. Add your first goal above.
+                  </div>
+                ) : (
+                  personalEntries.map((entry) => (
+                    <div key={entry.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                        <div>
+                          <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{entry.name}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Target: {entry.target || 'Not set'}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>{entry.value}</div>
+                          <span style={{
+                            ...getLedgerStatusStyle(entry.status),
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '12px',
+                            fontSize: '0.75rem',
+                            fontWeight: '600'
+                          }}>
+                            {entry.status.replace('_', ' ')}
+                          </span>
+                        </div>
+                      </div>
+                      {entry.progress !== undefined && (
+                        <div style={{ height: '8px', background: '#1C1C26', borderRadius: '4px', overflow: 'hidden' }}>
+                          <div style={{
+                            width: Math.min(entry.progress, 100) + '%',
+                            height: '100%',
+                            background: entry.progress >= 90 ? '#28A745' : entry.progress >= 70 ? '#F0B323' : '#DC3545',
+                            borderRadius: '4px'
+                          }} />
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
   // Reset tab when modal changes
   const handleModalOpen = (modalId: string) => {
@@ -1454,7 +1714,7 @@ export default function HeadquartersPage() {
     setActiveModal(modalId);
     if (modalId === 'campaigns') setActiveTab('my');
     else if (modalId === 'headwinds') setActiveTab('active');
-    else if (modalId === 'ledger') setActiveTab('company');
+    else if (modalId === 'ledger') setLedgerTab('COMPANY');
   };
 
   return (
@@ -1485,21 +1745,44 @@ export default function HeadquartersPage() {
               <BarChart3 size={20} style={{ color: '#00CCEE' }} /> Keystones
               <span style={{ fontSize: '0.75rem', fontWeight: '400', color: '#8888A0' }}>Your vital signs at a glance</span>
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1rem' }}>
-              {keystoneMetrics.map((metric) => (
-                <a key={metric.id} href={metric.module === 'CRO' ? '/' : '/' + metric.module.toLowerCase()} style={{ background: '#09090F', borderRadius: '10px', padding: '1rem', textDecoration: 'none', borderLeft: '4px solid ' + metric.color, transition: 'all 0.2s ease' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
-                    <span style={{ color: metric.color }}>{getIcon(metric.icon, 18)}</span>
-                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: metric.color }}>{metric.module}</span>
-                  </div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.15rem' }}>{metric.value}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '0.65rem', color: '#8888A0' }}>{metric.label}</span>
-                    {metric.trendValue && <span style={{ fontSize: '0.7rem', color: getTrendColor(metric.trend), fontWeight: '600' }}>{getTrendIcon(metric.trend)} {metric.trendValue}</span>}
-                  </div>
-                </a>
-              ))}
-            </div>
+            {keystonesLoading ? (
+              <LoadingSpinner text="Loading keystones..." />
+            ) : keystonesError ? (
+              <ErrorMessage message={keystonesError} onRetry={fetchKeystones} />
+            ) : keystones.length === 0 ? (
+              <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8888A0', fontSize: '0.9rem' }}>No keystones configured</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(keystones.length, 7)}, 1fr)`, gap: '1rem' }}>
+                {keystones.map((keystone) => (
+                  <a
+                    key={keystone.id}
+                    href={keystone.executive === 'CRO' ? '/' : '/' + keystone.executive.toLowerCase()}
+                    style={{
+                      background: '#09090F',
+                      borderRadius: '10px',
+                      padding: '1rem',
+                      textDecoration: 'none',
+                      borderLeft: `4px solid ${keystone.color || '#00CCEE'}`,
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
+                      <span style={{ color: keystone.color || '#00CCEE' }}>{getIcon(keystone.icon || 'target', 18)}</span>
+                      <span style={{ fontSize: '0.65rem', fontWeight: '700', color: keystone.color || '#00CCEE' }}>{keystone.executive}</span>
+                    </div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.15rem' }}>{keystone.value}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '0.65rem', color: '#8888A0' }}>{keystone.label}</span>
+                      {keystone.trendValue && (
+                        <span style={{ fontSize: '0.7rem', color: getTrendColor(keystone.trend || 'FLAT'), fontWeight: '600' }}>
+                          {getTrendIcon(keystone.trend || 'FLAT')} {keystone.trendValue}
+                        </span>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Quick Navigation Buttons */}

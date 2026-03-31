@@ -39,6 +39,8 @@ import { CampaignsModule } from './campaigns/campaigns.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { HeadwindsModule } from './headwinds/headwinds.module';
 import { HQGoalsModule } from './hq-goals/hq-goals.module';
+import { KeystonesModule } from './keystones/keystones.module';
+import { LedgerModule } from './ledger/ledger.module';
 import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { CmoModule } from './cmo/cmo.module';
@@ -89,6 +91,8 @@ import { IntegrationsModule } from './integrations/integrations.module';
     TreasuryModule,
     HeadwindsModule,
     HQGoalsModule,         // HQ Module: Goals (Personal, Quarterly, Annual campaigns)
+    KeystonesModule,       // HQ Module: Executive vital signs dashboard
+    LedgerModule,          // HQ Module: Company/Team/Personal metrics tracking
     SupportTicketsModule,
     KnowledgeModule,
     CmoModule,

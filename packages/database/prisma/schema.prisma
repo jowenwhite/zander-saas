@@ -117,6 +117,9 @@ model Tenant {
   assemblies              Assembly[]
   // HQ Goals Module relations
   hqGoals                 HQGoal[]
+  // HQ Keystones & Ledger relations
+  keystones               Keystone[]
+  ledgerEntries           LedgerEntry[]
   // Integration credentials (tenant-scoped)
   twilioCredential        TwilioCredential?
   calendlyCredential      CalendlyCredential?
@@ -1722,4 +1725,63 @@ model HQGoal {
   @@index([status])
   @@index([quarter, year])
   @@map("hq_goals")
+}
+
+// ============================================
+// HQ MODULE - KEYSTONES (Executive Vital Signs)
+// ============================================
+
+model Keystone {
+  id            String   @id @default(cuid())
+  tenantId      String
+  executive     String   // CRO, CFO, COO, CMO, CPO, CIO, EA — maps to AI executive
+  label         String   // Display label e.g. "Pipeline Value", "Monthly Revenue"
+  value         String   // Current value as string (allows "$139K", "94%", "4.2")
+  numericValue  Float?   // Numeric version for trend calculations
+  target        String?  // Target value as string
+  numericTarget Float?   // Numeric target for progress calc
+  trend         String?  // UP, DOWN, FLAT
+  trendValue    String?  // e.g. "+12%", "-3%"
+  color         String?  // Hex color for the card
+  icon          String?  // Emoji or icon identifier
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([executive])
+  @@map("keystones")
+}
+
+// ============================================
+// HQ MODULE - LEDGER (Company/Team/Personal Metrics)
+// ============================================
+
+model LedgerEntry {
+  id            String   @id @default(cuid())
+  tenantId      String
+  category      String   // COMPANY, TEAM, PERSONAL
+  name          String   // Metric name
+  keystone      String?  // Which executive owns this — links conceptually to Keystone.executive
+  value         String   // Current value
+  numericValue  Float?
+  target        String?
+  numericTarget Float?
+  progress      Int?     // 0-100 calculated or manual
+  trend         String?  // UP, DOWN, FLAT
+  owner         String?  // Person responsible
+  status        String   @default("ON_TRACK") // ON_TRACK, AT_RISK, BEHIND, EXCEEDED
+  period        String?  // WEEKLY, MONTHLY, QUARTERLY, ANNUAL
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([category])
+  @@index([status])
+  @@map("ledger_entries")
 }
