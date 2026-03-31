@@ -323,7 +323,7 @@ export default function LandingPage() {
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        paddingTop: '160px',
+        paddingTop: '220px',
         paddingLeft: '2rem',
         paddingRight: '2rem',
         paddingBottom: '80px',
