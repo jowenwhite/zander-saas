@@ -267,15 +267,15 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* NAV - 25% reduced height, 75% larger text */}
+      {/* NAV - reduced height */}
       <nav style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 100,
-        minHeight: '75px',
-        padding: '21px 2rem',
+        minHeight: '56px',
+        padding: '16px 2rem',
         display: 'flex',
         alignItems: 'center',
         background: 'rgba(8,10,15,0.88)',
@@ -380,12 +380,12 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
             style={{
-              fontFamily: "'Sora', var(--font-sora), sans-serif",
+              fontFamily: "'Inter', var(--font-inter), system-ui, sans-serif",
               marginBottom: '40px',
             }}
           >
-            <span style={{ display: 'block', color: '#FFFFFF', fontSize: '180px', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.04em', paddingTop: '0.15em' }}>Your business,</span>
-            <span style={{ display: 'block', color: '#00CFEB', fontSize: '180px', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.04em' }}>expertly run.</span>
+            <span style={{ display: 'block', color: '#FFFFFF', fontSize: '180px', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.03em' }}>Your business,</span>
+            <span style={{ display: 'block', color: '#00CFEB', fontSize: '180px', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.03em' }}>expertly run.</span>
           </motion.h1>
 
           <motion.p
