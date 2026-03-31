@@ -133,6 +133,19 @@ interface LegacyMilestone {
   sortOrder: number;
 }
 
+interface DashboardSummary {
+  activeHeadwinds: number;
+  completedThisMonth: number;
+  totalVictories: number;
+  nextMeeting?: {
+    id: string;
+    title: string;
+    startTime: string;
+  };
+  campaignProgress: number;
+  upcomingMilestoneYear?: number;
+}
+
 export default function HeadquartersPage() {
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -143,52 +156,58 @@ export default function HeadquartersPage() {
 
   // ============ API STATE ============
 
+  // Dashboard aggregated state
+  const [dashboardLoading, setDashboardLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
+  const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
+  const [isEmpty, setIsEmpty] = useState(false);
+
   // Headwinds state
   const [headwinds, setHeadwinds] = useState<Headwind[]>([]);
-  const [headwindsLoading, setHeadwindsLoading] = useState(true);
+  const [headwindsLoading, setHeadwindsLoading] = useState(false);
   const [headwindsError, setHeadwindsError] = useState<string | null>(null);
 
   // Victories (resolved headwinds) state
   const [victories, setVictories] = useState<Headwind[]>([]);
-  const [victoriesLoading, setVictoriesLoading] = useState(true);
+  const [victoriesLoading, setVictoriesLoading] = useState(false);
   const [victoriesError, setVictoriesError] = useState<string | null>(null);
 
   // Horizon items state
   const [horizonItems, setHorizonItems] = useState<HorizonItem[]>([]);
-  const [horizonLoading, setHorizonLoading] = useState(true);
+  const [horizonLoading, setHorizonLoading] = useState(false);
   const [horizonError, setHorizonError] = useState<string | null>(null);
 
   // Calendar events state
   const [upcomingMeetings, setUpcomingMeetings] = useState<CalendarEvent[]>([]);
-  const [meetingsLoading, setMeetingsLoading] = useState(true);
+  const [meetingsLoading, setMeetingsLoading] = useState(false);
   const [meetingsError, setMeetingsError] = useState<string | null>(null);
 
   // Past meetings state
   const [pastMeetings, setPastMeetings] = useState<CalendarEvent[]>([]);
-  const [pastMeetingsLoading, setPastMeetingsLoading] = useState(true);
+  const [pastMeetingsLoading, setPastMeetingsLoading] = useState(false);
 
   // Meeting templates state
   const [meetingTemplates, setMeetingTemplates] = useState<MeetingTemplate[]>([]);
-  const [templatesLoading, setTemplatesLoading] = useState(true);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
   const [templatesError, setTemplatesError] = useState<string | null>(null);
 
   // HQ Goals state
   const [personalGoals, setPersonalGoals] = useState<HQGoal[]>([]);
   const [quarterlyGoals, setQuarterlyGoals] = useState<HQGoal[]>([]);
   const [annualGoals, setAnnualGoals] = useState<HQGoal[]>([]);
-  const [goalsLoading, setGoalsLoading] = useState(true);
+  const [goalsLoading, setGoalsLoading] = useState(false);
   const [goalsError, setGoalsError] = useState<string | null>(null);
 
   // Keystones state
   const [keystones, setKeystones] = useState<Keystone[]>([]);
-  const [keystonesLoading, setKeystonesLoading] = useState(true);
+  const [keystonesLoading, setKeystonesLoading] = useState(false);
   const [keystonesError, setKeystonesError] = useState<string | null>(null);
   const [editingKeystone, setEditingKeystone] = useState<string | null>(null);
   const [keystoneEditValue, setKeystoneEditValue] = useState('');
 
   // Ledger state
   const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([]);
-  const [ledgerLoading, setLedgerLoading] = useState(true);
+  const [ledgerLoading, setLedgerLoading] = useState(false);
   const [ledgerError, setLedgerError] = useState<string | null>(null);
   const [ledgerTab, setLedgerTab] = useState<'COMPANY' | 'TEAM' | 'PERSONAL'>('COMPANY');
   const [showLedgerForm, setShowLedgerForm] = useState(false);
@@ -196,7 +215,7 @@ export default function HeadquartersPage() {
 
   // Founding Document state
   const [foundingDoc, setFoundingDoc] = useState<FoundingDocument | null>(null);
-  const [foundingLoading, setFoundingLoading] = useState(true);
+  const [foundingLoading, setFoundingLoading] = useState(false);
   const [foundingError, setFoundingError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editFieldValue, setEditFieldValue] = useState('');
@@ -204,7 +223,7 @@ export default function HeadquartersPage() {
 
   // Legacy Milestones state
   const [legacyMilestones, setLegacyMilestones] = useState<LegacyMilestone[]>([]);
-  const [legacyLoading, setLegacyLoading] = useState(true);
+  const [legacyLoading, setLegacyLoading] = useState(false);
   const [legacyError, setLegacyError] = useState<string | null>(null);
   const [showMilestoneForm, setShowMilestoneForm] = useState(false);
   const [newMilestone, setNewMilestone] = useState({ year: new Date().getFullYear() + 1, title: '', description: '', goals: '' });
@@ -227,6 +246,45 @@ export default function HeadquartersPage() {
 
   // ============ API FETCH FUNCTIONS ============
 
+  // Single dashboard fetch that populates all state
+  const fetchDashboard = useCallback(async () => {
+    if (!authData.token) return;
+    setDashboardLoading(true);
+    setDashboardError(null);
+    try {
+      const response = await fetch('/api/hq/dashboard', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch dashboard');
+      const data = await response.json();
+
+      // Populate all state from unified payload
+      setDashboardSummary(data.summary);
+      setIsEmpty(data.isEmpty);
+      setKeystones(data.keystones || []);
+      setHeadwinds(data.headwinds || []);
+      setVictories(data.victories || []);
+      setHorizonItems(data.horizonItems || []);
+      setUpcomingMeetings(data.upcomingMeetings || []);
+      setPastMeetings(data.pastMeetings || []);
+      setMeetingTemplates(data.meetingTemplates || []);
+      setPersonalGoals(data.goals?.personal || []);
+      setQuarterlyGoals(data.goals?.quarterly || []);
+      setAnnualGoals(data.goals?.annual || []);
+      setLedgerEntries(data.ledgerEntries || []);
+      setFoundingDoc(data.foundingDocument);
+      setLegacyMilestones(data.legacyMilestones || []);
+    } catch (error) {
+      setDashboardError(error instanceof Error ? error.message : 'Failed to load dashboard');
+    } finally {
+      setDashboardLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  // Individual fetch functions for refreshing after CRUD operations
   const fetchHeadwinds = useCallback(async () => {
     if (!authData.token) return;
     setHeadwindsLoading(true);
@@ -486,22 +544,12 @@ export default function HeadquartersPage() {
     }
   }, [authData.token, authData.tenantId]);
 
-  // Fetch all data when auth is available
+  // Fetch all dashboard data when auth is available (single API call)
   useEffect(() => {
     if (authData.token) {
-      fetchHeadwinds();
-      fetchVictories();
-      fetchHorizonItems();
-      fetchUpcomingMeetings();
-      fetchPastMeetings();
-      fetchMeetingTemplates();
-      fetchGoals();
-      fetchKeystones();
-      fetchLedgerEntries();
-      fetchFoundingDocument();
-      fetchLegacyMilestones();
+      fetchDashboard();
     }
-  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates, fetchGoals, fetchKeystones, fetchLedgerEntries, fetchFoundingDocument, fetchLegacyMilestones]);
+  }, [authData.token, fetchDashboard]);
 
   // ============ CRUD FUNCTIONS ============
 
@@ -2280,6 +2328,41 @@ export default function HeadquartersPage() {
             ))}
           </div>
 
+          {/* Dashboard Loading State */}
+          {dashboardLoading && (
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '3rem', marginBottom: '1.5rem', textAlign: 'center', border: '2px solid #2A2A38' }}>
+              <LoadingSpinner text="Loading headquarters data..." />
+            </div>
+          )}
+
+          {/* Dashboard Error State */}
+          {dashboardError && !dashboardLoading && (
+            <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', border: '2px solid #DC3545' }}>
+              <ErrorMessage message={dashboardError} onRetry={fetchDashboard} />
+            </div>
+          )}
+
+          {/* Empty Tenant State */}
+          {isEmpty && !dashboardLoading && (
+            <div style={{ background: 'linear-gradient(135deg, #1C1C26 0%, #13131A 100%)', borderRadius: '12px', padding: '3rem', marginBottom: '1.5rem', textAlign: 'center', border: '2px solid #00CCEE' }}>
+              <div style={{ marginBottom: '1rem' }}>
+                <Sparkles size={48} style={{ color: '#00CCEE' }} />
+              </div>
+              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', color: '#F0F0F5' }}>Welcome to Headquarters</h2>
+              <p style={{ margin: '0 0 1.5rem 0', color: '#8888A0', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>
+                Your command center is ready! Start by defining your Founding Principles, setting Campaigns, and tracking Headwinds.
+              </p>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <button onClick={() => handleModalOpen('founding')} style={{ padding: '0.75rem 1.5rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                  Define Founding Principles
+                </button>
+                <button onClick={() => handleModalOpen('campaigns')} style={{ padding: '0.75rem 1.5rem', background: 'transparent', color: '#00CCEE', border: '2px solid #00CCEE', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                  Create First Campaign
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Dashboard Cards - 2x2 Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             {/* Today's Assembly */}
@@ -2288,23 +2371,43 @@ export default function HeadquartersPage() {
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Calendar size={18} style={{ color: '#00CCEE' }} /> Today's Assembly
                 </h3>
-                <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>@ {todayAssembly.time}</span>
+                {dashboardSummary?.nextMeeting && (
+                  <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>@ {formatTime(dashboardSummary.nextMeeting.startTime)}</span>
+                )}
               </div>
               <div style={{ background: '#09090F', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>{todayAssembly.title}</div>
-                <div style={{ fontSize: '0.8rem', color: '#8888A0', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Users size={14} /> {todayAssembly.attendees} attendees</div>
+                {dashboardSummary?.nextMeeting ? (
+                  <>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>{dashboardSummary.nextMeeting.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8888A0', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Calendar size={14} /> {formatDate(dashboardSummary.nextMeeting.startTime)}
+                    </div>
+                  </>
+                ) : upcomingMeetings.length > 0 ? (
+                  <>
+                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>{upcomingMeetings[0].title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8888A0', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Calendar size={14} /> {formatDate(upcomingMeetings[0].startTime)}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ padding: '1rem', textAlign: 'center', color: '#8888A0', fontSize: '0.85rem' }}>
+                    No upcoming meetings scheduled
+                  </div>
+                )}
                 <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
-                  <strong>Agenda:</strong>
-                  <ul style={{ margin: '0.5rem 0 0 1rem', padding: 0 }}>
-                    {todayAssembly.agenda.map((item, i) => (
-                      <li key={i} style={{ marginBottom: '0.25rem' }}>{item}</li>
-                    ))}
-                  </ul>
+                  <strong>Quick Stats:</strong>
+                  <div style={{ marginTop: '0.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    <div>Active Headwinds: <span style={{ color: '#00CCEE', fontWeight: '600' }}>{dashboardSummary?.activeHeadwinds || headwinds.length}</span></div>
+                    <div>Campaign Progress: <span style={{ color: '#00CCEE', fontWeight: '600' }}>{dashboardSummary?.campaignProgress || 0}%</span></div>
+                    <div>Victories This Month: <span style={{ color: '#28A745', fontWeight: '600' }}>{dashboardSummary?.completedThisMonth || 0}</span></div>
+                    <div>Next Milestone: <span style={{ color: '#F0B323', fontWeight: '600' }}>{dashboardSummary?.upcomingMilestoneYear || 'TBD'}</span></div>
+                  </div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button style={{ flex: 1, padding: '0.75rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Join Meeting</button>
-                <button onClick={() => handleModalOpen('assembly')} style={{ flex: 1, padding: '0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>View Agenda</button>
+                <button onClick={() => handleModalOpen('assembly')} style={{ flex: 1, padding: '0.75rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Generate Assembly</button>
+                <button onClick={() => handleModalOpen('assembly')} style={{ flex: 1, padding: '0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '2px solid #2A2A38', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>View Templates</button>
               </div>
             </div>
 
@@ -2314,17 +2417,17 @@ export default function HeadquartersPage() {
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Wind size={18} style={{ color: '#00CCEE' }} /> Active Headwinds
                   <span style={{ background: '#00CCEE', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>
-                    {headwindsLoading ? '...' : headwinds.length}
+                    {dashboardLoading ? '...' : dashboardSummary?.activeHeadwinds ?? headwinds.length}
                   </span>
                 </h3>
                 <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
-              {headwindsLoading ? (
+              {dashboardLoading ? (
                 <LoadingSpinner text="Loading..." />
               ) : headwindsError ? (
                 <ErrorMessage message={headwindsError} onRetry={fetchHeadwinds} />
               ) : headwinds.length === 0 ? (
-                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8888A0', fontSize: '0.9rem' }}>No active headwinds</div>
+                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8888A0', fontSize: '0.9rem' }}>No active headwinds - great job!</div>
               ) : (
                 headwinds.slice(0, 3).map((item) => {
                   const priorityStyle = getPriorityStyle(item.priority);
@@ -2347,15 +2450,22 @@ export default function HeadquartersPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Target size={18} style={{ color: '#00CCEE' }} /> My Campaign Progress
+                  {dashboardSummary?.campaignProgress !== undefined && dashboardSummary.campaignProgress > 0 && (
+                    <span style={{ background: dashboardSummary.campaignProgress >= 80 ? '#28A745' : dashboardSummary.campaignProgress >= 50 ? '#F0B323' : '#DC3545', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>
+                      {dashboardSummary.campaignProgress}%
+                    </span>
+                  )}
                 </h3>
                 <button onClick={() => handleModalOpen('campaigns')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
-              {goalsLoading ? (
+              {dashboardLoading ? (
                 <LoadingSpinner text="Loading..." />
               ) : goalsError ? (
                 <ErrorMessage message={goalsError} onRetry={fetchGoals} />
               ) : personalGoals.length === 0 ? (
-                <div style={{ padding: '1rem', textAlign: 'center', color: '#8888A0', fontSize: '0.85rem' }}>No personal goals yet</div>
+                <div style={{ padding: '1rem', textAlign: 'center', color: '#8888A0', fontSize: '0.85rem' }}>
+                  No personal goals yet. <button onClick={() => { setNewGoalScope('PERSONAL'); setShowGoalForm(true); }} style={{ background: 'none', border: 'none', color: '#00CCEE', cursor: 'pointer', fontWeight: '600' }}>Create one →</button>
+                </div>
               ) : (
                 personalGoals.slice(0, 3).map((item) => (
                   <div key={item.id} style={{ marginBottom: '0.75rem' }}>
@@ -2375,16 +2485,23 @@ export default function HeadquartersPage() {
             <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #2A2A38' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Trophy size={18} style={{ color: '#00CCEE' }} /> Recent Victories
+                  <Trophy size={18} style={{ color: '#28A745' }} /> Recent Victories
+                  {dashboardSummary?.totalVictories !== undefined && dashboardSummary.totalVictories > 0 && (
+                    <span style={{ background: '#28A745', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>
+                      {dashboardSummary.totalVictories}
+                    </span>
+                  )}
                 </h3>
                 <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
-              {victoriesLoading ? (
+              {dashboardLoading ? (
                 <LoadingSpinner text="Loading..." />
               ) : victoriesError ? (
                 <ErrorMessage message={victoriesError} onRetry={fetchVictories} />
               ) : victories.length === 0 ? (
-                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8888A0', fontSize: '0.9rem' }}>No victories yet</div>
+                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8888A0', fontSize: '0.9rem' }}>
+                  No victories yet - resolve headwinds to celebrate wins!
+                </div>
               ) : (
                 victories.slice(0, 3).map((item) => (
                   <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.75rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid #28A745' }}>

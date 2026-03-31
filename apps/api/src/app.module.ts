@@ -43,6 +43,7 @@ import { KeystonesModule } from './keystones/keystones.module';
 import { LedgerModule } from './ledger/ledger.module';
 import { FoundingModule } from './founding/founding.module';
 import { LegacyModule } from './legacy/legacy.module';
+import { HQDashboardModule } from './hq-dashboard/hq-dashboard.module';
 import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { CmoModule } from './cmo/cmo.module';
@@ -97,6 +98,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
     LedgerModule,          // HQ Module: Company/Team/Personal metrics tracking
     FoundingModule,        // HQ Module: Vision/Mission/Values/Story singleton
     LegacyModule,          // HQ Module: 3-5 year roadmap milestones
+    HQDashboardModule,     // HQ Module: Aggregated dashboard endpoint
     SupportTicketsModule,
     KnowledgeModule,
     CmoModule,
