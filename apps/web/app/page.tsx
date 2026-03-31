@@ -395,7 +395,7 @@ export default function LandingPage() {
               textAlign: 'center',
             }}
           >
-            You built something real. Zander gives you the expert executive team to keep it organized, moving forward, and growing — so you can step back into the work you actually love.
+            You built something real. Zander gives you the structure, the team, and the tools to finally run it the way you’ve always known it should be run — organized, consistent, and moving forward on every front.
           </motion.p>
 
           <motion.p
@@ -411,7 +411,7 @@ export default function LandingPage() {
               textAlign: 'center',
             }}
           >
-            An AI-powered executive team that handles your inbox, drives your pipeline, runs your marketing, and manages your operations — so nothing falls through the cracks. Not even the things you&apos;ve been ignoring.
+            A platform built around how a real business actually operates — with expert executives who help you manage your pipeline, stay on top of your marketing, and keep everything running without things slipping through the cracks.
           </motion.p>
 
           <motion.div
@@ -584,7 +584,7 @@ export default function LandingPage() {
               margin: '0 auto',
               lineHeight: 1.75,
             }}>
-              Zander doesn&apos;t give you another dashboard to manage. It gives you a CMO who runs your marketing, a CRO who works your pipeline, and an EA who handles your inbox and schedule — all operating inside a single platform built around how a real business runs. And it gets your business organized and fully functioning on all fronts. Including the ones you&apos;ve been putting off.
+              Zander doesn’t give you another dashboard to manage. It gives you an organized, fully functioning business — with a CMO who helps run your marketing, a CRO who keeps your pipeline moving, and an EA who makes sure nothing gets missed. All operating inside a single platform built around how your business actually works.
             </p>
           </motion.div>
 
@@ -922,16 +922,16 @@ export default function LandingPage() {
           >
             {[
               {
-                quote: '"I was spending Sunday nights catching up on emails I should have answered Tuesday. Pam handles my follow-up, Jordan works every lead I can\'t get to, and I actually took a full weekend off last month for the first time in years."',
-                name: 'Independent Real Estate Broker',
+                quote: '"I’ve tried hiring a VA, a freelance marketing person, and a part-time sales coach. None of them talked to each other. I was the glue holding it all together, which defeated the purpose. With Zander, Pam knows what Jordan is working on, Don’s marketing feeds directly into Jordan’s pipeline — it all connects. For the first time, my business has a team that actually operates like one."',
+                name: 'Marcus Ellison, Independent Real Estate Broker',
               },
               {
-                quote: '"We build systems for our clients every day. Our own business was the one we kept ignoring. Zander gave us the structure we\'ve been selling to everyone else. Don runs our marketing calendar and Jordan follows up on every proposal we send."',
-                name: 'Founder, Digital Marketing Agency',
+                quote: 'We had a CRM, a project management tool, an email platform, a spreadsheet for our content calendar, and a whiteboard for everything else. Five tools, none of them talking to each other, and half of them out of date. Zander put everything in one place — our campaigns, our pipeline, our schedule, our client communication. I can actually see my whole business now. That alone was worth it.'ve been selling to everyone else. Don runs our marketing calendar and Jordan follows up on every proposal we send."',
+                name: 'Rachel Simmons, Founder, Digital Marketing Agency',
               },
               {
-                quote: '"I run a seven-figure contracting business from my truck. Pam handles my inbox while I\'m on job sites, Jordan follows up on every estimate I send, and I stopped losing work to guys who just answer the phone faster."',
-                name: 'Owner, Specialty Contracting Business',
+                quote: 'I’m not a tech guy. I run jobs, manage crews, and send estimates from my truck. Every platform I’ve tried expected me to spend weeks setting up automations and workflows before I got any value. Zander was different — my business was organized from day one. The pipeline, the follow-ups, the schedule. It worked immediately. And the more I use it, the more I keep finding things it can do that I didn’t even know were there.',
+                name: 'Derek Colvin, Owner, Specialty Contracting Firm',
               },
             ].map((t, i) => (
               <motion.div
