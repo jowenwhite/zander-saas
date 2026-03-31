@@ -1,13 +1,57 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { AssemblyModal } from '../components/assembly';
 import { logout, getStoredAuth } from '../utils/auth';
-import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Building2, Swords, Wind, FileText, Trophy, BookOpen, Calendar, Target, Rocket, Star, Map, Sparkles, Check, Scale } from 'lucide-react';
+import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Building2, Swords, Wind, FileText, Trophy, BookOpen, Calendar, Target, Rocket, Star, Map, Sparkles, Check, Scale, Loader2, AlertCircle, Plus, X } from 'lucide-react';
+
+// ============ TYPES ============
+
+interface Headwind {
+  id: string;
+  title: string;
+  description?: string;
+  priority: 'P1' | 'P2' | 'P3';
+  category: 'BUG' | 'REBUILD' | 'NEW_BUILD' | 'ENHANCEMENT' | 'TASK';
+  status: 'OPEN' | 'IN_PROGRESS' | 'TESTING' | 'DEPLOYED' | 'CLOSED';
+  owner?: string;
+  daysOpen?: number;
+  createdAt: string;
+  resolvedAt?: string;
+}
+
+interface HorizonItem {
+  id: string;
+  title: string;
+  description?: string;
+  category?: string;
+  status: string;
+  createdAt: string;
+}
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  startTime: string;
+  endTime?: string;
+  eventType?: string;
+  category?: string;
+  status?: string;
+  attendees?: number;
+}
+
+interface MeetingTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  executive?: string;
+  duration?: string;
+}
 
 export default function HeadquartersPage() {
   const [activeModule, setActiveModule] = useState('cro');
@@ -17,11 +61,309 @@ export default function HeadquartersPage() {
   const [showAssemblyModal, setShowAssemblyModal] = useState(false);
   const [authData, setAuthData] = useState<{ token: string | null; tenantId: string | null }>({ token: null, tenantId: null });
 
+  // ============ API STATE ============
+
+  // Headwinds state
+  const [headwinds, setHeadwinds] = useState<Headwind[]>([]);
+  const [headwindsLoading, setHeadwindsLoading] = useState(true);
+  const [headwindsError, setHeadwindsError] = useState<string | null>(null);
+
+  // Victories (resolved headwinds) state
+  const [victories, setVictories] = useState<Headwind[]>([]);
+  const [victoriesLoading, setVictoriesLoading] = useState(true);
+  const [victoriesError, setVictoriesError] = useState<string | null>(null);
+
+  // Horizon items state
+  const [horizonItems, setHorizonItems] = useState<HorizonItem[]>([]);
+  const [horizonLoading, setHorizonLoading] = useState(true);
+  const [horizonError, setHorizonError] = useState<string | null>(null);
+
+  // Calendar events state
+  const [upcomingMeetings, setUpcomingMeetings] = useState<CalendarEvent[]>([]);
+  const [meetingsLoading, setMeetingsLoading] = useState(true);
+  const [meetingsError, setMeetingsError] = useState<string | null>(null);
+
+  // Past meetings state
+  const [pastMeetings, setPastMeetings] = useState<CalendarEvent[]>([]);
+  const [pastMeetingsLoading, setPastMeetingsLoading] = useState(true);
+
+  // Meeting templates state
+  const [meetingTemplates, setMeetingTemplates] = useState<MeetingTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
+  const [templatesError, setTemplatesError] = useState<string | null>(null);
+
+  // Form states
+  const [showHeadwindForm, setShowHeadwindForm] = useState(false);
+  const [showHorizonForm, setShowHorizonForm] = useState(false);
+  const [newHeadwind, setNewHeadwind] = useState<{ title: string; description: string; priority: 'P1' | 'P2' | 'P3'; category: 'BUG' | 'REBUILD' | 'NEW_BUILD' | 'ENHANCEMENT' | 'TASK' }>({ title: '', description: '', priority: 'P2', category: 'TASK' });
+  const [newHorizonItem, setNewHorizonItem] = useState({ title: '', description: '', category: '' });
+  const [submitting, setSubmitting] = useState(false);
+
   // Load auth data on mount
   useEffect(() => {
     const auth = getStoredAuth();
     setAuthData({ token: auth.token, tenantId: auth.tenantId });
   }, []);
+
+  // ============ API FETCH FUNCTIONS ============
+
+  const fetchHeadwinds = useCallback(async () => {
+    if (!authData.token) return;
+    setHeadwindsLoading(true);
+    setHeadwindsError(null);
+    try {
+      const response = await fetch('/api/headwinds?status=OPEN&status=IN_PROGRESS&status=TESTING', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch headwinds');
+      const data = await response.json();
+      setHeadwinds(Array.isArray(data) ? data : data.headwinds || []);
+    } catch (error) {
+      setHeadwindsError(error instanceof Error ? error.message : 'Failed to load headwinds');
+    } finally {
+      setHeadwindsLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  const fetchVictories = useCallback(async () => {
+    if (!authData.token) return;
+    setVictoriesLoading(true);
+    setVictoriesError(null);
+    try {
+      const response = await fetch('/api/headwinds?status=CLOSED&status=DEPLOYED', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch victories');
+      const data = await response.json();
+      setVictories(Array.isArray(data) ? data : data.headwinds || []);
+    } catch (error) {
+      setVictoriesError(error instanceof Error ? error.message : 'Failed to load victories');
+    } finally {
+      setVictoriesLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  const fetchHorizonItems = useCallback(async () => {
+    if (!authData.token) return;
+    setHorizonLoading(true);
+    setHorizonError(null);
+    try {
+      const response = await fetch('/api/horizon', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch horizon items');
+      const data = await response.json();
+      setHorizonItems(Array.isArray(data) ? data : data.ideas || []);
+    } catch (error) {
+      setHorizonError(error instanceof Error ? error.message : 'Failed to load horizon items');
+    } finally {
+      setHorizonLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  const fetchUpcomingMeetings = useCallback(async () => {
+    if (!authData.token) return;
+    setMeetingsLoading(true);
+    setMeetingsError(null);
+    try {
+      const response = await fetch('/api/calendar-events/upcoming?limit=10', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch meetings');
+      const data = await response.json();
+      setUpcomingMeetings(Array.isArray(data) ? data : data.events || []);
+    } catch (error) {
+      setMeetingsError(error instanceof Error ? error.message : 'Failed to load meetings');
+    } finally {
+      setMeetingsLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  const fetchPastMeetings = useCallback(async () => {
+    if (!authData.token) return;
+    setPastMeetingsLoading(true);
+    try {
+      // Fetch events from the past 30 days
+      const endDate = new Date().toISOString();
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const response = await fetch(`/api/calendar-events?startDate=${startDate}&endDate=${endDate}&status=COMPLETED`, {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch past meetings');
+      const data = await response.json();
+      setPastMeetings(Array.isArray(data) ? data : data.events || []);
+    } catch (error) {
+      console.error('Failed to load past meetings:', error);
+    } finally {
+      setPastMeetingsLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  const fetchMeetingTemplates = useCallback(async () => {
+    if (!authData.token) return;
+    setTemplatesLoading(true);
+    setTemplatesError(null);
+    try {
+      const response = await fetch('/api/treasury/assemblies?category=assembly', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch templates');
+      const data = await response.json();
+      setMeetingTemplates(Array.isArray(data) ? data : data.assemblies || []);
+    } catch (error) {
+      setTemplatesError(error instanceof Error ? error.message : 'Failed to load templates');
+    } finally {
+      setTemplatesLoading(false);
+    }
+  }, [authData.token, authData.tenantId]);
+
+  // Fetch all data when auth is available
+  useEffect(() => {
+    if (authData.token) {
+      fetchHeadwinds();
+      fetchVictories();
+      fetchHorizonItems();
+      fetchUpcomingMeetings();
+      fetchPastMeetings();
+      fetchMeetingTemplates();
+    }
+  }, [authData.token, fetchHeadwinds, fetchVictories, fetchHorizonItems, fetchUpcomingMeetings, fetchPastMeetings, fetchMeetingTemplates]);
+
+  // ============ CRUD FUNCTIONS ============
+
+  const createHeadwind = async () => {
+    if (!authData.token || !newHeadwind.title.trim()) return;
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/headwinds', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: newHeadwind.title,
+          description: newHeadwind.description,
+          priority: newHeadwind.priority,
+          category: newHeadwind.category,
+          status: 'OPEN',
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to create headwind');
+      setNewHeadwind({ title: '', description: '', priority: 'P2', category: 'TASK' });
+      setShowHeadwindForm(false);
+      fetchHeadwinds();
+    } catch (error) {
+      console.error('Error creating headwind:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const resolveHeadwind = async (id: string) => {
+    if (!authData.token) return;
+    try {
+      const response = await fetch(`/api/headwinds/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'CLOSED' }),
+      });
+      if (!response.ok) throw new Error('Failed to resolve headwind');
+      fetchHeadwinds();
+      fetchVictories();
+    } catch (error) {
+      console.error('Error resolving headwind:', error);
+    }
+  };
+
+  const createHorizonItem = async () => {
+    if (!authData.token || !newHorizonItem.title.trim()) return;
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/horizon', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: newHorizonItem.title,
+          description: newHorizonItem.description,
+          category: newHorizonItem.category,
+          status: 'PARKED',
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to create horizon item');
+      setNewHorizonItem({ title: '', description: '', category: '' });
+      setShowHorizonForm(false);
+      fetchHorizonItems();
+    } catch (error) {
+      console.error('Error creating horizon item:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const promoteToHeadwind = async (horizonItem: HorizonItem) => {
+    if (!authData.token) return;
+    try {
+      // Create headwind from horizon item
+      const response = await fetch('/api/headwinds', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: horizonItem.title,
+          description: horizonItem.description,
+          priority: 'P2',
+          category: 'TASK',
+          status: 'OPEN',
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to promote to headwind');
+
+      // Delete from horizon
+      await fetch(`/api/horizon/${horizonItem.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+
+      fetchHeadwinds();
+      fetchHorizonItems();
+    } catch (error) {
+      console.error('Error promoting to headwind:', error);
+    }
+  };
 
   // ============ ICON MAPPING ============
   const iconMap: Record<string, React.ReactNode> = {
@@ -75,7 +417,7 @@ export default function HeadquartersPage() {
     return icons[key] || <Briefcase size={size} />;
   };
 
-  // ============ DATA ============
+  // ============ STATIC DATA (for non-API sections) ============
 
   const keystoneMetrics = [
     { id: 'cro', icon: 'briefcase', label: 'Pipeline Value', value: '$139,000', trend: 'up', trendValue: '12%', module: 'CRO', color: '#00CCEE' },
@@ -103,26 +445,6 @@ export default function HeadquartersPage() {
     attendees: 5
   };
 
-  const activeHeadwinds = [
-    { id: 1, title: 'Supply chain delays affecting delivery times', priority: 'high', days: 4, owner: 'Jonathan W.', category: 'Operations' },
-    { id: 2, title: 'Need to hire additional sales rep', priority: 'medium', days: 6, owner: 'David S.', category: 'People' },
-    { id: 3, title: 'Website conversion rate dropped 15%', priority: 'high', days: 9, owner: 'Marketing Team', category: 'Marketing' },
-  ];
-
-  const horizonItems = [
-    { id: 1, title: 'Explore new CRM integrations', addedDate: 'Nov 15', category: 'Technology' },
-    { id: 2, title: 'Consider expanding to Alabama market', addedDate: 'Nov 20', category: 'Growth' },
-    { id: 3, title: 'Evaluate equipment upgrade options', addedDate: 'Dec 1', category: 'Operations' },
-  ];
-
-  const victories = [
-    { id: 1, title: 'Completed CRM training ahead of schedule', date: 'Dec 10', resolvedBy: 'Team', daysToResolve: 5 },
-    { id: 2, title: 'Closed Johnson kitchen remodel - $45K', date: 'Dec 8', resolvedBy: 'Jonathan W.', daysToResolve: 12 },
-    { id: 3, title: 'Resolved shipping delay issue with vendor', date: 'Dec 5', resolvedBy: 'Operations', daysToResolve: 8 },
-    { id: 4, title: 'Fixed website loading speed issues', date: 'Dec 2', resolvedBy: 'CIO', daysToResolve: 3 },
-    { id: 5, title: 'Onboarded 2 new team members successfully', date: 'Nov 28', resolvedBy: 'HR', daysToResolve: 14 },
-  ];
-
   const myCampaignItems = [
     { id: 1, title: 'Close 3 deals this quarter', progress: 66, target: '3 deals', current: '2 deals', dueDate: 'Dec 31' },
     { id: 2, title: 'Launch email automation sequence', progress: 80, target: 'Complete', current: '4/5 sequences', dueDate: 'Dec 20' },
@@ -141,26 +463,6 @@ export default function HeadquartersPage() {
     { id: 2, title: 'Expand team to 30 employees', progress: 80, target: '30', current: '24' },
     { id: 3, title: 'Achieve 95% customer satisfaction', progress: 88, target: '95%', current: '94%' },
     { id: 4, title: 'Launch Zander V1.0', progress: 65, target: 'April 1', current: 'In Development' },
-  ];
-
-  const upcomingMeetings = [
-    { id: 1, title: 'Weekly Assembly', date: 'Today', time: '9:00 AM', type: 'weekly', attendees: 5 },
-    { id: 2, title: 'Sales Pipeline Review', date: 'Tomorrow', time: '2:00 PM', type: 'review', attendees: 3 },
-    { id: 3, title: 'Q4 Planning Session', date: 'Dec 18', time: '10:00 AM', type: 'quarterly', attendees: 8 },
-    { id: 4, title: '1:1 with David', date: 'Dec 19', time: '3:00 PM', type: '1on1', attendees: 2 },
-  ];
-
-  const pastMeetings = [
-    { id: 1, title: 'Weekly Assembly', date: 'Dec 9', duration: '45 min', actionItems: 3, notes: true },
-    { id: 2, title: 'Client Review - Anderson Project', date: 'Dec 8', duration: '30 min', actionItems: 2, notes: true },
-    { id: 3, title: 'Weekly Assembly', date: 'Dec 2', duration: '50 min', actionItems: 5, notes: true },
-  ];
-
-  const meetingTemplates = [
-    { id: 'weekly', name: 'Weekly Assembly', duration: '60 min', icon: 'calendar', description: 'Standard weekly team alignment' },
-    { id: 'quarterly', name: 'Quarterly Briefing', duration: '2 hours', icon: 'barChart', description: 'Quarterly planning and review' },
-    { id: 'annual', name: 'Annual Congress', duration: '4 hours', icon: 'building', description: 'Annual strategy and goal setting' },
-    { id: '1on1', name: '1:1 Meeting', duration: '30 min', icon: 'users', description: 'Individual check-in template' },
   ];
 
   const foundingPrinciples = {
@@ -216,9 +518,9 @@ export default function HeadquartersPage() {
   };
 
   const getPriorityStyle = (priority: string) => {
-    if (priority === 'high') return { bg: 'rgba(220, 53, 69, 0.1)', color: '#DC3545', label: 'HIGH' };
-    if (priority === 'medium') return { bg: 'rgba(240, 179, 35, 0.1)', color: '#B8860B', label: 'MEDIUM' };
-    return { bg: 'rgba(108, 117, 125, 0.1)', color: '#6C757D', label: 'LOW' };
+    if (priority === 'P1' || priority === 'high') return { bg: 'rgba(220, 53, 69, 0.1)', color: '#DC3545', label: priority === 'P1' ? 'P1' : 'HIGH' };
+    if (priority === 'P2' || priority === 'medium') return { bg: 'rgba(240, 179, 35, 0.1)', color: '#B8860B', label: priority === 'P2' ? 'P2' : 'MEDIUM' };
+    return { bg: 'rgba(108, 117, 125, 0.1)', color: '#6C757D', label: priority === 'P3' ? 'P3' : 'LOW' };
   };
 
   const getStatusStyle = (status: string) => {
@@ -235,6 +537,49 @@ export default function HeadquartersPage() {
     if (status === 'red') return '#DC3545';
     return '#6C757D';
   };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) return 'Today';
+    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const formatTime = (dateStr: string) => {
+    return new Date(dateStr).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  };
+
+  const getDaysOld = (dateStr: string) => {
+    const created = new Date(dateStr);
+    const now = new Date();
+    return Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  // ============ LOADING SPINNER COMPONENT ============
+
+  const LoadingSpinner = ({ text = 'Loading...' }: { text?: string }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', color: '#8888A0' }}>
+      <Loader2 size={20} style={{ animation: 'spin 1s linear infinite', marginRight: '0.5rem' }} />
+      {text}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+
+  const ErrorMessage = ({ message, onRetry }: { message: string; onRetry?: () => void }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', color: '#DC3545', background: 'rgba(220, 53, 69, 0.1)', borderRadius: '8px', gap: '0.5rem' }}>
+      <AlertCircle size={18} />
+      <span>{message}</span>
+      {onRetry && (
+        <button onClick={onRetry} style={{ marginLeft: '1rem', padding: '0.25rem 0.75rem', background: '#DC3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
+          Retry
+        </button>
+      )}
+    </div>
+  );
 
   // ============ MODAL CONTENT RENDERERS ============
 
@@ -281,22 +626,30 @@ export default function HeadquartersPage() {
             <h3 style={{ margin: 0, color: '#F0F0F5' }}>Upcoming Assemblies</h3>
             <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Schedule New</button>
           </div>
-          {upcomingMeetings.map((meeting) => (
-            <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <div style={{ width: '50px', height: '50px', background: '#1C1C26', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px solid #2A2A38' }}>
-                <span style={{ fontSize: '0.65rem', color: '#8888A0', textTransform: 'uppercase' }}>{meeting.date === 'Today' ? 'Today' : meeting.date === 'Tomorrow' ? 'Tom' : meeting.date.split(' ')[0]}</span>
-                <span style={{ fontSize: '1rem', fontWeight: '700', color: '#F0F0F5' }}>{meeting.date === 'Today' || meeting.date === 'Tomorrow' ? '•' : meeting.date.split(' ')[1]}</span>
+          {meetingsLoading ? (
+            <LoadingSpinner text="Loading meetings..." />
+          ) : meetingsError ? (
+            <ErrorMessage message={meetingsError} onRetry={fetchUpcomingMeetings} />
+          ) : upcomingMeetings.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>No upcoming meetings scheduled</div>
+          ) : (
+            upcomingMeetings.map((meeting) => (
+              <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+                <div style={{ width: '50px', height: '50px', background: '#1C1C26', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px solid #2A2A38' }}>
+                  <span style={{ fontSize: '0.65rem', color: '#8888A0', textTransform: 'uppercase' }}>{formatDate(meeting.startTime).split(' ')[0]}</span>
+                  <span style={{ fontSize: '1rem', fontWeight: '700', color: '#F0F0F5' }}>{formatDate(meeting.startTime) === 'Today' || formatDate(meeting.startTime) === 'Tomorrow' ? '•' : formatDate(meeting.startTime).split(' ')[1]}</span>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{meeting.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{formatTime(meeting.startTime)}{meeting.attendees ? ` • ${meeting.attendees} attendees` : ''}</div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button style={{ padding: '0.5rem 1rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Join</button>
+                  <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Agenda</button>
+                </div>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{meeting.title}</div>
-                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{meeting.time} • {meeting.attendees} attendees</div>
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button style={{ padding: '0.5rem 1rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Join</button>
-                <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Agenda</button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
 
@@ -304,20 +657,26 @@ export default function HeadquartersPage() {
       {activeTab === 'past' && (
         <div>
           <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Meeting History</h3>
-          {pastMeetings.map((meeting) => (
-            <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <div style={{ width: '50px', height: '50px', background: '#1C1C26', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #2A2A38' }}>
-                <ClipboardList size={24} style={{ color: '#00CCEE' }} />
+          {pastMeetingsLoading ? (
+            <LoadingSpinner text="Loading past meetings..." />
+          ) : pastMeetings.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>No past meetings found</div>
+          ) : (
+            pastMeetings.map((meeting) => (
+              <div key={meeting.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+                <div style={{ width: '50px', height: '50px', background: '#1C1C26', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #2A2A38' }}>
+                  <ClipboardList size={24} style={{ color: '#00CCEE' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{meeting.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{formatDate(meeting.startTime)}</div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>View Notes</button>
+                </div>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{meeting.title}</div>
-                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{meeting.date} • {meeting.duration} • {meeting.actionItems} action items</div>
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button style={{ padding: '0.5rem 1rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>View Notes</button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
 
@@ -325,21 +684,29 @@ export default function HeadquartersPage() {
       {activeTab === 'templates' && (
         <div>
           <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5' }}>Meeting Templates</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            {meetingTemplates.map((template) => (
-              <div key={template.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', border: '2px solid #2A2A38' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                  <span style={{ color: '#00CCEE' }}>{getIcon(template.icon, 28)}</span>
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{template.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{template.duration}</div>
+          {templatesLoading ? (
+            <LoadingSpinner text="Loading templates..." />
+          ) : templatesError ? (
+            <ErrorMessage message={templatesError} onRetry={fetchMeetingTemplates} />
+          ) : meetingTemplates.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>No meeting templates available</div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              {meetingTemplates.map((template) => (
+                <div key={template.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', border: '2px solid #2A2A38' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                    <span style={{ color: '#00CCEE' }}>{getIcon('calendar', 28)}</span>
+                    <div>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{template.name}</div>
+                      {template.duration && <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{template.duration}</div>}
+                    </div>
                   </div>
+                  {template.description && <p style={{ fontSize: '0.85rem', color: '#8888A0', margin: '0 0 1rem 0' }}>{template.description}</p>}
+                  <button style={{ width: '100%', padding: '0.5rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Use Template</button>
                 </div>
-                <p style={{ fontSize: '0.85rem', color: '#8888A0', margin: '0 0 1rem 0' }}>{template.description}</p>
-                <button style={{ width: '100%', padding: '0.5rem', background: '#13131A', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>Use Template</button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -464,7 +831,7 @@ export default function HeadquartersPage() {
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #2A2A38', paddingBottom: '1rem' }}>
         {[
-          { id: 'active', label: 'Active Headwinds', count: activeHeadwinds.length },
+          { id: 'active', label: 'Active Headwinds', count: headwinds.length },
           { id: 'victories', label: 'Victories', count: victories.length },
           { id: 'horizon', label: 'The Horizon', count: horizonItems.length },
         ].map((tab) => (
@@ -500,26 +867,101 @@ export default function HeadquartersPage() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h3 style={{ margin: 0, color: '#F0F0F5' }}>Active Headwinds</h3>
-            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add Headwind</button>
+            <button
+              onClick={() => setShowHeadwindForm(true)}
+              style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+            >
+              <Plus size={16} /> Add Headwind
+            </button>
           </div>
-          {activeHeadwinds.map((item) => {
-            const priorityStyle = getPriorityStyle(item.priority);
-            return (
-              <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${priorityStyle.color}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.35rem' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Owner: {item.owner} • Category: {item.category} • {item.days} days old</div>
-                  </div>
-                  <span style={{ fontSize: '0.65rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: priorityStyle.bg, color: priorityStyle.color }}>{priorityStyle.label}</span>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
-                  <button style={{ padding: '0.4rem 0.75rem', background: '#28A745', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Mark Resolved</button>
-                  <button style={{ padding: '0.4rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Discuss in Assembly</button>
-                </div>
+
+          {/* Create Headwind Form */}
+          {showHeadwindForm && (
+            <div style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '1rem', border: '2px solid #00CCEE' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h4 style={{ margin: 0, color: '#F0F0F5' }}>New Headwind</h4>
+                <button onClick={() => setShowHeadwindForm(false)} style={{ background: 'none', border: 'none', color: '#8888A0', cursor: 'pointer' }}><X size={20} /></button>
               </div>
-            );
-          })}
+              <input
+                type="text"
+                placeholder="Headwind title..."
+                value={newHeadwind.title}
+                onChange={(e) => setNewHeadwind({ ...newHeadwind, title: e.target.value })}
+                style={{ width: '100%', padding: '0.75rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.75rem', fontSize: '0.9rem' }}
+              />
+              <textarea
+                placeholder="Description (optional)..."
+                value={newHeadwind.description}
+                onChange={(e) => setNewHeadwind({ ...newHeadwind, description: e.target.value })}
+                style={{ width: '100%', padding: '0.75rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.75rem', fontSize: '0.9rem', minHeight: '60px', resize: 'vertical' }}
+              />
+              <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
+                <select
+                  value={newHeadwind.priority}
+                  onChange={(e) => setNewHeadwind({ ...newHeadwind, priority: e.target.value as 'P1' | 'P2' | 'P3' })}
+                  style={{ flex: 1, padding: '0.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5' }}
+                >
+                  <option value="P1">P1 - Critical</option>
+                  <option value="P2">P2 - High</option>
+                  <option value="P3">P3 - Normal</option>
+                </select>
+                <select
+                  value={newHeadwind.category}
+                  onChange={(e) => setNewHeadwind({ ...newHeadwind, category: e.target.value as 'BUG' | 'REBUILD' | 'NEW_BUILD' | 'ENHANCEMENT' | 'TASK' })}
+                  style={{ flex: 1, padding: '0.5rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5' }}
+                >
+                  <option value="TASK">Task</option>
+                  <option value="BUG">Bug</option>
+                  <option value="ENHANCEMENT">Enhancement</option>
+                  <option value="NEW_BUILD">New Build</option>
+                  <option value="REBUILD">Rebuild</option>
+                </select>
+              </div>
+              <button
+                onClick={createHeadwind}
+                disabled={!newHeadwind.title.trim() || submitting}
+                style={{ padding: '0.75rem 1.5rem', background: newHeadwind.title.trim() ? '#00CCEE' : '#2A2A38', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: newHeadwind.title.trim() ? 'pointer' : 'not-allowed' }}
+              >
+                {submitting ? 'Creating...' : 'Create Headwind'}
+              </button>
+            </div>
+          )}
+
+          {headwindsLoading ? (
+            <LoadingSpinner text="Loading headwinds..." />
+          ) : headwindsError ? (
+            <ErrorMessage message={headwindsError} onRetry={fetchHeadwinds} />
+          ) : headwinds.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>No active headwinds. Great job!</div>
+          ) : (
+            headwinds.map((item) => {
+              const priorityStyle = getPriorityStyle(item.priority);
+              const daysOld = getDaysOld(item.createdAt);
+              return (
+                <div key={item.id} style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: `4px solid ${priorityStyle.color}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.35rem' }}>{item.title}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
+                        {item.owner && `Owner: ${item.owner} • `}
+                        Category: {item.category} • {daysOld} days old
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '0.65rem', fontWeight: '700', padding: '0.25rem 0.75rem', borderRadius: '12px', background: priorityStyle.bg, color: priorityStyle.color }}>{priorityStyle.label}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                    <button
+                      onClick={() => resolveHeadwind(item.id)}
+                      style={{ padding: '0.4rem 0.75rem', background: '#28A745', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                    >
+                      <Check size={14} /> Mark Resolved
+                    </button>
+                    <button style={{ padding: '0.4rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Discuss in Assembly</button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       )}
 
@@ -527,15 +969,26 @@ export default function HeadquartersPage() {
       {activeTab === 'victories' && (
         <div>
           <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Trophy size={20} style={{ color: '#00CCEE' }} /> Victories - Resolved Headwinds</h3>
-          {victories.map((item) => (
-            <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: '4px solid #28A745' }}>
-              <Check size={20} style={{ color: '#28A745' }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
-                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Resolved: {item.date} • By: {item.resolvedBy} • Took {item.daysToResolve} days</div>
+          {victoriesLoading ? (
+            <LoadingSpinner text="Loading victories..." />
+          ) : victoriesError ? (
+            <ErrorMessage message={victoriesError} onRetry={fetchVictories} />
+          ) : victories.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>No victories yet. Keep pushing!</div>
+          ) : (
+            victories.map((item) => (
+              <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '10px', marginBottom: '0.75rem', borderLeft: '4px solid #28A745' }}>
+                <Check size={20} style={{ color: '#28A745' }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
+                    Resolved: {item.resolvedAt ? formatDate(item.resolvedAt) : formatDate(item.createdAt)}
+                    {item.owner && ` • By: ${item.owner}`}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
 
@@ -547,18 +1000,77 @@ export default function HeadquartersPage() {
               <h3 style={{ margin: 0, color: '#F0F0F5' }}>The Horizon</h3>
               <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#8888A0' }}>Future considerations and parking lot items</p>
             </div>
-            <button style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>+ Add to Horizon</button>
+            <button
+              onClick={() => setShowHorizonForm(true)}
+              style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+            >
+              <Plus size={16} /> Add to Horizon
+            </button>
           </div>
-          {horizonItems.map((item) => (
-            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
-              <Sparkles size={20} style={{ color: '#8888A0' }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
-                <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Added: {item.addedDate} • Category: {item.category}</div>
+
+          {/* Create Horizon Item Form */}
+          {showHorizonForm && (
+            <div style={{ padding: '1.25rem', background: '#09090F', borderRadius: '10px', marginBottom: '1rem', border: '2px solid #00CCEE' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h4 style={{ margin: 0, color: '#F0F0F5' }}>New Horizon Item</h4>
+                <button onClick={() => setShowHorizonForm(false)} style={{ background: 'none', border: 'none', color: '#8888A0', cursor: 'pointer' }}><X size={20} /></button>
               </div>
-              <button style={{ padding: '0.4rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}>Promote to Headwind</button>
+              <input
+                type="text"
+                placeholder="Idea title..."
+                value={newHorizonItem.title}
+                onChange={(e) => setNewHorizonItem({ ...newHorizonItem, title: e.target.value })}
+                style={{ width: '100%', padding: '0.75rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.75rem', fontSize: '0.9rem' }}
+              />
+              <textarea
+                placeholder="Description (optional)..."
+                value={newHorizonItem.description}
+                onChange={(e) => setNewHorizonItem({ ...newHorizonItem, description: e.target.value })}
+                style={{ width: '100%', padding: '0.75rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '0.75rem', fontSize: '0.9rem', minHeight: '60px', resize: 'vertical' }}
+              />
+              <input
+                type="text"
+                placeholder="Category (e.g., Technology, Growth, Operations)..."
+                value={newHorizonItem.category}
+                onChange={(e) => setNewHorizonItem({ ...newHorizonItem, category: e.target.value })}
+                style={{ width: '100%', padding: '0.75rem', background: '#1C1C26', border: '1px solid #2A2A38', borderRadius: '6px', color: '#F0F0F5', marginBottom: '1rem', fontSize: '0.9rem' }}
+              />
+              <button
+                onClick={createHorizonItem}
+                disabled={!newHorizonItem.title.trim() || submitting}
+                style={{ padding: '0.75rem 1.5rem', background: newHorizonItem.title.trim() ? '#00CCEE' : '#2A2A38', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: newHorizonItem.title.trim() ? 'pointer' : 'not-allowed' }}
+              >
+                {submitting ? 'Creating...' : 'Add to Horizon'}
+              </button>
             </div>
-          ))}
+          )}
+
+          {horizonLoading ? (
+            <LoadingSpinner text="Loading horizon items..." />
+          ) : horizonError ? (
+            <ErrorMessage message={horizonError} onRetry={fetchHorizonItems} />
+          ) : horizonItems.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>No items on the horizon. Add future ideas here!</div>
+          ) : (
+            horizonItems.map((item) => (
+              <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#09090F', borderRadius: '10px', marginBottom: '0.75rem' }}>
+                <Sparkles size={20} style={{ color: '#8888A0' }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{item.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
+                    Added: {formatDate(item.createdAt)}
+                    {item.category && ` • Category: ${item.category}`}
+                  </div>
+                </div>
+                <button
+                  onClick={() => promoteToHeadwind(item)}
+                  style={{ padding: '0.4rem 0.75rem', background: '#1C1C26', color: '#F0F0F5', border: '1px solid #2A2A38', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  Promote to Headwind
+                </button>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
@@ -639,7 +1151,7 @@ export default function HeadquartersPage() {
         <div style={{ position: 'relative' }}>
           {/* Timeline line */}
           <div style={{ position: 'absolute', left: '24px', top: '40px', bottom: '40px', width: '2px', background: 'var(--zander-border-gray)' }} />
-          
+
           {legacyMilestones.map((milestone, index) => (
             <div key={milestone.id} style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', position: 'relative' }}>
               {/* Year circle */}
@@ -659,7 +1171,7 @@ export default function HeadquartersPage() {
               }}>
                 {milestone.year}
               </div>
-              
+
               {/* Content */}
               <div style={{ flex: 1, padding: '1rem 1.25rem', background: '#09090F', borderRadius: '10px', borderLeft: `4px solid ${milestone.progress > 0 ? '#00CCEE' : 'var(--zander-border-gray)'}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
@@ -889,22 +1401,33 @@ export default function HeadquartersPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#F0F0F5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Wind size={18} style={{ color: '#00CCEE' }} /> Active Headwinds
-                  <span style={{ background: '#00CCEE', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>{activeHeadwinds.length}</span>
+                  <span style={{ background: '#00CCEE', color: 'white', fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: '700' }}>
+                    {headwindsLoading ? '...' : headwinds.length}
+                  </span>
                 </h3>
                 <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
-              {activeHeadwinds.map((item) => {
-                const priorityStyle = getPriorityStyle(item.priority);
-                return (
-                  <div key={item.id} style={{ padding: '0.75rem', background: '#09090F', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid ' + priorityStyle.color }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <span style={{ fontSize: '0.85rem', color: '#F0F0F5', flex: 1 }}>{item.title}</span>
-                      <span style={{ fontSize: '0.6rem', fontWeight: '700', padding: '0.2rem 0.5rem', borderRadius: '4px', background: priorityStyle.bg, color: priorityStyle.color }}>{priorityStyle.label}</span>
+              {headwindsLoading ? (
+                <LoadingSpinner text="Loading..." />
+              ) : headwindsError ? (
+                <ErrorMessage message={headwindsError} onRetry={fetchHeadwinds} />
+              ) : headwinds.length === 0 ? (
+                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8888A0', fontSize: '0.9rem' }}>No active headwinds</div>
+              ) : (
+                headwinds.slice(0, 3).map((item) => {
+                  const priorityStyle = getPriorityStyle(item.priority);
+                  const daysOld = getDaysOld(item.createdAt);
+                  return (
+                    <div key={item.id} style={{ padding: '0.75rem', background: '#09090F', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid ' + priorityStyle.color }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#F0F0F5', flex: 1 }}>{item.title}</span>
+                        <span style={{ fontSize: '0.6rem', fontWeight: '700', padding: '0.2rem 0.5rem', borderRadius: '4px', background: priorityStyle.bg, color: priorityStyle.color }}>{priorityStyle.label}</span>
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.35rem' }}>{daysOld} days old</div>
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.35rem' }}>{item.days} days old</div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
 
             {/* My Campaign Progress */}
@@ -936,15 +1459,23 @@ export default function HeadquartersPage() {
                 </h3>
                 <button onClick={() => handleModalOpen('headwinds')} style={{ fontSize: '0.75rem', color: '#00CCEE', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>View All →</button>
               </div>
-              {victories.slice(0, 3).map((item) => (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.75rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid #28A745' }}>
-                  <Check size={16} style={{ color: '#28A745' }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>{item.date}</div>
+              {victoriesLoading ? (
+                <LoadingSpinner text="Loading..." />
+              ) : victoriesError ? (
+                <ErrorMessage message={victoriesError} onRetry={fetchVictories} />
+              ) : victories.length === 0 ? (
+                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8888A0', fontSize: '0.9rem' }}>No victories yet</div>
+              ) : (
+                victories.slice(0, 3).map((item) => (
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.75rem', background: 'rgba(40, 167, 69, 0.05)', borderRadius: '8px', marginBottom: '0.5rem', borderLeft: '3px solid #28A745' }}>
+                    <Check size={16} style={{ color: '#28A745' }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>{item.resolvedAt ? formatDate(item.resolvedAt) : formatDate(item.createdAt)}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </main>
@@ -1031,6 +1562,7 @@ export default function HeadquartersPage() {
 
               {/* Modal Content */}
               <div style={{ padding: '2rem', maxHeight: 'calc(85vh - 120px)', overflowY: 'auto' }}>
+                {activeModal === 'assembly' && renderAssemblyContent()}
                 {activeModal === 'campaigns' && renderCampaignsContent()}
                 {activeModal === 'headwinds' && renderHeadwindsContent()}
                 {activeModal === 'founding' && renderFoundingContent()}
