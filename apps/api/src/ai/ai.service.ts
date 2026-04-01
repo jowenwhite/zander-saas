@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface Executive {
@@ -8,6 +8,25 @@ interface Executive {
   fullTitle: string;
   personality: string;
 }
+
+/**
+ * Executive tier requirements:
+ * - null = coming soon, not accessible to anyone
+ * - 'STARTER' = requires STARTER or higher
+ * - 'PRO' = requires PRO or higher
+ * - 'BUSINESS' = requires BUSINESS or higher
+ */
+const EXECUTIVE_TIER_REQUIREMENTS: Record<string, string | null> = {
+  ea: 'STARTER',      // Pam - available to all paid tiers
+  cro: 'PRO',         // Jordan - requires PRO or higher
+  cmo: 'BUSINESS',    // Don - requires BUSINESS or higher
+  cfo: null,          // Ben - Coming Q4 2026
+  coo: null,          // Miranda - Coming Q4 2026
+  cpo: null,          // Ted - Coming Q4 2026
+  cio: null,          // Jarvis - Coming Q4 2026
+};
+
+const TIER_HIERARCHY = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
 
 const executives: Record<string, Executive> = {
   cro: {
@@ -205,6 +224,83 @@ When responding:
 export class AiService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Verify tenant has access to the requested executive based on their subscription tier.
+   * Throws ForbiddenException if access is denied.
+   */
+  private async checkExecutiveAccess(tenantId: string, executiveId: string, executiveName: string): Promise<void> {
+    const requiredTier = EXECUTIVE_TIER_REQUIREMENTS[executiveId];
+
+    // null means coming soon - not accessible to anyone
+    if (requiredTier === null) {
+      throw new ForbiddenException({
+        statusCode: 403,
+        comingSoon: true,
+        executiveId,
+        executiveName,
+        message: `${executiveName} is coming soon and not yet available`,
+      });
+    }
+
+    // Get tenant's effective tier
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: {
+        subscriptionTier: true,
+        tierOverride: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+      },
+    });
+
+    if (!tenant) {
+      throw new ForbiddenException('Tenant not found');
+    }
+
+    // Determine effective tier: tierOverride > active trial > subscriptionTier > FREE
+    let currentTier = tenant.subscriptionTier || 'FREE';
+
+    if (tenant.tierOverride) {
+      currentTier = tenant.tierOverride;
+    } else if (tenant.trialTier && tenant.trialStartDate && tenant.trialEndDate) {
+      const now = new Date();
+      const trialStart = new Date(tenant.trialStartDate);
+      const trialEnd = new Date(tenant.trialEndDate);
+      if (now >= trialStart && now <= trialEnd) {
+        currentTier = tenant.trialTier;
+      }
+    }
+
+    // Compare tier levels
+    const requiredLevel = TIER_HIERARCHY.indexOf(requiredTier.toUpperCase());
+    const currentLevel = TIER_HIERARCHY.indexOf(currentTier.toUpperCase());
+    const effectiveCurrentLevel = currentLevel === -1 ? 0 : currentLevel;
+
+    if (effectiveCurrentLevel >= requiredLevel) {
+      return; // Access granted
+    }
+
+    // Access denied - throw with upgrade info
+    const tierNames: Record<string, string> = {
+      FREE: 'Free',
+      STARTER: 'Starter',
+      PRO: 'Pro',
+      BUSINESS: 'Business',
+      ENTERPRISE: 'Enterprise',
+    };
+
+    throw new ForbiddenException({
+      statusCode: 403,
+      locked: true,
+      executiveId,
+      executiveName,
+      requiredTier: requiredTier.toUpperCase(),
+      currentTier: currentTier.toUpperCase(),
+      message: `${executiveName} requires a ${tierNames[requiredTier.toUpperCase()] || requiredTier} subscription`,
+    });
+  }
+
   async queryKnowledge(query: string, limit: number = 5) {
     // Search knowledge base for relevant articles
     const articles = await this.prisma.knowledgeArticle.findMany({
@@ -236,6 +332,9 @@ export class AiService {
     if (!executive) {
       throw new Error(`Executive ${executiveId} not found`);
     }
+
+    // Check executive tier access before proceeding
+    await this.checkExecutiveAccess(tenantId, executiveId, executive.name);
 
     // Get context data for the tenant
     const [deals, contacts, activities] = await Promise.all([
