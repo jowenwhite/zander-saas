@@ -22,8 +22,8 @@ RUN npx prisma generate
 # Copy API source code and tsconfig
 COPY apps/api/ .
 
-# Compile TypeScript to JavaScript
-RUN npx tsc
+# Compile TypeScript to JavaScript (with increased memory for large codebase)
+RUN NODE_OPTIONS="--max-old-space-size=4096" npx tsc
 
 # Expose port
 EXPOSE 3001
