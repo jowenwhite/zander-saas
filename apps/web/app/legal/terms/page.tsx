@@ -140,7 +140,7 @@ export default function TermsPage() {
         color: '#6C757D'
       }}>
         <p style={{ margin: 0 }}>
-          &copy; {new Date().getFullYear()} 64 West Holdings LLC. All rights reserved.
+          &copy; {new Date().getFullYear()} Zander Systems LLC. All rights reserved.
         </p>
         <p style={{ margin: '0.5rem 0 0' }}>
           Questions? Contact us at{' '}

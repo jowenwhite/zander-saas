@@ -141,9 +141,9 @@ export default function LoginPage() {
           <p style={{ fontWeight: '600', margin: 0, fontSize: '1rem', color: '#00CCEE' }}>— Alexander Hamilton</p>
         </div>
 
-        {/* 64 West Branding */}
+        {/* Footer */}
         <div style={{ fontSize: '0.9rem', color: '#55556A', marginTop: '2rem' }}>
-          © 2026 Zander Technologies LLC
+          © 2026 Zander Systems LLC
         </div>
       </div>
 

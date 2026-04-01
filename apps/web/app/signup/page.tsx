@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -84,20 +83,32 @@ export default function SignupPage() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '3rem',
+        padding: '40px 40px 20px 40px',
         color: 'white'
       }}>
-        <div>
-          <div style={{ marginBottom: '1rem' }}>
-            <Image
-              src="/images/zander-logo-white.svg"
-              alt="Zander"
-              width={200}
-              height={50}
-              priority
-            />
-          </div>
-          <p style={{ fontSize: '1.5rem', fontWeight: '300', opacity: 0.9, margin: 0 }}>
+        <div style={{
+          textAlign: 'center',
+          width: '100%',
+          padding: '40px 20px 24px 20px'
+        }}>
+          <img
+            src="/images/zander-logo.svg"
+            alt="Zander"
+            style={{
+              width: '400px',
+              height: 'auto',
+              display: 'block',
+              margin: '0 auto'
+            }}
+          />
+          <p style={{
+            fontSize: '1.4rem',
+            fontWeight: '600',
+            color: '#F0F0F5',
+            textAlign: 'center',
+            marginTop: '20px',
+            lineHeight: '1.4'
+          }}>
             Your AI-Powered Executive Team
           </p>
         </div>
@@ -106,21 +117,21 @@ export default function SignupPage() {
         <div style={{ marginTop: 'auto' }}>
           <blockquote style={{
             fontStyle: 'italic',
-            fontSize: '1.125rem',
-            opacity: 0.8,
+            fontSize: '1.05rem',
+            color: '#8888A0',
             marginBottom: '1.5rem',
-            lineHeight: 1.6,
-            borderLeft: '3px solid #F0B323',
+            lineHeight: 1.7,
+            borderLeft: '3px solid #00CCEE',
             paddingLeft: '1rem'
           }}>
             "Commerce is the great engine of social progress, transforming individual potential into collective achievement."
           </blockquote>
-          <p style={{ fontWeight: '600', margin: 0, color: '#F0B323' }}>— Alexander Hamilton</p>
+          <p style={{ fontWeight: '600', margin: 0, fontSize: '1rem', color: '#00CCEE' }}>— Alexander Hamilton</p>
         </div>
 
-        {/* 64 West Branding */}
-        <div style={{ fontSize: '0.875rem', opacity: 0.7, marginTop: '2rem' }}>
-          By 64 West Capital Partners
+        {/* Footer */}
+        <div style={{ fontSize: '0.9rem', color: '#55556A', marginTop: '2rem' }}>
+          © 2026 Zander Systems LLC
         </div>
       </div>
 
@@ -306,14 +317,26 @@ export default function SignupPage() {
               style={{
                 width: '100%',
                 padding: '0.875rem 1rem',
-                background: loading ? '#ccc' : 'linear-gradient(135deg, #BF0A30 0%, #A00A28 100%)',
-                color: 'white',
+                background: loading ? '#555' : '#00CCEE',
+                color: '#000000',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '1rem',
                 fontWeight: '600',
                 cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                boxShadow: '0 4px 6px rgba(0, 204, 238, 0.2)',
                 marginBottom: '1.5rem'
+              }}
+              onMouseOver={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 8px rgba(0, 204, 238, 0.3)';
+                }
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 204, 238, 0.2)';
               }}
             >
               {loading ? 'Creating Account...' : 'Create Account'}
@@ -332,7 +355,9 @@ export default function SignupPage() {
           <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
             <p style={{ fontSize: '0.75rem', color: '#ADB5BD' }}>
               By creating an account, you agree to our{' '}
-              <a href="/legal/terms" style={{ color: '#8888A0' }}>Terms of Service</a>
+              <a href="https://zanderos.com/terms" style={{ color: '#8888A0' }}>Terms of Service</a>
+              {' '}and{' '}
+              <a href="https://zanderos.com/privacy" style={{ color: '#8888A0' }}>Privacy Policy</a>
             </p>
           </div>
         </div>
