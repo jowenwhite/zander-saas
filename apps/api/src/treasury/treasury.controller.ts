@@ -2,10 +2,13 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, Forb
 import { TreasuryService } from './treasury.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { TierGuard } from '../common/guards/tier.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 
 @Controller('treasury')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('PRO')
 export class TreasuryController {
   constructor(private readonly treasuryService: TreasuryService) {}
 

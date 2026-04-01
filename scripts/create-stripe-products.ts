@@ -5,23 +5,27 @@
  * Run with: npx ts-node scripts/create-stripe-products.ts
  *
  * Requires: STRIPE_SECRET_KEY environment variable
+ *
+ * NOTE: Does NOT create Enterprise tier — those are custom per customer.
  */
 
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error('ERROR: STRIPE_SECRET_KEY environment variable is required');
+  console.error('Usage: STRIPE_SECRET_KEY=sk_live_xxx npx ts-node scripts/create-stripe-products.ts');
+  process.exit(1);
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-12-18.acacia',
 });
 
 interface ProductConfig {
   name: string;
   description: string;
   monthlyPrice: number;
-  metadata: {
-    tier: string;
-    founding_rate: string;
-    public_rate: string;
-  };
+  tier: string;
 }
 
 const products: ProductConfig[] = [
@@ -29,67 +33,39 @@ const products: ProductConfig[] = [
     name: 'Zander Starter',
     description: 'Your EA and HQ — fully operational from day one. Includes Pam (AI Executive Assistant), inbox management, calendar, SMS sequences.',
     monthlyPrice: 19900, // $199.00 in cents
-    metadata: {
-      tier: 'starter',
-      founding_rate: '$199/mo',
-      public_rate: '$299/mo',
-    },
+    tier: 'STARTER',
   },
   {
     name: 'Zander Pro',
-    description: 'Everything in Starter plus Don (AI CMO), marketing calendar, campaign execution, brand strategy, social and email sequences.',
+    description: 'Everything in Starter plus Jordan (AI CRO), pipeline management, deal tracking, outreach sequences.',
     monthlyPrice: 34900, // $349.00 in cents
-    metadata: {
-      tier: 'pro',
-      founding_rate: '$349/mo',
-      public_rate: '$499/mo',
-    },
+    tier: 'PRO',
   },
   {
     name: 'Zander Business',
-    description: 'The complete C-suite. Everything in Pro plus Jordan (AI CRO), pipeline management, deal tracking, outreach sequences.',
+    description: 'The complete C-suite. Everything in Pro plus Don (AI CMO), marketing calendar, campaign execution, brand strategy.',
     monthlyPrice: 59900, // $599.00 in cents
-    metadata: {
-      tier: 'business',
-      founding_rate: '$599/mo',
-      public_rate: '$799/mo',
-    },
-  },
-  {
-    name: 'Zander Enterprise',
-    description: 'Custom build for complex organizations. Everything in Business plus custom executive configuration, multi-location support, priority onboarding.',
-    monthlyPrice: 99900, // $999.00 in cents
-    metadata: {
-      tier: 'enterprise',
-      founding_rate: '$999/mo',
-      public_rate: '$1,499/mo',
-    },
+    tier: 'BUSINESS',
   },
 ];
 
-const waitlistProduct = {
-  name: 'Zander Waitlist Reservation',
-  description: 'Reserve your spot in the next Zander onboarding cohort. Non-refundable.',
-  price: 4900, // $49.00 in cents
-  metadata: {
-    tier: 'waitlist',
-    type: 'one_time',
-  },
-};
-
 async function createProducts() {
   console.log('Creating Zander Stripe products...\n');
+  console.log('='.repeat(60));
 
-  const createdPrices: Record<string, string> = {};
+  const results: { tier: string; productId: string; priceId: string }[] = [];
 
-  // Create subscription products
   for (const productConfig of products) {
-    console.log(`Creating product: ${productConfig.name}`);
+    console.log(`\nCreating: ${productConfig.name}`);
+    console.log(`  Tier: ${productConfig.tier}`);
+    console.log(`  Price: $${(productConfig.monthlyPrice / 100).toFixed(2)}/month`);
 
     const product = await stripe.products.create({
       name: productConfig.name,
       description: productConfig.description,
-      metadata: productConfig.metadata,
+      metadata: {
+        tier: productConfig.tier,
+      },
     });
 
     const price = await stripe.prices.create({
@@ -100,50 +76,37 @@ async function createProducts() {
         interval: 'month',
       },
       metadata: {
-        tier: productConfig.metadata.tier,
-        founding_rate: 'true',
+        tier: productConfig.tier,
       },
     });
 
-    createdPrices[productConfig.metadata.tier] = price.id;
+    results.push({
+      tier: productConfig.tier,
+      productId: product.id,
+      priceId: price.id,
+    });
+
     console.log(`  Product ID: ${product.id}`);
     console.log(`  Price ID: ${price.id}`);
+  }
+
+  console.log('\n' + '='.repeat(60));
+  console.log('SUMMARY - ADD THESE TO ENVIRONMENT VARIABLES:');
+  console.log('='.repeat(60));
+  console.log('');
+
+  for (const result of results) {
+    console.log(`${result.tier}:`);
+    console.log(`  Product: ${result.productId}`);
+    console.log(`  Price:   ${result.priceId}`);
     console.log('');
   }
 
-  // Create waitlist product (one-time)
-  console.log(`Creating product: ${waitlistProduct.name}`);
-
-  const waitlistProd = await stripe.products.create({
-    name: waitlistProduct.name,
-    description: waitlistProduct.description,
-    metadata: waitlistProduct.metadata,
-  });
-
-  const waitlistPrice = await stripe.prices.create({
-    product: waitlistProd.id,
-    unit_amount: waitlistProduct.price,
-    currency: 'usd',
-    metadata: {
-      tier: 'waitlist',
-      type: 'one_time',
-    },
-  });
-
-  createdPrices['waitlist'] = waitlistPrice.id;
-  console.log(`  Product ID: ${waitlistProd.id}`);
-  console.log(`  Price ID: ${waitlistPrice.id}`);
+  console.log('Environment variable format:');
   console.log('');
-
-  console.log('='.repeat(60));
-  console.log('ADD THESE PRICE IDs TO VERCEL ENVIRONMENT VARIABLES:');
-  console.log('='.repeat(60));
-  console.log('');
-  console.log(`STRIPE_PRICE_STARTER=${createdPrices['starter']}`);
-  console.log(`STRIPE_PRICE_PRO=${createdPrices['pro']}`);
-  console.log(`STRIPE_PRICE_BUSINESS=${createdPrices['business']}`);
-  console.log(`STRIPE_PRICE_ENTERPRISE=${createdPrices['enterprise']}`);
-  console.log(`STRIPE_PRICE_WAITLIST=${createdPrices['waitlist']}`);
+  for (const result of results) {
+    console.log(`STRIPE_PRICE_${result.tier}=${result.priceId}`);
+  }
   console.log('');
   console.log('Done! Products and prices created successfully.');
 }

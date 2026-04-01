@@ -11,12 +11,15 @@ import {
   Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { HQGoalsService } from './hq-goals.service';
 import { CreateHQGoalDto } from './dto/create-hq-goal.dto';
 import { UpdateHQGoalDto } from './dto/update-hq-goal.dto';
 
 @Controller('hq-goals')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class HQGoalsController {
   constructor(private readonly hqGoalsService: HQGoalsService) {}
 

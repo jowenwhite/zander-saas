@@ -1,10 +1,13 @@
 import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { ExecutiveChatDto, ZanderChatDto } from './dto';
 
 @Controller('ai')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 

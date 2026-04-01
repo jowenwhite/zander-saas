@@ -79,11 +79,13 @@ model Tenant {
   userTenantAccess        UserTenantAccess[]
   products                Product[]
   campaigns               Campaign[]
-  stripeCustomerId        String?
-  stripeSubscriptionId    String?
-  subscriptionStatus      String?
-  subscriptionTier        String?
-  subscriptionCohort      String?
+  // Subscription fields
+  // Valid subscriptionTier values: FREE, STARTER, PRO, BUSINESS, ENTERPRISE
+  stripeCustomerId        String?                  @map("stripe_customer_id")
+  stripeSubscriptionId    String?                  @map("stripe_subscription_id")
+  subscriptionStatus      String?                  @map("subscription_status")
+  subscriptionTier        String                   @default("FREE") @map("subscription_tier")
+  subscriptionCohort      String?                  @map("subscription_cohort")
   trialEndsAt             DateTime?
   rateLockExpiresAt       DateTime?
   // Company settings
