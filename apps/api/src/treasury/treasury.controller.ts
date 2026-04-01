@@ -8,7 +8,7 @@ import { RequireTier } from '../common/decorators/require-tier.decorator';
 
 @Controller('treasury')
 @UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('PRO')
+@RequireTier('STARTER')
 export class TreasuryController {
   constructor(private readonly treasuryService: TreasuryService) {}
 

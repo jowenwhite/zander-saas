@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, Query, Headers, Body, UnauthorizedException, HttpCode, Request, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Query, Headers, Body, UnauthorizedException, HttpCode, Request, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AdminService } from './admin.service';
 import { Public } from '../auth/public.decorator';
@@ -432,6 +432,110 @@ export class AdminController {
   async getWaitlistSummary(@Headers('x-admin-secret') secretKey: string) {
     this.validateAdminSecret(secretKey);
     return this.adminService.getWaitlistSummary();
+  }
+
+  // ============================================
+  // TENANT TIER MANAGEMENT ENDPOINTS
+  // ============================================
+
+  /**
+   * GET /admin/tenants
+   * List all tenants with their tier info
+   */
+  @Public()
+  @Get('tenants')
+  async listTenants(@Headers('x-admin-secret') secretKey: string) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.listTenants();
+  }
+
+  /**
+   * GET /admin/tenants/:id/subscription
+   * Get tenant subscription details
+   */
+  @Public()
+  @Get('tenants/:id/subscription')
+  async getTenantSubscription(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.getTenantSubscription(tenantId);
+  }
+
+  /**
+   * POST /admin/tenants/:id/tier-override
+   * Set tier override for a tenant (grants access without payment)
+   */
+  @Public()
+  @Post('tenants/:id/tier-override')
+  @HttpCode(200)
+  async setTierOverride(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+    @Body() data: { tier: string; note?: string },
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.setTierOverride(tenantId, data.tier, data.note);
+  }
+
+  /**
+   * DELETE /admin/tenants/:id/tier-override
+   * Remove tier override for a tenant
+   */
+  @Public()
+  @Delete('tenants/:id/tier-override')
+  async removeTierOverride(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.removeTierOverride(tenantId);
+  }
+
+  /**
+   * POST /admin/tenants/:id/trial
+   * Start a trial for a tenant
+   */
+  @Public()
+  @Post('tenants/:id/trial')
+  @HttpCode(200)
+  async startTrial(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+    @Body() data: { tier: string; durationDays: number },
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.startTrial(tenantId, data.tier, data.durationDays);
+  }
+
+  /**
+   * DELETE /admin/tenants/:id/trial
+   * End a trial for a tenant
+   */
+  @Public()
+  @Delete('tenants/:id/trial')
+  async endTrial(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.endTrial(tenantId);
+  }
+
+  /**
+   * PATCH /admin/tenants/:id/subscription-tier
+   * Update subscription tier directly (for manual adjustments)
+   */
+  @Public()
+  @Patch('tenants/:id/subscription-tier')
+  async updateSubscriptionTier(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+    @Body() data: { tier: string },
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.updateSubscriptionTier(tenantId, data.tier);
   }
 
   /**

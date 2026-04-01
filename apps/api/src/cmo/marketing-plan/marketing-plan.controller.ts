@@ -5,11 +5,17 @@ import {
   Patch,
   Body,
   Request,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { TierGuard } from '../../common/guards/tier.guard';
+import { RequireTier } from '../../common/decorators/require-tier.decorator';
 import { MarketingPlanService } from './marketing-plan.service';
 import { UpsertMarketingPlanDto } from './dto/upsert-marketing-plan.dto';
 
 @Controller('cmo/marketing-plan')
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('BUSINESS')
 export class MarketingPlanController {
   constructor(private readonly marketingPlanService: MarketingPlanService) {}
 

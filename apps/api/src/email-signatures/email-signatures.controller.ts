@@ -1,9 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { EmailSignaturesService } from './email-signatures.service';
 import { CreateEmailSignatureDto } from './dto/create-email-signature.dto';
 import { UpdateEmailSignatureDto } from './dto/update-email-signature.dto';
 
 @Controller('email-signatures')
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class EmailSignaturesController {
   constructor(private readonly emailSignaturesService: EmailSignaturesService) {}
 

@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { AutomationService } from './automation.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import {
@@ -10,7 +12,8 @@ import {
 } from './dto';
 
 @Controller()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class AutomationController {
   constructor(private readonly automationService: AutomationService) {}
 

@@ -1,12 +1,15 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, Logger } from '@nestjs/common';
 import { ProductsService, ProductImportRow } from './products.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CreateProductDto, UpdateProductDto } from './dto';
 
 @Controller('products')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
 

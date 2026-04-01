@@ -1,7 +1,12 @@
-import { Controller, Get, Request } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { TierGuard } from '../../common/guards/tier.guard';
+import { RequireTier } from '../../common/decorators/require-tier.decorator';
 import { DashboardService } from './dashboard.service';
 
 @Controller('cmo/dashboard')
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('BUSINESS')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 

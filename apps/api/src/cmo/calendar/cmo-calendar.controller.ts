@@ -10,6 +10,9 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { TierGuard } from '../../common/guards/tier.guard';
+import { RequireTier } from '../../common/decorators/require-tier.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CmoCalendarService } from './cmo-calendar.service';
@@ -21,6 +24,8 @@ import { CreateIdeaDto } from './dto/create-idea.dto';
 import { UpdateIdeaDto } from './dto/update-idea.dto';
 
 @Controller('cmo/calendar')
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('BUSINESS')
 export class CmoCalendarController {
   constructor(private readonly cmoCalendarService: CmoCalendarService) {}
 

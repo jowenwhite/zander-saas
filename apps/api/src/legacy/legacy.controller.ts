@@ -10,13 +10,16 @@ import {
   Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { LegacyService } from './legacy.service';
 import { CreateMilestoneDto } from './dto/create-milestone.dto';
 import { UpdateMilestoneDto } from './dto/update-milestone.dto';
 import { ReorderMilestonesDto } from './dto/reorder-milestones.dto';
 
 @Controller('legacy')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class LegacyController {
   constructor(private readonly legacyService: LegacyService) {}
 

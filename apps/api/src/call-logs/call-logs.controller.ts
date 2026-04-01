@@ -1,11 +1,14 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { CallLogsService } from './call-logs.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('call-logs')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class CallLogsController {
   constructor(private readonly callLogsService: CallLogsService) {}
 

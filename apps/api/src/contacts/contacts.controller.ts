@@ -1,12 +1,15 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto, UpdateContactDto, ImportContactsDto } from './dto';
 
 @Controller('contacts')
-@UseGuards(JwtAuthGuard) // All routes require authentication
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
 

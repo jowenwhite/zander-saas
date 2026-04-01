@@ -88,6 +88,12 @@ model Tenant {
   subscriptionCohort      String?                  @map("subscription_cohort")
   trialEndsAt             DateTime?
   rateLockExpiresAt       DateTime?
+  // Trial and override fields for tier management
+  trialTier               String?                  @map("trial_tier")
+  trialStartDate          DateTime?                @map("trial_start_date")
+  trialEndDate            DateTime?                @map("trial_end_date")
+  tierOverride            String?                  @map("tier_override")
+  tierOverrideNote        String?                  @map("tier_override_note")
   // Company settings
   website                 String?
   email                   String?

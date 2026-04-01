@@ -63,17 +63,39 @@ export class TierGuard implements CanActivate {
       throw new ForbiddenException('Tenant not identified');
     }
 
-    // Look up tenant's subscription tier from database
+    // Look up tenant's subscription tier and override fields from database
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
-      select: { subscriptionTier: true },
+      select: {
+        subscriptionTier: true,
+        tierOverride: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+      },
     });
 
     if (!tenant) {
       throw new ForbiddenException('Tenant not found');
     }
 
-    const currentTier = tenant.subscriptionTier || 'FREE';
+    // Determine effective tier: tierOverride > active trial > subscriptionTier > FREE
+    let currentTier = tenant.subscriptionTier || 'FREE';
+
+    // Check for tier override (admin-granted access)
+    if (tenant.tierOverride) {
+      currentTier = tenant.tierOverride;
+    }
+    // Check for active trial
+    else if (tenant.trialTier && tenant.trialStartDate && tenant.trialEndDate) {
+      const now = new Date();
+      const trialStart = new Date(tenant.trialStartDate);
+      const trialEnd = new Date(tenant.trialEndDate);
+
+      if (now >= trialStart && now <= trialEnd) {
+        currentTier = tenant.trialTier;
+      }
+    }
 
     // Get tier levels
     const requiredLevel = TierGuard.TIER_HIERARCHY.indexOf(

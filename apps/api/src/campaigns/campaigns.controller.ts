@@ -1,10 +1,15 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TierGuard } from '../common/guards/tier.guard';
+import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CampaignsService } from './campaigns.service';
 import { CreateCampaignDto, UpdateCampaignDto, EnrollContactDto } from './dto';
 
 @Controller('campaigns')
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('STARTER')
 export class CampaignsController {
   constructor(private readonly campaignsService: CampaignsService) {}
 

@@ -9,6 +9,9 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { TierGuard } from '../../common/guards/tier.guard';
+import { RequireTier } from '../../common/decorators/require-tier.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { WorkflowsService } from './workflows.service';
@@ -16,6 +19,8 @@ import { CreateWorkflowDto } from './dto/create-workflow.dto';
 import { UpdateWorkflowDto } from './dto/update-workflow.dto';
 
 @Controller('cmo/workflows')
+@UseGuards(JwtAuthGuard, TierGuard)
+@RequireTier('BUSINESS')
 export class WorkflowsController {
   constructor(private readonly workflowsService: WorkflowsService) {}
 

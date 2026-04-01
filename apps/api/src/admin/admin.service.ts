@@ -3851,4 +3851,293 @@ If at limit:
       },
     };
   }
+
+  // ============================================
+  // TENANT TIER MANAGEMENT METHODS
+  // ============================================
+
+  /**
+   * List all tenants with their tier info
+   */
+  async listTenants() {
+    const tenants = await this.prisma.tenant.findMany({
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionTier: true,
+        tierOverride: true,
+        tierOverrideNote: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+        createdAt: true,
+        _count: {
+          select: { users: true },
+        },
+      },
+      orderBy: { companyName: 'asc' },
+    });
+
+    return {
+      success: true,
+      data: tenants.map((t) => ({
+        id: t.id,
+        name: t.companyName,
+        subscriptionTier: t.subscriptionTier || 'FREE',
+        tierOverride: t.tierOverride,
+        tierOverrideNote: t.tierOverrideNote,
+        trialTier: t.trialTier,
+        trialStartDate: t.trialStartDate,
+        trialEndDate: t.trialEndDate,
+        trialActive: this.isTrialActive(t),
+        effectiveTier: this.getEffectiveTier(t),
+        userCount: t._count.users,
+        createdAt: t.createdAt,
+      })),
+      count: tenants.length,
+    };
+  }
+
+  /**
+   * Get tenant subscription details
+   */
+  async getTenantSubscription(tenantId: string) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionTier: true,
+        tierOverride: true,
+        tierOverrideNote: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+        createdAt: true,
+        _count: {
+          select: { users: true },
+        },
+      },
+    });
+
+    if (!tenant) {
+      return { success: false, error: 'Tenant not found' };
+    }
+
+    return {
+      success: true,
+      data: {
+        id: tenant.id,
+        name: tenant.companyName,
+        subscriptionTier: tenant.subscriptionTier || 'FREE',
+        tierOverride: tenant.tierOverride,
+        tierOverrideNote: tenant.tierOverrideNote,
+        trialTier: tenant.trialTier,
+        trialStartDate: tenant.trialStartDate,
+        trialEndDate: tenant.trialEndDate,
+        trialActive: this.isTrialActive(tenant),
+        effectiveTier: this.getEffectiveTier(tenant),
+        userCount: tenant._count.users,
+        createdAt: tenant.createdAt,
+      },
+    };
+  }
+
+  /**
+   * Set tier override for a tenant (grants access without payment)
+   */
+  async setTierOverride(tenantId: string, tier: string, note?: string) {
+    const validTiers = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
+    const normalizedTier = tier.toUpperCase();
+
+    if (!validTiers.includes(normalizedTier)) {
+      return { success: false, error: `Invalid tier: ${tier}. Valid tiers: ${validTiers.join(', ')}` };
+    }
+
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        tierOverride: normalizedTier,
+        tierOverrideNote: note,
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionTier: true,
+        tierOverride: true,
+        tierOverrideNote: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Tier override set to ${normalizedTier} for ${tenant.companyName}`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * Remove tier override for a tenant
+   */
+  async removeTierOverride(tenantId: string) {
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        tierOverride: null,
+        tierOverrideNote: null,
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionTier: true,
+        tierOverride: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Tier override removed for ${tenant.companyName}. Effective tier is now ${tenant.subscriptionTier || 'FREE'}`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * Start a trial for a tenant
+   */
+  async startTrial(tenantId: string, tier: string, durationDays: number) {
+    const validTiers = ['STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
+    const normalizedTier = tier.toUpperCase();
+
+    if (!validTiers.includes(normalizedTier)) {
+      return { success: false, error: `Invalid trial tier: ${tier}. Valid tiers: ${validTiers.join(', ')}` };
+    }
+
+    if (durationDays < 1 || durationDays > 90) {
+      return { success: false, error: 'Trial duration must be between 1 and 90 days' };
+    }
+
+    const now = new Date();
+    const trialEndDate = new Date(now);
+    trialEndDate.setDate(trialEndDate.getDate() + durationDays);
+
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        trialTier: normalizedTier,
+        trialStartDate: now,
+        trialEndDate: trialEndDate,
+      },
+      select: {
+        id: true,
+        companyName: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: `${durationDays}-day ${normalizedTier} trial started for ${tenant.companyName}`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * End a trial for a tenant
+   */
+  async endTrial(tenantId: string) {
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        trialTier: null,
+        trialStartDate: null,
+        trialEndDate: null,
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionTier: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Trial ended for ${tenant.companyName}. Effective tier is now ${tenant.subscriptionTier || 'FREE'}`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * Update subscription tier directly (for manual adjustments)
+   */
+  async updateSubscriptionTier(tenantId: string, tier: string) {
+    const validTiers = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
+    const normalizedTier = tier.toUpperCase();
+
+    if (!validTiers.includes(normalizedTier)) {
+      return { success: false, error: `Invalid tier: ${tier}. Valid tiers: ${validTiers.join(', ')}` };
+    }
+
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        subscriptionTier: normalizedTier,
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionTier: true,
+        tierOverride: true,
+      },
+    });
+
+    const effectiveTier = tenant.tierOverride || tenant.subscriptionTier;
+
+    return {
+      success: true,
+      message: `Subscription tier updated to ${normalizedTier} for ${tenant.companyName}`,
+      data: {
+        ...tenant,
+        effectiveTier,
+      },
+    };
+  }
+
+  /**
+   * Helper: Check if trial is active
+   */
+  private isTrialActive(tenant: {
+    trialTier?: string | null;
+    trialStartDate?: Date | null;
+    trialEndDate?: Date | null;
+  }): boolean {
+    if (!tenant.trialTier || !tenant.trialStartDate || !tenant.trialEndDate) {
+      return false;
+    }
+    const now = new Date();
+    const trialStart = new Date(tenant.trialStartDate);
+    const trialEnd = new Date(tenant.trialEndDate);
+    return now >= trialStart && now <= trialEnd;
+  }
+
+  /**
+   * Helper: Get effective tier considering override and trial
+   */
+  private getEffectiveTier(tenant: {
+    subscriptionTier?: string | null;
+    tierOverride?: string | null;
+    trialTier?: string | null;
+    trialStartDate?: Date | null;
+    trialEndDate?: Date | null;
+  }): string {
+    // Priority: tierOverride > active trial > subscriptionTier > FREE
+    if (tenant.tierOverride) {
+      return tenant.tierOverride;
+    }
+    if (this.isTrialActive(tenant)) {
+      return tenant.trialTier!;
+    }
+    return tenant.subscriptionTier || 'FREE';
+  }
 }

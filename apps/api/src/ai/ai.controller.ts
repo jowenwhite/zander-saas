@@ -1,13 +1,12 @@
 import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TierGuard } from '../common/guards/tier.guard';
-import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { ExecutiveChatDto, ZanderChatDto } from './dto';
 
+// NOTE: No tier guard here - this is a generic endpoint that routes to ALL executives.
+// Tier checking happens in AiService based on which executive is being accessed.
 @Controller('ai')
-@UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('STARTER')
+@UseGuards(JwtAuthGuard)
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
