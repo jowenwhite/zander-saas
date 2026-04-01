@@ -132,4 +132,67 @@ export class TenantsService {
     }
     return tenant;
   }
+
+  /**
+   * Get the effective subscription tier for a tenant.
+   * Priority: tierOverride > active trial > subscriptionTier > FREE
+   */
+  async getEffectiveTier(tenantId: string) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: {
+        id: true,
+        subscriptionTier: true,
+        tierOverride: true,
+        tierOverrideNote: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+        stripeCustomerId: true,
+        stripeSubscriptionId: true,
+      },
+    });
+
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    }
+
+    // Determine effective tier: tierOverride > active trial > subscriptionTier > FREE
+    let effectiveTier = tenant.subscriptionTier || 'FREE';
+    let tierSource: 'subscription' | 'override' | 'trial' = 'subscription';
+    let trialDaysRemaining: number | null = null;
+
+    // Check for tier override (admin-granted access)
+    if (tenant.tierOverride) {
+      effectiveTier = tenant.tierOverride;
+      tierSource = 'override';
+    }
+    // Check for active trial
+    else if (tenant.trialTier && tenant.trialStartDate && tenant.trialEndDate) {
+      const now = new Date();
+      const trialStart = new Date(tenant.trialStartDate);
+      const trialEnd = new Date(tenant.trialEndDate);
+
+      if (now >= trialStart && now <= trialEnd) {
+        effectiveTier = tenant.trialTier;
+        tierSource = 'trial';
+        trialDaysRemaining = Math.ceil(
+          (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        );
+      }
+    }
+
+    return {
+      tenantId: tenant.id,
+      effectiveTier: effectiveTier.toUpperCase(),
+      tierSource,
+      baseTier: (tenant.subscriptionTier || 'FREE').toUpperCase(),
+      trialTier: tenant.trialTier?.toUpperCase() || null,
+      trialEndDate: tenant.trialEndDate,
+      trialDaysRemaining,
+      tierOverride: tenant.tierOverride?.toUpperCase() || null,
+      tierOverrideNote: tenant.tierOverrideNote,
+      hasStripeSubscription: !!tenant.stripeSubscriptionId,
+    };
+  }
 }

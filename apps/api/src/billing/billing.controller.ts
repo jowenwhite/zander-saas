@@ -52,15 +52,40 @@ export class BillingController {
   @Post('checkout')
   async createCheckout(
     @Request() req: any,
-    @Body() body: { priceId: string; cohort?: 'beta' | 'founding' | 'public' },
+    @Body() body: {
+      priceId?: string;
+      tier?: 'STARTER' | 'PRO' | 'BUSINESS';
+      cohort?: 'beta' | 'founding' | 'public';
+      successUrl?: string;
+      cancelUrl?: string;
+    },
   ) {
     const baseUrl = process.env.FRONTEND_URL || 'https://app.zanderos.com';
+
+    // Resolve priceId from tier if not provided directly
+    let priceId = body.priceId;
+    if (!priceId && body.tier) {
+      const tierPriceMap: Record<string, string | undefined> = {
+        STARTER: process.env.STRIPE_PRICE_STARTER,
+        PRO: process.env.STRIPE_PRICE_PRO,
+        BUSINESS: process.env.STRIPE_PRICE_BUSINESS,
+      };
+      priceId = tierPriceMap[body.tier];
+      if (!priceId) {
+        throw new Error(`Price ID not configured for tier: ${body.tier}`);
+      }
+    }
+
+    if (!priceId) {
+      throw new Error('Either priceId or tier must be provided');
+    }
+
     return this.billingService.createCheckoutSession(
       req.user.tenantId,
       req.user.email,
-      body.priceId,
-      `${baseUrl}/settings?tab=billing&success=true`,
-      `${baseUrl}/settings?tab=billing&canceled=true`,
+      priceId,
+      body.successUrl || `${baseUrl}/settings?tab=billing&success=true`,
+      body.cancelUrl || `${baseUrl}/settings?tab=billing&canceled=true`,
       body.cohort || 'public',
       14,
     );

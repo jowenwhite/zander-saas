@@ -3,9 +3,24 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import OnboardingChecklist from './OnboardingChecklist';
 import TenantSwitcher from './TenantSwitcher';
-import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck, UserCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck, UserCircle2, ChevronLeft, ChevronRight, Lock, Clock, Megaphone, DollarSign, Settings, Users2, Server } from 'lucide-react';
+import { useTier, SubscriptionTier } from '../contexts/TierContext';
+import { EXECUTIVE_TIERS, hasExecutiveAccess, getRequiredTier, getTierConfig } from '../../lib/tier-config';
+import UpgradeModal from './UpgradeModal';
+import ComingSoonModal from './ComingSoonModal';
 
 const SIDEBAR_COLLAPSED_KEY = 'zander_sidebar_collapsed';
+
+// All executives with their sidebar configuration
+const EXECUTIVE_CONFIGS = [
+  { id: 'jordan', icon: Bot, label: 'Jordan', role: 'CRO', fullTitle: 'Chief Revenue Officer', href: '/ai', color: '#00CCEE', comingSoon: false },
+  { id: 'pam', icon: UserCircle2, label: 'Pam', role: 'EA', fullTitle: 'Executive Assistant', href: '/ea', color: '#C2185B', comingSoon: false },
+  { id: 'don', icon: Megaphone, label: 'Don', role: 'CMO', fullTitle: 'Chief Marketing Officer', href: '/cmo', color: '#F57C00', comingSoon: false },
+  { id: 'ben', icon: DollarSign, label: 'Ben', role: 'CFO', fullTitle: 'Chief Financial Officer', href: '/cfo', color: '#2E7D32', comingSoon: true },
+  { id: 'miranda', icon: Settings, label: 'Miranda', role: 'COO', fullTitle: 'Chief Operations Officer', href: '/coo', color: '#5E35B1', comingSoon: true },
+  { id: 'ted', icon: Users2, label: 'Ted', role: 'CPO', fullTitle: 'Chief People Officer', href: '/cpo', color: '#0288D1', comingSoon: true },
+  { id: 'jarvis', icon: Server, label: 'Jarvis', role: 'CIO', fullTitle: 'Chief Information Officer', href: '/cio', color: '#455A64', comingSoon: true },
+];
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -14,10 +29,16 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedChange }: SidebarProps) {
   const pathname = usePathname();
+  const { tier, loading: tierLoading } = useTier();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [showOnboardingChecklist, setShowOnboardingChecklist] = useState(false);
   const [checklistDismissed, setChecklistDismissed] = useState(false);
   const [internalCollapsed, setInternalCollapsed] = useState(false);
+
+  // Modal states
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [comingSoonModalOpen, setComingSoonModalOpen] = useState(false);
+  const [selectedExecutive, setSelectedExecutive] = useState<typeof EXECUTIVE_CONFIGS[0] | null>(null);
 
   // Use controlled value if provided, otherwise use internal state
   const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed;
@@ -107,9 +128,27 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
     { icon: Mail, label: 'Communication', href: '/communication' },
     { icon: Calendar, label: 'Schedule', href: '/schedule' },
     { icon: ClipboardList, label: 'Forms', href: '/forms' },
-    { icon: Bot, label: 'Ask Jordan (CRO)', href: '/ai' },
-    { icon: UserCircle2, label: 'Ask Pam (EA)', href: '/ea' },
   ];
+
+  // Determine executive access states
+  const getExecutiveState = (exec: typeof EXECUTIVE_CONFIGS[0]): 'active' | 'locked' | 'coming_soon' => {
+    if (exec.comingSoon) return 'coming_soon';
+    if (!tier) return 'locked'; // Loading or not authenticated
+    const effectiveTier = tier.effectiveTier;
+    const hasAccess = hasExecutiveAccess(effectiveTier, exec.id);
+    return hasAccess ? 'active' : 'locked';
+  };
+
+  const handleExecutiveClick = (exec: typeof EXECUTIVE_CONFIGS[0], state: 'active' | 'locked' | 'coming_soon') => {
+    if (state === 'coming_soon') {
+      setSelectedExecutive(exec);
+      setComingSoonModalOpen(true);
+    } else if (state === 'locked') {
+      setSelectedExecutive(exec);
+      setUpgradeModalOpen(true);
+    }
+    // For 'active', we just let the link navigate normally
+  };
 
   const linkStyle = (active: boolean) => ({
     display: 'flex',
@@ -280,6 +319,130 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
           </ul>
         </div>
 
+        {/* AI Team Section */}
+        <div style={{ padding: '1rem 1rem 0' }}>
+          <div style={sectionHeaderStyle}>
+            AI Team
+          </div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            {EXECUTIVE_CONFIGS.map((exec) => {
+              const state = getExecutiveState(exec);
+              const isLocked = state === 'locked';
+              const isComingSoon = state === 'coming_soon';
+              const isExecActive = isActive(exec.href);
+
+              return (
+                <li key={exec.id} style={{ marginBottom: '0.25rem' }}>
+                  {state === 'active' ? (
+                    <a
+                      href={exec.href}
+                      style={{
+                        ...linkStyle(isExecActive),
+                        justifyContent: isCollapsed ? 'center' : 'flex-start',
+                      }}
+                      title={isCollapsed ? `${exec.label} (${exec.role})` : undefined}
+                    >
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <div style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: exec.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          color: 'white',
+                        }}>
+                          {exec.label[0]}
+                        </div>
+                      </div>
+                      {!isCollapsed && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          {exec.label}
+                          <span style={{ fontSize: '0.7rem', color: '#8888A0' }}>({exec.role})</span>
+                        </span>
+                      )}
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => handleExecutiveClick(exec, state)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        color: isComingSoon ? '#55556A' : '#8888A0',
+                        background: 'transparent',
+                        border: 'none',
+                        width: '100%',
+                        cursor: 'pointer',
+                        fontWeight: '400',
+                        transition: 'all 0.2s ease',
+                        justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        opacity: isComingSoon ? 0.6 : 0.8,
+                      }}
+                      title={isCollapsed ? `${exec.label} (${exec.role}) - ${isComingSoon ? 'Coming Soon' : 'Upgrade Required'}` : undefined}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <div style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: isComingSoon ? '#2A2A38' : exec.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          color: 'white',
+                          opacity: isComingSoon ? 0.5 : 0.7,
+                        }}>
+                          {exec.label[0]}
+                        </div>
+                        {/* Lock or Clock overlay */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '-2px',
+                          right: '-4px',
+                          width: '14px',
+                          height: '14px',
+                          borderRadius: '50%',
+                          background: '#09090F',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                          {isComingSoon ? (
+                            <Clock size={10} style={{ color: '#55556A' }} />
+                          ) : (
+                            <Lock size={10} style={{ color: '#F0B429' }} />
+                          )}
+                        </div>
+                      </div>
+                      {!isCollapsed && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          {exec.label}
+                          <span style={{ fontSize: '0.7rem', color: '#55556A' }}>({exec.role})</span>
+                        </span>
+                      )}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
         {/* Admin Section - SuperAdmin Only */}
         {isSuperAdmin && (
           <div style={{ padding: '1rem', borderTop: '2px solid #2A2A38', marginTop: '1rem' }}>
@@ -354,6 +517,29 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
             </button>
           )}
         </div>
+      )}
+
+      {/* Upgrade Modal */}
+      {upgradeModalOpen && selectedExecutive && (
+        <UpgradeModal
+          executive={selectedExecutive}
+          currentTier={tier?.effectiveTier || 'FREE'}
+          onClose={() => {
+            setUpgradeModalOpen(false);
+            setSelectedExecutive(null);
+          }}
+        />
+      )}
+
+      {/* Coming Soon Modal */}
+      {comingSoonModalOpen && selectedExecutive && (
+        <ComingSoonModal
+          executive={selectedExecutive}
+          onClose={() => {
+            setComingSoonModalOpen(false);
+            setSelectedExecutive(null);
+          }}
+        />
       )}
     </aside>
   );

@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from './components/ThemeProvider'
 import { PostHogProvider } from './components/PostHogProvider'
 import { PEPProvider, PersistentExecutivePanel } from './components/pep'
+import { TierProvider } from './contexts/TierContext'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,10 +32,12 @@ export default function RootLayout({
       <body className={`${inter.variable} ${sora.variable} font-sans`}>
         <PostHogProvider>
           <ThemeProvider>
-            <PEPProvider>
-              {children}
-              <PersistentExecutivePanel />
-            </PEPProvider>
+            <TierProvider>
+              <PEPProvider>
+                {children}
+                <PersistentExecutivePanel />
+              </PEPProvider>
+            </TierProvider>
           </ThemeProvider>
         </PostHogProvider>
       </body>

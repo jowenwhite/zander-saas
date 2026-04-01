@@ -16,6 +16,11 @@ export class TenantsController {
     return this.tenantsService.findOne(req.user.tenantId);
   }
 
+  @Get('tier')
+  async getMyTier(@Request() req) {
+    return this.tenantsService.getEffectiveTier(req.user.tenantId);
+  }
+
   @Patch('me')
   async updateMyTenant(
     @Request() req,
