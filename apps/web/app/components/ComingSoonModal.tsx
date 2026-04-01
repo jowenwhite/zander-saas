@@ -188,7 +188,7 @@ export default function ComingSoonModal({ executive, onClose }: ComingSoonModalP
                     letterSpacing: '0.5px',
                   }}
                 >
-                  Coming Soon
+                  Coming Q4 2026
                 </span>
               </div>
               <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.95rem' }}>

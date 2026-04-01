@@ -5,21 +5,22 @@ import OnboardingChecklist from './OnboardingChecklist';
 import TenantSwitcher from './TenantSwitcher';
 import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck, UserCircle2, ChevronLeft, ChevronRight, Lock, Clock, Megaphone, DollarSign, Settings, Users2, Server } from 'lucide-react';
 import { useTier, SubscriptionTier } from '../contexts/TierContext';
-import { EXECUTIVE_TIERS, hasExecutiveAccess, getRequiredTier, getTierConfig } from '../../lib/tier-config';
+import { EXECUTIVE_TIERS, hasExecutiveAccess, getRequiredTier, getTierConfig, isComingSoon } from '../../lib/tier-config';
 import UpgradeModal from './UpgradeModal';
 import ComingSoonModal from './ComingSoonModal';
 
 const SIDEBAR_COLLAPSED_KEY = 'zander_sidebar_collapsed';
 
 // All executives with their sidebar configuration
+// Note: comingSoon status is determined by isComingSoon() from tier-config.ts
 const EXECUTIVE_CONFIGS = [
-  { id: 'jordan', icon: Bot, label: 'Jordan', role: 'CRO', fullTitle: 'Chief Revenue Officer', href: '/ai', color: '#00CCEE', comingSoon: false },
-  { id: 'pam', icon: UserCircle2, label: 'Pam', role: 'EA', fullTitle: 'Executive Assistant', href: '/ea', color: '#C2185B', comingSoon: false },
-  { id: 'don', icon: Megaphone, label: 'Don', role: 'CMO', fullTitle: 'Chief Marketing Officer', href: '/cmo', color: '#F57C00', comingSoon: false },
-  { id: 'ben', icon: DollarSign, label: 'Ben', role: 'CFO', fullTitle: 'Chief Financial Officer', href: '/cfo', color: '#2E7D32', comingSoon: true },
-  { id: 'miranda', icon: Settings, label: 'Miranda', role: 'COO', fullTitle: 'Chief Operations Officer', href: '/coo', color: '#5E35B1', comingSoon: true },
-  { id: 'ted', icon: Users2, label: 'Ted', role: 'CPO', fullTitle: 'Chief People Officer', href: '/cpo', color: '#0288D1', comingSoon: true },
-  { id: 'jarvis', icon: Server, label: 'Jarvis', role: 'CIO', fullTitle: 'Chief Information Officer', href: '/cio', color: '#455A64', comingSoon: true },
+  { id: 'pam', icon: UserCircle2, label: 'Pam', role: 'EA', fullTitle: 'Executive Assistant', href: '/ea', color: '#C2185B' },
+  { id: 'jordan', icon: Bot, label: 'Jordan', role: 'CRO', fullTitle: 'Chief Revenue Officer', href: '/ai', color: '#00CCEE' },
+  { id: 'don', icon: Megaphone, label: 'Don', role: 'CMO', fullTitle: 'Chief Marketing Officer', href: '/cmo', color: '#F57C00' },
+  { id: 'ben', icon: DollarSign, label: 'Ben', role: 'CFO', fullTitle: 'Chief Financial Officer', href: '/cfo', color: '#2E7D32' },
+  { id: 'miranda', icon: Settings, label: 'Miranda', role: 'COO', fullTitle: 'Chief Operations Officer', href: '/coo', color: '#5E35B1' },
+  { id: 'ted', icon: Users2, label: 'Ted', role: 'CPO', fullTitle: 'Chief People Officer', href: '/cpo', color: '#0288D1' },
+  { id: 'jarvis', icon: Server, label: 'Jarvis', role: 'CIO', fullTitle: 'Chief Information Officer', href: '/cio', color: '#455A64' },
 ];
 
 interface SidebarProps {
@@ -132,7 +133,8 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
 
   // Determine executive access states
   const getExecutiveState = (exec: typeof EXECUTIVE_CONFIGS[0]): 'active' | 'locked' | 'coming_soon' => {
-    if (exec.comingSoon) return 'coming_soon';
+    // Check if coming soon (null tier in config = coming soon)
+    if (isComingSoon(exec.id)) return 'coming_soon';
     if (!tier) return 'locked'; // Loading or not authenticated
     const effectiveTier = tier.effectiveTier;
     const hasAccess = hasExecutiveAccess(effectiveTier, exec.id);
@@ -328,7 +330,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
             {EXECUTIVE_CONFIGS.map((exec) => {
               const state = getExecutiveState(exec);
               const isLocked = state === 'locked';
-              const isComingSoon = state === 'coming_soon';
+              const isExecComingSoon = state === 'coming_soon';
               const isExecActive = isActive(exec.href);
 
               return (
@@ -375,7 +377,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                         padding: '0.75rem 1rem',
                         borderRadius: '8px',
                         textDecoration: 'none',
-                        color: isComingSoon ? '#55556A' : '#8888A0',
+                        color: isExecComingSoon ? '#55556A' : '#8888A0',
                         background: 'transparent',
                         border: 'none',
                         width: '100%',
@@ -383,9 +385,9 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                         fontWeight: '400',
                         transition: 'all 0.2s ease',
                         justifyContent: isCollapsed ? 'center' : 'flex-start',
-                        opacity: isComingSoon ? 0.6 : 0.8,
+                        opacity: isExecComingSoon ? 0.6 : 0.8,
                       }}
-                      title={isCollapsed ? `${exec.label} (${exec.role}) - ${isComingSoon ? 'Coming Soon' : 'Upgrade Required'}` : undefined}
+                      title={isCollapsed ? `${exec.label} (${exec.role}) - ${isExecComingSoon ? 'Coming Q4 2026' : 'Upgrade Required'}` : undefined}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
                       }}
@@ -398,14 +400,14 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                           width: '24px',
                           height: '24px',
                           borderRadius: '50%',
-                          background: isComingSoon ? '#2A2A38' : exec.color,
+                          background: isExecComingSoon ? '#2A2A38' : exec.color,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '12px',
                           fontWeight: '700',
                           color: 'white',
-                          opacity: isComingSoon ? 0.5 : 0.7,
+                          opacity: isExecComingSoon ? 0.5 : 0.7,
                         }}>
                           {exec.label[0]}
                         </div>
@@ -422,7 +424,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}>
-                          {isComingSoon ? (
+                          {isExecComingSoon ? (
                             <Clock size={10} style={{ color: '#55556A' }} />
                           ) : (
                             <Lock size={10} style={{ color: '#F0B429' }} />
