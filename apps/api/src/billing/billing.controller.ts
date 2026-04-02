@@ -30,7 +30,7 @@ export class BillingController {
   async createWaitlistDeposit(
     @Body() body: { email: string; name: string },
   ) {
-    const baseUrl = process.env.FRONTEND_URL || 'https://app.zanderos.com';
+    const baseUrl = process.env.FRONTEND_URL || 'https://zanderos.com';
     return this.billingService.createWaitlistDeposit(
       body.email,
       body.name,
@@ -60,7 +60,7 @@ export class BillingController {
       cancelUrl?: string;
     },
   ) {
-    const baseUrl = process.env.FRONTEND_URL || 'https://app.zanderos.com';
+    const baseUrl = process.env.FRONTEND_URL || 'https://zanderos.com';
 
     // Resolve priceId from tier if not provided directly
     let priceId = body.priceId;
@@ -135,7 +135,7 @@ export class BillingController {
     @Request() req: any,
     @Body() body: { returnUrl?: string },
   ) {
-    const baseUrl = process.env.FRONTEND_URL || 'https://app.zanderos.com';
+    const baseUrl = process.env.FRONTEND_URL || 'https://zanderos.com';
     return this.billingService.createBillingPortalSession(
       req.user.tenantId,
       body.returnUrl || `${baseUrl}/settings?tab=billing`,

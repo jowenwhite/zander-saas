@@ -1,10 +1,26 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+// Stripe price IDs for each tier
+const TIER_PRICE_MAP: Record<string, string> = {
+  STARTER: 'price_1THMKiCryiiyM4ceRYP44O8T',
+  PRO: 'price_1THMKiCryiiyM4ceQjddUKNI',
+  BUSINESS: 'price_1THMKjCryiiyM4ceaJIYMyfI',
+};
+
+const TIER_DISPLAY_NAMES: Record<string, string> = {
+  STARTER: 'Starter',
+  PRO: 'Pro',
+  BUSINESS: 'Business',
+};
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedTier = searchParams.get('tier')?.toUpperCase() || null;
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -12,6 +28,7 @@ export default function SignupPage() {
   const [company, setCompany] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,8 +78,44 @@ export default function SignupPage() {
         localStorage.setItem('zander_token', loginData.token);
         localStorage.setItem('zander_user', JSON.stringify(loginData.user));
 
-        // Redirect to dashboard (onboarding wizard will show there)
-        router.push('/');
+        // If tier was selected, redirect to Stripe checkout
+        if (selectedTier && TIER_PRICE_MAP[selectedTier]) {
+          setCheckoutLoading(true);
+          try {
+            const checkoutResponse = await fetch('https://api.zanderos.com/billing/checkout', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${loginData.token}`
+              },
+              body: JSON.stringify({
+                priceId: TIER_PRICE_MAP[selectedTier],
+                cohort: 'founding',
+                successUrl: `${window.location.origin}/upgrade-success?tier=${selectedTier}`,
+                cancelUrl: `${window.location.origin}/settings?tab=billing&canceled=true`,
+              })
+            });
+
+            const checkoutData = await checkoutResponse.json();
+
+            if (checkoutData.url) {
+              // Redirect to Stripe Checkout
+              window.location.href = checkoutData.url;
+              return;
+            } else {
+              // Checkout creation failed, go to dashboard anyway
+              console.error('Checkout URL not returned:', checkoutData);
+              router.push('/');
+            }
+          } catch (checkoutErr) {
+            console.error('Checkout redirect failed:', checkoutErr);
+            // Still go to dashboard if checkout fails
+            router.push('/');
+          }
+        } else {
+          // No tier selected, redirect to dashboard (FREE account)
+          router.push('/');
+        }
       } else {
         // Account created but login failed - send to login page
         router.push('/login?registered=true');
@@ -71,6 +124,7 @@ export default function SignupPage() {
       setError('Unable to connect to server. Please try again.');
     } finally {
       setLoading(false);
+      setCheckoutLoading(false);
     }
   };
 
@@ -150,9 +204,27 @@ export default function SignupPage() {
             marginBottom: '0.5rem',
             color: '#F0F0F5'
           }}>Create Your Account</h2>
-          <p style={{ marginBottom: '2rem', color: '#8888A0' }}>
+          <p style={{ marginBottom: '1rem', color: '#8888A0' }}>
             Start transforming your business with Zander
           </p>
+
+          {selectedTier && TIER_PRICE_MAP[selectedTier] && (
+            <div style={{
+              background: 'rgba(0, 204, 238, 0.1)',
+              border: '1px solid rgba(0, 204, 238, 0.3)',
+              borderRadius: '8px',
+              padding: '0.75rem 1rem',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}>
+              <span style={{ color: '#00CCEE', fontSize: '1.2rem' }}>✓</span>
+              <span style={{ color: '#F0F0F5', fontSize: '0.9rem' }}>
+                You selected <strong style={{ color: '#00CCEE' }}>{TIER_DISPLAY_NAMES[selectedTier]}</strong> — you'll complete payment after signup
+              </span>
+            </div>
+          )}
 
           {error && (
             <div style={{
@@ -313,23 +385,23 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || checkoutLoading}
               style={{
                 width: '100%',
                 padding: '0.875rem 1rem',
-                background: loading ? '#555' : '#00CCEE',
+                background: (loading || checkoutLoading) ? '#555' : '#00CCEE',
                 color: '#000000',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '1rem',
                 fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: (loading || checkoutLoading) ? 'not-allowed' : 'pointer',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                 boxShadow: '0 4px 6px rgba(0, 204, 238, 0.2)',
                 marginBottom: '1.5rem'
               }}
               onMouseOver={(e) => {
-                if (!loading) {
+                if (!loading && !checkoutLoading) {
                   e.currentTarget.style.transform = 'translateY(-2px)';
                   e.currentTarget.style.boxShadow = '0 6px 8px rgba(0, 204, 238, 0.3)';
                 }
@@ -339,7 +411,7 @@ export default function SignupPage() {
                 e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 204, 238, 0.2)';
               }}
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {checkoutLoading ? 'Redirecting to Payment...' : loading ? 'Creating Account...' : selectedTier ? `Create Account & Continue to Payment` : 'Create Account'}
             </button>
           </form>
 

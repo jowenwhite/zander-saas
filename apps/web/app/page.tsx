@@ -1125,7 +1125,7 @@ export default function LandingPage() {
                 $199<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
               <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$299/mo public</p>
-              <a href="/signup" style={{
+              <a href="/signup?tier=STARTER" style={{
                 display: 'block',
                 width: '100%',
                 padding: '14px',
@@ -1193,7 +1193,7 @@ export default function LandingPage() {
                 $349<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
               <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$499/mo public</p>
-              <a href="/signup" style={{
+              <a href="/signup?tier=PRO" style={{
                 display: 'block',
                 width: '100%',
                 padding: '14px',
@@ -1244,7 +1244,7 @@ export default function LandingPage() {
                 $599<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
               <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.4)', textDecoration: 'line-through', marginBottom: '28px' }}>$799/mo public</p>
-              <a href="/signup" style={{
+              <a href="/signup?tier=BUSINESS" style={{
                 display: 'block',
                 width: '100%',
                 padding: '14px',

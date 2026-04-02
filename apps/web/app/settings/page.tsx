@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
@@ -58,9 +59,41 @@ const getIntegrationIcon = (iconKey: string, size: number = 24): React.ReactNode
 };
 
 export default function SettingsPage() {
+  const searchParams = useSearchParams();
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  const [showCanceledBanner, setShowCanceledBanner] = useState(false);
+
+  // Handle success/canceled query params for billing redirects
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+    const tab = searchParams.get('tab');
+
+    if (tab) {
+      setActiveTab(tab);
+    }
+
+    if (success === 'true') {
+      setShowSuccessBanner(true);
+      // Auto-hide after 8 seconds
+      const timer = setTimeout(() => setShowSuccessBanner(false), 8000);
+      // Clean up URL
+      window.history.replaceState({}, '', '/settings?tab=billing');
+      return () => clearTimeout(timer);
+    }
+
+    if (canceled === 'true') {
+      setShowCanceledBanner(true);
+      // Auto-hide after 5 seconds
+      const timer = setTimeout(() => setShowCanceledBanner(false), 5000);
+      // Clean up URL
+      window.history.replaceState({}, '', '/settings?tab=billing');
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   // Profile State - starts empty, populated from API
   const [profile, setProfile] = useState({
@@ -2263,6 +2296,102 @@ export default function SettingsPage() {
             </div>
           ) : (
           <>
+          {/* Success Banner */}
+          {showSuccessBanner && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%)',
+              border: '1px solid rgba(34, 197, 94, 0.4)',
+              borderRadius: '12px',
+              padding: '1rem 1.5rem',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: '#22C55E',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Check size={18} color="#fff" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, color: '#F0F0F5', fontWeight: '600', fontSize: '1rem' }}>
+                    Subscription activated successfully!
+                  </p>
+                  <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
+                    Your 14-day free trial has started. Welcome to Zander!
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSuccessBanner(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#8888A0',
+                  cursor: 'pointer',
+                  padding: '0.5rem',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Canceled Banner */}
+          {showCanceledBanner && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              borderRadius: '12px',
+              padding: '1rem 1.5rem',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: '#F59E0B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <AlertTriangle size={18} color="#fff" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, color: '#F0F0F5', fontWeight: '600', fontSize: '1rem' }}>
+                    Checkout was canceled
+                  </p>
+                  <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
+                    No charges were made. You can try again anytime.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowCanceledBanner(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#8888A0',
+                  cursor: 'pointer',
+                  padding: '0.5rem',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
           <div style={{ background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', color: 'white' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.75rem' }}>{profile.firstName?.[0] || ''}{profile.lastName?.[0] || ''}</div>
