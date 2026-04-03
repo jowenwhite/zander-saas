@@ -450,6 +450,14 @@ export default function SettingsPage() {
   const [billingLoading, setBillingLoading] = useState(true);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
   const [selectedInterval, setSelectedInterval] = useState<'month' | 'year'>('month');
+  const [tokenUsage, setTokenUsage] = useState<{
+    monthlyTokensUsed: number;
+    monthlyTokenLimit: number;
+    effectiveTier: string;
+    percentageUsed: number;
+    formatted: { used: string; limit: string };
+    resetsAt: string;
+  } | null>(null);
 
   // Data Retention State
   const [dataRetention, setDataRetention] = useState('90');
@@ -499,6 +507,17 @@ export default function SettingsPage() {
           if (subRes.ok) {
             const subData = await subRes.json();
             setBilling(subData);
+          }
+
+          // Fetch token usage
+          const tokenRes = await fetch('https://api.zanderos.com/billing/token-usage', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (tokenRes.ok) {
+            const tokenData = await tokenRes.json();
+            if (tokenData.success) {
+              setTokenUsage(tokenData.usage);
+            }
           }
         }
       } catch (error) {
@@ -1607,7 +1626,7 @@ export default function SettingsPage() {
                 <CreditCard size={16} /> Manage Payment Method
               </button>
               {!billing.cancelAtPeriodEnd && (
-                <button 
+                <button
                   onClick={handleCancelSubscription}
                   style={{ padding: '0.75rem 1.5rem', background: '#1C1C26', color: '#DC3545', border: '2px solid #DC3545', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
                 >
@@ -1621,6 +1640,55 @@ export default function SettingsPage() {
             <div style={{ marginBottom: '0.5rem', color: '#00CCEE' }}><Rocket size={32} /></div>
             <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.5rem' }}>No Active Subscription</div>
             <div style={{ color: '#8888A0', fontSize: '0.9rem' }}>Choose a plan below to get started with Zander</div>
+          </div>
+        )}
+
+        {/* AI Token Usage */}
+        {tokenUsage && (
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem' }}>AI Token Usage</h3>
+            <div style={{ padding: '1.5rem', background: '#1C1C26', borderRadius: '12px', border: '2px solid #2A2A38' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <div>
+                  <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>Monthly Token Usage</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
+                    {tokenUsage.formatted.used} <span style={{ fontSize: '1rem', fontWeight: '400', color: '#8888A0' }}>/ {tokenUsage.formatted.limit}</span>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{tokenUsage.effectiveTier} Plan</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: '600', color: tokenUsage.percentageUsed >= 90 ? '#DC3545' : tokenUsage.percentageUsed >= 75 ? '#F0B323' : '#28A745' }}>
+                    {tokenUsage.percentageUsed}% used
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div style={{
+                width: '100%',
+                height: '12px',
+                background: '#09090F',
+                borderRadius: '6px',
+                overflow: 'hidden',
+                marginBottom: '0.75rem'
+              }}>
+                <div style={{
+                  width: `${Math.min(100, tokenUsage.percentageUsed)}%`,
+                  height: '100%',
+                  background: tokenUsage.percentageUsed >= 90
+                    ? 'linear-gradient(90deg, #DC3545 0%, #FF6B6B 100%)'
+                    : tokenUsage.percentageUsed >= 75
+                      ? 'linear-gradient(90deg, #F0B323 0%, #FFD700 100%)'
+                      : 'linear-gradient(90deg, #00CCEE 0%, #00E5FF 100%)',
+                  borderRadius: '6px',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+
+              <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>
+                Resets on {new Date(tokenUsage.resetsAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              </div>
+            </div>
           </div>
         )}
 

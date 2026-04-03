@@ -94,6 +94,9 @@ model Tenant {
   trialEndDate            DateTime?                @map("trial_end_date")
   tierOverride            String?                  @map("tier_override")
   tierOverrideNote        String?                  @map("tier_override_note")
+  // Token usage tracking (monthly rollup for fast cap checking)
+  monthlyTokensUsed       Int                      @default(0) @map("monthly_tokens_used")
+  tokenResetDate          DateTime?                @map("token_reset_date")
   // Company settings
   website                 String?
   email                   String?

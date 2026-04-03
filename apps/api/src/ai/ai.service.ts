@@ -1,5 +1,11 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  TIER_TOKEN_CAPS,
+  TIER_HIERARCHY,
+  getTokenCapForTier,
+  formatTokenCount,
+} from '../common/config/tier-config';
 
 interface Executive {
   id: string;
@@ -25,8 +31,6 @@ const EXECUTIVE_TIER_REQUIREMENTS: Record<string, string | null> = {
   cpo: null,          // Ted - Coming Q4 2026
   cio: null,          // Jarvis - Coming Q4 2026
 };
-
-const TIER_HIERARCHY = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
 
 const executives: Record<string, Executive> = {
   cro: {
@@ -225,6 +229,177 @@ export class AiService {
   constructor(private prisma: PrismaService) {}
 
   /**
+   * Get tenant's effective tier considering overrides and trials.
+   */
+  private getEffectiveTier(tenant: {
+    subscriptionTier: string | null;
+    tierOverride: string | null;
+    trialTier: string | null;
+    trialStartDate: Date | null;
+    trialEndDate: Date | null;
+  }): string {
+    let currentTier = tenant.subscriptionTier || 'FREE';
+
+    if (tenant.tierOverride) {
+      currentTier = tenant.tierOverride;
+    } else if (tenant.trialTier && tenant.trialStartDate && tenant.trialEndDate) {
+      const now = new Date();
+      const trialStart = new Date(tenant.trialStartDate);
+      const trialEnd = new Date(tenant.trialEndDate);
+      if (now >= trialStart && now <= trialEnd) {
+        currentTier = tenant.trialTier;
+      }
+    }
+
+    return currentTier.toUpperCase();
+  }
+
+  /**
+   * Check if the tenant has tokens remaining for the current month.
+   * Performs lazy monthly reset if needed.
+   * Returns tenant data with updated token info.
+   */
+  private async checkAndResetTokens(tenantId: string): Promise<{
+    tenant: any;
+    effectiveTier: string;
+    monthlyTokensUsed: number;
+    monthlyTokenLimit: number;
+    tokenResetDate: Date;
+  }> {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: {
+        id: true,
+        subscriptionTier: true,
+        tierOverride: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+        monthlyTokensUsed: true,
+        tokenResetDate: true,
+      },
+    });
+
+    if (!tenant) {
+      throw new ForbiddenException('Tenant not found');
+    }
+
+    const effectiveTier = this.getEffectiveTier(tenant);
+    const monthlyTokenLimit = getTokenCapForTier(effectiveTier);
+
+    // Check if we need to reset (first of current month)
+    const now = new Date();
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const tokenResetDate = tenant.tokenResetDate ? new Date(tenant.tokenResetDate) : null;
+
+    let monthlyTokensUsed = tenant.monthlyTokensUsed || 0;
+
+    // Lazy reset: if tokenResetDate is null or in a prior month, reset
+    if (!tokenResetDate || tokenResetDate < firstOfMonth) {
+      await this.prisma.tenant.update({
+        where: { id: tenantId },
+        data: {
+          monthlyTokensUsed: 0,
+          tokenResetDate: firstOfMonth,
+        },
+      });
+      monthlyTokensUsed = 0;
+    }
+
+    return {
+      tenant,
+      effectiveTier,
+      monthlyTokensUsed,
+      monthlyTokenLimit,
+      tokenResetDate: firstOfMonth,
+    };
+  }
+
+  /**
+   * Check if tenant has tokens remaining. Throws if cap exceeded.
+   */
+  private async enforceTokenCap(tenantId: string): Promise<{
+    effectiveTier: string;
+    monthlyTokensUsed: number;
+    monthlyTokenLimit: number;
+    tokenResetDate: Date;
+  }> {
+    const { effectiveTier, monthlyTokensUsed, monthlyTokenLimit, tokenResetDate } =
+      await this.checkAndResetTokens(tenantId);
+
+    if (monthlyTokensUsed >= monthlyTokenLimit) {
+      // Calculate next reset date (first of next month)
+      const nextReset = new Date(tokenResetDate);
+      nextReset.setMonth(nextReset.getMonth() + 1);
+
+      throw new ForbiddenException({
+        statusCode: 403,
+        tokenCapExceeded: true,
+        monthlyTokensUsed,
+        monthlyTokenLimit,
+        effectiveTier,
+        resetsAt: nextReset.toISOString(),
+        message: `Monthly token limit reached. You've used ${formatTokenCount(monthlyTokensUsed)} of your ${formatTokenCount(monthlyTokenLimit)} token allowance. Resets on ${nextReset.toLocaleDateString()}.`,
+      });
+    }
+
+    return { effectiveTier, monthlyTokensUsed, monthlyTokenLimit, tokenResetDate };
+  }
+
+  /**
+   * Record token usage after a successful API call.
+   * Updates both the tenant rollup and the detailed TokenUsage table.
+   */
+  private async recordTokenUsage(
+    tenantId: string,
+    executiveId: string,
+    inputTokens: number,
+    outputTokens: number,
+  ): Promise<{ monthlyTokensUsed: number }> {
+    const totalTokens = inputTokens + outputTokens;
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+
+    // Update tenant rollup
+    const updatedTenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        monthlyTokensUsed: { increment: totalTokens },
+      },
+      select: { monthlyTokensUsed: true },
+    });
+
+    // Upsert to TokenUsage for per-executive analytics
+    await this.prisma.tokenUsage.upsert({
+      where: {
+        tenantId_executive_month_year: {
+          tenantId,
+          executive: executiveId,
+          month,
+          year,
+        },
+      },
+      update: {
+        inputTokens: { increment: inputTokens },
+        outputTokens: { increment: outputTokens },
+        totalTokens: { increment: totalTokens },
+      },
+      create: {
+        tenantId,
+        executive: executiveId,
+        month,
+        year,
+        inputTokens,
+        outputTokens,
+        totalTokens,
+      },
+    });
+
+    return { monthlyTokensUsed: updatedTenant.monthlyTokensUsed };
+  }
+
+  /**
    * Verify tenant has access to the requested executive based on their subscription tier.
    * Throws ForbiddenException if access is denied.
    */
@@ -336,6 +511,10 @@ export class AiService {
     // Check executive tier access before proceeding
     await this.checkExecutiveAccess(tenantId, executiveId, executive.name);
 
+    // Check token cap before making API call
+    const { effectiveTier, monthlyTokensUsed, monthlyTokenLimit, tokenResetDate } =
+      await this.enforceTokenCap(tenantId);
+
     // Get context data for the tenant
     const [deals, contacts, activities] = await Promise.all([
       this.prisma.deal.findMany({
@@ -428,10 +607,28 @@ IMPORTANT: If the user asks about how to use Zander, platform features, or needs
       if (!response.ok) {
         const error = await response.text();
         console.error('Claude API error:', error);
-        return this.getMockResponse(executive, message);
+        return this.getMockResponse(executive, message, {
+          monthlyTokensUsed,
+          monthlyTokenLimit,
+          effectiveTier,
+        });
       }
 
       const data = await response.json();
+
+      // Extract token usage from Claude response
+      const inputTokens = data.usage?.input_tokens || 0;
+      const outputTokens = data.usage?.output_tokens || 0;
+      const tokensUsed = inputTokens + outputTokens;
+
+      // Record usage
+      const { monthlyTokensUsed: updatedMonthlyTokensUsed } = await this.recordTokenUsage(
+        tenantId,
+        executiveId,
+        inputTokens,
+        outputTokens,
+      );
+
       return {
         content: data.content[0].text,
         executive: {
@@ -439,14 +636,30 @@ IMPORTANT: If the user asks about how to use Zander, platform features, or needs
           name: executive.name,
           role: executive.role,
         },
+        usage: {
+          tokensUsed,
+          inputTokens,
+          outputTokens,
+          monthlyTokensUsed: updatedMonthlyTokensUsed,
+          monthlyTokenLimit,
+          effectiveTier,
+        },
       };
     } catch (error) {
       console.error('Error calling Claude API:', error);
-      return this.getMockResponse(executive, message);
+      return this.getMockResponse(executive, message, {
+        monthlyTokensUsed,
+        monthlyTokenLimit,
+        effectiveTier,
+      });
     }
   }
 
-  private getMockResponse(executive: Executive, message: string): any {
+  private getMockResponse(
+    executive: Executive,
+    message: string,
+    usageInfo?: { monthlyTokensUsed: number; monthlyTokenLimit: number; effectiveTier: string },
+  ): any {
     const lowerMessage = message.toLowerCase();
     let response = '';
 
@@ -511,7 +724,7 @@ While the full AI integration is being set up, I can tell you that my expertise 
 Could you tell me more specifically what you'd like help with? I'm ready to dive in! 🚀`;
     }
 
-    return {
+    const result: any = {
       content: response,
       executive: {
         id: executive.id,
@@ -519,6 +732,20 @@ Could you tell me more specifically what you'd like help with? I'm ready to dive
         role: executive.role,
       },
     };
+
+    // Include usage info if provided (mock responses don't consume real tokens)
+    if (usageInfo) {
+      result.usage = {
+        tokensUsed: 0,
+        inputTokens: 0,
+        outputTokens: 0,
+        monthlyTokensUsed: usageInfo.monthlyTokensUsed,
+        monthlyTokenLimit: usageInfo.monthlyTokenLimit,
+        effectiveTier: usageInfo.effectiveTier,
+      };
+    }
+
+    return result;
   }
 
 

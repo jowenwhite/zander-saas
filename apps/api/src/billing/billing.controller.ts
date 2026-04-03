@@ -11,10 +11,15 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Public } from '../auth/jwt-auth.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import { PrismaService } from '../prisma/prisma.service';
+import { getTokenCapForTier, formatTokenCount } from '../common/config/tier-config';
 
 @Controller('billing')
 export class BillingController {
-  constructor(private readonly billingService: BillingService) {}
+  constructor(
+    private readonly billingService: BillingService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   // ============================================
   // PUBLIC ENDPOINTS
@@ -142,5 +147,68 @@ export class BillingController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('token-usage')
+  async getTokenUsage(@Request() req: any) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: req.user.tenantId },
+      select: {
+        subscriptionTier: true,
+        tierOverride: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+        monthlyTokensUsed: true,
+        tokenResetDate: true,
+      },
+    });
 
+    if (!tenant) {
+      return { success: false, error: 'Tenant not found' };
+    }
+
+    // Determine effective tier
+    let effectiveTier = tenant.subscriptionTier || 'FREE';
+    if (tenant.tierOverride) {
+      effectiveTier = tenant.tierOverride;
+    } else if (tenant.trialTier && tenant.trialStartDate && tenant.trialEndDate) {
+      const now = new Date();
+      const trialStart = new Date(tenant.trialStartDate);
+      const trialEnd = new Date(tenant.trialEndDate);
+      if (now >= trialStart && now <= trialEnd) {
+        effectiveTier = tenant.trialTier;
+      }
+    }
+
+    const monthlyTokenLimit = getTokenCapForTier(effectiveTier);
+    const monthlyTokensUsed = tenant.monthlyTokensUsed || 0;
+
+    // Check if reset is needed (lazy reset logic for display)
+    const now = new Date();
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const tokenResetDate = tenant.tokenResetDate ? new Date(tenant.tokenResetDate) : null;
+    const needsReset = !tokenResetDate || tokenResetDate < firstOfMonth;
+
+    // Calculate next reset date
+    const nextReset = new Date(firstOfMonth);
+    nextReset.setMonth(nextReset.getMonth() + 1);
+
+    return {
+      success: true,
+      usage: {
+        monthlyTokensUsed: needsReset ? 0 : monthlyTokensUsed,
+        monthlyTokenLimit,
+        effectiveTier: effectiveTier.toUpperCase(),
+        percentageUsed: Math.min(
+          100,
+          Math.round(((needsReset ? 0 : monthlyTokensUsed) / monthlyTokenLimit) * 100),
+        ),
+        formatted: {
+          used: formatTokenCount(needsReset ? 0 : monthlyTokensUsed),
+          limit: formatTokenCount(monthlyTokenLimit),
+        },
+        resetsAt: nextReset.toISOString(),
+      },
+    };
+  }
 }
