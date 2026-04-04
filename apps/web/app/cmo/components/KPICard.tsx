@@ -34,16 +34,12 @@ export default function KPICard({
     position: 'relative',
   };
 
-  const iconBoxStyle: CSSProperties = {
-    width: '48px',
-    height: '48px',
-    borderRadius: '12px',
-    background: gradient || `linear-gradient(135deg, ${color} 0%, ${adjustColor(color, -20)} 100%)`,
-    color: 'white',
+  // Flat monochrome icon style - no colored backgrounds
+  const iconStyle: CSSProperties = {
+    color: '#00CCEE',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '1.25rem',
   };
 
   return (
@@ -62,7 +58,7 @@ export default function KPICard({
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <div style={iconBoxStyle}>{icon}</div>
+        <div style={iconStyle}>{icon}</div>
         {trend && (
           <span style={{
             padding: '0.25rem 0.5rem',
@@ -98,14 +94,4 @@ export default function KPICard({
       )}
     </div>
   );
-}
-
-// Helper function to darken/lighten colors
-function adjustColor(color: string, amount: number): string {
-  const hex = color.replace('#', '');
-  const num = parseInt(hex, 16);
-  const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-  const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
-  const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
 }

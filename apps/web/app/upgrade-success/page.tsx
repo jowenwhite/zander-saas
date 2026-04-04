@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
 const TIER_CONFIG: Record<string, {
   displayName: string;
@@ -63,7 +63,7 @@ const TIER_CONFIG: Record<string, {
   },
 };
 
-export default function UpgradeSuccessPage() {
+function UpgradeSuccessContent() {
   const searchParams = useSearchParams();
   const tier = searchParams.get('tier')?.toUpperCase() || 'STARTER';
   const config = TIER_CONFIG[tier] || TIER_CONFIG.STARTER;
@@ -325,5 +325,14 @@ export default function UpgradeSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+// Wrap in Suspense to handle useSearchParams
+export default function UpgradeSuccessPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#09090F' }} />}>
+      <UpgradeSuccessContent />
+    </Suspense>
   );
 }

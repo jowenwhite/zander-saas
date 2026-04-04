@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import NavBar from '../../../components/NavBar';
 import Sidebar from '../../../components/Sidebar';
@@ -36,7 +36,7 @@ interface FormSubmission {
   };
 }
 
-export default function FormSubmitPage() {
+function FormSubmitContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const formId = params.formId as string;
@@ -501,6 +501,15 @@ export default function FormSubmitPage() {
         }
       `}</style>
     </AuthGuard>
+  );
+}
+
+// Wrap in Suspense to handle useSearchParams
+export default function FormSubmitPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#09090F' }} />}>
+      <FormSubmitContent />
+    </Suspense>
   );
 }
 

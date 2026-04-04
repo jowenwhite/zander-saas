@@ -126,35 +126,41 @@ export default function ProductionPage() {
     { id: 'lost_deals', name: 'Lost This Month', icon: 'trendingDown', color: '#95A5A6', gradient: 'linear-gradient(135deg, #95A5A6 0%, #7f8c8d 100%)' },
   ];
   
-  // Calculate KPI values
+  // Calculate KPI values - uses dynamic stage detection from stages array
   const getKpiValue = (kpiId: string) => {
+    // Get early-stage names (first few stages by order)
+    const earlyStages = stages.slice(0, Math.min(2, stages.length)).map(s => s.name);
+    // Get mid-to-late stage names (for "closing soon" - stages with high probability but not won)
+    const closingStages = stages.filter(s => s.probability >= 50 && s.probability < 100).map(s => s.name);
+
     switch (kpiId) {
       case 'won_revenue':
         return { value: formatCurrency(wonValue), detail: `${wonDeals.length} deals closed`, trend: '+12%', trendUp: true };
       case 'pipeline_value':
         return { value: formatCurrency(pipelineValue), detail: `${activeDeals.length} active deals`, trend: '+8%', trendUp: true };
       case 'closing_soon':
-        const closingDeals = deals.filter(d => d.stage === 'NEGOTIATION');
+        const closingDeals = deals.filter(d => closingStages.includes(d.stage));
         return { value: String(closingDeals.length), detail: `Expected: ${formatCurrency(closingDeals.reduce((sum, d) => sum + d.dealValue, 0))}`, trend: '+5', trendUp: true };
       case 'win_rate':
         return { value: `${winRate}%`, detail: 'Last 30 days', trend: '+3%', trendUp: true };
       case 'avg_deal_size':
-        const avgSize = wonDeals.length > 0 ? wonValue / wonDeals.length : 0;
-        return { value: formatCurrency(avgSize), detail: `From ${wonDeals.length} deals`, trend: '+5%', trendUp: true };
+        const avgSize = wonDeals.length > 0 ? wonValue / wonDeals.length : (activeDeals.length > 0 ? pipelineValue / activeDeals.length : 0);
+        return { value: formatCurrency(avgSize), detail: `From ${wonDeals.length > 0 ? wonDeals.length : activeDeals.length} deals`, trend: '+5%', trendUp: true };
       case 'total_deals':
         return { value: String(deals.length), detail: 'All time', trend: '+' + activeDeals.length, trendUp: true };
       case 'weighted_pipeline':
         const weighted = activeDeals.reduce((sum, d) => sum + (d.dealValue * d.probability / 100), 0);
         return { value: formatCurrency(weighted), detail: 'Risk-adjusted', trend: '+6%', trendUp: true };
       case 'leads_count':
-        const leads = deals.filter(d => d.stage === 'LEAD' || d.stage === 'PROSPECT');
+        const leads = deals.filter(d => earlyStages.includes(d.stage));
         return { value: String(leads.length), detail: 'In early stages', trend: '+3', trendUp: true };
       case 'proposals_out':
-        const proposals = deals.filter(d => d.stage === 'PROPOSAL');
-        return { value: String(proposals.length), detail: formatCurrency(proposals.reduce((sum, d) => sum + d.dealValue, 0)), trend: '+2', trendUp: true };
+        // Mid-stages (not early, not closing, not won/lost)
+        const midStages = stages.filter(s => s.probability >= 25 && s.probability < 50).map(s => s.name);
+        const proposalDeals = deals.filter(d => midStages.includes(d.stage));
+        return { value: String(proposalDeals.length), detail: formatCurrency(proposalDeals.reduce((sum, d) => sum + d.dealValue, 0)), trend: '+2', trendUp: true };
       case 'lost_deals':
-        const lost = deals.filter(d => d.stage === 'CLOSED_LOST');
-        return { value: String(lost.length), detail: formatCurrency(lost.reduce((sum, d) => sum + d.dealValue, 0)), trend: '-2', trendUp: false };
+        return { value: String(lostDeals.length), detail: formatCurrency(lostDeals.reduce((sum, d) => sum + d.dealValue, 0)), trend: '-2', trendUp: false };
       default:
         return { value: '0', detail: '', trend: '', trendUp: true };
     }
@@ -336,12 +342,20 @@ export default function ProductionPage() {
     }
   }
 
-  // Calculate metrics
-  const activeDeals = deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST');
-  const wonDeals = deals.filter(d => d.stage === 'CLOSED_WON');
+  // Calculate metrics - detect won/lost stages dynamically
+  const wonStageNames = stages
+    .filter(s => s.probability === 100 || s.name.toLowerCase().includes('won') || s.name.toLowerCase() === 'complete')
+    .map(s => s.name);
+  const lostStageNames = stages
+    .filter(s => s.probability === 0 || s.name.toLowerCase().includes('lost'))
+    .map(s => s.name);
+
+  const activeDeals = deals.filter(d => !wonStageNames.includes(d.stage) && !lostStageNames.includes(d.stage));
+  const wonDeals = deals.filter(d => wonStageNames.includes(d.stage));
+  const lostDeals = deals.filter(d => lostStageNames.includes(d.stage));
   const pipelineValue = activeDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
   const wonValue = wonDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
-  const winRate = deals.length > 0 ? Math.round((wonDeals.length / deals.length) * 100) : 0;
+  const winRate = (wonDeals.length + lostDeals.length) > 0 ? Math.round((wonDeals.length / (wonDeals.length + lostDeals.length)) * 100) : 0;
 
   // Get deals by stage for pipeline
   const getDealsByStage = (stageName: string) => {
@@ -1018,19 +1032,10 @@ export default function ProductionPage() {
               padding: '1.5rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}><DollarSign size={24} /></div>
+                <DollarSign size={24} style={{ color: '#00CCEE' }} />
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
-                {formatCurrency(deals.reduce((sum, d) => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST' ? sum + d.dealValue : sum, 0))}
+                {formatCurrency(pipelineValue)}
               </div>
               <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Total Pipeline</div>
             </div>
@@ -1042,19 +1047,10 @@ export default function ProductionPage() {
               padding: '1.5rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}><Target size={24} /></div>
+                <Target size={24} style={{ color: '#27AE60' }} />
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
-                {formatCurrency(deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + (d.dealValue * d.probability / 100), 0))}
+                {formatCurrency(activeDeals.reduce((sum, d) => sum + (d.dealValue * d.probability / 100), 0))}
               </div>
               <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Weighted Pipeline</div>
             </div>
@@ -1066,23 +1062,10 @@ export default function ProductionPage() {
               padding: '1.5rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #3498DB 0%, #2471a3 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}><BarChart3 size={24} /></div>
+                <BarChart3 size={24} style={{ color: '#3498DB' }} />
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
-                {(() => {
-                  const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
-                  const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
-                  return won + lost > 0 ? ((won / (won + lost)) * 100).toFixed(1) : '0';
-                })()}%
+                {winRate}%
               </div>
               <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Win Rate</div>
             </div>
@@ -1094,23 +1077,10 @@ export default function ProductionPage() {
               padding: '1.5rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #9B59B6 0%, #7d3c98 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}><TrendingUp size={24} /></div>
+                <TrendingUp size={24} style={{ color: '#9B59B6' }} />
               </div>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', marginBottom: '0.25rem' }}>
-                {(() => {
-                  const activeDeals = deals.filter(d => d.stage !== 'CLOSED_WON' && d.stage !== 'CLOSED_LOST');
-                  const total = activeDeals.reduce((sum, d) => sum + d.dealValue, 0);
-                  return activeDeals.length > 0 ? formatCurrency(total / activeDeals.length) : '$0';
-                })()}
+                {activeDeals.length > 0 ? formatCurrency(pipelineValue / activeDeals.length) : '$0'}
               </div>
               <div style={{ color: '#8888A0', fontSize: '0.875rem' }}>Avg Deal Size</div>
             </div>
@@ -1127,21 +1097,21 @@ export default function ProductionPage() {
             }}>
               <h3 style={{ margin: '0 0 1.5rem 0', color: '#F0F0F5', fontSize: '1.25rem' }}>Pipeline Funnel</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'].map((stage) => {
-                  const stageDeals = deals.filter(d => d.stage === stage);
+                {stages.map((stageObj) => {
+                  const stageDeals = deals.filter(d => d.stage === stageObj.name);
                   const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
-                  const maxValue = Math.max(...['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'].map(s => deals.filter(d => d.stage === s).reduce((sum, d) => sum + d.dealValue, 0)), 1);
-                  const stageLabels: Record<string, string> = { 'LEAD': 'Lead', 'PROSPECT': 'Prospect', 'QUALIFIED': 'Qualified', 'PROPOSAL': 'Proposal', 'NEGOTIATION': 'Negotiation', 'CLOSED_WON': 'Closed Won' };
+                  const maxValue = Math.max(...stages.map(s => deals.filter(d => d.stage === s.name).reduce((sum, d) => sum + d.dealValue, 0)), 1);
+                  const isWonStage = wonStageNames.includes(stageObj.name);
                   return (
-                    <div key={stage} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div key={stageObj.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <div style={{ width: '100px', fontSize: '0.875rem', color: '#F0F0F5', fontWeight: '500' }}>
-                        {stageLabels[stage] || stage}
+                        {stageObj.name}
                       </div>
                       <div style={{ flex: 1, height: '32px', background: '#09090F', borderRadius: '6px', overflow: 'hidden' }}>
                         <div style={{
                           width: `${(stageValue / maxValue) * 100}%`,
                           height: '100%',
-                          background: stage === 'CLOSED_WON' ? 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' : 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
+                          background: isWonStage ? 'linear-gradient(135deg, #27AE60 0%, #1e8449 100%)' : 'linear-gradient(135deg, #00CCEE 0%, #0099BB 100%)',
                           borderRadius: '6px',
                           display: 'flex',
                           alignItems: 'center',
@@ -1176,44 +1146,36 @@ export default function ProductionPage() {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <span style={{ color: '#8888A0', fontSize: '0.875rem' }}>Won</span>
-                    <span style={{ color: '#27AE60', fontWeight: '600' }}>{deals.filter(d => d.stage === 'CLOSED_WON').length} deals</span>
+                    <span style={{ color: '#27AE60', fontWeight: '600' }}>{wonDeals.length} deals</span>
                   </div>
                   <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
                     <div style={{
-                      width: (() => {
-                        const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
-                        const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
-                        return won + lost > 0 ? `${(won / (won + lost)) * 100}%` : '0%';
-                      })(),
+                      width: (wonDeals.length + lostDeals.length) > 0 ? `${(wonDeals.length / (wonDeals.length + lostDeals.length)) * 100}%` : '0%',
                       height: '100%',
                       background: '#27AE60',
                       borderRadius: '4px'
                     }}></div>
                   </div>
                   <div style={{ marginTop: '0.5rem', fontSize: '1.25rem', fontWeight: '700', color: '#27AE60' }}>
-                    {formatCurrency(deals.filter(d => d.stage === 'CLOSED_WON').reduce((sum, d) => sum + d.dealValue, 0))}
+                    {formatCurrency(wonValue)}
                   </div>
                 </div>
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <span style={{ color: '#8888A0', fontSize: '0.875rem' }}>Lost</span>
-                    <span style={{ color: '#00CCEE', fontWeight: '600' }}>{deals.filter(d => d.stage === 'CLOSED_LOST').length} deals</span>
+                    <span style={{ color: '#00CCEE', fontWeight: '600' }}>{lostDeals.length} deals</span>
                   </div>
                   <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
                     <div style={{
-                      width: (() => {
-                        const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
-                        const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
-                        return won + lost > 0 ? `${(lost / (won + lost)) * 100}%` : '0%';
-                      })(),
+                      width: (wonDeals.length + lostDeals.length) > 0 ? `${(lostDeals.length / (wonDeals.length + lostDeals.length)) * 100}%` : '0%',
                       height: '100%',
                       background: '#00CCEE',
                       borderRadius: '4px'
                     }}></div>
                   </div>
                   <div style={{ marginTop: '0.5rem', fontSize: '1.25rem', fontWeight: '700', color: '#00CCEE' }}>
-                    {formatCurrency(deals.filter(d => d.stage === 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}
+                    {formatCurrency(lostDeals.reduce((sum, d) => sum + d.dealValue, 0))}
                   </div>
                 </div>
 
@@ -1228,11 +1190,7 @@ export default function ProductionPage() {
                     Conversion Rate
                   </div>
                   <div style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5' }}>
-                    {(() => {
-                      const won = deals.filter(d => d.stage === 'CLOSED_WON').length;
-                      const lost = deals.filter(d => d.stage === 'CLOSED_LOST').length;
-                      return won + lost > 0 ? ((won / (won + lost)) * 100).toFixed(1) : '0';
-                    })()}%
+                    {winRate}%
                   </div>
                 </div>
               </div>
@@ -1260,22 +1218,22 @@ export default function ProductionPage() {
                 </tr>
               </thead>
               <tbody>
-                {['LEAD', 'PROSPECT', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON'].map((stage) => {
-                  const stageDeals = deals.filter(d => d.stage === stage);
+                {stages.filter(s => !lostStageNames.includes(s.name)).map((stageObj) => {
+                  const stageDeals = deals.filter(d => d.stage === stageObj.name);
                   const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
-                  const totalPipeline = deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0);
-                  const stageLabels: Record<string, string> = { 'LEAD': 'Lead', 'PROSPECT': 'Prospect', 'QUALIFIED': 'Qualified', 'PROPOSAL': 'Proposal', 'NEGOTIATION': 'Negotiation', 'CLOSED_WON': 'Closed Won' };
+                  const totalPipeline = pipelineValue + wonValue;
+                  const isWonStage = wonStageNames.includes(stageObj.name);
                   return (
-                    <tr key={stage} style={{ borderBottom: '1px solid #2A2A38' }}>
+                    <tr key={stageObj.id} style={{ borderBottom: '1px solid #2A2A38' }}>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                           <div style={{
                             width: '12px',
                             height: '12px',
                             borderRadius: '50%',
-                            background: stage === 'CLOSED_WON' ? '#27AE60' : '#00CCEE'
+                            background: isWonStage ? '#27AE60' : '#00CCEE'
                           }}></div>
-                          <span style={{ fontWeight: '500', color: '#F0F0F5' }}>{stageLabels[stage] || stage}</span>
+                          <span style={{ fontWeight: '500', color: '#F0F0F5' }}>{stageObj.name}</span>
                         </div>
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'right', color: '#8888A0' }}>{stageDeals.length}</td>
@@ -1293,14 +1251,10 @@ export default function ProductionPage() {
               <tfoot>
                 <tr style={{ background: '#13131A' }}>
                   <td style={{ padding: '1rem', fontWeight: '700', color: 'white' }}>Total</td>
-                  <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{deals.filter(d => d.stage !== 'CLOSED_LOST').length}</td>
-                  <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(deals.filter(d => d.stage !== 'CLOSED_LOST').reduce((sum, d) => sum + d.dealValue, 0))}</td>
+                  <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{activeDeals.length + wonDeals.length}</td>
+                  <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(pipelineValue + wonValue)}</td>
                   <td style={{ padding: '1rem', textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
-                    {(() => {
-                      const filteredDeals = deals.filter(d => d.stage !== 'CLOSED_LOST');
-                      const total = filteredDeals.reduce((sum, d) => sum + d.dealValue, 0);
-                      return filteredDeals.length > 0 ? formatCurrency(total / filteredDeals.length) : '$0';
-                    })()}
+                    {(activeDeals.length + wonDeals.length) > 0 ? formatCurrency((pipelineValue + wonValue) / (activeDeals.length + wonDeals.length)) : '$0'}
                   </td>
                   <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>100%</td>
                 </tr>

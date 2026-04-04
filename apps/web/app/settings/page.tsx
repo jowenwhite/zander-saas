@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
@@ -58,7 +58,7 @@ const getIntegrationIcon = (iconKey: string, size: number = 24): React.ReactNode
   return icons[iconKey] || <Cloud size={size} />;
 };
 
-export default function SettingsPage() {
+function SettingsContent() {
   const searchParams = useSearchParams();
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -2697,5 +2697,14 @@ export default function SettingsPage() {
         </div>
       )}
         </AuthGuard>
+  );
+}
+
+// Wrap SettingsContent in Suspense to handle useSearchParams
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#09090F' }} />}>
+      <SettingsContent />
+    </Suspense>
   );
 }

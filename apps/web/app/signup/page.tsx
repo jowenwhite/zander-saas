@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Stripe price IDs for each tier
@@ -16,7 +16,7 @@ const TIER_DISPLAY_NAMES: Record<string, string> = {
   BUSINESS: 'Business',
 };
 
-export default function SignupPage() {
+function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedTier = searchParams.get('tier')?.toUpperCase() || null;
@@ -435,5 +435,14 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Wrap SignupContent in Suspense to handle useSearchParams
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#09090F' }} />}>
+      <SignupContent />
+    </Suspense>
   );
 }

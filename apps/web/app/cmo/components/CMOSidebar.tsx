@@ -84,14 +84,17 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
         {title}
       </div>
       <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-        {items.map((item) => (
-          <li key={item.label} style={{ marginBottom: '0.25rem' }}>
-            <a href={item.href} style={linkStyle(isActive(item.href))}>
-              <item.icon size={20} strokeWidth={2} style={{ color: 'inherit' }} />
-              {!collapsed && <span>{item.label}</span>}
-            </a>
-          </li>
-        ))}
+        {items.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <li key={item.label} style={{ marginBottom: '0.25rem' }}>
+              <a href={item.href} style={linkStyle(active)}>
+                <item.icon size={20} strokeWidth={2} color={active ? '#F0F0F5' : '#8888A0'} />
+                {!collapsed && <span>{item.label}</span>}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
