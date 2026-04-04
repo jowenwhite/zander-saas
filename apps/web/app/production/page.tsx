@@ -343,9 +343,9 @@ export default function ProductionPage() {
   const wonValue = wonDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
   const winRate = deals.length > 0 ? Math.round((wonDeals.length / deals.length) * 100) : 0;
 
-  // Get deals by stage for pipeline
+  // Get deals by stage for pipeline (case-insensitive)
   const getDealsByStage = (stageName: string) => {
-    return deals.filter(d => d.stage === stageName);
+    return deals.filter(d => d.stage?.toLowerCase() === stageName?.toLowerCase());
   };
 
   // Get greeting based on time of day - uses logged-in user's firstName

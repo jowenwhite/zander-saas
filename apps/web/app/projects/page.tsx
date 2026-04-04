@@ -173,7 +173,7 @@ export default function ProjectsPage() {
 
   function handleDrop(e: React.DragEvent, newStage: string) {
     e.preventDefault();
-    if (draggedDeal && draggedDeal.stage !== newStage) {
+    if (draggedDeal && draggedDeal.stage?.toLowerCase() !== newStage?.toLowerCase()) {
       updateDealStage(draggedDeal.id, newStage);
     }
     setDraggedDeal(null);
@@ -192,7 +192,7 @@ export default function ProjectsPage() {
   });
 
   const getDealsByStage = (stageName: string) => {
-    return filteredDeals.filter(d => d.stage === stageName);
+    return filteredDeals.filter(d => d.stage?.toLowerCase() === stageName?.toLowerCase());
   };
   
   const getStageValue = (stage: string) => {
