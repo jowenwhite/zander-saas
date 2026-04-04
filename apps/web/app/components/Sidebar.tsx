@@ -290,7 +290,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} style={{ color: isActive(item.href) ? '#00CCEE' : '#F0F0F5' }} />
+                  <item.icon size={20} strokeWidth={2} color={isActive(item.href) ? '#00CCEE' : '#F0F0F5'} />
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -313,7 +313,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} style={{ color: isActive(item.href) ? '#00CCEE' : '#F0F0F5' }} />
+                  <item.icon size={20} strokeWidth={2} color={isActive(item.href) ? '#00CCEE' : '#F0F0F5'} />
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -461,7 +461,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? 'Treasury Admin' : undefined}
                 >
-                  <Landmark size={20} strokeWidth={2} style={{ color: 'inherit' }} />
+                  <Landmark size={20} strokeWidth={2} color={isActive('/admin/treasury') ? '#00CCEE' : '#F0F0F5'} />
                   {!isCollapsed && <span>Treasury Admin</span>}
                 </a>
               </li>
@@ -474,7 +474,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? 'Support Admin' : undefined}
                 >
-                  <Shield size={20} strokeWidth={2} style={{ color: 'inherit' }} />
+                  <Shield size={20} strokeWidth={2} color={isActive('/admin/support-admin') ? '#00CCEE' : '#F0F0F5'} />
                   {!isCollapsed && <span>Support Admin</span>}
                 </a>
               </li>

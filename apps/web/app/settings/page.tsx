@@ -459,6 +459,13 @@ function SettingsContent() {
     resetsAt: string;
   } | null>(null);
 
+  // Hardcoded Stripe price fallbacks - used when API doesn't return metadata
+  const FALLBACK_PRICES: Record<string, { id: string; amount: number; interval: 'month' | 'year' }> = {
+    'STARTER': { id: 'price_1THMKiCryiiyM4ceRYP44O8T', amount: 19900, interval: 'month' },
+    'PRO': { id: 'price_1THMKiCryiiyM4ceQjddUKNI', amount: 34900, interval: 'month' },
+    'BUSINESS': { id: 'price_1THMKjCryiiyM4ceaJIYMyfI', amount: 59900, interval: 'month' },
+  };
+
   // Data Retention State
   const [dataRetention, setDataRetention] = useState('90');
 
@@ -1573,10 +1580,10 @@ function SettingsContent() {
     }
 
     const tiers = [
-      { id: 'STARTER', name: 'Starter', description: '1 AI Executive', executives: 1, teamMembers: 3, storage: '5GB' },
-      { id: 'PRO', name: 'Pro', description: '3 AI Executives', executives: 3, teamMembers: 10, storage: '25GB', popular: true },
-      { id: 'BUSINESS', name: 'Business', description: 'All 7 AI Executives', executives: 7, teamMembers: 25, storage: '100GB' },
-      { id: 'enterprise', name: 'Enterprise', description: 'White Glove Service', executives: 7, teamMembers: 'Custom', storage: 'Unlimited', customFeatures: ['White Label Branding', 'Custom Software by Project'] }
+      { id: 'STARTER', name: 'Starter', description: '1 AI Executive', executives: 1, teamMembers: 3, storage: '5GB', price: 199 },
+      { id: 'PRO', name: 'Pro', description: '3 AI Executives', executives: 3, teamMembers: 10, storage: '25GB', popular: true, price: 349 },
+      { id: 'BUSINESS', name: 'Business', description: 'All 7 AI Executives', executives: 7, teamMembers: 25, storage: '100GB', price: 599 },
+      { id: 'ENTERPRISE', name: 'Enterprise', description: 'White Glove Service', executives: 7, teamMembers: 'Custom', storage: 'Unlimited', customFeatures: ['White Label Branding', 'Custom Software by Project'] }
     ];
 
     return (
@@ -1731,9 +1738,14 @@ function SettingsContent() {
         {/* Pricing Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
           {tiers.map((tier) => {
+            // Try API prices first, fall back to hardcoded prices
             const tierPrices = prices.filter(p => p.metadata?.tier === tier.id);
-            const price = tierPrices.find(p => p.interval === selectedInterval) || tierPrices.find(p => p.interval === 'month');
-            const isCurrentPlan = billing?.items?.[0]?.productName?.toLowerCase().includes(tier.id);
+            const apiPrice = tierPrices.find(p => p.interval === selectedInterval) || tierPrices.find(p => p.interval === 'month');
+            const fallbackPrice = FALLBACK_PRICES[tier.id];
+            const price = apiPrice || (fallbackPrice && selectedInterval === 'month' ? fallbackPrice : null);
+            const displayAmount = tier.price ? tier.price * 100 : (price?.amount || 0); // Use tier.price if available
+            const priceId = price?.id || fallbackPrice?.id;
+            const isCurrentPlan = billing?.items?.[0]?.productName?.toLowerCase().includes(tier.id.toLowerCase());
 
             return (
               <div
@@ -1769,13 +1781,13 @@ function SettingsContent() {
                   <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{tier.description}</div>
                 </div>
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                  {price ? (
+                  {tier.price ? (
                     <>
                       <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#00CCEE' }}>
-                        {formatPrice(price.interval === 'year' ? price.amount / 12 : price.amount)}
+                        ${tier.price}
                       </div>
                       <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>
-                        per month{price.interval === 'year' && ' (billed annually)'}
+                        per month
                       </div>
                     </>
                   ) : (
@@ -1820,8 +1832,8 @@ function SettingsContent() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => price && handleCheckout(price.id)}
-                    disabled={upgradeLoading || !price}
+                    onClick={() => priceId && handleCheckout(priceId)}
+                    disabled={upgradeLoading || !priceId || tier.id === 'ENTERPRISE'}
                     style={{
                       width: '100%',
                       padding: '0.75rem',
