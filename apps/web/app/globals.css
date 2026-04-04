@@ -401,23 +401,28 @@ nav, [class*="nav"], [class*="Nav"],
   color: #F0F0F5 !important;
 }
 
+/* Target only text spans, not SVG icons */
+nav a span, [class*="nav"] a span, [class*="Nav"] a span,
+[class*="sidebar"] a span, [class*="Sidebar"] a span {
+  color: #8888A0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 nav a, [class*="nav"] a, [class*="Nav"] a,
 [class*="sidebar"] a, [class*="Sidebar"] a {
-  color: #8888A0 !important;
   text-decoration: none;
-  font-size: 1rem !important;
-  font-weight: 500 !important;
   transition: color 0.2s ease;
 }
 
-nav a:hover, [class*="nav"] a:hover,
-[class*="sidebar"] a:hover, [class*="Sidebar"] a:hover {
-  color: #F0F0F5 !important;
+nav a:hover span, [class*="nav"] a:hover span,
+[class*="sidebar"] a:hover span, [class*="Sidebar"] a:hover span {
+  color: #F0F0F5;
 }
 
-nav a[class*="active"], [class*="nav"] a[class*="active"],
-[class*="sidebar"] a[class*="active"] {
-  color: #00CCEE !important;
+nav a[class*="active"] span, [class*="nav"] a[class*="active"] span,
+[class*="sidebar"] a[class*="active"] span {
+  color: #00CCEE;
 }
 
 /* --------------------------------------------------------------------------
