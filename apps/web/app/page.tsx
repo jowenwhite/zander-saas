@@ -220,7 +220,7 @@ export default function LandingPage() {
       lineHeight: 1.65,
       WebkitFontSmoothing: 'antialiased',
       fontSize: '30px',
-      zoom: 0.73,
+      zoom: 0.87,
     }}>
       <style>{`
         @keyframes ambientPulse {
