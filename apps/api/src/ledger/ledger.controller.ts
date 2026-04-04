@@ -11,15 +11,12 @@ import {
   Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TierGuard } from '../common/guards/tier.guard';
-import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { LedgerService } from './ledger.service';
 import { CreateLedgerEntryDto } from './dto/create-ledger-entry.dto';
 import { UpdateLedgerEntryDto } from './dto/update-ledger-entry.dto';
 
 @Controller('ledger')
-@UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('STARTER')
+@UseGuards(JwtAuthGuard)
 export class LedgerController {
   constructor(private readonly ledgerService: LedgerService) {}
 

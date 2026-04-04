@@ -13,13 +13,10 @@ import {
 } from '@nestjs/common';
 import { AssemblyService } from './assembly.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TierGuard } from '../common/guards/tier.guard';
-import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { CreateAssemblyDto, UpdateAssemblyDto, RunSectionDto } from './dto/create-assembly.dto';
 
 @Controller('assemblies')
-@UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('STARTER')
+@UseGuards(JwtAuthGuard)
 export class AssemblyController {
   constructor(private readonly assemblyService: AssemblyService) {}
 

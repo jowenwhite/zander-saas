@@ -12,14 +12,11 @@ import {
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TierGuard } from '../common/guards/tier.guard';
-import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Controller('tasks')
-@UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('STARTER')
+@UseGuards(JwtAuthGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 

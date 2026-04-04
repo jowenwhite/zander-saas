@@ -1,15 +1,12 @@
 import { Controller, Get, Post, Delete, Body, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TierGuard } from '../common/guards/tier.guard';
-import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { TwilioCredentialsService } from './twilio-credentials.service';
 import { CalendlyCredentialsService } from './calendly-credentials.service';
 import { SaveTwilioCredentialsDto } from './dto/save-twilio-credentials.dto';
 import { SaveCalendlyCredentialsDto } from './dto/save-calendly-credentials.dto';
 
 @Controller('integrations')
-@UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('STARTER')
+@UseGuards(JwtAuthGuard)
 export class IntegrationsController {
   constructor(
     private readonly twilioService: TwilioCredentialsService,

@@ -10,16 +10,13 @@ import {
   Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TierGuard } from '../common/guards/tier.guard';
-import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { KeystonesService } from './keystones.service';
 import { CreateKeystoneDto } from './dto/create-keystone.dto';
 import { UpdateKeystoneDto } from './dto/update-keystone.dto';
 import { ReorderKeystonesDto } from './dto/reorder-keystones.dto';
 
 @Controller('keystones')
-@UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('STARTER')
+@UseGuards(JwtAuthGuard)
 export class KeystonesController {
   constructor(private readonly keystonesService: KeystonesService) {}
 

@@ -9,14 +9,11 @@ import {
   Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TierGuard } from '../common/guards/tier.guard';
-import { RequireTier } from '../common/decorators/require-tier.decorator';
 import { FoundingService } from './founding.service';
 import { UpdateFoundingDto, UpdateFieldDto } from './dto/update-founding.dto';
 
 @Controller('founding')
-@UseGuards(JwtAuthGuard, TierGuard)
-@RequireTier('STARTER')
+@UseGuards(JwtAuthGuard)
 export class FoundingController {
   constructor(private readonly foundingService: FoundingService) {}
 
