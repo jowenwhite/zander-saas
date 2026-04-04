@@ -426,6 +426,16 @@ nav a[class*="active"] span, [class*="nav"] a[class*="active"] span,
 }
 
 /* --------------------------------------------------------------------------
+   SIDEBAR ICON FIX - Nuclear option to force icon visibility
+   -------------------------------------------------------------------------- */
+.sidebar-icon-fix svg {
+  stroke: #F0F0F5 !important;
+}
+.sidebar-icon-fix.active svg {
+  stroke: #00CCEE !important;
+}
+
+/* --------------------------------------------------------------------------
    LINKS
    -------------------------------------------------------------------------- */
 a {

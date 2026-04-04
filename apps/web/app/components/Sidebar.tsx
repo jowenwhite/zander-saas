@@ -290,7 +290,9 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} color={isActive(item.href) ? '#00CCEE' : '#F0F0F5'} />
+                  <span className={`sidebar-icon-fix${isActive(item.href) ? ' active' : ''}`}>
+                    <item.icon size={20} strokeWidth={2} />
+                  </span>
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -313,7 +315,9 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} color={isActive(item.href) ? '#00CCEE' : '#F0F0F5'} />
+                  <span className={`sidebar-icon-fix${isActive(item.href) ? ' active' : ''}`}>
+                    <item.icon size={20} strokeWidth={2} />
+                  </span>
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -461,7 +465,9 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? 'Treasury Admin' : undefined}
                 >
-                  <Landmark size={20} strokeWidth={2} color={isActive('/admin/treasury') ? '#00CCEE' : '#F0F0F5'} />
+                  <span className={`sidebar-icon-fix${isActive('/admin/treasury') ? ' active' : ''}`}>
+                    <Landmark size={20} strokeWidth={2} />
+                  </span>
                   {!isCollapsed && <span>Treasury Admin</span>}
                 </a>
               </li>
@@ -474,7 +480,9 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? 'Support Admin' : undefined}
                 >
-                  <Shield size={20} strokeWidth={2} color={isActive('/admin/support-admin') ? '#00CCEE' : '#F0F0F5'} />
+                  <span className={`sidebar-icon-fix${isActive('/admin/support-admin') ? ' active' : ''}`}>
+                    <Shield size={20} strokeWidth={2} />
+                  </span>
                   {!isCollapsed && <span>Support Admin</span>}
                 </a>
               </li>
