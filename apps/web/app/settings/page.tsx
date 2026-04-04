@@ -1573,9 +1573,9 @@ function SettingsContent() {
     }
 
     const tiers = [
-      { id: 'starter', name: 'Starter', description: '1 AI Executive', executives: 1, teamMembers: 3, storage: '5GB' },
-      { id: 'professional', name: 'Professional', description: '3 AI Executives', executives: 3, teamMembers: 10, storage: '25GB', popular: true },
-      { id: 'business', name: 'Business', description: 'All 7 AI Executives', executives: 7, teamMembers: 25, storage: '100GB' },
+      { id: 'STARTER', name: 'Starter', description: '1 AI Executive', executives: 1, teamMembers: 3, storage: '5GB' },
+      { id: 'PRO', name: 'Pro', description: '3 AI Executives', executives: 3, teamMembers: 10, storage: '25GB', popular: true },
+      { id: 'BUSINESS', name: 'Business', description: 'All 7 AI Executives', executives: 7, teamMembers: 25, storage: '100GB' },
       { id: 'enterprise', name: 'Enterprise', description: 'White Glove Service', executives: 7, teamMembers: 'Custom', storage: 'Unlimited', customFeatures: ['White Label Branding', 'Custom Software by Project'] }
     ];
 

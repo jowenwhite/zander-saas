@@ -290,7 +290,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} color={isActive(item.href) ? '#00CCEE' : '#F0F0F5'} />
+                  <item.icon size={20} strokeWidth={2} style={{ color: isActive(item.href) ? '#00CCEE' : '#F0F0F5' }} />
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -313,7 +313,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} color={isActive(item.href) ? '#00CCEE' : '#F0F0F5'} />
+                  <item.icon size={20} strokeWidth={2} style={{ color: isActive(item.href) ? '#00CCEE' : '#F0F0F5' }} />
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>

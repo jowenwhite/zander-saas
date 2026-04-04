@@ -25,6 +25,7 @@ interface Deal {
   dealName: string;
   dealValue: number;
   stage: string;
+  status?: 'open' | 'won' | 'lost';
   probability: number;
   expectedCloseDate?: string;
   contact: Contact | null;
@@ -342,17 +343,11 @@ export default function ProductionPage() {
     }
   }
 
-  // Calculate metrics - detect won/lost stages dynamically
-  const wonStageNames = stages
-    .filter(s => s.probability === 100 || s.name.toLowerCase().includes('won') || s.name.toLowerCase() === 'complete')
-    .map(s => s.name);
-  const lostStageNames = stages
-    .filter(s => s.probability === 0 || s.name.toLowerCase().includes('lost'))
-    .map(s => s.name);
-
-  const activeDeals = deals.filter(d => !wonStageNames.includes(d.stage) && !lostStageNames.includes(d.stage));
-  const wonDeals = deals.filter(d => wonStageNames.includes(d.stage));
-  const lostDeals = deals.filter(d => lostStageNames.includes(d.stage));
+  // Calculate metrics using deal status field (open/won/lost)
+  // The status field is the source of truth for deal outcomes
+  const activeDeals = deals.filter(d => d.status === 'open' || !d.status);
+  const wonDeals = deals.filter(d => d.status === 'won');
+  const lostDeals = deals.filter(d => d.status === 'lost');
   const pipelineValue = activeDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
   const wonValue = wonDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
   const winRate = (wonDeals.length + lostDeals.length) > 0 ? Math.round((wonDeals.length / (wonDeals.length + lostDeals.length)) * 100) : 0;
@@ -1101,7 +1096,7 @@ export default function ProductionPage() {
                   const stageDeals = deals.filter(d => d.stage === stageObj.name);
                   const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
                   const maxValue = Math.max(...stages.map(s => deals.filter(d => d.stage === s.name).reduce((sum, d) => sum + d.dealValue, 0)), 1);
-                  const isWonStage = wonStageNames.includes(stageObj.name);
+                  const isWonStage = stageObj.probability === 100 || stageObj.name.toLowerCase().includes('won');
                   return (
                     <div key={stageObj.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <div style={{ width: '100px', fontSize: '0.875rem', color: '#F0F0F5', fontWeight: '500' }}>
@@ -1218,11 +1213,11 @@ export default function ProductionPage() {
                 </tr>
               </thead>
               <tbody>
-                {stages.filter(s => !lostStageNames.includes(s.name)).map((stageObj) => {
+                {stages.filter(s => s.probability !== 0 && !s.name.toLowerCase().includes('lost')).map((stageObj) => {
                   const stageDeals = deals.filter(d => d.stage === stageObj.name);
                   const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
                   const totalPipeline = pipelineValue + wonValue;
-                  const isWonStage = wonStageNames.includes(stageObj.name);
+                  const isWonStage = stageObj.probability === 100 || stageObj.name.toLowerCase().includes('won');
                   return (
                     <tr key={stageObj.id} style={{ borderBottom: '1px solid #2A2A38' }}>
                       <td style={{ padding: '1rem' }}>
