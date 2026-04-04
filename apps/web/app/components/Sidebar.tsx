@@ -290,7 +290,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} />
+                  <item.icon size={20} strokeWidth={2} style={{ color: 'inherit' }} />
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -313,7 +313,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon size={20} strokeWidth={2} />
+                  <item.icon size={20} strokeWidth={2} style={{ color: 'inherit' }} />
                   {!isCollapsed && <span>{item.label}</span>}
                 </a>
               </li>
@@ -461,7 +461,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? 'Treasury Admin' : undefined}
                 >
-                  <Landmark size={20} strokeWidth={2} />
+                  <Landmark size={20} strokeWidth={2} style={{ color: 'inherit' }} />
                   {!isCollapsed && <span>Treasury Admin</span>}
                 </a>
               </li>
@@ -474,7 +474,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                   }}
                   title={isCollapsed ? 'Support Admin' : undefined}
                 >
-                  <Shield size={20} strokeWidth={2} />
+                  <Shield size={20} strokeWidth={2} style={{ color: 'inherit' }} />
                   {!isCollapsed && <span>Support Admin</span>}
                 </a>
               </li>

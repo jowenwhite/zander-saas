@@ -1,9 +1,16 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import TenantSwitcher from '../../components/TenantSwitcher';
+import { LayoutDashboard, FileText, FolderKanban, Users, Package, Mail, Calendar, CalendarDays, ClipboardList, Bot, Zap, Target, BarChart3, UserCircle, DollarSign, Palette, FileCode, LucideIcon } from 'lucide-react';
 
 interface CMOSidebarProps {
   collapsed?: boolean;
+}
+
+interface NavItem {
+  icon: LucideIcon;
+  label: string;
+  href: string;
 }
 
 export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
@@ -14,36 +21,36 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
   // CMO 5 Pillars Navigation
   // All routes use /cmo prefix to stay within CMO context
 
-  const marketingItems = [
-    { icon: '📊', label: 'Dashboard', href: '/cmo' },
-    { icon: '📝', label: 'Marketing Plan', href: '/cmo/plan' },
-    { icon: '📁', label: 'Projects', href: '/cmo/projects' },
-    { icon: '👥', label: 'People', href: '/cmo/people' },
-    { icon: '📦', label: 'Products', href: '/cmo/products' },
+  const marketingItems: NavItem[] = [
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/cmo' },
+    { icon: FileText, label: 'Marketing Plan', href: '/cmo/plan' },
+    { icon: FolderKanban, label: 'Projects', href: '/cmo/projects' },
+    { icon: Users, label: 'People', href: '/cmo/people' },
+    { icon: Package, label: 'Products', href: '/cmo/products' },
   ];
 
-  const processItems = [
-    { icon: '📧', label: 'Communication', href: '/cmo/communication' },
-    { icon: '📅', label: 'Schedule', href: '/cmo/schedule' },
-    { icon: '🗓️', label: 'Marketing Calendar', href: '/cmo/calendar' },
-    { icon: '📋', label: 'Forms', href: '/cmo/forms' },
-    { icon: '🤖', label: 'Ask Don', href: '/cmo/ai' },
+  const processItems: NavItem[] = [
+    { icon: Mail, label: 'Communication', href: '/cmo/communication' },
+    { icon: Calendar, label: 'Schedule', href: '/cmo/schedule' },
+    { icon: CalendarDays, label: 'Marketing Calendar', href: '/cmo/calendar' },
+    { icon: ClipboardList, label: 'Forms', href: '/cmo/forms' },
+    { icon: Bot, label: 'Ask Don', href: '/cmo/ai' },
   ];
 
-  const automationItems = [
-    { icon: '⚡', label: 'Workflows', href: '/cmo/workflows' },
-    { icon: '🎯', label: 'Funnels', href: '/cmo/funnels' },
+  const automationItems: NavItem[] = [
+    { icon: Zap, label: 'Workflows', href: '/cmo/workflows' },
+    { icon: Target, label: 'Funnels', href: '/cmo/funnels' },
   ];
 
-  const insightsItems = [
-    { icon: '📈', label: 'Analytics', href: '/cmo/analytics' },
-    { icon: '🎭', label: 'Personas', href: '/cmo/personas' },
-    { icon: '💰', label: 'Budget', href: '/cmo/budget' },
+  const insightsItems: NavItem[] = [
+    { icon: BarChart3, label: 'Analytics', href: '/cmo/analytics' },
+    { icon: UserCircle, label: 'Personas', href: '/cmo/personas' },
+    { icon: DollarSign, label: 'Budget', href: '/cmo/budget' },
   ];
 
-  const assetsItems = [
-    { icon: '🎨', label: 'Brand Library', href: '/cmo/brand' },
-    { icon: '📄', label: 'Templates', href: '/cmo/templates' },
+  const assetsItems: NavItem[] = [
+    { icon: Palette, label: 'Brand Library', href: '/cmo/brand' },
+    { icon: FileCode, label: 'Templates', href: '/cmo/templates' },
   ];
 
   // CMO uses cyan accent color on dark theme
@@ -71,7 +78,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
     display: collapsed ? 'none' : 'block'
   };
 
-  const renderSection = (title: string, items: { icon: string; label: string; href: string }[]) => (
+  const renderSection = (title: string, items: NavItem[]) => (
     <div style={{ padding: title === 'Marketing' ? '1.5rem 1rem 1rem' : '0 1rem 1rem' }}>
       <div style={sectionHeaderStyle}>
         {title}
@@ -80,7 +87,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
         {items.map((item) => (
           <li key={item.label} style={{ marginBottom: '0.25rem' }}>
             <a href={item.href} style={linkStyle(isActive(item.href))}>
-              <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+              <item.icon size={20} strokeWidth={2} style={{ color: 'inherit' }} />
               {!collapsed && <span>{item.label}</span>}
             </a>
           </li>

@@ -206,7 +206,7 @@ export default function Navigation({ activePage }: NavigationProps) {
                   background: activePage === item.id ? 'rgba(0, 204, 238, 0.1)' : 'transparent',
                   fontWeight: activePage === item.id ? '600' : '400'
                 }}>
-                  <item.icon size={18} strokeWidth={2} />
+                  <item.icon size={18} strokeWidth={2} style={{ color: 'inherit' }} />
                   <span>{item.label}</span>
                 </a>
               </li>
@@ -234,7 +234,7 @@ export default function Navigation({ activePage }: NavigationProps) {
                   textDecoration: 'none',
                   color: '#F0F0F5'
                 }}>
-                  <item.icon size={18} strokeWidth={2} />
+                  <item.icon size={18} strokeWidth={2} style={{ color: 'inherit' }} />
                   <span>{item.label}</span>
                 </a>
               </li>
