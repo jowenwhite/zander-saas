@@ -239,7 +239,7 @@ export class WebhookController {
         </div>
       `;
 
-      await this.emailService.sendEmail({
+      const result = await this.emailService.sendEmail({
         to: email,
         subject: 'Welcome to Zander — Your team is ready',
         html,
@@ -247,7 +247,11 @@ export class WebhookController {
         replyTo: 'support@zanderos.com',
       });
 
-      this.logger.log(`Welcome email sent to ${email}`);
+      if (result.success) {
+        this.logger.log(`Welcome email sent to ${email}, messageId: ${result.messageId}`);
+      } else {
+        this.logger.warn(`Welcome email failed for ${email}: ${result.error}`);
+      }
     } catch (err) {
       this.logger.error(`Failed to send welcome email to ${email}: ${err.message}`);
     }
@@ -296,14 +300,18 @@ export class WebhookController {
         </div>
       `;
 
-      await this.emailService.sendEmail({
+      const result = await this.emailService.sendEmail({
         to: 'jonathan@zanderos.com',
         subject: `New Zander Subscriber: ${customerName} — ${tierName}`,
         html,
         from: 'Zander System <noreply@zanderos.com>',
       });
 
-      this.logger.log(`Admin notification sent for new subscriber: ${customerEmail}`);
+      if (result.success) {
+        this.logger.log(`Admin notification sent for new subscriber: ${customerEmail}, messageId: ${result.messageId}`);
+      } else {
+        this.logger.warn(`Admin notification failed for ${customerEmail}: ${result.error}`);
+      }
     } catch (err) {
       this.logger.error(`Failed to send admin notification: ${err.message}`);
     }
