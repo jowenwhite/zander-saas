@@ -107,14 +107,14 @@ export default function LoginPage() {
             src="/images/zander-logo.svg"
             alt="Zander"
             style={{
-              width: '400px',
+              width: '500px',
               height: 'auto',
               display: 'block',
               margin: '0 auto'
             }}
           />
           <p style={{
-            fontSize: '1.4rem',
+            fontSize: '1.8rem',
             fontWeight: '600',
             color: '#F0F0F5',
             textAlign: 'center',
@@ -155,28 +155,28 @@ export default function LoginPage() {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <div style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
+        <div style={{ width: '100%', maxWidth: '600px', padding: '2rem' }}>
           {!requires2FA ? (
             <>
               <h2 style={{
-                fontSize: '2rem',
+                fontSize: '3rem',
                 fontWeight: '700',
-                marginBottom: '0.5rem',
+                marginBottom: '0.75rem',
                 color: '#F0F0F5'
               }}>Welcome Back</h2>
-              <p style={{ marginBottom: '2rem', color: '#8888A0' }}>
+              <p style={{ marginBottom: '2.5rem', color: '#8888A0', fontSize: '1.3rem' }}>
                 Sign in to access your Zander dashboard
               </p>
             </>
           ) : (
             <>
               <h2 style={{
-                fontSize: '2rem',
+                fontSize: '3rem',
                 fontWeight: '700',
-                marginBottom: '0.5rem',
+                marginBottom: '0.75rem',
                 color: '#F0F0F5'
               }}>Two-Factor Authentication</h2>
-              <p style={{ marginBottom: '2rem', color: '#8888A0' }}>
+              <p style={{ marginBottom: '2.5rem', color: '#8888A0', fontSize: '1.3rem' }}>
                 Enter the 6-digit code from your authenticator app
               </p>
             </>
@@ -187,10 +187,10 @@ export default function LoginPage() {
               background: 'rgba(0, 204, 238, 0.1)',
               border: '1px solid #00CCEE',
               color: '#00CCEE',
-              padding: '0.75rem 1rem',
+              padding: '1.125rem 1.5rem',
               borderRadius: '8px',
-              marginBottom: '1.5rem',
-              fontSize: '0.875rem'
+              marginBottom: '2rem',
+              fontSize: '1.3rem'
             }}>
               {error}
             </div>
@@ -199,13 +199,13 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit}>
             {!requires2FA ? (
               <>
-                <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '2rem' }}>
                   <label style={{
                     display: 'block',
-                    fontSize: '0.875rem',
+                    fontSize: '1.3rem',
                     fontWeight: '600',
                     color: '#F0F0F5',
-                    marginBottom: '0.5rem'
+                    marginBottom: '0.75rem'
                   }}>
                     Email Address
                   </label>
@@ -217,10 +217,10 @@ export default function LoginPage() {
                     placeholder="Enter your email"
                     style={{
                       width: '100%',
-                      padding: '0.75rem 1rem',
+                      padding: '1.125rem 1.5rem',
                       border: '2px solid #2A2A38',
                       borderRadius: '8px',
-                      fontSize: '1rem',
+                      fontSize: '1.5rem',
                       outline: 'none',
                       transition: 'border-color 0.2s ease',
                       boxSizing: 'border-box'
@@ -230,13 +230,13 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '2rem' }}>
                   <label style={{
                     display: 'block',
-                    fontSize: '0.875rem',
+                    fontSize: '1.3rem',
                     fontWeight: '600',
                     color: '#F0F0F5',
-                    marginBottom: '0.5rem'
+                    marginBottom: '0.75rem'
                   }}>
                     Password
                   </label>
@@ -248,10 +248,10 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     style={{
                       width: '100%',
-                      padding: '0.75rem 1rem',
+                      padding: '1.125rem 1.5rem',
                       border: '2px solid #2A2A38',
                       borderRadius: '8px',
-                      fontSize: '1rem',
+                      fontSize: '1.5rem',
                       outline: 'none',
                       transition: 'border-color 0.2s ease',
                       boxSizing: 'border-box'
@@ -265,20 +265,20 @@ export default function LoginPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: '1.5rem'
+                  marginBottom: '2rem'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <input
                       type="checkbox"
                       id="remember"
-                      style={{ width: '16px', height: '16px', accentColor: '#00CCEE' }}
+                      style={{ width: '20px', height: '20px', accentColor: '#00CCEE' }}
                     />
-                    <label htmlFor="remember" style={{ fontSize: '0.875rem', color: '#F0F0F5' }}>
+                    <label htmlFor="remember" style={{ fontSize: '1.3rem', color: '#F0F0F5' }}>
                       Remember me
                     </label>
                   </div>
                   <a href="/forgot-password" style={{
-                    fontSize: '0.875rem',
+                    fontSize: '1.3rem',
                     color: '#00CCEE',
                     textDecoration: 'none',
                     fontWeight: '500'
@@ -289,13 +289,13 @@ export default function LoginPage() {
               </>
             ) : (
               <>
-                <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '2rem' }}>
                   <label style={{
                     display: 'block',
-                    fontSize: '0.875rem',
+                    fontSize: '1.3rem',
                     fontWeight: '600',
                     color: '#F0F0F5',
-                    marginBottom: '0.5rem'
+                    marginBottom: '0.75rem'
                   }}>
                     Authentication Code
                   </label>
@@ -309,12 +309,12 @@ export default function LoginPage() {
                     autoFocus
                     style={{
                       width: '100%',
-                      padding: '1rem',
+                      padding: '1.5rem',
                       border: '2px solid #2A2A38',
                       borderRadius: '8px',
-                      fontSize: '1.5rem',
+                      fontSize: '2.25rem',
                       textAlign: 'center',
-                      letterSpacing: '8px',
+                      letterSpacing: '12px',
                       fontWeight: '600',
                       outline: 'none',
                       transition: 'border-color 0.2s ease',
@@ -330,15 +330,15 @@ export default function LoginPage() {
                   onClick={handleBack}
                   style={{
                     width: '100%',
-                    padding: '0.75rem 1rem',
+                    padding: '1.125rem 1.5rem',
                     background: 'transparent',
                     color: '#8888A0',
                     border: '2px solid #2A2A38',
                     borderRadius: '8px',
-                    fontSize: '0.875rem',
+                    fontSize: '1.3rem',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    marginBottom: '1rem'
+                    marginBottom: '1.5rem'
                   }}
                 >
                   ← Back to login
@@ -351,12 +351,12 @@ export default function LoginPage() {
               disabled={loading || (requires2FA && twoFactorCode.length !== 6)}
               style={{
                 width: '100%',
-                padding: '0.875rem 1rem',
+                padding: '1.3rem 1.5rem',
                 background: (loading || (requires2FA && twoFactorCode.length !== 6)) ? '#555' : '#00CCEE',
                 color: '#000000',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '1rem',
+                fontSize: '1.5rem',
                 fontWeight: '600',
                 cursor: (loading || (requires2FA && twoFactorCode.length !== 6)) ? 'not-allowed' : 'pointer',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -378,8 +378,8 @@ export default function LoginPage() {
           </form>
 
           {!requires2FA && (
-            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              <p style={{ fontSize: '0.875rem', color: '#8888A0' }}>
+            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+              <p style={{ fontSize: '1.3rem', color: '#8888A0' }}>
                 Don't have an account?{' '}
                 <a href="/signup" style={{ color: '#00CCEE', textDecoration: 'none', fontWeight: '600' }}>
                   Sign up

@@ -149,14 +149,14 @@ function SignupContent() {
             src="/images/zander-logo.svg"
             alt="Zander"
             style={{
-              width: '400px',
+              width: '500px',
               height: 'auto',
               display: 'block',
               margin: '0 auto'
             }}
           />
           <p style={{
-            fontSize: '1.4rem',
+            fontSize: '1.8rem',
             fontWeight: '600',
             color: '#F0F0F5',
             textAlign: 'center',
@@ -197,14 +197,14 @@ function SignupContent() {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <div style={{ width: '100%', maxWidth: '420px', padding: '2rem' }}>
+        <div style={{ width: '100%', maxWidth: '630px', padding: '2rem' }}>
           <h2 style={{
-            fontSize: '2rem',
+            fontSize: '3rem',
             fontWeight: '700',
-            marginBottom: '0.5rem',
+            marginBottom: '0.75rem',
             color: '#F0F0F5'
           }}>Create Your Account</h2>
-          <p style={{ marginBottom: '1rem', color: '#8888A0' }}>
+          <p style={{ marginBottom: '1.5rem', color: '#8888A0', fontSize: '1.3rem' }}>
             Start transforming your business with Zander
           </p>
 
@@ -213,14 +213,14 @@ function SignupContent() {
               background: 'rgba(0, 204, 238, 0.1)',
               border: '1px solid rgba(0, 204, 238, 0.3)',
               borderRadius: '8px',
-              padding: '0.75rem 1rem',
-              marginBottom: '1.5rem',
+              padding: '1.125rem 1.5rem',
+              marginBottom: '2rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: '0.75rem',
             }}>
-              <span style={{ color: '#00CCEE', fontSize: '1.2rem' }}>✓</span>
-              <span style={{ color: '#F0F0F5', fontSize: '0.9rem' }}>
+              <span style={{ color: '#00CCEE', fontSize: '1.8rem' }}>✓</span>
+              <span style={{ color: '#F0F0F5', fontSize: '1.3rem' }}>
                 You selected <strong style={{ color: '#00CCEE' }}>{TIER_DISPLAY_NAMES[selectedTier]}</strong> — you'll complete payment after signup
               </span>
             </div>
@@ -231,24 +231,24 @@ function SignupContent() {
               background: 'rgba(0, 204, 238, 0.1)',
               border: '1px solid #00CCEE',
               color: '#00CCEE',
-              padding: '0.75rem 1rem',
+              padding: '1.125rem 1.5rem',
               borderRadius: '8px',
-              marginBottom: '1.5rem',
-              fontSize: '0.875rem'
+              marginBottom: '2rem',
+              fontSize: '1.3rem'
             }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
               <div>
                 <label style={{
                   display: 'block',
-                  fontSize: '0.875rem',
+                  fontSize: '1.3rem',
                   fontWeight: '600',
                   color: '#F0F0F5',
-                  marginBottom: '0.5rem'
+                  marginBottom: '0.75rem'
                 }}>
                   First Name
                 </label>
@@ -260,10 +260,10 @@ function SignupContent() {
                   placeholder="First Name"
                   style={{
                     width: '100%',
-                    padding: '0.75rem 1rem',
+                    padding: '1.125rem 1.5rem',
                     border: '2px solid #2A2A38',
                     borderRadius: '8px',
-                    fontSize: '1rem',
+                    fontSize: '1.5rem',
                     outline: 'none',
                     boxSizing: 'border-box'
                   }}
@@ -272,10 +272,10 @@ function SignupContent() {
               <div>
                 <label style={{
                   display: 'block',
-                  fontSize: '0.875rem',
+                  fontSize: '1.3rem',
                   fontWeight: '600',
                   color: '#F0F0F5',
-                  marginBottom: '0.5rem'
+                  marginBottom: '0.75rem'
                 }}>
                   Last Name
                 </label>
@@ -287,10 +287,10 @@ function SignupContent() {
                   placeholder="Last Name"
                   style={{
                     width: '100%',
-                    padding: '0.75rem 1rem',
+                    padding: '1.125rem 1.5rem',
                     border: '2px solid #2A2A38',
                     borderRadius: '8px',
-                    fontSize: '1rem',
+                    fontSize: '1.5rem',
                     outline: 'none',
                     boxSizing: 'border-box'
                   }}
@@ -298,13 +298,13 @@ function SignupContent() {
               </div>
             </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: '2rem' }}>
               <label style={{
                 display: 'block',
-                fontSize: '0.875rem',
+                fontSize: '1.3rem',
                 fontWeight: '600',
                 color: '#F0F0F5',
-                marginBottom: '0.5rem'
+                marginBottom: '0.75rem'
               }}>
                 Work Email
               </label>
@@ -316,23 +316,23 @@ function SignupContent() {
                 placeholder="you@company.com"
                 style={{
                   width: '100%',
-                  padding: '0.75rem 1rem',
+                  padding: '1.125rem 1.5rem',
                   border: '2px solid #2A2A38',
                   borderRadius: '8px',
-                  fontSize: '1rem',
+                  fontSize: '1.5rem',
                   outline: 'none',
                   boxSizing: 'border-box'
                 }}
               />
             </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: '2rem' }}>
               <label style={{
                 display: 'block',
-                fontSize: '0.875rem',
+                fontSize: '1.3rem',
                 fontWeight: '600',
                 color: '#F0F0F5',
-                marginBottom: '0.5rem'
+                marginBottom: '0.75rem'
               }}>
                 Password
               </label>
@@ -345,23 +345,23 @@ function SignupContent() {
                 placeholder="Minimum 8 characters"
                 style={{
                   width: '100%',
-                  padding: '0.75rem 1rem',
+                  padding: '1.125rem 1.5rem',
                   border: '2px solid #2A2A38',
                   borderRadius: '8px',
-                  fontSize: '1rem',
+                  fontSize: '1.5rem',
                   outline: 'none',
                   boxSizing: 'border-box'
                 }}
               />
             </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: '2rem' }}>
               <label style={{
                 display: 'block',
-                fontSize: '0.875rem',
+                fontSize: '1.3rem',
                 fontWeight: '600',
                 color: '#F0F0F5',
-                marginBottom: '0.5rem'
+                marginBottom: '0.75rem'
               }}>
                 Company Name
               </label>
@@ -373,10 +373,10 @@ function SignupContent() {
                 placeholder="Your company"
                 style={{
                   width: '100%',
-                  padding: '0.75rem 1rem',
+                  padding: '1.125rem 1.5rem',
                   border: '2px solid #2A2A38',
                   borderRadius: '8px',
-                  fontSize: '1rem',
+                  fontSize: '1.5rem',
                   outline: 'none',
                   boxSizing: 'border-box'
                 }}
@@ -388,17 +388,17 @@ function SignupContent() {
               disabled={loading || checkoutLoading}
               style={{
                 width: '100%',
-                padding: '0.875rem 1rem',
+                padding: '1.3rem 1.5rem',
                 background: (loading || checkoutLoading) ? '#555' : '#00CCEE',
                 color: '#000000',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '1rem',
+                fontSize: '1.5rem',
                 fontWeight: '600',
                 cursor: (loading || checkoutLoading) ? 'not-allowed' : 'pointer',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                 boxShadow: '0 4px 6px rgba(0, 204, 238, 0.2)',
-                marginBottom: '1.5rem'
+                marginBottom: '2rem'
               }}
               onMouseOver={(e) => {
                 if (!loading && !checkoutLoading) {
@@ -416,7 +416,7 @@ function SignupContent() {
           </form>
 
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.875rem', color: '#8888A0' }}>
+            <p style={{ fontSize: '1.3rem', color: '#8888A0' }}>
               Already have an account?{' '}
               <a href="/login" style={{ color: '#00CCEE', textDecoration: 'none', fontWeight: '600' }}>
                 Sign in
@@ -424,8 +424,8 @@ function SignupContent() {
             </p>
           </div>
 
-          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-            <p style={{ fontSize: '0.75rem', color: '#ADB5BD' }}>
+          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+            <p style={{ fontSize: '1.1rem', color: '#ADB5BD' }}>
               By creating an account, you agree to our{' '}
               <a href="https://zanderos.com/terms" style={{ color: '#8888A0' }}>Terms of Service</a>
               {' '}and{' '}
