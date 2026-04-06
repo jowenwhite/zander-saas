@@ -1846,7 +1846,7 @@ function SettingsContent() {
                       opacity: upgradeLoading ? 0.7 : 1
                     }}
                   >
-                    {upgradeLoading ? 'Processing...' : billing ? 'Upgrade' : 'Start 14-Day Trial'}
+                    {upgradeLoading ? 'Processing...' : tier.id === 'ENTERPRISE' ? 'Schedule Discovery Call' : billing ? 'Upgrade' : `Subscribe — $${tier.price}/mo`}
                   </button>
                 )}
               </div>
@@ -2405,7 +2405,7 @@ function SettingsContent() {
                     Subscription activated successfully!
                   </p>
                   <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
-                    Your 14-day free trial has started. Welcome to Zander!
+                    Your subscription is now active. Welcome to Zander!
                   </p>
                 </div>
               </div>

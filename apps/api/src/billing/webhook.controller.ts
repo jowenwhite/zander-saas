@@ -147,10 +147,10 @@ export class WebhookController {
       }
     }
 
-    // Get tenant info before update for email
+    // Get tenant info before update for email - include ALL users, not just owners
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
-      include: { users: { where: { role: 'owner' }, take: 1 } },
+      include: { users: { take: 1, orderBy: { createdAt: 'asc' } } },
     });
 
     // Update tenant with subscription info and tier
@@ -167,9 +167,18 @@ export class WebhookController {
 
     this.logger.log(`Updated tenant ${tenantId} with subscription ${subscriptionId}, tier: ${tier}`);
 
-    // Get customer email from session or tenant
-    const customerEmail = session.customer_email || tenant?.email || tenant?.users?.[0]?.email;
-    const customerName = tenant?.companyName || tenant?.users?.[0]?.firstName || 'Valued Customer';
+    // Get customer email from multiple sources (in priority order)
+    // 1. session.customer_email (set during checkout)
+    // 2. session.metadata.customerEmail (backup in metadata)
+    // 3. tenant.users[0].email (first user on tenant)
+    const customerEmail = session.customer_email ||
+                          session.metadata?.customerEmail ||
+                          tenant?.users?.[0]?.email;
+    const customerName = tenant?.companyName ||
+                         tenant?.users?.[0]?.firstName ||
+                         'Valued Customer';
+
+    this.logger.log(`Email resolution: session.customer_email=${session.customer_email}, metadata.customerEmail=${session.metadata?.customerEmail}, user.email=${tenant?.users?.[0]?.email}, resolved=${customerEmail}`);
 
     // Send welcome email
     if (customerEmail) {

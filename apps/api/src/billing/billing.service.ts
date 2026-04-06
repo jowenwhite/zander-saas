@@ -65,6 +65,7 @@ export class BillingService {
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
+      customer_email: email, // Ensure email is on session for webhook
       payment_method_types: ['card'],
       line_items: [
         {
@@ -78,6 +79,7 @@ export class BillingService {
       metadata: {
         tenantId,
         cohort,
+        customerEmail: email, // Also store in metadata as backup
       },
     };
 

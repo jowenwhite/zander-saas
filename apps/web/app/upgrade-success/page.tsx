@@ -23,7 +23,7 @@ const TIER_CONFIG: Record<string, {
       'Inbox management and draft routing',
       'Calendar and scheduling',
       'SMS and follow-up sequences',
-      '14-day free trial included',
+      '30-day money-back guarantee',
     ],
   },
   PRO: {
@@ -40,7 +40,7 @@ const TIER_CONFIG: Record<string, {
       'Marketing calendar and campaign execution',
       'Brand and content strategy',
       'Social and email sequences',
-      '14-day free trial included',
+      '30-day money-back guarantee',
     ],
   },
   BUSINESS: {
@@ -58,7 +58,7 @@ const TIER_CONFIG: Record<string, {
       'Pipeline management and deal tracking',
       'Outreach sequences and lead follow-up',
       'Full executive team operating in sync',
-      '14-day free trial included',
+      '30-day money-back guarantee',
     ],
   },
 };
@@ -267,20 +267,20 @@ function UpgradeSuccessContent() {
           </ul>
         </div>
 
-        {/* Trial notice */}
+        {/* Money-back guarantee notice */}
         <div style={{
-          background: 'rgba(0, 204, 238, 0.1)',
-          border: '1px solid rgba(0, 204, 238, 0.3)',
+          background: 'rgba(46, 125, 50, 0.1)',
+          border: '1px solid rgba(46, 125, 50, 0.3)',
           borderRadius: '8px',
           padding: '1rem',
           marginBottom: '2rem',
         }}>
           <p style={{
             margin: 0,
-            color: '#00CCEE',
+            color: '#4CAF50',
             fontSize: '0.95rem',
           }}>
-            Your 14-day free trial has started. You won't be charged until it ends.
+            Your subscription is now active. 30-day money-back guarantee — no questions asked.
           </p>
         </div>
 

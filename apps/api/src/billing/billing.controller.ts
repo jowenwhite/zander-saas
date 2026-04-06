@@ -92,7 +92,7 @@ export class BillingController {
       body.successUrl || `${baseUrl}/settings?tab=billing&success=true`,
       body.cancelUrl || `${baseUrl}/settings?tab=billing&canceled=true`,
       body.cohort || 'public',
-      14,
+      0, // No free trial - charge immediately, 30-day money-back guarantee
     );
   }
 
@@ -107,7 +107,7 @@ export class BillingController {
     await this.billingService.changeSubscription(
       req.user.tenantId,
       body.priceId,
-      body.trialDays ?? 30,
+      body.trialDays ?? 0, // No free trial on upgrades - charge immediately
     );
     return { success: true, message: 'Subscription upgraded' };
   }
