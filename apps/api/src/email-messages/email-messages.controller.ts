@@ -120,6 +120,16 @@ export class EmailMessagesController {
     return this.emailMessagesService.markAllAsRead(tenantId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('bulk-mark-read')
+  async bulkMarkAsRead(@Request() req, @Body() body: { ids: string[] }) {
+    const tenantId = req.user.tenantId;
+    if (!body.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
+      return { updated: 0 };
+    }
+    return this.emailMessagesService.bulkMarkAsRead(tenantId, body.ids);
+  }
+
 // Resend Inbound Webhook - no auth required (webhook from Resend)
   @Post('inbound-webhook')
   async handleInboundWebhook(@Body() payload: any) {

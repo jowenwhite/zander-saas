@@ -287,16 +287,28 @@ export class EmailMessagesService {
 
   async markAsRead(tenantId: string, id: string) {
     return this.prisma.emailMessage.update({
-      where: { id },
+      where: { id, tenantId },
       data: { isRead: true },
     });
   }
 
   async markAsUnread(tenantId: string, id: string) {
     return this.prisma.emailMessage.update({
-      where: { id },
+      where: { id, tenantId },
       data: { isRead: false },
     });
+  }
+
+  async bulkMarkAsRead(tenantId: string, ids: string[]) {
+    const result = await this.prisma.emailMessage.updateMany({
+      where: {
+        id: { in: ids },
+        tenantId,
+        direction: 'inbound',
+      },
+      data: { isRead: true },
+    });
+    return { updated: result.count };
   }
 
   async archiveEmail(tenantId: string, id: string) {
