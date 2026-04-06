@@ -33,6 +33,7 @@
     "reflect-metadata": "^0.1.14",
     "resend": "^6.6.0",
     "rxjs": "^7.8.1",
+    "stripe": "^17.7.0",
     "twilio": "^5.11.1"
   },
   "devDependencies": {

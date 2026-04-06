@@ -10,8 +10,8 @@ COPY apps/api/package*.json ./
 # Install dependencies
 RUN npm install
 
-# Install specific Prisma CLI version and stripe
-RUN npm install prisma@5.22.0 stripe
+# Install specific Prisma CLI version
+RUN npm install prisma@5.22.0
 
 # Copy prisma schema from packages/database
 COPY packages/database/prisma/schema.prisma ./prisma/
