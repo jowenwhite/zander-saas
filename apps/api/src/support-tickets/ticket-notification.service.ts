@@ -240,7 +240,7 @@ export class TicketNotificationService {
 
     <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
       <p style="margin: 0;">Zander - Operating Simply</p>
-      <p style="margin: 5px 0 0;">Powered by 64 West Holdings</p>
+      <p style="margin: 5px 0 0;">Powered by Zander Systems LLC</p>
     </div>
   </div>
 </body>
@@ -312,7 +312,7 @@ export class TicketNotificationService {
 
     <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
       <p style="margin: 0;">Zander - Operating Simply</p>
-      <p style="margin: 5px 0 0;">Powered by 64 West Holdings</p>
+      <p style="margin: 5px 0 0;">Powered by Zander Systems LLC</p>
     </div>
   </div>
 </body>
@@ -385,7 +385,7 @@ export class TicketNotificationService {
 
     <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
       <p style="margin: 0;">Zander - Operating Simply</p>
-      <p style="margin: 5px 0 0;">Powered by 64 West Holdings</p>
+      <p style="margin: 5px 0 0;">Powered by Zander Systems LLC</p>
     </div>
   </div>
 </body>

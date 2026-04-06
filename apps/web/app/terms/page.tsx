@@ -81,14 +81,21 @@ export default function TermsPage() {
             <p style={{ color: 'rgba(255,255,255,0.75)', marginBottom: '1rem' }}>
               Founding members receive their subscription rate locked for life. This means your monthly rate will not increase, and new features and AI Executives will be included at no additional cost.
             </p>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '0.75rem', marginTop: '1.5rem' }}>Waitlist Reservation</h3>
-            <p style={{ color: 'rgba(255,255,255,0.75)', marginBottom: '1rem' }}>
-              The $49 waitlist reservation fee is <strong>non-refundable</strong>. It reserves your spot in our next onboarding cohort but does not guarantee specific pricing or features.
-            </p>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '0.75rem', marginTop: '1.5rem' }}>30-Day Money-Back Guarantee</h3>
-            <p style={{ color: 'rgba(255,255,255,0.75)' }}>
-              New subscribers may request a full refund of their first month&apos;s subscription payment within 30 days if not satisfied. This guarantee does not apply to the waitlist reservation fee.
-            </p>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '0.75rem', marginTop: '1.5rem' }}>Refund Policy</h3>
+            <ul style={{ color: 'rgba(255,255,255,0.75)', paddingLeft: '1.5rem' }}>
+              <li style={{ marginBottom: '0.75rem' }}>
+                <strong>30-Day Money-Back Guarantee:</strong> New subscribers are eligible for a full refund of their first monthly subscription payment within 30 days of initial purchase, no questions asked. Refund requests should be submitted to <a href="mailto:support@zanderos.com" style={{ color: '#00CFEB' }}>support@zanderos.com</a>.
+              </li>
+              <li style={{ marginBottom: '0.75rem' }}>
+                After the initial 30-day period, monthly subscriptions are non-refundable for partial months.
+              </li>
+              <li style={{ marginBottom: '0.75rem' }}>
+                The $49 Founding Member waitlist fee is non-refundable.
+              </li>
+              <li>
+                <strong>Annual subscriptions:</strong> Pro-rata refund available within first 30 days only.
+              </li>
+            </ul>
           </section>
 
           <section>
@@ -118,7 +125,14 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>7. AI Executive Actions</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>7. AI-Generated Content Disclaimer</h2>
+            <p style={{ color: 'rgba(255,255,255,0.75)' }}>
+              AI-generated content and recommendations provided by Zander&apos;s executive team (including but not limited to Pam, Jordan, Don, Ben, Miranda, Ted, and Jarvis) are for informational and organizational purposes only. They do not constitute professional financial, legal, tax, medical, or investment advice. Users should consult qualified professionals before making decisions based on AI-generated recommendations. Zander Systems LLC is not liable for actions taken based on AI executive output.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>8. AI Executive Actions</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', marginBottom: '1rem' }}>
               <strong>Human Approval Required:</strong> All outbound communications (emails, SMS, etc.) drafted by AI Executives require your approval before sending. You are responsible for reviewing and approving all external communications.
             </p>
@@ -128,7 +142,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>8. Your Data</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>9. Your Data</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', marginBottom: '1rem' }}>
               You retain all rights to your data. By using the Service, you grant us a limited license to use your data solely to provide the Service. We will not sell your data or use it for purposes other than operating and improving the Service.
             </p>
@@ -138,84 +152,84 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>9. Third-Party Integrations</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>10. Third-Party Integrations</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               The Service integrates with third-party platforms (Google, Twilio, Calendly, Stripe, etc.). Your use of these integrations is subject to the respective third party&apos;s terms of service. We are not responsible for third-party services or their availability.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>10. Intellectual Property</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>11. Intellectual Property</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               The Service, including all content, features, and functionality, is owned by Zander Systems LLC and is protected by copyright, trademark, and other intellectual property laws. You may not copy, modify, distribute, or create derivative works without our express permission.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>11. Disclaimer of Warranties</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>12. Disclaimer of Warranties</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. WE DO NOT GUARANTEE THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR SECURE. YOU USE THE SERVICE AT YOUR OWN RISK.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>12. Limitation of Liability</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>13. Limitation of Liability</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               TO THE MAXIMUM EXTENT PERMITTED BY LAW, ZANDER SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES. OUR TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE TWELVE MONTHS PRECEDING THE CLAIM.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>13. Indemnification</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>14. Indemnification</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               You agree to indemnify and hold harmless Zander, its officers, directors, employees, and agents from any claims, damages, losses, or expenses arising from your use of the Service, your violation of these Terms, or your violation of any third-party rights.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>14. Termination</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>15. Termination</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               We may suspend or terminate your access to the Service at any time for violation of these Terms or for any other reason at our discretion. Upon termination, your right to use the Service ceases immediately.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>15. Changes to Terms</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>16. Changes to Terms</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               We may modify these Terms at any time. We will provide notice of material changes via email or through the Service. Your continued use after changes take effect constitutes acceptance of the new Terms.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>16. Governing Law</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>17. Governing Law</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               These Terms are governed by the laws of the State of Delaware, without regard to conflict of law principles. Any disputes shall be resolved in the state or federal courts located in Delaware.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>17. Dispute Resolution</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>18. Dispute Resolution</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               Before filing any claim, you agree to attempt to resolve disputes informally by contacting us at <a href="mailto:legal@zanderos.com" style={{ color: '#00CFEB' }}>legal@zanderos.com</a>. If we cannot resolve the dispute within 30 days, either party may proceed with formal legal action.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>18. Severability</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>19. Severability</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               If any provision of these Terms is found unenforceable, the remaining provisions will continue in full force and effect.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>19. Entire Agreement</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>20. Entire Agreement</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               These Terms, together with our Privacy Policy, constitute the entire agreement between you and Zander regarding the Service and supersede all prior agreements.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>20. Contact Us</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>21. Contact Us</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               If you have questions about these Terms:
             </p>

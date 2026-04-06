@@ -246,7 +246,7 @@ export class WebhookController {
 
           <p style="color: #999; font-size: 12px; text-align: center;">
             Zander - Operating Simply<br>
-            Powered by 64 West Holdings
+            Powered by Zander Systems LLC
           </p>
         </div>
       `;

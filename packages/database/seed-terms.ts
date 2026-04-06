@@ -13,7 +13,7 @@ async function seedTerms() {
 
 ## 1. AGREEMENT TO TERMS
 
-By accessing or using Zander ("Service"), operated by 64 West Holdings LLC ("Company," "we," "us," or "our"), you ("User," "you," or "your") agree to be bound by these Terms of Service ("Terms"). If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms.
+By accessing or using Zander ("Service"), operated by Zander Systems LLC ("Company," "we," "us," or "our"), you ("User," "you," or "your") agree to be bound by these Terms of Service ("Terms"). If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms.
 
 **If you do not agree to these Terms, you may not access or use the Service.**
 
@@ -139,7 +139,7 @@ Violations may result in immediate suspension or termination without refund.
 ## 7. INTELLECTUAL PROPERTY
 
 ### 7.1 Our Intellectual Property
-The Service, including all software, designs, text, graphics, interfaces, and trademarks, is owned by 64 West Holdings LLC and protected by intellectual property laws. You receive a limited, non-exclusive, non-transferable license to use the Service during your subscription.
+The Service, including all software, designs, text, graphics, interfaces, and trademarks, is owned by Zander Systems LLC and protected by intellectual property laws. You receive a limited, non-exclusive, non-transferable license to use the Service during your subscription.
 
 ### 7.2 Feedback
 Any suggestions, feedback, or ideas you provide about the Service become our property and may be used without compensation or attribution.
@@ -218,7 +218,7 @@ Some jurisdictions do not allow limitation of certain damages. In such cases, li
 
 ## 12. INDEMNIFICATION
 
-You agree to indemnify, defend, and hold harmless 64 West Holdings LLC, its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorney fees) arising from:
+You agree to indemnify, defend, and hold harmless Zander Systems LLC, its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorney fees) arising from:
 
 - Your use of the Service
 - Your violation of these Terms
@@ -291,7 +291,7 @@ Upon termination:
 ## 16. GENERAL PROVISIONS
 
 ### 16.1 Entire Agreement
-These Terms, together with our Privacy Policy, constitute the entire agreement between you and 64 West Holdings LLC regarding the Service.
+These Terms, together with our Privacy Policy, constitute the entire agreement between you and Zander Systems LLC regarding the Service.
 
 ### 16.2 Severability
 If any provision is found unenforceable, the remaining provisions remain in full effect.
@@ -315,7 +315,7 @@ We may update these Terms with 30 days' notice. Continued use after changes cons
 
 ## 17. CONTACT INFORMATION
 
-**64 West Holdings LLC**
+**Zander Systems LLC**
 
 - **General Inquiries**: hello@zanderos.com
 - **Support**: support@zanderos.com
@@ -330,7 +330,7 @@ BY CLICKING "I ACCEPT" OR BY ACCESSING OR USING THE SERVICE, YOU ACKNOWLEDGE THA
 
 ---
 
-*© 2026 64 West Holdings LLC. All rights reserved.*`;
+*© 2026 Zander Systems LLC. All rights reserved.*`;
 
   const terms = await prisma.termsVersion.upsert({
     where: { version: '1.0' },

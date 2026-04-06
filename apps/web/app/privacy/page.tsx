@@ -116,14 +116,21 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>6. Third-Party Integrations</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>6. Third-Party AI Processing</h2>
+            <p style={{ color: 'rgba(255,255,255,0.75)' }}>
+              To provide AI executive functionality, certain user data may be processed by third-party AI service providers (currently Anthropic). These providers are contractually prohibited from using your data for model training or any purpose other than providing the requested service. Data is transmitted via encrypted connections and is not retained by third-party providers beyond the immediate processing session. We select AI providers that maintain enterprise-grade security standards and data handling practices.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>7. Third-Party Integrations</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               Zander integrates with third-party services like Google (Gmail, Calendar), Twilio (SMS), Calendly, and Stripe. When you connect these services, you authorize us to access data according to the permissions you grant. Each integration follows OAuth standards and you can revoke access at any time.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>7. Your Rights</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>8. Your Rights</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', marginBottom: '1rem' }}>You have the right to:</p>
             <ul style={{ color: 'rgba(255,255,255,0.75)', paddingLeft: '1.5rem' }}>
               <li>Access and receive a copy of your data</li>
@@ -139,35 +146,35 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>8. Data Retention</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>9. Data Retention</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               We retain your data for as long as your account is active or as needed to provide services. When you delete your account, we delete or anonymize your data within 30 days, except where we&apos;re required to retain it for legal purposes.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>9. Cookies</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>10. Cookies</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               We use cookies and similar technologies for authentication, preferences, analytics, and security. You can control cookies through your browser settings, but disabling certain cookies may affect platform functionality.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>10. Children&apos;s Privacy</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>11. Children&apos;s Privacy</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               Zander is not intended for use by anyone under 18. We do not knowingly collect information from children.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>11. Changes to This Policy</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>12. Changes to This Policy</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               We may update this Privacy Policy from time to time. We will notify you of material changes by email or through the platform. Your continued use after changes constitutes acceptance.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>12. Contact Us</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#00CFEB' }}>13. Contact Us</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)' }}>
               If you have questions about this Privacy Policy or our data practices:
             </p>
