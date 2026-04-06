@@ -19,7 +19,11 @@ const TIER_DISPLAY_NAMES: Record<string, string> = {
 function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const selectedTier = searchParams.get('tier')?.toUpperCase() || null;
+  const tierParam = searchParams.get('tier');
+  const selectedTier = tierParam?.toUpperCase() || null;
+
+  // Only consider it a valid tier if it exists in our price map
+  const hasValidTier = selectedTier !== null && TIER_PRICE_MAP[selectedTier] !== undefined;
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -78,8 +82,8 @@ function SignupContent() {
         localStorage.setItem('zander_token', loginData.token);
         localStorage.setItem('zander_user', JSON.stringify(loginData.user));
 
-        // If tier was selected, redirect to Stripe checkout
-        if (selectedTier && TIER_PRICE_MAP[selectedTier]) {
+        // If a valid tier was selected, redirect to Stripe checkout
+        if (hasValidTier && selectedTier) {
           setCheckoutLoading(true);
           try {
             const checkoutResponse = await fetch('https://api.zanderos.com/billing/checkout', {
@@ -208,7 +212,7 @@ function SignupContent() {
             Start transforming your business with Zander
           </p>
 
-          {selectedTier && TIER_PRICE_MAP[selectedTier] && (
+          {hasValidTier && selectedTier && (
             <div style={{
               background: 'rgba(0, 204, 238, 0.1)',
               border: '1px solid rgba(0, 204, 238, 0.3)',
@@ -411,7 +415,7 @@ function SignupContent() {
                 e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 204, 238, 0.2)';
               }}
             >
-              {checkoutLoading ? 'Redirecting to Payment...' : loading ? 'Creating Account...' : selectedTier ? `Create Account & Continue to Payment` : 'Create Account'}
+              {checkoutLoading ? 'Redirecting to Payment...' : loading ? 'Creating Account...' : hasValidTier ? 'Create Account & Continue to Payment' : 'Create Account'}
             </button>
           </form>
 

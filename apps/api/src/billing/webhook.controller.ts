@@ -11,6 +11,7 @@ import Stripe from 'stripe';
 import { PrismaService } from '../prisma/prisma.service';
 import { Public } from '../auth/jwt-auth.decorator';
 import { EmailService } from '../integrations/email/email.service';
+import { TIER_TOKEN_CAPS, formatTokenCount } from '../common/config/tier-config';
 
 // Stripe LIVE price IDs -> Tier mapping
 const PRICE_TO_TIER: Record<string, string> = {
@@ -174,9 +175,11 @@ export class WebhookController {
     const customerEmail = session.customer_email ||
                           session.metadata?.customerEmail ||
                           tenant?.users?.[0]?.email;
-    const customerName = tenant?.companyName ||
-                         tenant?.users?.[0]?.firstName ||
-                         'Valued Customer';
+
+    // For the greeting, prefer user's first name over company name
+    // Trim to remove any whitespace issues
+    const firstUser = tenant?.users?.[0];
+    const customerName = (firstUser?.firstName?.trim() || tenant?.companyName?.trim() || 'Valued Customer');
 
     this.logger.log(`Email resolution: session.customer_email=${session.customer_email}, metadata.customerEmail=${session.metadata?.customerEmail}, user.email=${tenant?.users?.[0]?.email}, resolved=${customerEmail}`);
 
@@ -327,20 +330,24 @@ export class WebhookController {
   }
 
   private getTierFeatures(tier: string): string[] {
+    // Get the actual token cap from config
+    const tokenCap = TIER_TOKEN_CAPS[tier] ?? TIER_TOKEN_CAPS.STARTER;
+    const formattedTokens = formatTokenCount(tokenCap);
+
     switch (tier) {
       case 'STARTER':
         return [
           'Pam - Executive Assistant (scheduling, email drafts, task management)',
           'Contact & Deal Management',
           'Email & Calendar Integration',
-          '10,000 AI tokens/month',
+          `${formattedTokens} AI tokens/month`,
         ];
       case 'PRO':
         return [
           'Everything in Starter, plus:',
           'Jordan - AI Sales Director (pipeline coaching, follow-ups)',
           'Sales Analytics & Forecasting',
-          '50,000 AI tokens/month',
+          `${formattedTokens} AI tokens/month`,
           'Priority Support',
         ];
       case 'BUSINESS':
@@ -349,7 +356,7 @@ export class WebhookController {
           'Don - AI CMO (marketing strategy, content planning)',
           'Full HQ Strategic Dashboard',
           'Team Collaboration Features',
-          '200,000 AI tokens/month',
+          `${formattedTokens} AI tokens/month`,
           'Dedicated Success Manager',
         ];
       default:
