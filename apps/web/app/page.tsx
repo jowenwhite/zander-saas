@@ -1119,9 +1119,11 @@ export default function LandingPage() {
                 borderRadius: '16px',
                 padding: '2.25rem',
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
               }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.teal }}>Starter</h3>
-              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Your EA and HQ — fully operational from day one.</p>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5, minHeight: '90px' }}>Your EA and HQ — fully operational from day one.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
                 $199<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
@@ -1172,6 +1174,8 @@ export default function LandingPage() {
                 borderRadius: '16px',
                 padding: '2.25rem',
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
               }}>
               <div style={{
                 position: 'absolute',
@@ -1189,7 +1193,7 @@ export default function LandingPage() {
                 whiteSpace: 'nowrap',
               }}>Most Popular</div>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.amber }}>Pro</h3>
-              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Add your marketing machine — campaigns, brand, and content.</p>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5, minHeight: '90px' }}>Add your marketing machine — campaigns, brand, and content.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
                 $349<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
@@ -1238,9 +1242,11 @@ export default function LandingPage() {
                 borderRadius: '16px',
                 padding: '2.25rem',
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
               }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.green }}>Business</h3>
-              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>The complete C-suite. Every executive included, forever.</p>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5, minHeight: '90px' }}>The complete C-suite. Every executive included, forever.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
                 $599<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
@@ -1289,9 +1295,11 @@ export default function LandingPage() {
                 borderRadius: '16px',
                 padding: '2.25rem',
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
               }}>
               <h3 style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '42px', fontWeight: 700, marginBottom: '6px', color: BRAND_COLORS.purple }}>Enterprise</h3>
-              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5 }}>Custom build for complex organizations and agencies.</p>
+              <p style={{ fontSize: '30px', color: 'rgba(255,255,255,0.6)', marginBottom: '24px', lineHeight: 1.5, minHeight: '90px' }}>Custom build for complex organizations and agencies.</p>
               <div style={{ fontFamily: "'Sora', var(--font-sora), sans-serif", fontSize: '78px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
                 $999<span style={{ fontSize: '30px', fontWeight: 500, color: 'rgba(255,255,255,0.58)' }}>/mo</span>
               </div>
