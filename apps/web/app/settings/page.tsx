@@ -1830,10 +1830,29 @@ function SettingsContent() {
                   >
                     Current Plan
                   </button>
+                ) : tier.id === 'ENTERPRISE' ? (
+                  <a
+                    href="mailto:jonathan@zanderos.com?subject=Zander%20Enterprise%20Inquiry"
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: '#1C1C26',
+                      color: '#00CCEE',
+                      border: '2px solid #00CCEE',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    Contact Account Manager
+                  </a>
                 ) : (
                   <button
                     onClick={() => priceId && handleCheckout(priceId)}
-                    disabled={upgradeLoading || !priceId || tier.id === 'ENTERPRISE'}
+                    disabled={upgradeLoading || !priceId}
                     style={{
                       width: '100%',
                       padding: '0.75rem',
@@ -1846,12 +1865,30 @@ function SettingsContent() {
                       opacity: upgradeLoading ? 0.7 : 1
                     }}
                   >
-                    {upgradeLoading ? 'Processing...' : tier.id === 'ENTERPRISE' ? 'Schedule Discovery Call' : billing ? 'Upgrade' : `Subscribe — $${tier.price}/mo`}
+                    {upgradeLoading ? 'Processing...' : billing ? 'Upgrade' : `Subscribe — $${tier.price}/mo`}
                   </button>
                 )}
               </div>
             );
           })}
+        </div>
+
+        {/* 30-Day Money-Back Guarantee */}
+        <div style={{
+          marginTop: '2rem',
+          padding: '1rem 1.5rem',
+          background: 'rgba(40, 167, 69, 0.1)',
+          border: '1px solid rgba(40, 167, 69, 0.3)',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem'
+        }}>
+          <span style={{ fontSize: '1.25rem' }}>&#x2714;&#xFE0F;</span>
+          <span style={{ color: '#28A745', fontWeight: '600', fontSize: '0.95rem' }}>
+            30-Day Money-Back Guarantee — Try any plan risk-free
+          </span>
         </div>
       </div>
     );
@@ -2488,13 +2525,14 @@ function SettingsContent() {
           </div>
 
           <div style={{ background: '#1C1C26', borderRadius: '12px', border: '2px solid #2A2A38', overflow: 'hidden' }}>
-            <div style={{ display: 'flex', borderBottom: '2px solid #2A2A38' }}>
+            <div style={{ display: 'flex', borderBottom: '2px solid #2A2A38', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   style={{
-                    flex: 1,
+                    flex: 'none',
+                    minWidth: '100px',
                     padding: '1rem',
                     background: activeTab === tab.id ? '#09090F' : '#1C1C26',
                     border: 'none',
@@ -2506,7 +2544,8 @@ function SettingsContent() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.5rem',
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   <span>{getTabIcon(tab.id)}</span>
