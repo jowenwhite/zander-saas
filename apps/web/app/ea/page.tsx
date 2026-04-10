@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
+import { getActiveTenant } from '../utils/auth';
 import { ClipboardList, Calendar, Inbox, LayoutDashboard, CheckSquare, Clock, AlertTriangle, Send, Plus, ChevronRight, Circle, Mail, MessageSquare, Phone, Video, MailOpen, ArrowLeft, ArrowRight, SquarePen } from 'lucide-react';
 
 type ToolExecution = {
@@ -288,12 +289,14 @@ export default function EAPage() {
 
     try {
       const token = localStorage.getItem('zander_token');
+      const activeTenant = getActiveTenant();
+      const tenantId = activeTenant?.id;
       const conversationHistory = messages.map(m => ({ role: m.role, content: m.content }));
 
       const response = await fetch('/api/ea/pam', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ message: userMessage.content, conversationHistory })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(tenantId && { 'x-tenant-id': tenantId }) },
+        body: JSON.stringify({ message: userMessage.content, conversationHistory, tenantId })
       });
 
       if (!response.ok) throw new Error('Failed to get AI response');
@@ -361,6 +364,8 @@ export default function EAPage() {
     setBookingMeeting(true);
     try {
       const token = localStorage.getItem('zander_token');
+      const activeTenant = getActiveTenant();
+      const tenantId = activeTenant?.id;
       const contactName = contacts.find(c => c.id === meetingForm.contactId);
       const attendeeName = contactName ? `${contactName.firstName} ${contactName.lastName}` : 'No attendee';
 
@@ -369,8 +374,8 @@ export default function EAPage() {
 
       const response = await fetch('/api/ea/pam', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ message: bookingMessage, conversationHistory: [] })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(tenantId && { 'x-tenant-id': tenantId }) },
+        body: JSON.stringify({ message: bookingMessage, conversationHistory: [], tenantId })
       });
 
       if (response.ok) {

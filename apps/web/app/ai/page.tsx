@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
+import { getActiveTenant } from '../utils/auth';
 import { Ticket, AlertTriangle, Lightbulb, SquarePen } from 'lucide-react';
 
 type ToolExecution = {
@@ -108,6 +109,8 @@ export default function AskJordanPage() {
 
     try {
       const token = localStorage.getItem('zander_token');
+      const activeTenant = getActiveTenant();
+      const tenantId = activeTenant?.id;
 
       const conversationHistory = messages.map(m => ({
         role: m.role,
@@ -120,10 +123,12 @@ export default function AskJordanPage() {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+          ...(tenantId && { 'x-tenant-id': tenantId }),
         },
         body: JSON.stringify({
           message: userMessage.content,
-          conversationHistory
+          conversationHistory,
+          tenantId
         })
       });
 

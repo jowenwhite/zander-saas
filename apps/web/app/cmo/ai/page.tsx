@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { SquarePen } from 'lucide-react';
 import { CMOLayout } from '../components';
+import { getActiveTenant } from '../../utils/auth';
 
 type ToolExecution = {
   tool: string;
@@ -103,6 +104,8 @@ export default function AskDonPage() {
 
     try {
       const token = localStorage.getItem('zander_token');
+      const activeTenant = getActiveTenant();
+      const tenantId = activeTenant?.id;
 
       const conversationHistory = messages.map((m) => ({
         role: m.role,
@@ -115,10 +118,12 @@ export default function AskDonPage() {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+          ...(tenantId && { 'x-tenant-id': tenantId }),
         },
         body: JSON.stringify({
           message: userMessage.content,
           conversationHistory,
+          tenantId,
         }),
       });
 
