@@ -1811,7 +1811,7 @@ export async function POST(request: NextRequest) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
         system: PAM_SYSTEM_PROMPT,
         tools: TOOLS,
@@ -1872,7 +1872,7 @@ export async function POST(request: NextRequest) {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
+          model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
           system: PAM_SYSTEM_PROMPT,
           messages: [
