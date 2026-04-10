@@ -139,7 +139,25 @@ export default function PersistentExecutivePanel() {
 
       // Get tenantId fresh at request time (may have loaded after component mount)
       const activeTenant = getActiveTenant();
-      const currentTenantId = activeTenant?.id || tenantId;
+      // Fallback chain: activeTenant.id -> state tenantId -> direct localStorage read
+      let currentTenantId = activeTenant?.id || tenantId;
+      if (!currentTenantId) {
+        // Direct localStorage fallback in case getActiveTenant failed
+        try {
+          const storedTenant = localStorage.getItem('zander_active_tenant');
+          if (storedTenant) {
+            const parsed = JSON.parse(storedTenant);
+            currentTenantId = parsed?.id;
+          }
+        } catch (e) {
+          console.error('Failed to parse tenant from localStorage:', e);
+        }
+      }
+
+      if (!currentTenantId) {
+        console.error('No tenant ID available for AI request');
+        throw new Error('Tenant ID not available');
+      }
 
       const response = await fetch(execInfo.apiRoute, {
         method: 'POST',
