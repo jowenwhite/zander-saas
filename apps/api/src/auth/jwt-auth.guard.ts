@@ -32,6 +32,7 @@ export class JwtAuthGuard implements CanActivate {
         sub: decoded.sub,
         isSuperAdmin: decoded.isSuperAdmin || false,
         userId: decoded.sub,
+        id: decoded.sub, // Alias for backwards compatibility with controllers using req.user.id
         email: decoded.email,
         tenantId: decoded.tenantId,
         role: decoded.role || 'member'
