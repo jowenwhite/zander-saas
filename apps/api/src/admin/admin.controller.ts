@@ -653,6 +653,34 @@ export class AdminController {
   }
 
   /**
+   * GET /admin/errors
+   * System-wide error logs for diagnostics (admin-secret protected)
+   */
+  @Public()
+  @Get('errors')
+  async getSystemErrors(
+    @Headers('x-admin-secret') secretKey: string,
+    @Query('level') level?: string,
+    @Query('tenantId') tenantId?: string,
+    @Query('statusCode') statusCode?: string,
+    @Query('hours') hours?: string,
+    @Query('search') search?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.getSystemErrors({
+      level,
+      tenantId,
+      statusCode: statusCode ? parseInt(statusCode) : undefined,
+      hours: hours ? parseInt(hours) : 24,
+      search,
+      limit: limit ? parseInt(limit) : 100,
+      offset: offset ? parseInt(offset) : 0,
+    });
+  }
+
+  /**
    * Helper to validate admin secret key
    */
   private validateAdminSecret(secretKey: string) {

@@ -4815,4 +4815,114 @@ If at limit:
       })),
     };
   }
+
+  /**
+   * GET /admin/errors
+   * System-wide error logs for diagnostics
+   */
+  async getSystemErrors(params: {
+    level?: string;
+    tenantId?: string;
+    statusCode?: number;
+    hours?: number;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const { level, tenantId, statusCode, hours = 24, search, limit = 100, offset = 0 } = params;
+    const since = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+    // Build where clause
+    const where: any = {
+      createdAt: { gte: since },
+    };
+
+    if (level && level !== 'ALL') {
+      where.level = level.toLowerCase();
+    }
+
+    if (tenantId) {
+      where.tenantId = tenantId;
+    }
+
+    if (statusCode) {
+      where.metadata = {
+        path: ['statusCode'],
+        equals: statusCode,
+      };
+    }
+
+    if (search) {
+      where.OR = [
+        { message: { contains: search, mode: 'insensitive' } },
+        { endpoint: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Get errors with pagination
+    const [errors, total] = await Promise.all([
+      this.prisma.errorLog.findMany({
+        where,
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.errorLog.count({ where }),
+    ]);
+
+    // Count by level for summary
+    const levelCounts = await this.prisma.errorLog.groupBy({
+      by: ['level'],
+      where: { createdAt: { gte: since } },
+      _count: { level: true },
+    });
+
+    const byLevel = levelCounts.reduce(
+      (acc, item) => {
+        acc[item.level.toUpperCase()] = item._count.level;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    // Get unique status codes for filter options
+    const statusCodes = await this.prisma.errorLog.findMany({
+      where: { createdAt: { gte: since }, metadata: { not: null } },
+      select: { metadata: true },
+      distinct: ['metadata'],
+      take: 20,
+    });
+
+    const uniqueStatusCodes = [
+      ...new Set(
+        statusCodes
+          .map((e: any) => e.metadata?.statusCode)
+          .filter((code: any) => code !== undefined),
+      ),
+    ].sort();
+
+    return {
+      success: true,
+      data: errors.map((e) => ({
+        id: e.id,
+        timestamp: e.createdAt.toISOString(),
+        level: e.level.toUpperCase(),
+        message: e.message,
+        stack: e.stack,
+        endpoint: e.endpoint,
+        tenantId: e.tenantId,
+        userId: e.userId,
+        metadata: e.metadata,
+        statusCode: (e.metadata as any)?.statusCode,
+        method: (e.metadata as any)?.method,
+        responseTime: (e.metadata as any)?.responseTime,
+      })),
+      total,
+      limit,
+      offset,
+      byLevel,
+      statusCodes: uniqueStatusCodes,
+      hours,
+    };
+  }
 }

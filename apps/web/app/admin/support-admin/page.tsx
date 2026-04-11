@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '../../components/Sidebar';
 import { HealthTab } from './components/HealthTab';
 import { TenantsTab } from './components/TenantsTab';
+import { DiagnosticsTab } from './components/DiagnosticsTab';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
@@ -134,7 +135,7 @@ export default function SupportAdminPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'headwinds' | 'tenants' | 'tickets' | 'knowledge' | 'health'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'headwinds' | 'tenants' | 'tickets' | 'knowledge' | 'health' | 'diagnostics'>('overview');
   
   // Data state
   const [health, setHealth] = useState<SystemHealth>(MOCK_HEALTH);
@@ -787,7 +788,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
             borderRadius: '8px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
-            {(['overview', 'health', 'headwinds', 'tenants', 'tickets', 'knowledge'] as const).map(tab => (
+            {(['overview', 'health', 'diagnostics', 'headwinds', 'tenants', 'tickets', 'knowledge'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -856,6 +857,10 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
 
           {activeTab === 'health' && (
             <HealthTab />
+          )}
+
+          {activeTab === 'diagnostics' && (
+            <DiagnosticsTab />
           )}
 
           {activeTab === 'headwinds' && (
