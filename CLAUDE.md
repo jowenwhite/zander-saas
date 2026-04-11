@@ -40,6 +40,11 @@
 3. Landing page build session (use the brief doc)
 4. /privacy and /terms pages
 
+### Test Credentials
+- **Email**: jonathan@zanderos.com
+- **Password**: 4S@iling1979!
+- **Default Tenant**: Zander Inc (ALWAYS verify tenant switcher before testing)
+
 ---
 
 ## AI Executive Execution Framework
