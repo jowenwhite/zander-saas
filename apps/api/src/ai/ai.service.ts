@@ -564,7 +564,10 @@ Content: ${a.content}
       : '';
 
     // Build messages for Claude
-    const systemPrompt = `${executive.personality}
+    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const systemPrompt = `Today's date is ${currentDate}.
+
+${executive.personality}
 
 ${businessContext}
 ${knowledgeContext}
