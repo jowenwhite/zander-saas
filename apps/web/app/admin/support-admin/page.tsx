@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '../../components/Sidebar';
 import { HealthTab } from './components/HealthTab';
+import { TenantsTab } from './components/TenantsTab';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
@@ -929,54 +930,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
           )}
 
           {activeTab === 'tenants' && (
-            <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-              <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #2A2A38' }}>
-                <input
-                  type="text"
-                  placeholder="Search tenants..."
-                  value={tenantSearch}
-                  onChange={(e) => setTenantSearch(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    border: '2px solid #2A2A38',
-                    borderRadius: '8px',
-                    fontSize: '1rem'
-                  }}
-                />
-              </div>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ background: '#13131A' }}>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Tenant</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Users</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Plan</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Last Active</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#8888A0' }}>Status</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#8888A0' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTenants.map(t => (
-                    <tr key={t.id} style={{ borderBottom: '1px solid #2A2A38' }}>
-                      <td style={{ padding: '1rem', fontWeight: '600', color: '#F0F0F5' }}>{t.companyName}</td>
-                      <td style={{ padding: '1rem', textAlign: 'center' }}>{t._count?.users || t.users?.length || 0}</td>
-                      <td style={{ padding: '1rem' }}>
-                        <span style={{ background: t.subscriptionTier === 'enterprise' ? '#00CCEE' : t.subscriptionTier === 'pro' ? '#13131A' : '#6c757d', color: t.subscriptionTier === 'enterprise' ? '#13131A' : 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>{t.subscriptionTier || 'starter'}</span>
-                      </td>
-                      <td style={{ padding: '1rem', color: '#8888A0' }}>{t.tenantType}</td>
-                      <td style={{ padding: '1rem' }}>
-                        <span style={{ background: getStatusColor(t.subscriptionStatus || 'active'), color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{t.subscriptionStatus || 'active'}</span>
-                      </td>
-                      <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <button style={{ background: '#13131A', color: 'white', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem', fontSize: '0.8rem' }}>View As</button>
-                        <button style={{ background: '#13131A', color: '#8888A0', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Details</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <TenantsTab />
           )}
 
           

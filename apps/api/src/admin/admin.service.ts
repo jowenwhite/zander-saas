@@ -3871,6 +3871,10 @@ If at limit:
         trialStartDate: true,
         trialEndDate: true,
         createdAt: true,
+        archivedAt: true,
+        lastActivityAt: true,
+        currentEngagementScore: true,
+        currentChurnRiskLevel: true,
         _count: {
           select: { users: true },
         },
@@ -3893,6 +3897,11 @@ If at limit:
         effectiveTier: this.getEffectiveTier(t),
         userCount: t._count.users,
         createdAt: t.createdAt,
+        archivedAt: t.archivedAt,
+        lastActivityAt: t.lastActivityAt,
+        engagementScore: t.currentEngagementScore,
+        churnRiskLevel: t.currentChurnRiskLevel,
+        status: t.archivedAt ? 'ARCHIVED' : 'ACTIVE',
       })),
       count: tenants.length,
     };
