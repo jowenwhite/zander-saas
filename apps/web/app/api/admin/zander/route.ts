@@ -1325,6 +1325,187 @@ const TOOLS = [
       },
       required: []
     }
+  },
+  // ========== SECTION 9: PHASE 2 TENANT MANAGEMENT ==========
+  {
+    name: 'tenant_rename',
+    description: 'Rename a tenant company name. Audit logged. Use when a company rebrands or name correction needed.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to rename'
+        },
+        newCompanyName: {
+          type: 'string',
+          description: 'New company name'
+        },
+        reason: {
+          type: 'string',
+          description: 'Reason for rename (for audit log)'
+        }
+      },
+      required: ['tenantId', 'newCompanyName']
+    }
+  },
+  {
+    name: 'tenant_archive',
+    description: 'Soft-archive a tenant. Data preserved, access suspended. Use for churned or inactive accounts.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to archive'
+        },
+        reason: {
+          type: 'string',
+          description: 'Reason for archiving (for audit log)'
+        }
+      },
+      required: ['tenantId']
+    }
+  },
+  {
+    name: 'tenant_restore',
+    description: 'Restore an archived tenant to active status. Use when a churned customer returns.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to restore'
+        },
+        reason: {
+          type: 'string',
+          description: 'Reason for restoring (for audit log)'
+        }
+      },
+      required: ['tenantId']
+    }
+  },
+  {
+    name: 'tenant_trial_extend',
+    description: 'Extend trial period for a tenant. Use for promising leads or customers needing more evaluation time.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to extend trial'
+        },
+        days: {
+          type: 'number',
+          description: 'Number of days to extend (e.g., 7, 14, 30)'
+        },
+        reason: {
+          type: 'string',
+          description: 'Reason for extension (for audit log)'
+        }
+      },
+      required: ['tenantId', 'days']
+    }
+  },
+  // ========== SECTION 10: PHASE 2 USER SEGMENTATION ==========
+  {
+    name: 'get_churning_users',
+    description: 'Identify users showing churn signals (decreased activity, no recent login). Use for proactive retention outreach.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        daysInactive: {
+          type: 'number',
+          description: 'Minimum days since last activity (default 14)'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum users to return (default 20)'
+        }
+      },
+      required: []
+    }
+  },
+  // ========== SECTION 11: PHASE 2 DRAFT COMMUNICATIONS ==========
+  {
+    name: 'draft_at_risk_outreach',
+    description: 'Draft personalized outreach to at-risk accounts. Never auto-sends. Creates pending approval queue item.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to reach out to'
+        },
+        channel: {
+          type: 'string',
+          enum: ['email', 'sms'],
+          description: 'Communication channel'
+        },
+        tone: {
+          type: 'string',
+          enum: ['supportive', 'urgent', 'offer'],
+          description: 'Tone of outreach (default supportive)'
+        }
+      },
+      required: ['tenantId', 'channel']
+    }
+  },
+  {
+    name: 'draft_upgrade_offer',
+    description: 'Draft upgrade offer for high-engagement accounts. Never auto-sends. Creates pending approval queue item.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantId: {
+          type: 'string',
+          description: 'Tenant ID to send offer to'
+        },
+        currentTier: {
+          type: 'string',
+          enum: ['starter', 'pro', 'business'],
+          description: 'Current subscription tier'
+        },
+        targetTier: {
+          type: 'string',
+          enum: ['pro', 'business', 'enterprise'],
+          description: 'Target subscription tier to upgrade to'
+        },
+        incentive: {
+          type: 'string',
+          enum: ['discount', 'extended_trial', 'free_month'],
+          description: 'Incentive to include in offer'
+        }
+      },
+      required: ['tenantId', 'currentTier', 'targetTier']
+    }
+  },
+  {
+    name: 'draft_reactivation_campaign',
+    description: 'Draft reactivation campaign for churned/inactive accounts. Never auto-sends. Creates pending bulk approval.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        tenantIds: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of tenant IDs to target'
+        },
+        daysInactive: {
+          type: 'number',
+          description: 'Minimum days inactive for targeting'
+        },
+        subject: {
+          type: 'string',
+          description: 'Email subject line (optional, will generate if not provided)'
+        },
+        body: {
+          type: 'string',
+          description: 'Email body (optional, will generate if not provided)'
+        }
+      },
+      required: ['tenantIds', 'daysInactive']
+    }
   }
 ];
 
@@ -3444,6 +3625,496 @@ Thanks for being part of our beta community!
           return { success: false, error: `Failed to fetch action log (${response.status})` };
         }
         return { success: true, result: await response.json() };
+      }
+
+      // ========== PHASE 2: TENANT MANAGEMENT TOOLS ==========
+      case 'tenant_rename': {
+        const { tenantId, newCompanyName, reason } = toolInput as {
+          tenantId: string;
+          newCompanyName: string;
+          reason?: string;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+
+        // Get current tenant name for logging
+        const getRes = await fetch(`${API_URL}/tenants/${tenantId}`, { headers });
+        let oldName = 'unknown';
+        if (getRes.ok) {
+          const tenant = await getRes.json();
+          oldName = tenant.companyName;
+        }
+
+        const url = `${API_URL}/admin/tenants/${tenantId}/rename`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { ...headers, 'x-admin-secret': adminSecret || '', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newCompanyName, reason: reason || 'Renamed via Zander' })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          return { success: false, error: `Failed to rename tenant (${response.status}): ${errorText}` };
+        }
+
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            tenantId,
+            oldName,
+            newName: newCompanyName,
+            updatedAt: data.updatedAt || new Date().toISOString(),
+            reason: reason || 'No reason provided',
+            message: `Tenant renamed from "${oldName}" to "${newCompanyName}"`
+          }
+        };
+      }
+
+      case 'tenant_archive': {
+        const { tenantId, reason } = toolInput as {
+          tenantId: string;
+          reason?: string;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+
+        // Get tenant name for response
+        const getRes = await fetch(`${API_URL}/tenants/${tenantId}`, { headers });
+        let companyName = 'unknown';
+        if (getRes.ok) {
+          const tenant = await getRes.json();
+          companyName = tenant.companyName;
+        }
+
+        const url = `${API_URL}/admin/tenants/${tenantId}/archive`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { ...headers, 'x-admin-secret': adminSecret || '', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: reason || 'Archived via Zander' })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          return { success: false, error: `Failed to archive tenant (${response.status}): ${errorText}` };
+        }
+
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            tenantId,
+            companyName,
+            status: 'ARCHIVED',
+            archivedAt: data.archivedAt || new Date().toISOString(),
+            reason: reason || 'No reason provided',
+            message: `Tenant "${companyName}" has been archived. Data preserved, access suspended.`,
+            note: 'Use tenant_restore to reactivate this tenant.'
+          }
+        };
+      }
+
+      case 'tenant_restore': {
+        const { tenantId, reason } = toolInput as {
+          tenantId: string;
+          reason?: string;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+
+        // Get tenant name for response
+        const getRes = await fetch(`${API_URL}/tenants/${tenantId}`, { headers });
+        let companyName = 'unknown';
+        if (getRes.ok) {
+          const tenant = await getRes.json();
+          companyName = tenant.companyName;
+        }
+
+        const url = `${API_URL}/admin/tenants/${tenantId}/restore`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { ...headers, 'x-admin-secret': adminSecret || '', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: reason || 'Restored via Zander' })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          return { success: false, error: `Failed to restore tenant (${response.status}): ${errorText}` };
+        }
+
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            tenantId,
+            companyName,
+            status: 'ACTIVE',
+            restoredAt: data.restoredAt || new Date().toISOString(),
+            archivedAt: null,
+            reason: reason || 'No reason provided',
+            message: `Tenant "${companyName}" has been restored to active status.`
+          }
+        };
+      }
+
+      case 'tenant_trial_extend': {
+        const { tenantId, days, reason } = toolInput as {
+          tenantId: string;
+          days: number;
+          reason?: string;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+
+        // Get current tenant trial info
+        const getRes = await fetch(`${API_URL}/tenants/${tenantId}`, { headers });
+        let companyName = 'unknown';
+        let currentTrialEnd = null;
+        if (getRes.ok) {
+          const tenant = await getRes.json();
+          companyName = tenant.companyName;
+          currentTrialEnd = tenant.trialEndsAt;
+        }
+
+        const url = `${API_URL}/admin/tenants/${tenantId}/trial/extend`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { ...headers, 'x-admin-secret': adminSecret || '', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ days, reason: reason || 'Extended via Zander' })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          return { success: false, error: `Failed to extend trial (${response.status}): ${errorText}` };
+        }
+
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            tenantId,
+            companyName,
+            previousTrialEnd: currentTrialEnd,
+            newTrialEnd: data.trialEndsAt,
+            daysExtended: days,
+            trialExtendedCount: data.trialExtendedCount || 1,
+            lastExtendedAt: data.lastExtendedAt || new Date().toISOString(),
+            reason: reason || 'No reason provided',
+            message: `Trial extended by ${days} days for "${companyName}"`
+          }
+        };
+      }
+
+      // ========== PHASE 2: USER SEGMENTATION TOOLS ==========
+      case 'get_churning_users': {
+        const { daysInactive = 14, limit = 20 } = toolInput as {
+          daysInactive?: number;
+          limit?: number;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+        const params = new URLSearchParams();
+        params.append('segment', 'churning');
+        params.append('daysInactive', String(daysInactive));
+        params.append('limit', String(limit));
+
+        const url = `${API_URL}/admin/users/segments?${params.toString()}`;
+        const response = await fetch(url, {
+          headers: { ...headers, 'x-admin-secret': adminSecret || '' }
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          return { success: false, error: `Failed to fetch churning users (${response.status}): ${errorText}` };
+        }
+
+        const data = await response.json();
+        return {
+          success: true,
+          result: {
+            segment: 'churning',
+            criteria: { daysInactive, limit },
+            count: data.count || data.churning?.length || 0,
+            churning: data.churning || data.users || [],
+            asOf: new Date().toISOString(),
+            recommendation: 'Consider using draft_at_risk_outreach or draft_reactivation_campaign for these users.'
+          }
+        };
+      }
+
+      // ========== PHASE 2: DRAFT COMMUNICATION TOOLS ==========
+      case 'draft_at_risk_outreach': {
+        const { tenantId, channel, tone = 'supportive' } = toolInput as {
+          tenantId: string;
+          channel: string;
+          tone?: string;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+
+        // Get tenant info for personalization
+        const getRes = await fetch(`${API_URL}/tenants/${tenantId}`, { headers });
+        let tenantInfo = { companyName: 'Valued Customer', ownerEmail: null, ownerName: null };
+        if (getRes.ok) {
+          const tenant = await getRes.json();
+          tenantInfo = {
+            companyName: tenant.companyName || 'Valued Customer',
+            ownerEmail: tenant.users?.[0]?.email || null,
+            ownerName: tenant.users?.[0]?.name || null
+          };
+        }
+
+        // Generate outreach content based on tone
+        const toneContent = {
+          supportive: {
+            subject: `We're here to help, ${tenantInfo.companyName}`,
+            body: `Hi ${tenantInfo.ownerName || 'there'},\n\nWe noticed you haven't been as active on Zander lately, and we wanted to check in. Is there anything we can help with?\n\nWhether you have questions about features, need help with setup, or just want to share feedback — we're here for you.\n\nJust reply to this email and let us know how we can support you.\n\nBest,\nThe Zander Team`
+          },
+          urgent: {
+            subject: `Important: Your ${tenantInfo.companyName} account`,
+            body: `Hi ${tenantInfo.ownerName || 'there'},\n\nWe've noticed a significant drop in activity on your Zander account. Before we assume anything, we wanted to reach out directly.\n\nIs everything okay? Are there blockers we can help remove?\n\nLet's schedule a quick call to make sure you're getting the most out of Zander.\n\nReply to this email or book time here: [CALENDAR_LINK]\n\nBest,\nThe Zander Team`
+          },
+          offer: {
+            subject: `A special offer for ${tenantInfo.companyName}`,
+            body: `Hi ${tenantInfo.ownerName || 'there'},\n\nWe've missed seeing you on Zander! To help you get back on track, we'd like to offer you:\n\n✨ 30% off your next month\n✨ A free 30-minute onboarding session with our team\n✨ Priority support access\n\nJust reply "YES" and we'll set everything up.\n\nLooking forward to hearing from you!\n\nBest,\nThe Zander Team`
+          }
+        };
+
+        const content = toneContent[tone as keyof typeof toneContent] || toneContent.supportive;
+
+        // Create scheduled communication with needsApproval
+        const scheduledUrl = `${API_URL}/scheduled-communications`;
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'x-admin-secret': adminSecret || '',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            recipientEmail: tenantInfo.ownerEmail,
+            recipientName: tenantInfo.ownerName || tenantInfo.companyName,
+            type: channel,
+            subject: content.subject,
+            body: content.body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'zander-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: true,
+            result: {
+              status: 'DRAFT_CREATED',
+              message: 'At-risk outreach drafted but could not queue for approval',
+              tenantId,
+              channel,
+              tone,
+              draft: content,
+              error: `Queue failed: ${errorText}`,
+              note: 'Review and send manually'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            status: 'PENDING',
+            message: "At-risk outreach drafted — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            tenantId,
+            companyName: tenantInfo.companyName,
+            channel,
+            tone,
+            draftContent: content,
+            note: 'Review and approve in Scheduled → Pending before sending. Never auto-sends.'
+          }
+        };
+      }
+
+      case 'draft_upgrade_offer': {
+        const { tenantId, currentTier, targetTier, incentive } = toolInput as {
+          tenantId: string;
+          currentTier: string;
+          targetTier: string;
+          incentive?: string;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+
+        // Get tenant info for personalization
+        const getRes = await fetch(`${API_URL}/tenants/${tenantId}`, { headers });
+        let tenantInfo = { companyName: 'Valued Customer', ownerEmail: null, ownerName: null };
+        if (getRes.ok) {
+          const tenant = await getRes.json();
+          tenantInfo = {
+            companyName: tenant.companyName || 'Valued Customer',
+            ownerEmail: tenant.users?.[0]?.email || null,
+            ownerName: tenant.users?.[0]?.name || null
+          };
+        }
+
+        // Generate upgrade offer content based on incentive
+        const tierFeatures: Record<string, string[]> = {
+          pro: ['Unlimited AI conversations', 'Advanced analytics', 'Priority support'],
+          business: ['Team collaboration', 'Custom integrations', 'Dedicated success manager'],
+          enterprise: ['Custom AI training', 'SLA guarantees', 'On-premise deployment options']
+        };
+
+        const incentiveText: Record<string, string> = {
+          discount: '🎁 **Special Offer:** Get 20% off your first 3 months on the new plan!',
+          extended_trial: '🎁 **Special Offer:** Try the new plan free for 30 days before committing!',
+          free_month: '🎁 **Special Offer:** Get your first month completely free when you upgrade today!'
+        };
+
+        const features = tierFeatures[targetTier] || [];
+        const incentiveMessage = incentive ? incentiveText[incentive] : '';
+
+        const content = {
+          subject: `Ready to unlock more with Zander ${targetTier.charAt(0).toUpperCase() + targetTier.slice(1)}?`,
+          body: `Hi ${tenantInfo.ownerName || 'there'},\n\nYou've been doing great things with Zander ${currentTier}! Based on your usage, we think you'd love what ${targetTier} has to offer:\n\n${features.map(f => `✨ ${f}`).join('\n')}\n\n${incentiveMessage}\n\nReady to level up? Reply to this email or click here to upgrade: [UPGRADE_LINK]\n\nQuestions? Just reply — we're happy to help.\n\nBest,\nThe Zander Team`
+        };
+
+        // Create scheduled communication with needsApproval
+        const scheduledUrl = `${API_URL}/scheduled-communications`;
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'x-admin-secret': adminSecret || '',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            recipientEmail: tenantInfo.ownerEmail,
+            recipientName: tenantInfo.ownerName || tenantInfo.companyName,
+            type: 'email',
+            subject: content.subject,
+            body: content.body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'zander-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: true,
+            result: {
+              status: 'DRAFT_CREATED',
+              message: 'Upgrade offer drafted but could not queue for approval',
+              tenantId,
+              currentTier,
+              targetTier,
+              incentive,
+              draft: content,
+              error: `Queue failed: ${errorText}`,
+              note: 'Review and send manually'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            status: 'PENDING',
+            message: "Upgrade offer drafted — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            tenantId,
+            companyName: tenantInfo.companyName,
+            currentTier,
+            targetTier,
+            incentive: incentive || 'none',
+            draftContent: content,
+            note: 'Review and approve in Scheduled → Pending before sending. Never auto-sends.'
+          }
+        };
+      }
+
+      case 'draft_reactivation_campaign': {
+        const { tenantIds, daysInactive, subject, body } = toolInput as {
+          tenantIds: string[];
+          daysInactive: number;
+          subject?: string;
+          body?: string;
+        };
+
+        const adminSecret = process.env.ADMIN_SECRET_KEY;
+
+        // Generate default content if not provided
+        const defaultSubject = subject || 'We miss you! Come back to Zander';
+        const defaultBody = body || `Hi there,\n\nIt's been a while since we've seen you on Zander, and we wanted to reach out.\n\nA lot has changed since you were last here:\n\n✨ New AI capabilities\n✨ Improved performance\n✨ Better integrations\n\nWe'd love to show you what's new. Come back and explore — your account is ready and waiting.\n\n[REACTIVATION_LINK]\n\nQuestions? Just reply to this email.\n\nBest,\nThe Zander Team`;
+
+        const content = {
+          subject: defaultSubject,
+          body: `[BULK REACTIVATION CAMPAIGN]\nTarget: ${tenantIds.length} tenants inactive ${daysInactive}+ days\n\n---\n\n${defaultBody}`
+        };
+
+        // Create scheduled communication with needsApproval for bulk
+        const scheduledUrl = `${API_URL}/scheduled-communications`;
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'x-admin-secret': adminSecret || '',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            recipientEmail: null,
+            recipientName: `Bulk Campaign: ${tenantIds.length} inactive tenants`,
+            type: 'email',
+            subject: content.subject,
+            body: content.body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'zander-ai',
+            metadata: JSON.stringify({
+              campaignType: 'reactivation',
+              targetTenantIds: tenantIds,
+              daysInactive,
+              recipientCount: tenantIds.length
+            })
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: true,
+            result: {
+              status: 'DRAFT_CREATED',
+              message: 'Reactivation campaign drafted but could not queue for approval',
+              targetTenantIds: tenantIds,
+              recipientCount: tenantIds.length,
+              daysInactive,
+              draft: content,
+              error: `Queue failed: ${errorText}`,
+              note: 'Review and send manually to each tenant'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            status: 'PENDING_BULK',
+            message: "Reactivation campaign drafted — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            targetTenantIds: tenantIds,
+            recipientCount: tenantIds.length,
+            daysInactive,
+            draftContent: content,
+            note: 'Review and approve in Scheduled → Pending. This is a BULK campaign — each tenant will receive a copy. Never auto-sends.',
+            warning: 'Bulk campaigns require manual approval and individual sending confirmation.'
+          }
+        };
       }
 
       default:
