@@ -4181,15 +4181,14 @@ If at limit:
       },
     });
 
-    // Log the action to AuditLog
-    await this.prisma.auditLog.create({
+    // Log the action to TenantActivityLog
+    await this.prisma.tenantActivityLog.create({
       data: {
         tenantId,
-        action: 'UPDATE',
-        resource: 'tenant',
-        resourceId: tenantId,
-        details: { oldName, newName: trimmedName },
-        status: 'success',
+        action: 'RENAME',
+        actionPerformedBy: 'ZANDER_AUTO',
+        oldValue: { companyName: oldName },
+        newValue: { companyName: trimmedName },
       },
     });
 
@@ -4201,44 +4200,42 @@ If at limit:
   }
 
   /**
-   * Archive a tenant (sets subscriptionStatus to 'archived')
-   * Note: Using subscriptionStatus field since Tenant model doesn't have archivedAt
+   * Archive a tenant (sets archivedAt timestamp)
    */
   async archiveTenant(tenantId: string) {
     const existingTenant = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
-      select: { subscriptionStatus: true, companyName: true },
+      select: { archivedAt: true, companyName: true },
     });
 
     if (!existingTenant) {
       return { success: false, error: 'Tenant not found' };
     }
 
-    if (existingTenant.subscriptionStatus === 'archived') {
+    if (existingTenant.archivedAt) {
       return { success: false, error: 'Tenant is already archived' };
     }
 
+    const archivedAt = new Date();
     const tenant = await this.prisma.tenant.update({
       where: { id: tenantId },
       data: {
-        subscriptionStatus: 'archived',
+        archivedAt,
       },
       select: {
         id: true,
         companyName: true,
-        subscriptionStatus: true,
+        archivedAt: true,
       },
     });
 
     // Log the action
-    await this.prisma.auditLog.create({
+    await this.prisma.tenantActivityLog.create({
       data: {
         tenantId,
         action: 'ARCHIVE',
-        resource: 'tenant',
-        resourceId: tenantId,
-        details: { archivedAt: new Date().toISOString() },
-        status: 'success',
+        actionPerformedBy: 'ZANDER_AUTO',
+        newValue: { archivedAt: archivedAt.toISOString() },
       },
     });
 
@@ -4250,19 +4247,19 @@ If at limit:
   }
 
   /**
-   * Restore an archived tenant (clears 'archived' subscriptionStatus)
+   * Restore an archived tenant (clears archivedAt timestamp)
    */
   async restoreTenant(tenantId: string) {
     const existingTenant = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
-      select: { subscriptionStatus: true, companyName: true },
+      select: { archivedAt: true, companyName: true },
     });
 
     if (!existingTenant) {
       return { success: false, error: 'Tenant not found' };
     }
 
-    if (existingTenant.subscriptionStatus !== 'archived') {
+    if (!existingTenant.archivedAt) {
       return { success: false, error: 'Tenant is not archived' };
     }
 
@@ -4270,23 +4267,23 @@ If at limit:
       where: { id: tenantId },
       data: {
         subscriptionStatus: 'active',
+        archivedAt: null,
       },
       select: {
         id: true,
         companyName: true,
-        subscriptionStatus: true,
+        archivedAt: true,
       },
     });
 
     // Log the action
-    await this.prisma.auditLog.create({
+    await this.prisma.tenantActivityLog.create({
       data: {
         tenantId,
         action: 'RESTORE',
-        resource: 'tenant',
-        resourceId: tenantId,
-        details: { restoredAt: new Date().toISOString() },
-        status: 'success',
+        actionPerformedBy: 'ZANDER_AUTO',
+        oldValue: { archivedAt: existingTenant.archivedAt?.toISOString() },
+        newValue: { archivedAt: null },
       },
     });
 
@@ -4344,19 +4341,13 @@ If at limit:
     });
 
     // Log the action
-    await this.prisma.auditLog.create({
+    await this.prisma.tenantActivityLog.create({
       data: {
         tenantId,
-        action: 'UPDATE',
-        resource: 'tenant',
-        resourceId: tenantId,
-        details: {
-          action: 'trial_extended',
-          additionalDays,
-          oldEndDate: existingTenant.trialEndDate?.toISOString(),
-          newEndDate: newEndDate.toISOString()
-        },
-        status: 'success',
+        action: 'TRIAL_EXTEND',
+        actionPerformedBy: 'ZANDER_AUTO',
+        oldValue: { trialEndDate: existingTenant.trialEndDate?.toISOString() },
+        newValue: { trialEndDate: newEndDate.toISOString(), additionalDays },
       },
     });
 

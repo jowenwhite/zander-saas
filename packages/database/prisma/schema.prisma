@@ -139,6 +139,14 @@ model Tenant {
   calendlyCredential      CalendlyCredential?
   googleTokens            GoogleToken[]
   emailSignatures         EmailSignature[]
+  // Phase 1: Tenant monitoring fields
+  archivedAt              DateTime?                @map("archived_at")
+  lastActivityAt          DateTime?                @map("last_activity_at")
+  currentEngagementScore  Float?                   @map("current_engagement_score")
+  currentChurnRiskLevel   String?                  @map("current_churn_risk_level")
+  // Phase 1: Activity & engagement relations
+  activityLogs            TenantActivityLog[]
+  engagementSnapshots     UserEngagementSnapshot[]
 
   @@map("tenants")
 }
@@ -1842,4 +1850,87 @@ model LegacyMilestone {
   @@index([year])
   @@index([status])
   @@map("legacy_milestones")
+}
+
+// ============================================
+// PHASE 1: TENANT ACTIVITY & ENGAGEMENT MONITORING
+// ============================================
+
+model TenantActivityLog {
+  id                String   @id @default(cuid())
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+
+  action            String   // "RENAME", "ARCHIVE", "RESTORE", "TIER_OVERRIDE", "TRIAL_EXTEND"
+  actionPerformedBy String   // "JONATHAN_MANUAL" or "ZANDER_AUTO"
+  timestamp         DateTime @default(now())
+
+  oldValue          Json?    // Before state
+  newValue          Json?    // After state
+  reason            String?
+  metadata          Json?
+
+  createdAt         DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@index([action])
+  @@map("tenant_activity_logs")
+}
+
+model UserEngagementSnapshot {
+  id                String   @id @default(cuid())
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+
+  snapshotDate      DateTime
+
+  activeUsersCount  Int
+  totalUsersCount   Int
+  tasksCreated      Int
+  emailsSent        Int
+  eventsLogged      Int
+
+  avgResponseTime   Float
+  errorRate         Float
+  tokenUsage        Int
+
+  engagementScore   Float    // 0-100
+  churnRiskLevel    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+
+  createdAt         DateTime @default(now())
+
+  @@unique([tenantId, snapshotDate])
+  @@index([tenantId])
+  @@index([snapshotDate])
+  @@index([churnRiskLevel])
+  @@map("user_engagement_snapshots")
+}
+
+model SystemHealthSnapshot {
+  id                String   @id @default(cuid())
+
+  apiHealthy        Boolean
+  apiResponseTime   Float
+  databaseHealthy   Boolean
+  databaseLatency   Float
+
+  emailServiceHealthy Boolean
+  stripeHealthy     Boolean
+
+  totalActiveUsers  Int
+  totalTenants      Int
+  totalRequests     Int
+  totalTokensUsed   Int
+
+  p95ResponseTime   Float
+  errorRatePercent  Float
+
+  overallStatus     String   // "HEALTHY", "DEGRADED", "DOWN"
+
+  createdAt         DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([overallStatus])
+  @@map("system_health_snapshots")
 }
