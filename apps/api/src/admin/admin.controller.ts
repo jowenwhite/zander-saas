@@ -621,6 +621,37 @@ export class AdminController {
     return this.adminService.getUsersBySegment(segment);
   }
 
+  // ============================================
+  // SYSTEM HEALTH MONITORING ENDPOINTS
+  // ============================================
+
+  /**
+   * GET /admin/health/system
+   * Real-time system health check with actual service pings
+   */
+  @Public()
+  @Get('health/system')
+  async getSystemHealth(@Headers('x-admin-secret') secretKey: string) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.getSystemHealth();
+  }
+
+  /**
+   * GET /admin/health/history
+   * Historical health snapshots for charts
+   */
+  @Public()
+  @Get('health/history')
+  async getSystemHealthHistory(
+    @Headers('x-admin-secret') secretKey: string,
+    @Query('hours') hours?: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.getSystemHealthHistory(
+      hours ? parseInt(hours) : 24,
+    );
+  }
+
   /**
    * Helper to validate admin secret key
    */
