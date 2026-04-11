@@ -538,6 +538,89 @@ export class AdminController {
     return this.adminService.updateSubscriptionTier(tenantId, data.tier);
   }
 
+  // ============================================
+  // PHASE 2: TENANT MANAGEMENT ENDPOINTS
+  // ============================================
+
+  /**
+   * POST /admin/tenants/:id/rename
+   * Rename a tenant (update companyName)
+   */
+  @Public()
+  @Post('tenants/:id/rename')
+  @HttpCode(200)
+  async renameTenant(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+    @Body() data: { newName: string },
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.renameTenant(tenantId, data.newName);
+  }
+
+  /**
+   * POST /admin/tenants/:id/archive
+   * Archive a tenant (soft delete)
+   */
+  @Public()
+  @Post('tenants/:id/archive')
+  @HttpCode(200)
+  async archiveTenant(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.archiveTenant(tenantId);
+  }
+
+  /**
+   * POST /admin/tenants/:id/restore
+   * Restore an archived tenant
+   */
+  @Public()
+  @Post('tenants/:id/restore')
+  @HttpCode(200)
+  async restoreTenant(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.restoreTenant(tenantId);
+  }
+
+  /**
+   * POST /admin/tenants/:id/trial/extend
+   * Extend an existing trial by additional days
+   */
+  @Public()
+  @Post('tenants/:id/trial/extend')
+  @HttpCode(200)
+  async extendTrial(
+    @Param('id') tenantId: string,
+    @Headers('x-admin-secret') secretKey: string,
+    @Body() data: { additionalDays: number },
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.extendTrial(tenantId, data.additionalDays);
+  }
+
+  /**
+   * GET /admin/users/segments
+   * Get users by segment (churning, at_risk, power_users, new, inactive)
+   */
+  @Public()
+  @Get('users/segments')
+  async getUsersBySegment(
+    @Headers('x-admin-secret') secretKey: string,
+    @Query('segment') segment: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    if (!segment) {
+      return { success: false, error: 'segment query parameter is required' };
+    }
+    return this.adminService.getUsersBySegment(segment);
+  }
+
   /**
    * Helper to validate admin secret key
    */

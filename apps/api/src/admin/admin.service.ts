@@ -4140,4 +4140,426 @@ If at limit:
     }
     return tenant.subscriptionTier || 'FREE';
   }
+
+  // ============================================
+  // PHASE 2: TENANT MANAGEMENT ENDPOINTS
+  // ============================================
+
+  /**
+   * Rename a tenant (update companyName)
+   */
+  async renameTenant(tenantId: string, newName: string) {
+    if (!newName || newName.trim().length === 0) {
+      return { success: false, error: 'New name is required' };
+    }
+
+    const trimmedName = newName.trim();
+    if (trimmedName.length > 200) {
+      return { success: false, error: 'Name must be 200 characters or less' };
+    }
+
+    const existingTenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { companyName: true },
+    });
+
+    if (!existingTenant) {
+      return { success: false, error: 'Tenant not found' };
+    }
+
+    const oldName = existingTenant.companyName;
+
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        companyName: trimmedName,
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subdomain: true,
+      },
+    });
+
+    // Log the action to AuditLog
+    await this.prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'UPDATE',
+        resource: 'tenant',
+        resourceId: tenantId,
+        details: { oldName, newName: trimmedName },
+        status: 'success',
+      },
+    });
+
+    return {
+      success: true,
+      message: `Tenant renamed to "${trimmedName}"`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * Archive a tenant (sets subscriptionStatus to 'archived')
+   * Note: Using subscriptionStatus field since Tenant model doesn't have archivedAt
+   */
+  async archiveTenant(tenantId: string) {
+    const existingTenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { subscriptionStatus: true, companyName: true },
+    });
+
+    if (!existingTenant) {
+      return { success: false, error: 'Tenant not found' };
+    }
+
+    if (existingTenant.subscriptionStatus === 'archived') {
+      return { success: false, error: 'Tenant is already archived' };
+    }
+
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        subscriptionStatus: 'archived',
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionStatus: true,
+      },
+    });
+
+    // Log the action
+    await this.prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'ARCHIVE',
+        resource: 'tenant',
+        resourceId: tenantId,
+        details: { archivedAt: new Date().toISOString() },
+        status: 'success',
+      },
+    });
+
+    return {
+      success: true,
+      message: `Tenant "${tenant.companyName}" has been archived`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * Restore an archived tenant (clears 'archived' subscriptionStatus)
+   */
+  async restoreTenant(tenantId: string) {
+    const existingTenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { subscriptionStatus: true, companyName: true },
+    });
+
+    if (!existingTenant) {
+      return { success: false, error: 'Tenant not found' };
+    }
+
+    if (existingTenant.subscriptionStatus !== 'archived') {
+      return { success: false, error: 'Tenant is not archived' };
+    }
+
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        subscriptionStatus: 'active',
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subscriptionStatus: true,
+      },
+    });
+
+    // Log the action
+    await this.prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'RESTORE',
+        resource: 'tenant',
+        resourceId: tenantId,
+        details: { restoredAt: new Date().toISOString() },
+        status: 'success',
+      },
+    });
+
+    return {
+      success: true,
+      message: `Tenant "${tenant.companyName}" has been restored`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * Extend an existing trial by additional days
+   */
+  async extendTrial(tenantId: string, additionalDays: number) {
+    if (additionalDays < 1 || additionalDays > 90) {
+      return { success: false, error: 'Additional days must be between 1 and 90' };
+    }
+
+    const existingTenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: {
+        companyName: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true
+      },
+    });
+
+    if (!existingTenant) {
+      return { success: false, error: 'Tenant not found' };
+    }
+
+    if (!existingTenant.trialEndDate || !existingTenant.trialTier) {
+      return { success: false, error: 'Tenant does not have an active or past trial to extend' };
+    }
+
+    // Extend from current end date (or now if trial already ended)
+    const currentEndDate = new Date(existingTenant.trialEndDate);
+    const baseDate = currentEndDate > new Date() ? currentEndDate : new Date();
+    const newEndDate = new Date(baseDate);
+    newEndDate.setDate(newEndDate.getDate() + additionalDays);
+
+    const tenant = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        trialEndDate: newEndDate,
+      },
+      select: {
+        id: true,
+        companyName: true,
+        trialTier: true,
+        trialStartDate: true,
+        trialEndDate: true,
+      },
+    });
+
+    // Log the action
+    await this.prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'UPDATE',
+        resource: 'tenant',
+        resourceId: tenantId,
+        details: {
+          action: 'trial_extended',
+          additionalDays,
+          oldEndDate: existingTenant.trialEndDate?.toISOString(),
+          newEndDate: newEndDate.toISOString()
+        },
+        status: 'success',
+      },
+    });
+
+    return {
+      success: true,
+      message: `Trial extended by ${additionalDays} days for "${tenant.companyName}". New end date: ${newEndDate.toISOString().split('T')[0]}`,
+      data: tenant,
+    };
+  }
+
+  /**
+   * Get users by segment (churning, at-risk, power-users, etc.)
+   * Note: Using updatedAt as proxy for activity since User model doesn't have lastLoginAt
+   */
+  async getUsersBySegment(segment: string) {
+    const validSegments = ['churning', 'at_risk', 'power_users', 'new', 'inactive'];
+    const normalizedSegment = segment.toLowerCase().replace('-', '_');
+
+    if (!validSegments.includes(normalizedSegment)) {
+      return {
+        success: false,
+        error: `Invalid segment: ${segment}. Valid segments: ${validSegments.join(', ')}`
+      };
+    }
+
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const sixtyDaysAgo = new Date(now);
+    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+    const fourteenDaysAgo = new Date(now);
+    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+    let users: any[] = [];
+    let segmentDescription = '';
+
+    // Using updatedAt as a proxy for activity since User model doesn't have lastLoginAt
+    switch (normalizedSegment) {
+      case 'churning':
+        // Users with no activity for 30+ days
+        segmentDescription = 'Users inactive for 30+ days (potential churn)';
+        users = await this.prisma.user.findMany({
+          where: {
+            updatedAt: {
+              lt: thirtyDaysAgo,
+            },
+          },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            createdAt: true,
+            updatedAt: true,
+            tenantId: true,
+            tenant: {
+              select: {
+                companyName: true,
+                subscriptionTier: true,
+              },
+            },
+          },
+          orderBy: { updatedAt: 'desc' },
+          take: 100,
+        });
+        break;
+
+      case 'at_risk':
+        // Users showing declining engagement (14-30 days since last activity)
+        segmentDescription = 'Users showing declining engagement (14-30 days inactive)';
+        users = await this.prisma.user.findMany({
+          where: {
+            updatedAt: {
+              lt: fourteenDaysAgo,
+              gte: thirtyDaysAgo,
+            },
+          },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            createdAt: true,
+            updatedAt: true,
+            tenantId: true,
+            tenant: {
+              select: {
+                companyName: true,
+                subscriptionTier: true,
+              },
+            },
+          },
+          orderBy: { updatedAt: 'desc' },
+          take: 100,
+        });
+        break;
+
+      case 'power_users':
+        // Users with recent activity (active within last 7 days)
+        segmentDescription = 'Highly engaged users (active within last 7 days)';
+        users = await this.prisma.user.findMany({
+          where: {
+            updatedAt: {
+              gte: sevenDaysAgo,
+            },
+          },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            createdAt: true,
+            updatedAt: true,
+            tenantId: true,
+            tenant: {
+              select: {
+                companyName: true,
+                subscriptionTier: true,
+              },
+            },
+          },
+          orderBy: { updatedAt: 'desc' },
+          take: 100,
+        });
+        break;
+
+      case 'new':
+        // Users created in the last 30 days
+        segmentDescription = 'New users (created in last 30 days)';
+        users = await this.prisma.user.findMany({
+          where: {
+            createdAt: {
+              gte: thirtyDaysAgo,
+            },
+          },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            createdAt: true,
+            updatedAt: true,
+            tenantId: true,
+            tenant: {
+              select: {
+                companyName: true,
+                subscriptionTier: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 100,
+        });
+        break;
+
+      case 'inactive':
+        // Users with no activity for 60+ days
+        segmentDescription = 'Inactive users (60+ days without activity)';
+        users = await this.prisma.user.findMany({
+          where: {
+            updatedAt: {
+              lt: sixtyDaysAgo,
+            },
+          },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            createdAt: true,
+            updatedAt: true,
+            tenantId: true,
+            tenant: {
+              select: {
+                companyName: true,
+                subscriptionTier: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 100,
+        });
+        break;
+    }
+
+    return {
+      success: true,
+      segment: normalizedSegment,
+      description: segmentDescription,
+      count: users.length,
+      data: users.map((u) => ({
+        id: u.id,
+        email: u.email,
+        name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email,
+        lastActivity: u.updatedAt,
+        createdAt: u.createdAt,
+        tenantId: u.tenantId,
+        tenantName: u.tenant?.companyName,
+        subscriptionTier: u.tenant?.subscriptionTier,
+        daysSinceActivity: Math.floor((now.getTime() - new Date(u.updatedAt).getTime()) / (1000 * 60 * 60 * 24)),
+      })),
+    };
+  }
 }
