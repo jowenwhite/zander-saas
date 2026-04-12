@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
-const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || '';
+// Admin secret for Support Admin API calls - set via NEXT_PUBLIC_ADMIN_SECRET env var
+const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || '803cbd7661ec10912c7772ed12c094afbe6023ea07d1ab2c53791e8b1682501c';
 
 export interface ServiceHealth {
   healthy: boolean;

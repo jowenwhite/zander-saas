@@ -29,7 +29,7 @@ interface TenantsResponse {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
-const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || 'zander-support-2025';
+const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || '803cbd7661ec10912c7772ed12c094afbe6023ea07d1ab2c53791e8b1682501c';
 
 export function useTenants() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
