@@ -6,6 +6,7 @@ import { HealthTab } from './components/HealthTab';
 import { TenantsTab } from './components/TenantsTab';
 import { DiagnosticsTab } from './components/DiagnosticsTab';
 import { UsersTab } from './components/UsersTab';
+import { useHealth } from './hooks/useHealth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
@@ -164,6 +165,14 @@ export default function SupportAdminPage() {
   const [editingHeadwind, setEditingHeadwind] = useState<Headwind | null>(null);
   const [headwindForm, setHeadwindForm] = useState({ title: '', description: '', priority: 'P2', category: 'BUG', status: 'OPEN', gitBranch: '', estimatedHours: '', dueDate: '' });
   const [saving, setSaving] = useState(false);
+
+  // Ticket modal state
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [ticketLoading, setTicketLoading] = useState(false);
+
+  // Use health hook for real-time metrics
+  const { health: systemHealthData } = useHealth(30000); // Poll every 30 seconds
 
   useEffect(() => {
     const token = localStorage.getItem('zander_token');
@@ -407,6 +416,45 @@ export default function SupportAdminPage() {
       }
     } catch (error) {
       console.error('Failed to delete headwind:', error);
+    }
+  };
+
+  const openTicketDetail = async (ticket: SupportTicket) => {
+    setSelectedTicket(ticket);
+    setShowTicketModal(true);
+  };
+
+  const updateTicketStatus = async (ticketId: string, newStatus: string) => {
+    setTicketLoading(true);
+    try {
+      const token = localStorage.getItem('zander_token');
+      const response = await fetch(`${API_URL}/support-tickets/${ticketId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (response.ok) {
+        const updatedTicket = await response.json();
+        // Update local state
+        setSelectedTicket(updatedTicket);
+        setTickets(prev => prev.map(t => t.id === ticketId ? updatedTicket : t));
+
+        // If resolved, show notification about user being notified
+        if (newStatus === 'RESOLVED') {
+          alert('Ticket resolved. User has been notified.');
+        }
+      } else {
+        alert('Failed to update ticket status');
+      }
+    } catch (error) {
+      console.error('Failed to update ticket:', error);
+      alert('Failed to update ticket status');
+    } finally {
+      setTicketLoading(false);
     }
   };
 
@@ -761,9 +809,11 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
             <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                 <span style={{ color: '#8888A0', fontSize: '0.9rem' }}>Active Users</span>
-                <span style={{ fontSize: '0.8rem', color: '#28a745' }}>↑ 12%</span>
+                <span style={{ fontSize: '0.8rem', color: '#00CCEE' }}>30d</span>
               </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>35</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
+                {systemHealthData?.metrics?.totalActiveUsers ?? '–'}
+              </div>
             </div>
             
             <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -1067,11 +1117,15 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                 </thead>
                 <tbody>
                   {tickets.map(t => (
-                    <tr key={t.id} style={{ borderBottom: '1px solid #2A2A38' }}>
+                    <tr
+                      key={t.id}
+                      style={{ borderBottom: '1px solid #2A2A38', cursor: 'pointer' }}
+                      onClick={() => openTicketDetail(t)}
+                    >
                       <td style={{ padding: '1rem', fontWeight: '600', color: '#F0F0F5' }}>{t.ticketNumber}</td>
-                      <td style={{ padding: '1rem' }}>{t.subject}</td>
+                      <td style={{ padding: '1rem', color: '#F0F0F5' }}>{t.subject}</td>
                       <td style={{ padding: '1rem' }}>
-                        <div style={{ fontWeight: '500' }}>{t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown'}</div>
+                        <div style={{ fontWeight: '500', color: '#F0F0F5' }}>{t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown'}</div>
                         <div style={{ fontSize: '0.85rem', color: '#8888A0' }}>{t.tenant?.companyName || 'Unknown'}</div>
                       </td>
                       <td style={{ padding: '1rem', color: '#8888A0' }}>{t.createdVia}</td>
@@ -1080,7 +1134,12 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                       </td>
                       <td style={{ padding: '1rem', color: '#8888A0' }}>{formatTimeAgo(t.createdAt)}</td>
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <button style={{ background: '#13131A', color: 'white', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Open</button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openTicketDetail(t); }}
+                          style={{ background: '#00CCEE', color: '#13131A', border: 'none', padding: '0.5rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600' }}
+                        >
+                          Open
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -1447,6 +1506,339 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button onClick={() => setShowHeadwindModal(false)} style={{ background: '#13131A', color: '#8888A0', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
               <button onClick={saveHeadwind} disabled={saving} style={{ background: '#13131A', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', opacity: saving ? 0.7 : 1 }}>{saving ? 'Saving...' : 'Save'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ticket Detail Modal */}
+      {showTicketModal && selectedTicket && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
+        }}>
+          <div style={{
+            background: '#1C1C26',
+            borderRadius: '12px',
+            width: '600px',
+            maxHeight: '85vh',
+            overflow: 'auto',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '1.5rem',
+              borderBottom: '1px solid #2A2A38',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              position: 'sticky',
+              top: 0,
+              background: '#1C1C26',
+              zIndex: 1
+            }}>
+              <div>
+                <h2 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.25rem' }}>
+                  🎫 {selectedTicket.ticketNumber}
+                </h2>
+                <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.85rem' }}>
+                  Created {new Date(selectedTicket.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <button
+                onClick={() => { setShowTicketModal(false); setSelectedTicket(null); }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#8888A0',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  padding: '0.5rem',
+                  lineHeight: 1
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div style={{ padding: '1.5rem' }}>
+              {/* Status & Priority Row */}
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Status</label>
+                  <select
+                    value={selectedTicket.status}
+                    onChange={(e) => updateTicketStatus(selectedTicket.id, e.target.value)}
+                    disabled={ticketLoading}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '2px solid #2A2A38',
+                      borderRadius: '6px',
+                      background: '#13131A',
+                      color: '#F0F0F5',
+                      fontSize: '0.9rem',
+                      cursor: ticketLoading ? 'wait' : 'pointer'
+                    }}
+                  >
+                    <option value="NEW">🆕 New</option>
+                    <option value="IN_PROGRESS">🔄 In Progress</option>
+                    <option value="PENDING_REVIEW">👀 Pending Review</option>
+                    <option value="AI_RESOLVED">🤖 AI Resolved</option>
+                    <option value="RESOLVED">✅ Resolved</option>
+                    <option value="CLOSED">🔒 Closed</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Priority</label>
+                  <div style={{
+                    padding: '0.75rem',
+                    border: '2px solid #2A2A38',
+                    borderRadius: '6px',
+                    background: '#13131A'
+                  }}>
+                    <span style={{
+                      background: getPriorityColor(selectedTicket.priority),
+                      color: 'white',
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '4px',
+                      fontSize: '0.85rem',
+                      fontWeight: '600'
+                    }}>
+                      {selectedTicket.priority}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Category</label>
+                  <div style={{
+                    padding: '0.75rem',
+                    border: '2px solid #2A2A38',
+                    borderRadius: '6px',
+                    background: '#13131A',
+                    color: '#F0F0F5',
+                    fontSize: '0.9rem'
+                  }}>
+                    {selectedTicket.category.replace('_', ' ')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Subject</label>
+                <div style={{
+                  padding: '1rem',
+                  background: '#13131A',
+                  borderRadius: '8px',
+                  color: '#F0F0F5',
+                  fontSize: '1rem',
+                  fontWeight: '600'
+                }}>
+                  {selectedTicket.subject}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Description</label>
+                <div style={{
+                  padding: '1rem',
+                  background: '#13131A',
+                  borderRadius: '8px',
+                  color: '#F0F0F5',
+                  fontSize: '0.9rem',
+                  lineHeight: '1.6',
+                  whiteSpace: 'pre-wrap'
+                }}>
+                  {selectedTicket.description || '(No description provided)'}
+                </div>
+              </div>
+
+              {/* User & Tenant Info */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Submitted By</label>
+                  <div style={{
+                    padding: '0.75rem',
+                    background: '#13131A',
+                    borderRadius: '8px'
+                  }}>
+                    <div style={{ color: '#F0F0F5', fontWeight: '500' }}>
+                      {selectedTicket.user ? `${selectedTicket.user.firstName} ${selectedTicket.user.lastName}` : 'Unknown User'}
+                    </div>
+                    <div style={{ color: '#8888A0', fontSize: '0.85rem' }}>
+                      {selectedTicket.user?.email || '—'}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Tenant</label>
+                  <div style={{
+                    padding: '0.75rem',
+                    background: '#13131A',
+                    borderRadius: '8px'
+                  }}>
+                    <div style={{ color: '#F0F0F5', fontWeight: '500' }}>
+                      {selectedTicket.tenant?.companyName || 'Unknown Tenant'}
+                    </div>
+                    <div style={{ color: '#8888A0', fontSize: '0.85rem' }}>
+                      Via: {selectedTicket.createdVia || 'Direct'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Summary (if exists) */}
+              {selectedTicket.aiSummary && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>🤖 AI Summary</label>
+                  <div style={{
+                    padding: '1rem',
+                    background: 'linear-gradient(135deg, rgba(0,204,238,0.1) 0%, rgba(147,51,234,0.1) 100%)',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0,204,238,0.2)',
+                    color: '#F0F0F5',
+                    fontSize: '0.9rem',
+                    lineHeight: '1.5'
+                  }}>
+                    {selectedTicket.aiSummary}
+                  </div>
+                </div>
+              )}
+
+              {/* AI Response (if exists) */}
+              {selectedTicket.aiResponse && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>🤖 AI Response Sent</label>
+                  <div style={{
+                    padding: '1rem',
+                    background: '#13131A',
+                    borderRadius: '8px',
+                    color: '#8888A0',
+                    fontSize: '0.85rem',
+                    lineHeight: '1.5',
+                    fontStyle: 'italic'
+                  }}>
+                    {selectedTicket.aiResponse}
+                  </div>
+                </div>
+              )}
+
+              {/* Linked Headwind (if exists) */}
+              {selectedTicket.linkedHeadwind && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>🔗 Linked Headwind</label>
+                  <div style={{
+                    padding: '0.75rem',
+                    background: '#13131A',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem'
+                  }}>
+                    <span style={{
+                      background: getPriorityColor(selectedTicket.linkedHeadwind.priority),
+                      color: 'white',
+                      padding: '0.2rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700'
+                    }}>
+                      {selectedTicket.linkedHeadwind.priority}
+                    </span>
+                    <span style={{ color: '#F0F0F5' }}>{selectedTicket.linkedHeadwind.title}</span>
+                    <span style={{
+                      background: getStatusColor(selectedTicket.linkedHeadwind.status),
+                      color: 'white',
+                      padding: '0.2rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.7rem'
+                    }}>
+                      {selectedTicket.linkedHeadwind.status.replace('_', ' ')}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Resolution (if resolved) */}
+              {selectedTicket.resolution && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', color: '#8888A0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>✅ Resolution</label>
+                  <div style={{
+                    padding: '1rem',
+                    background: 'rgba(40, 167, 69, 0.1)',
+                    border: '1px solid rgba(40, 167, 69, 0.3)',
+                    borderRadius: '8px',
+                    color: '#28a745',
+                    fontSize: '0.9rem',
+                    lineHeight: '1.5'
+                  }}>
+                    {selectedTicket.resolution}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderTop: '1px solid #2A2A38',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: '#13131A'
+            }}>
+              <div style={{ color: '#8888A0', fontSize: '0.8rem' }}>
+                Last updated: {new Date(selectedTicket.updatedAt).toLocaleString()}
+                {selectedTicket.resolvedAt && (
+                  <span> • Resolved: {new Date(selectedTicket.resolvedAt).toLocaleString()}</span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                {selectedTicket.status !== 'RESOLVED' && selectedTicket.status !== 'CLOSED' && (
+                  <button
+                    onClick={() => updateTicketStatus(selectedTicket.id, 'RESOLVED')}
+                    disabled={ticketLoading}
+                    style={{
+                      background: '#28a745',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem 1.25rem',
+                      borderRadius: '6px',
+                      cursor: ticketLoading ? 'wait' : 'pointer',
+                      fontWeight: '600',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    ✅ Resolve Ticket
+                  </button>
+                )}
+                <button
+                  onClick={() => { setShowTicketModal(false); setSelectedTicket(null); }}
+                  style={{
+                    background: '#2A2A38',
+                    color: '#F0F0F5',
+                    border: 'none',
+                    padding: '0.75rem 1.25rem',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

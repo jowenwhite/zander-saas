@@ -131,14 +131,14 @@ function ResponseTimeHistoryChart({
           <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, borderTop: '1px dashed #2A2A38' }} />
 
           {/* SVG Lines */}
-          <svg style={{ width: '100%', height: '100%' }} preserveAspectRatio="none">
+          <svg style={{ width: '100%', height: '100%' }} viewBox="0 0 100 100" preserveAspectRatio="none">
             {/* API Line */}
             <path
               d={data
                 .map((point, idx) => {
-                  const x = (idx / (data.length - 1)) * 100;
+                  const x = data.length > 1 ? (idx / (data.length - 1)) * 100 : 50;
                   const y = 100 - (point.apiResponseTime / maxTime) * 100;
-                  return `${idx === 0 ? 'M' : 'L'} ${x}% ${y}%`;
+                  return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
                 })
                 .join(' ')}
               fill="none"
@@ -150,9 +150,9 @@ function ResponseTimeHistoryChart({
             <path
               d={data
                 .map((point, idx) => {
-                  const x = (idx / (data.length - 1)) * 100;
+                  const x = data.length > 1 ? (idx / (data.length - 1)) * 100 : 50;
                   const y = 100 - (point.databaseLatency / maxTime) * 100;
-                  return `${idx === 0 ? 'M' : 'L'} ${x}% ${y}%`;
+                  return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
                 })
                 .join(' ')}
               fill="none"
@@ -265,7 +265,7 @@ function ErrorRateHistoryChart({
           <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, borderTop: '1px dashed #2A2A38' }} />
 
           {/* SVG with area fill */}
-          <svg style={{ width: '100%', height: '100%' }} preserveAspectRatio="none">
+          <svg style={{ width: '100%', height: '100%' }} viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
               <linearGradient id="errorAreaGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={currentColor} stopOpacity="0.3" />
@@ -275,13 +275,13 @@ function ErrorRateHistoryChart({
 
             {/* Area fill */}
             <path
-              d={`M 0 100% ${data
+              d={`M 0 100 ${data
                 .map((point, idx) => {
-                  const x = (idx / (data.length - 1)) * 100;
+                  const x = data.length > 1 ? (idx / (data.length - 1)) * 100 : 50;
                   const y = 100 - (point.errorRate / scaleMax) * 100;
-                  return `L ${x}% ${y}%`;
+                  return `L ${x} ${y}`;
                 })
-                .join(' ')} L 100% 100% Z`}
+                .join(' ')} L 100 100 Z`}
               fill="url(#errorAreaGradient)"
             />
 
@@ -289,9 +289,9 @@ function ErrorRateHistoryChart({
             <path
               d={data
                 .map((point, idx) => {
-                  const x = (idx / (data.length - 1)) * 100;
+                  const x = data.length > 1 ? (idx / (data.length - 1)) * 100 : 50;
                   const y = 100 - (point.errorRate / scaleMax) * 100;
-                  return `${idx === 0 ? 'M' : 'L'} ${x}% ${y}%`;
+                  return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
                 })
                 .join(' ')}
               fill="none"

@@ -135,15 +135,24 @@ export function ErrorRateChart({ history }: ErrorRateChartProps) {
               width: '100%',
               height: '100%',
             }}
+            viewBox="0 0 100 100"
             preserveAspectRatio="none"
           >
+            {/* Gradient definition */}
+            <defs>
+              <linearGradient id="errorGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor={errorColor} stopOpacity="0" />
+                <stop offset="100%" stopColor={errorColor} stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+
             {/* Area fill */}
             <path
               d={`
                 M 0 100
                 ${dataPoints
                   .map((point, idx) => {
-                    const x = (idx / (dataPoints.length - 1)) * 100;
+                    const x = dataPoints.length > 1 ? (idx / (dataPoints.length - 1)) * 100 : 50;
                     const y = 100 - (point.errorRate / scaleMax) * 100;
                     return `L ${x} ${y}`;
                   })
@@ -152,34 +161,22 @@ export function ErrorRateChart({ history }: ErrorRateChartProps) {
                 Z
               `}
               fill="url(#errorGradient)"
-              style={{ transform: 'scaleY(-1) translateY(-100%)', transformOrigin: 'center' }}
             />
 
             {/* Line */}
             <path
-              d={`
-                M 0 ${100 - (dataPoints[0]?.errorRate || 0) / scaleMax * 100}
-                ${dataPoints
-                  .map((point, idx) => {
-                    const x = (idx / (dataPoints.length - 1)) * 100;
-                    const y = 100 - (point.errorRate / scaleMax) * 100;
-                    return `L ${x} ${y}`;
-                  })
-                  .join(' ')}
-              `}
+              d={dataPoints
+                .map((point, idx) => {
+                  const x = dataPoints.length > 1 ? (idx / (dataPoints.length - 1)) * 100 : 50;
+                  const y = 100 - (point.errorRate / scaleMax) * 100;
+                  return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
+                })
+                .join(' ')}
               fill="none"
               stroke={errorColor}
               strokeWidth="2"
-              style={{ transform: 'scaleY(-1) translateY(-100%)', transformOrigin: 'center' }}
+              vectorEffect="non-scaling-stroke"
             />
-
-            {/* Gradient definition */}
-            <defs>
-              <linearGradient id="errorGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stopColor={errorColor} stopOpacity="0" />
-                <stop offset="100%" stopColor={errorColor} stopOpacity="0.3" />
-              </linearGradient>
-            </defs>
           </svg>
 
           {/* Data points */}
