@@ -37,6 +37,11 @@ export const ZANDER: ExecutiveInfo = {
   apiRoute: '/api/admin/zander',
 };
 
+// TODO: Unify PEP and executive page chat conversations to share the same thread per executive per tenant.
+// Currently PEP uses sessionStorage (pep_chat_{executive}) while executive pages (/ai, /cmo/ai, /ea)
+// use their own local state. These should share the same conversation thread so users see
+// continuity whether they access an executive via the floating PEP button or the dedicated page.
+
 // Module to executive mapping
 // Order matters - more specific paths should come first
 const MODULE_EXECUTIVE_MAP: [string, Executive][] = [

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '../../components/Sidebar';
 import { HealthTab } from './components/HealthTab';
@@ -91,21 +91,6 @@ interface KnowledgeArticle {
   updatedAt: string;
 }
 
-interface ZanderAction {
-  label: string;
-  action: string;
-  ticketId?: string;
-  headwindId?: string;
-  ticketNumber?: string;
-}
-
-interface ZanderMessage {
-  role: 'zander' | 'user';
-  content: string;
-  timestamp: string;
-  actions?: ZanderAction[];
-}
-
 // Mock Data
 const MOCK_HEALTH: SystemHealth = {
   api: 'healthy',
@@ -117,24 +102,8 @@ const MOCK_HEALTH: SystemHealth = {
 
 
 
-const INITIAL_ZANDER_MESSAGE: ZanderMessage = {
-  role: 'zander',
-  content: `Good afternoon. Here's your operational status:
-
-📊 SYSTEM: All systems operational  •  🎫 TICKETS: 3 total (1 auto-resolved, 1 needs review, 1 new)  •  🔴 HEADWINDS: 1 P1 in progress (Gmail sync)  •  👥 TENANTS: 5 active, 35 total users
-
-⚠️ I noticed the Gmail sync issue (Headwind #1) may be related to the new ticket from Bob Wilson. Should I link them?`,
-  timestamp: new Date().toISOString(),
-  actions: [
-    { label: 'Yes, link ticket to Headwind', action: 'link_headwind' },
-    { label: 'Show me the ticket', action: 'view_ticket' },
-    { label: 'Dismiss', action: 'dismiss' }
-  ]
-};
-
 export default function SupportAdminPage() {
   const router = useRouter();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'headwinds' | 'tenants' | 'users' | 'tickets' | 'knowledge' | 'health' | 'diagnostics'>('overview');
@@ -148,14 +117,7 @@ export default function SupportAdminPage() {
   const [showKnowledgeModal, setShowKnowledgeModal] = useState(false);
   const [editingArticle, setEditingArticle] = useState<KnowledgeArticle | null>(null);
   const [articleForm, setArticleForm] = useState({ title: '', slug: '', content: '', summary: '', category: 'PLATFORM_GUIDE', tags: '', searchTerms: '', isPublished: true });
-  
-  // Zander AI state
-  const [zanderOpen, setZanderOpen] = useState(true);
-  const [zanderExpanded, setZanderExpanded] = useState(false);
-  const [zanderMessages, setZanderMessages] = useState<ZanderMessage[]>([]);
-  const [zanderInput, setZanderInput] = useState('');
-  const [zanderLoading, setZanderLoading] = useState(false);
-  
+
   // Search/Filter state
   const [tenantSearch, setTenantSearch] = useState('');
   const [headwindFilter, setHeadwindFilter] = useState<'all' | 'P1' | 'P2' | 'P3'>('all');
@@ -198,54 +160,7 @@ export default function SupportAdminPage() {
     fetchTenants();
     fetchTickets();
     fetchKnowledge();
-    fetchZanderGreeting();
   }, [router]);
-
-  useEffect(() => {
-    // Scroll to bottom of messages when new message added
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [zanderMessages]);
-
-
-  const fetchZanderGreeting = async () => {
-    try {
-      const token = localStorage.getItem('zander_token');
-      // Use the new tool-enabled Zander route
-      const response = await fetch('/api/admin/zander', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          message: 'Give me a brief operational status update. Check current tickets and headwinds.',
-          conversationHistory: []
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const greeting: ZanderMessage = {
-          role: 'zander',
-          content: data.content,
-          timestamp: new Date().toISOString(),
-          actions: data.actions
-        };
-        setZanderMessages([greeting]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch Zander greeting:', error);
-      // Fallback to a simple greeting with dynamic user name
-      const userData = localStorage.getItem('zander_user');
-      const userName = userData ? JSON.parse(userData).firstName || 'there' : 'there';
-      const fallback: ZanderMessage = {
-        role: 'zander',
-        content: `Hello ${userName}. I'm ready to help you manage platform operations. What would you like to know?`,
-        timestamp: new Date().toISOString()
-      };
-      setZanderMessages([fallback]);
-    }
-  };
 
   const checkSystemHealth = async () => {
     try {
@@ -458,242 +373,6 @@ export default function SupportAdminPage() {
     }
   };
 
-  const handleZanderSend = async () => {
-    if (!zanderInput.trim() || zanderLoading) return;
-
-    const userMessage: ZanderMessage = {
-      role: 'user',
-      content: zanderInput,
-      timestamp: new Date().toISOString()
-    };
-    setZanderMessages(prev => [...prev, userMessage]);
-    const currentInput = zanderInput;
-    setZanderInput('');
-    setZanderLoading(true);
-
-    try {
-      const token = localStorage.getItem('zander_token');
-      // Build conversation history for context
-      const conversationHistory = zanderMessages.map(msg => ({
-        role: msg.role === 'zander' ? 'assistant' : msg.role,
-        content: msg.content
-      }));
-
-      // Use the new tool-enabled Zander route
-      const response = await fetch('/api/admin/zander', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          message: currentInput,
-          conversationHistory
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response from Zander');
-      }
-
-      const data = await response.json();
-
-      // If tools were executed, refresh data
-      if (data.toolsExecuted && data.toolsExecuted.length > 0) {
-        // Refresh relevant data based on what tools were used
-        const toolNames = data.toolsExecuted.map((t: { tool: string }) => t.tool);
-        if (toolNames.some((t: string) => t.includes('ticket'))) {
-          fetchTickets();
-        }
-        if (toolNames.some((t: string) => t.includes('headwind'))) {
-          fetchHeadwinds();
-        }
-        if (toolNames.some((t: string) => t.includes('tenant'))) {
-          fetchTenants();
-        }
-      }
-
-      const aiResponse: ZanderMessage = {
-        role: 'zander',
-        content: data.content,
-        timestamp: new Date().toISOString(),
-        actions: data.actions
-      };
-      setZanderMessages(prev => [...prev, aiResponse]);
-    } catch (error) {
-      console.error('Zander chat error:', error);
-      const errorResponse: ZanderMessage = {
-        role: 'zander',
-        content: 'I encountered an error processing your request. Please try again.',
-        timestamp: new Date().toISOString()
-      };
-      setZanderMessages(prev => [...prev, errorResponse]);
-    } finally {
-      setZanderLoading(false);
-    }
-  };
-
-  const handleZanderAction = async (actionData: ZanderAction) => {
-    const { action, ticketId, headwindId, ticketNumber } = actionData;
-    
-    if (action === 'dismiss') {
-      const response: ZanderMessage = {
-        role: 'zander',
-        content: 'Got it. Let me know if you need anything else!',
-        timestamp: new Date().toISOString()
-      };
-      setZanderMessages(prev => [...prev, response]);
-      return;
-    }
-    
-    if (action === 'link_headwind' && ticketId && headwindId) {
-      try {
-        const token = localStorage.getItem('zander_token');
-        const response = await fetch(`${API_URL}/support-tickets/${ticketId}/link-headwind/${headwindId}`, {
-          method: 'PUT',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (response.ok) {
-          const zanderResponse: ZanderMessage = {
-            role: 'zander',
-            content: `Done! I've linked ${ticketNumber || 'the ticket'} to the headwind. The ticket will be tracked with this issue.`,
-            timestamp: new Date().toISOString()
-          };
-          setZanderMessages(prev => [...prev, zanderResponse]);
-          fetchTickets();
-          fetchHeadwinds();
-        } else {
-          throw new Error('Failed to link');
-        }
-      } catch (error) {
-        const errorResponse: ZanderMessage = {
-          role: 'zander',
-          content: 'Sorry, I could not link the ticket to the headwind. Please try manually from the Tickets tab.',
-          timestamp: new Date().toISOString()
-        };
-        setZanderMessages(prev => [...prev, errorResponse]);
-      }
-      return;
-    }
-    
-    if (action === 'view_ticket' && ticketId) {
-      try {
-        const token = localStorage.getItem('zander_token');
-        const response = await fetch(`${API_URL}/support-tickets/${ticketId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (response.ok) {
-          const ticket = await response.json();
-          const zanderResponse: ZanderMessage = {
-            role: 'zander',
-            content: `**${ticket.ticketNumber}: ${ticket.subject}**
-
-**Status:** ${ticket.status}  |  **Priority:** ${ticket.priority}  |  **Via:** ${ticket.createdVia}
-**From:** ${ticket.user?.firstName || 'Unknown'} ${ticket.user?.lastName || ''} (${ticket.tenant?.companyName || 'Unknown'})
-**Created:** ${new Date(ticket.createdAt).toLocaleString()}
-
-**Description:**
-${ticket.description}
-
-${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' (' + ticket.linkedHeadwind.status + ')' : '**Not linked to any headwind**'}`,
-            timestamp: new Date().toISOString(),
-            actions: ticket.linkedHeadwind ? undefined : [
-              { label: 'Link to a Headwind', action: 'suggest_link', ticketId: ticket.id, ticketNumber: ticket.ticketNumber },
-              { label: 'Mark as Resolved', action: 'resolve_ticket', ticketId: ticket.id, ticketNumber: ticket.ticketNumber },
-              { label: 'Close', action: 'dismiss' }
-            ]
-          };
-          setZanderMessages(prev => [...prev, zanderResponse]);
-        } else {
-          throw new Error('Failed to fetch ticket');
-        }
-      } catch (error) {
-        const errorResponse: ZanderMessage = {
-          role: 'zander',
-          content: 'Sorry, I could not fetch the ticket details. Please check the Tickets tab.',
-          timestamp: new Date().toISOString()
-        };
-        setZanderMessages(prev => [...prev, errorResponse]);
-      }
-      return;
-    }
-    
-    if (action === 'resolve_ticket' && ticketId) {
-      try {
-        const token = localStorage.getItem('zander_token');
-        const response = await fetch(`${API_URL}/support-tickets/${ticketId}`, {
-          method: 'PUT',
-          headers: { 
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}` 
-          },
-          body: JSON.stringify({ status: 'RESOLVED' })
-        });
-        
-        if (response.ok) {
-          const zanderResponse: ZanderMessage = {
-            role: 'zander',
-            content: `${ticketNumber || 'Ticket'} has been marked as resolved.`,
-            timestamp: new Date().toISOString()
-          };
-          setZanderMessages(prev => [...prev, zanderResponse]);
-          fetchTickets();
-        } else {
-          throw new Error('Failed to resolve');
-        }
-      } catch (error) {
-        const errorResponse: ZanderMessage = {
-          role: 'zander',
-          content: 'Sorry, I could not resolve the ticket. Please try from the Tickets tab.',
-          timestamp: new Date().toISOString()
-        };
-        setZanderMessages(prev => [...prev, errorResponse]);
-      }
-      return;
-    }
-    
-    if (action === 'suggest_link' && ticketId) {
-      const activeHeadwinds = headwinds.filter(h => h.status !== 'CLOSED');
-      if (activeHeadwinds.length === 0) {
-        const zanderResponse: ZanderMessage = {
-          role: 'zander',
-          content: 'There are no active headwinds to link this ticket to. Create a new headwind from the Headwinds tab if needed.',
-          timestamp: new Date().toISOString()
-        };
-        setZanderMessages(prev => [...prev, zanderResponse]);
-        return;
-      }
-      
-      const zanderResponse: ZanderMessage = {
-        role: 'zander',
-        content: `Which headwind should I link ${ticketNumber} to?`,
-        timestamp: new Date().toISOString(),
-        actions: [
-          ...activeHeadwinds.slice(0, 3).map(h => ({
-            label: `[${h.priority}] ${h.title}`,
-            action: 'link_headwind',
-            ticketId: ticketId,
-            headwindId: h.id,
-            ticketNumber: ticketNumber
-          })),
-          { label: 'Cancel', action: 'dismiss' }
-        ]
-      };
-      setZanderMessages(prev => [...prev, zanderResponse]);
-      return;
-    }
-    
-    // Default
-    const response: ZanderMessage = {
-      role: 'zander',
-      content: 'Action completed.',
-      timestamp: new Date().toISOString()
-    };
-    setZanderMessages(prev => [...prev, response]);
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy': case 'active': case 'DEPLOYED': case 'CLOSED': case 'AI_RESOLVED': case 'RESOLVED': return '#28a745';
@@ -729,11 +408,9 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
     (t.companyName || '').toLowerCase().includes(tenantSearch.toLowerCase())
   );
 
-  const filteredHeadwinds = headwinds.filter(h => 
+  const filteredHeadwinds = headwinds.filter(h =>
     headwindFilter === 'all' || h.priority === headwindFilter
   );
-
-  const zanderHeight = zanderExpanded ? '400px' : zanderOpen ? '200px' : '48px';
 
   if (loading) {
     return (
@@ -765,7 +442,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
       <Sidebar />
       <div style={{ flex: 1, marginLeft: '240px', display: 'flex', flexDirection: 'column', height: '100vh' }}>
         {/* Main Content Area - Scrollable */}
-        <main style={{ flex: 1, padding: '2rem', overflow: 'auto', paddingBottom: zanderHeight }}>
+        <main style={{ flex: 1, padding: '2rem', overflow: 'auto' }}>
           {/* Header */}
           <div style={{
             background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
@@ -1147,9 +824,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
               </table>
             </div>
           )}
-        </main>
 
-        
         {/* Knowledge Article Modal */}
         {showKnowledgeModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
@@ -1274,160 +949,7 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
             </div>
           </div>
         )}
-
-        {/* Zander AI Bottom Panel */}
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: '240px',
-          right: 0,
-          height: zanderHeight,
-          background: '#1C1C26',
-          borderTop: '2px solid #00CCEE',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.1)',
-          transition: 'height 0.3s ease',
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: 100
-        }}>
-          {/* Zander Header Bar */}
-          <div 
-            style={{
-              background: 'linear-gradient(135deg, #13131A 0%, #1C1C26 100%)',
-              padding: '0.75rem 1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              cursor: 'pointer'
-            }}
-            onClick={() => setZanderOpen(!zanderOpen)}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#00CCEE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🤖</div>
-              <div>
-                <span style={{ color: 'white', fontWeight: '600', fontSize: '1rem' }}>Zander</span>
-                <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginLeft: '0.5rem' }}>Your Operations AI</span>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              {zanderOpen && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setZanderExpanded(!zanderExpanded); }}
-                  style={{
-                    background: 'rgba(255,255,255,0.2)',
-                    border: 'none',
-                    color: 'white',
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  {zanderExpanded ? '▼ Collapse' : '▲ Expand'}
-                </button>
-              )}
-              <button
-                onClick={(e) => { e.stopPropagation(); setZanderOpen(!zanderOpen); }}
-                style={{
-                  background: zanderOpen ? '#00CCEE' : 'rgba(255,255,255,0.2)',
-                  border: 'none',
-                  color: zanderOpen ? '#13131A' : 'white',
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.8rem'
-                }}
-              >
-                {zanderOpen ? 'Hide' : 'Show'}
-              </button>
-            </div>
-          </div>
-
-          {/* Zander Content */}
-          {zanderOpen && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              {/* Messages */}
-              <div style={{ flex: 1, overflow: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {zanderMessages.map((msg, idx) => (
-                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                    <div style={{
-                      background: msg.role === 'zander' ? '#f8f9fa' : '#13131A',
-                      color: msg.role === 'zander' ? '#13131A' : 'white',
-                      padding: '0.75rem 1rem',
-                      borderRadius: '8px',
-                      maxWidth: '80%',
-                      whiteSpace: 'pre-wrap',
-                      fontSize: '0.9rem',
-                      lineHeight: '1.4'
-                    }}>
-                      {msg.content}
-                    </div>
-                    {msg.actions && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                        {msg.actions.map((action, actionIdx) => (
-                          <button
-                            key={actionIdx}
-                            onClick={() => handleZanderAction(action)}
-                            style={{
-                              background: action.action === 'dismiss' ? '#f5f5f5' : '#00CCEE',
-                              color: action.action === 'dismiss' ? '#666' : '#13131A',
-                              border: 'none',
-                              padding: '0.4rem 0.75rem',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              fontWeight: '600',
-                              fontSize: '0.8rem'
-                            }}
-                          >
-                            {action.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input */}
-              <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid #2A2A38', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  value={zanderInput}
-                  onChange={(e) => setZanderInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleZanderSend()}
-                  placeholder="Ask Zander anything..."
-                  style={{
-                    flex: 1,
-                    padding: '0.6rem 1rem',
-                    border: '2px solid #2A2A38',
-                    borderRadius: '6px',
-                    fontSize: '0.9rem'
-                  }}
-                />
-                <button
-                  onClick={handleZanderSend}
-                  disabled={zanderLoading || !zanderInput.trim()}
-                  style={{
-                    background: zanderLoading ? '#999' : '#13131A',
-                    color: 'white',
-                    border: 'none',
-                    padding: '0.6rem 1.25rem',
-                    borderRadius: '6px',
-                    cursor: zanderLoading ? 'not-allowed' : 'pointer',
-                    fontWeight: '600',
-                    fontSize: '0.9rem',
-                    opacity: (!zanderInput.trim() || zanderLoading) ? 0.6 : 1
-                  }}
-                >
-                  {zanderLoading ? '...' : 'Send'}
-                </button>
-                <span style={{ fontSize: '0.75rem', color: '#55556A', marginLeft: '0.5rem' }}>Powered by Claude</span>
-              </div>
-            </div>
-          )}
-        </div>
+        </main>
       </div>
 
       {/* Headwind Modal */}
