@@ -394,7 +394,7 @@ function FormSubmitContent() {
                     >
                       <span style={{ fontSize: '1.5rem' }}>👤</span>
                       <div>
-                        <div style={{ fontWeight: '600', color: '#13131A' }}>
+                        <div style={{ fontWeight: '600', color: '#F0F0F5' }}>
                           {submission.contact.firstName} {submission.contact.lastName}
                         </div>
                         <div style={{ fontSize: '0.9rem', color: '#8888A0' }}>

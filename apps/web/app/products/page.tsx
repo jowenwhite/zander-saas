@@ -211,7 +211,7 @@ export default function ProductsPage() {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
               <div>
-                <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#13131A', margin: 0 }}>
+                <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#F0F0F5', margin: 0 }}>
                   Products
                 </h1>
                 <p style={{ color: '#8888A0', margin: '0.5rem 0 0' }}>

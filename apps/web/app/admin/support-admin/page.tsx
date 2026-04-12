@@ -799,8 +799,8 @@ ${ticket.linkedHeadwind ? '**Linked to:** ' + ticket.linkedHeadwind.title + ' ('
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '600',
-                  background: activeTab === tab ? '#13131A' : 'transparent',
-                  color: activeTab === tab ? 'white' : '#13131A',
+                  background: activeTab === tab ? '#00CCEE' : 'transparent',
+                  color: activeTab === tab ? '#13131A' : 'rgba(255,255,255,0.7)',
                   transition: 'all 0.2s ease'
                 }}
               >

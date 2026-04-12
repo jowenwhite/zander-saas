@@ -1111,7 +1111,7 @@ export default function SchedulePage() {
                               padding: '0.75rem',
                               borderBottom: '1px solid #2A2A38',
                               background: isToday ? '#00CCEE' : '#09090F',
-                              color: isToday ? 'white' : '#13131A',
+                              color: isToday ? 'white' : '#F0F0F5',
                               fontWeight: '600',
                               textAlign: 'center'
                             }}>
@@ -1193,7 +1193,7 @@ export default function SchedulePage() {
                                 height: '24px',
                                 borderRadius: '50%',
                                 background: isToday ? '#00CCEE' : 'transparent',
-                                color: isToday ? 'white' : '#13131A',
+                                color: isToday ? 'white' : '#F0F0F5',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',

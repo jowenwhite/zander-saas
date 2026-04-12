@@ -434,30 +434,30 @@ export default function ContactDetailPage() {
                   <div style={{ background: '#1C1C26', borderRadius: '8px', padding: '1rem' }}>
                     <div style={{ marginBottom: '1rem' }}>
                       <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Email</div>
-                      <div style={{ color: '#13131A' }}>{contact.email}</div>
+                      <div style={{ color: '#F0F0F5' }}>{contact.email}</div>
                     </div>
                     {contact.phone && (
                       <div style={{ marginBottom: '1rem' }}>
                         <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Phone</div>
-                        <div style={{ color: '#13131A' }}>{contact.phone}</div>
+                        <div style={{ color: '#F0F0F5' }}>{contact.phone}</div>
                       </div>
                     )}
                     {contact.company && (
                       <div style={{ marginBottom: '1rem' }}>
                         <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Company</div>
-                        <div style={{ color: '#13131A' }}>{contact.company}</div>
+                        <div style={{ color: '#F0F0F5' }}>{contact.company}</div>
                       </div>
                     )}
                     {contact.title && (
                       <div style={{ marginBottom: '1rem' }}>
                         <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Title</div>
-                        <div style={{ color: '#13131A' }}>{contact.title}</div>
+                        <div style={{ color: '#F0F0F5' }}>{contact.title}</div>
                       </div>
                     )}
                     {contact.source && (
                       <div>
                         <div style={{ fontSize: '0.75rem', color: '#8888A0', marginBottom: '0.25rem' }}>Source</div>
-                        <div style={{ color: '#13131A' }}>{contact.source}</div>
+                        <div style={{ color: '#F0F0F5' }}>{contact.source}</div>
                       </div>
                     )}
                   </div>
@@ -556,7 +556,7 @@ export default function ContactDetailPage() {
                       borderRadius: '8px',
                       padding: '1rem',
                       minHeight: '120px',
-                      color: notes ? '#13131A' : '#8888A0',
+                      color: notes ? '#F0F0F5' : '#8888A0',
                       fontSize: '0.9rem',
                       lineHeight: 1.6
                     }}>
@@ -578,7 +578,7 @@ export default function ContactDetailPage() {
                       }}>
                         <span style={{ fontSize: '1rem' }}>{getActivityIcon(activity.type)}</span>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: '0.85rem', color: '#13131A' }}>{activity.title || activity.description}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{activity.title || activity.description}</div>
                           <div style={{ fontSize: '0.7rem', color: '#8888A0', marginTop: '0.25rem' }}>
                             {formatDateTime(activity.date)}
                           </div>
@@ -679,12 +679,12 @@ export default function ContactDetailPage() {
                           }}
                         >
                           <div>
-                            <div style={{ fontWeight: '600', color: '#13131A', marginBottom: '0.25rem' }}>{deal.name}</div>
+                            <div style={{ fontWeight: '600', color: '#F0F0F5', marginBottom: '0.25rem' }}>{deal.name}</div>
                             <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>Created {formatDate(deal.createdAt)}</div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                             <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontWeight: '700', color: '#13131A' }}>{formatCurrency(deal.value)}</div>
+                              <div style={{ fontWeight: '700', color: '#F0F0F5' }}>{formatCurrency(deal.value)}</div>
                               <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{deal.probability}% probability</div>
                             </div>
                             <span style={{
@@ -750,7 +750,7 @@ export default function ContactDetailPage() {
                         {getActivityIcon(activity.type)}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: '500', color: '#13131A', marginBottom: '0.25rem' }}>
+                        <div style={{ fontWeight: '500', color: '#F0F0F5', marginBottom: '0.25rem' }}>
                           {activity.direction === 'inbound' ? '📥 ' : activity.direction === 'outbound' ? '📤 ' : ''}{activity.title || activity.description}
                         </div>
                         <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#8888A0' }}>
@@ -817,7 +817,7 @@ export default function ContactDetailPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <span style={{ fontSize: '1.5rem' }}>📋</span>
                         <div>
-                          <div style={{ fontWeight: '600', color: '#13131A' }}>{form.formName}</div>
+                          <div style={{ fontWeight: '600', color: '#F0F0F5' }}>{form.formName}</div>
                           <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
                             {form.status === 'complete' && `Completed ${formatDateTime(form.submittedAt!)}`}
                             {form.status === 'sent' && `Sent ${formatDateTime(form.sentAt!)}`}

@@ -353,7 +353,7 @@ export default function LoginPage() {
                 width: '100%',
                 padding: '1.3rem 1.5rem',
                 background: (loading || (requires2FA && twoFactorCode.length !== 6)) ? '#555' : '#00CCEE',
-                color: '#000000',
+                color: (loading || (requires2FA && twoFactorCode.length !== 6)) ? '#aaa' : '#000000',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '1.5rem',

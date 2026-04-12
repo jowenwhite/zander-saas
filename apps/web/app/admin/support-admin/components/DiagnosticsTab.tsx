@@ -23,7 +23,7 @@ export function DiagnosticsTab() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: '1rem',
         }}
       >
@@ -140,6 +140,7 @@ function StatCard({
         background: '#1C1C26',
         borderRadius: '12px',
         padding: '1.25rem',
+        minWidth: 0,
       }}
     >
       <div

@@ -1299,7 +1299,7 @@ export default function HeadquartersPage() {
                       {item.dueDate && ` • Due: ${formatDate(item.dueDate)}`}
                     </div>
                   </div>
-                  <span style={{ fontSize: '1.25rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
+                  <span style={{ fontSize: '1.25rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#F0F0F5' }}>{item.progress}%</span>
                 </div>
                 <div style={{ height: '10px', background: '#1C1C26', borderRadius: '5px', overflow: 'hidden' }}>
                   <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '5px', transition: 'width 0.3s ease' }} />
@@ -2471,7 +2471,7 @@ export default function HeadquartersPage() {
                   <div key={item.id} style={{ marginBottom: '0.75rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
                       <span style={{ fontSize: '0.85rem', color: '#F0F0F5' }}>{item.title}</span>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#13131A' }}>{item.progress}%</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: item.progress === 100 ? '#28A745' : '#F0F0F5' }}>{item.progress}%</span>
                     </div>
                     <div style={{ height: '8px', background: '#09090F', borderRadius: '4px', overflow: 'hidden' }}>
                       <div style={{ width: item.progress + '%', height: '100%', background: item.progress === 100 ? '#28A745' : '#00CCEE', borderRadius: '4px', transition: 'width 0.3s ease' }} />
