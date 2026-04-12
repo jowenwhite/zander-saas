@@ -168,6 +168,7 @@ async function bootstrap() {
       'Accept',
       'Origin',
       'X-CSRF-Token',
+      'x-admin-secret',  // Support Admin API authentication
     ],
     exposedHeaders: ['X-Total-Count', 'X-Page', 'X-Per-Page'],
     credentials: true,
