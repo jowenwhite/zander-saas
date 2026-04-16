@@ -43,6 +43,13 @@ model Tenant {
   currentChurnRiskLevel   String?                  @map("current_churn_risk_level")
   currentEngagementScore  Float?                   @map("current_engagement_score")
   lastActivityAt          DateTime?                @map("last_activity_at")
+  // Consulting fields
+  consultingStatus        ConsultingStatus?        @map("consulting_status")
+  packageType             String?                  @map("package_type")
+  hoursRemaining          Float                    @default(0) @map("hours_remaining")
+  hoursUsed               Float                    @default(0) @map("hours_used")
+  packagePurchaseDate     DateTime?                @map("package_purchase_date")
+  packageExpirationDate   DateTime?                @map("package_expiration_date")
   activities              Activity[]
   assemblies              Assembly[]
   calendarEvents          CalendarEvent[]
@@ -89,6 +96,10 @@ model Tenant {
   socialPosts             SocialPost[]
   socialEngagements       SocialEngagement[]
   designAssets            DesignAsset[]
+  // Consulting module (Phase 5)
+  consultingEngagements   ConsultingEngagement[]
+  consultingTimeEntries   ConsultingTimeEntry[]
+  consultingDeliverables  ConsultingDeliverable[]
 
   @@map("tenants")
 }
@@ -1854,4 +1865,96 @@ model DesignAsset {
   @@index([tenantId])
   @@index([source])
   @@map("design_assets")
+}
+
+// ============================================
+// CONSULTING MODULE MODELS
+// Phase 5: Consulting & Professional Services
+// ============================================
+
+enum ConsultingStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+enum DeliverableStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  DELIVERED
+}
+
+enum EngagementStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  EXPIRED
+}
+
+model ConsultingEngagement {
+  id              String            @id @default(cuid())
+  tenantId        String
+  packageType     String
+  startDate       DateTime
+  endDate         DateTime?
+  status          EngagementStatus  @default(ACTIVE)
+  totalHours      Float             @default(0)
+  hoursUsed       Float             @default(0)
+  billableHours   Float             @default(0)
+  stripePaymentId String?
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  tenant       Tenant                  @relation(fields: [tenantId], references: [id])
+  timeEntries  ConsultingTimeEntry[]
+  deliverables ConsultingDeliverable[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("consulting_engagements")
+}
+
+model ConsultingTimeEntry {
+  id            String   @id @default(cuid())
+  tenantId      String
+  engagementId  String
+  date          DateTime
+  hours         Float
+  billableHours Float    @default(0)
+  description   String
+  category      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant     Tenant               @relation(fields: [tenantId], references: [id])
+  engagement ConsultingEngagement @relation(fields: [engagementId], references: [id])
+
+  @@index([tenantId])
+  @@index([engagementId])
+  @@index([date])
+  @@map("consulting_time_entries")
+}
+
+model ConsultingDeliverable {
+  id           String            @id @default(cuid())
+  tenantId     String
+  engagementId String
+  packageTier  String
+  name         String
+  description  String?
+  status       DeliverableStatus @default(PENDING)
+  deliveredAt  DateTime?
+  documentUrl  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  tenant     Tenant               @relation(fields: [tenantId], references: [id])
+  engagement ConsultingEngagement @relation(fields: [engagementId], references: [id])
+
+  @@index([tenantId])
+  @@index([engagementId])
+  @@index([status])
+  @@map("consulting_deliverables")
 }
