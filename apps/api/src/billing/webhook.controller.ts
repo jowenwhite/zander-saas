@@ -27,20 +27,23 @@ const TIER_AMOUNTS: Record<string, number> = {
   'BUSINESS': 599,
 };
 
-// Consulting package price IDs (populated after running create-consulting-stripe-products.ts)
-// These will be filled in after Stripe products are created
+// Consulting package price IDs (from Stripe)
 const CONSULTING_PRICE_IDS: Record<string, { type: string; hours: number; price: number }> = {
-  // Example: 'price_xxx': { type: 'BUSINESS_ANALYSIS', hours: 0, price: 500 },
-  // 'price_xxx': { type: 'COMPASS', hours: 20, price: 2500 },
-  // 'price_xxx': { type: 'FOUNDATION', hours: 40, price: 4500 },
-  // 'price_xxx': { type: 'BLUEPRINT', hours: 80, price: 8000 },
-  // 'price_xxx': { type: 'EXTENSION', hours: 10, price: 250 },
+  'price_1TMrUlCesrE5OiIGm3P5qwpM': { type: 'BUSINESS_ANALYSIS', hours: 0, price: 500 },
+  'price_1TMrUmCesrE5OiIGFhluNodU': { type: 'COMPASS', hours: 20, price: 2500 },
+  'price_1TMrUnCesrE5OiIGe6YO8ROu': { type: 'FOUNDATION', hours: 40, price: 4500 },
+  'price_1TMrUoCesrE5OiIG4b894eDD': { type: 'BLUEPRINT', hours: 80, price: 8000 },
+  'price_1TMrUpCesrE5OiIGlGoEknqD': { type: 'EXTENSION', hours: 10, price: 250 },
 };
 
-// Digital store product price IDs
+// Digital store product price IDs (from Stripe)
 const DIGITAL_STORE_PRICE_IDS: Record<string, { type: string; name: string }> = {
-  // These will be populated after running the Stripe products script
-  // 'price_xxx': { type: 'OPERATIONS_PLAYBOOK', name: 'Operations Playbook' },
+  'price_1TMrUqCesrE5OiIGA4bIIMuQ': { type: 'OPERATIONS_PLAYBOOK', name: 'Operations Playbook' },
+  'price_1TMrUqCesrE5OiIGTdRgIrWD': { type: 'STARTUP_FOUNDATIONS', name: 'Startup Foundations Kit' },
+  'price_1TMrUrCesrE5OiIG5x1t2cky': { type: 'SALES_MARKETING', name: 'Sales and Marketing Kit' },
+  'price_1TMrUsCesrE5OiIGBAGXRGvX': { type: 'HIRING_TEAM', name: 'Hiring and Team Building Kit' },
+  'price_1TMrUtCesrE5OiIGMZtWMuK4': { type: 'FINANCIAL_CLARITY', name: 'Financial Clarity Kit' },
+  'price_1TMrUuCesrE5OiIG12AsAs2F': { type: 'INDUSTRY_STARTER', name: 'Industry Starter Packs' },
 };
 
 @Controller('webhooks')

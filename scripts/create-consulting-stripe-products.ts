@@ -1,22 +1,16 @@
 /**
  * Create Consulting and Digital Store Products in Stripe
  *
- * Run with: npx ts-node scripts/create-consulting-stripe-products.ts
+ * Run with: cd apps/api && pnpm exec ts-node ../../scripts/create-consulting-stripe-products.ts
  *
  * This script creates all consulting packages and digital store products in Stripe.
  * It's idempotent - running it multiple times won't create duplicates (checks by name).
  */
 
 import Stripe from 'stripe';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
 
-// Load environment variables from root .env
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-});
+// Uses STRIPE_SECRET_KEY from apps/api/.env (loaded by ts-node)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // Consulting packages (one-time payments)
 const CONSULTING_PACKAGES = [
