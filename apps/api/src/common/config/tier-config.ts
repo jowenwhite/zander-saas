@@ -15,12 +15,19 @@ export const TIER_TOKEN_CAPS: Record<string, number> = {
   PRO: 200_000, // 200K tokens/month
   BUSINESS: 500_000, // 500K tokens/month
   ENTERPRISE: 2_000_000, // 2M tokens/month
+  CONSULTING: 0, // No AI executive access - HQ/documents/surveys only
 };
 
 /**
- * Tier hierarchy for comparison (higher index = more access)
+ * Standard tier hierarchy for comparison (higher index = more access)
+ * CONSULTING is separate - it's a different product type (no AI, HQ-only)
  */
 export const TIER_HIERARCHY = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
+
+/**
+ * Special tiers that don't follow the standard hierarchy
+ */
+export const SPECIAL_TIERS = ['CONSULTING'];
 
 /**
  * Human-readable tier names
@@ -31,6 +38,7 @@ export const TIER_NAMES: Record<string, string> = {
   PRO: 'Pro',
   BUSINESS: 'Business',
   ENTERPRISE: 'Enterprise',
+  CONSULTING: 'Consulting',
 };
 
 /**
