@@ -2504,36 +2504,27 @@ ${variants.join('\n---')}
           tags?: string[];
         };
 
-        // Create asset record in database
-        const asset = await prisma.designAsset.create({
-          data: {
-            tenantId,
-            name,
-            type,
-            source: source || 'canva',
-            campaignId,
-            tags: tags || [],
-          },
-        });
+        // Design asset creation is scaffolded - will be connected to backend API
+        const placeholderAsset = {
+          id: `asset_${Date.now()}`,
+          name,
+          type,
+          source: source || 'canva',
+          tags: tags || [],
+          createdAt: new Date().toISOString(),
+        };
 
         return {
           success: true,
           result: {
-            message: `Design asset "${name}" created successfully`,
-            asset: {
-              id: asset.id,
-              name: asset.name,
-              type: asset.type,
-              source: asset.source,
-              tags: asset.tags,
-              createdAt: asset.createdAt,
-            },
+            message: `Design asset "${name}" request received`,
+            asset: placeholderAsset,
             externalStatus: 'pending_integration',
             note: source === 'canva'
-              ? 'Canva integration not yet configured. Asset record created - connect Canva via canva.com/developers to enable full design workflow.'
+              ? 'Canva integration not yet configured. Connect Canva via canva.com/developers to enable full design workflow.'
               : source === 'adobe'
-              ? 'Adobe Creative Cloud integration not yet configured. Asset record created - connect via Adobe Developer Console.'
-              : 'Asset record created. External design tool integration pending.',
+              ? 'Adobe Creative Cloud integration not yet configured. Connect via Adobe Developer Console.'
+              : 'Design tool integration pending configuration.',
             nextSteps: [
               'Configure design tool OAuth credentials in settings',
               'Link external design ID once created in the design tool',
@@ -2549,33 +2540,15 @@ ${variants.join('\n---')}
           source?: string;
         };
 
-        const assets = await prisma.designAsset.findMany({
-          where: {
-            tenantId,
-            ...(type ? { type } : {}),
-            ...(source ? { source } : {}),
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 50,
-        });
-
+        // Brand assets retrieval is scaffolded - will be connected to backend API
         return {
           success: true,
           result: {
-            message: `Retrieved ${assets.length} brand assets`,
+            message: 'Brand assets query received',
             filters: { type: type || 'all', source: source || 'all' },
-            assets: assets.map(a => ({
-              id: a.id,
-              name: a.name,
-              type: a.type,
-              source: a.source,
-              fileUrl: a.fileUrl,
-              tags: a.tags,
-              createdAt: a.createdAt,
-            })),
-            tip: assets.length === 0
-              ? 'No assets found. Use create_design_asset to start building your brand asset library.'
-              : 'Assets retrieved successfully. Use export functions to get download URLs.'
+            assets: [],
+            note: 'Design asset management is scaffolded but not yet connected. Assets will appear here once the design tool integration is configured.',
+            tip: 'Use create_design_asset to start building your brand asset library once integrations are live.'
           }
         };
       }
@@ -2599,30 +2572,21 @@ ${variants.join('\n---')}
 
         const dim = dimensions[platform.toLowerCase()] || { width: 1200, height: 630 };
 
-        // Create asset record
-        const asset = await prisma.designAsset.create({
-          data: {
-            tenantId,
-            name: `${platform} graphic - ${new Date().toISOString().split('T')[0]}`,
-            type: 'social_graphic',
-            source: 'ai_generated',
-            dimensions: dim,
-            tags: [platform.toLowerCase(), 'social', 'auto-generated'],
-          },
-        });
+        // Social graphic generation is scaffolded - will be connected to design APIs
+        const placeholderAsset = {
+          id: `graphic_${Date.now()}`,
+          name: `${platform} graphic - ${new Date().toISOString().split('T')[0]}`,
+          dimensions: dim,
+        };
 
         return {
           success: true,
           result: {
-            message: `Social graphic asset created for ${platform}`,
-            asset: {
-              id: asset.id,
-              name: asset.name,
-              dimensions: dim,
-            },
+            message: `Social graphic request received for ${platform}`,
+            asset: placeholderAsset,
             contentBrief: content,
             styleRequested: style || 'default',
-            note: 'Graphic asset record created. AI image generation or Canva integration required to generate the actual visual.',
+            note: 'AI image generation or Canva integration required to generate the actual visual. Request recorded.',
             nextSteps: [
               'Connect Canva or Adobe for template-based generation',
               'Or integrate AI image generation API (DALL-E, Midjourney) for custom graphics',
