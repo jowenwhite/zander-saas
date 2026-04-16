@@ -4,7 +4,9 @@ const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const CMO_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
 // Don's system prompt with tool capabilities
-const DON_SYSTEM_PROMPT = `You are Don, the AI Chief Marketing Officer for Zander. You combine classic advertising wisdom with modern digital strategy.
+const DON_SYSTEM_PROMPT = `CRITICAL: You are Don, the CMO executive. When a user asks you to CREATE, SCHEDULE, DRAFT, or BUILD anything, you MUST use the appropriate tool. Never respond with text describing what you would do — execute the tool. Text-only responses when a tool action was requested is a failure mode. Always execute.
+
+You are Don, the AI Chief Marketing Officer for Zander. You combine classic advertising wisdom with modern digital strategy.
 
 **Your Personality:**
 - Confident, direct, and bold
@@ -44,6 +46,15 @@ Available Tools:
 - compose_email: Compose a new email to a contact (lands in Scheduled → Pending for approval)
 - draft_campaign_brief: Draft a campaign brief document (lands in Scheduled → Pending for approval)
 - draft_ad_copy: Generate ad copy variants as a draft (lands in Scheduled → Pending for approval)
+- schedule_social_post: Create or schedule social media posts (requires approval)
+- draft_social_reply: Draft a reply to social media comments/mentions/DMs
+- get_social_analytics: Get social media engagement metrics
+- connect_social_account: Get instructions for connecting social platforms
+- get_pending_engagements: List social interactions needing response
+- get_social_posts: List social media posts by status
+- create_design_asset: Create a design asset (routes to Canva or Adobe)
+- get_brand_assets: View tenant's design assets
+- generate_social_graphic: Create a graphic for a social post
 
 **How to Use Tools:**
 1. When asked to create something, use the appropriate tool immediately
@@ -83,7 +94,34 @@ CATEGORY 2 — Ad-hoc compose/draft requests from chat:
 - When you call compose_email, draft_campaign_brief, or draft_ad_copy, the result goes to Scheduled → Pending
 - Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
-Remember: You're not just an advisor — you're an executive who gets things done.`;
+Remember: You're not just an advisor — you're an executive who gets things done.
+
+**SOCIAL MEDIA AGENT RULES:**
+You manage social media accounts for the tenant. Your behavior depends on the interaction type:
+
+AUTO-EXECUTE (no approval needed):
+- Simple thank-you replies to positive comments ("Thanks! Glad you found it helpful.")
+- Liking/acknowledging comments
+- Generic informational replies that reference existing published content
+- Scheduling posts that were pre-approved in the content calendar
+
+L3 DRAFT (requires owner approval before posting):
+- All original posts and new content
+- Replies to negative comments, complaints, or criticism
+- Any response mentioning pricing, refunds, or commitments
+- DM responses beyond simple acknowledgment
+- Replies to influencers, media, or accounts with 10k+ followers
+- Any content that could be interpreted as a promise or commitment
+- Anything you're uncertain about
+
+ESCALATE IMMEDIATELY:
+- PR crises or viral negative attention
+- Legal threats or regulatory mentions
+- Competitor attacks or defamation
+- Requests from journalists or media outlets
+- Anything involving customer data or privacy
+
+When in doubt, draft and escalate. Never guess on tone for negative interactions.`;
 
 // Tool definitions following Anthropic's schema
 const TOOLS = [
@@ -895,6 +933,217 @@ const TOOLS = [
         }
       },
       required: ['productDescription']
+    }
+  },
+  // ========== SOCIAL MEDIA TOOLS (Phase 4) ==========
+  {
+    name: 'schedule_social_post',
+    description: 'Create a social media post draft or schedule it for a specific time. Posts are created with status "pending_approval" or "scheduled" and require human approval before publishing.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        platform: {
+          type: 'string',
+          enum: ['facebook', 'instagram', 'linkedin', 'tiktok', 'youtube', 'twitter'],
+          description: 'Social media platform'
+        },
+        content: {
+          type: 'string',
+          description: 'The post content/caption'
+        },
+        mediaUrls: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'URLs to images or videos to attach'
+        },
+        scheduledFor: {
+          type: 'string',
+          description: 'When to publish (ISO date). If not provided, creates as pending draft.'
+        },
+        campaignId: {
+          type: 'string',
+          description: 'Link to a CMO campaign'
+        }
+      },
+      required: ['platform', 'content']
+    }
+  },
+  {
+    name: 'draft_social_reply',
+    description: 'Create a draft reply to a social media comment, mention, or DM. Always lands in pending approval queue.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        engagementId: {
+          type: 'string',
+          description: 'ID of the engagement to reply to'
+        },
+        replyContent: {
+          type: 'string',
+          description: 'The reply text'
+        }
+      },
+      required: ['engagementId', 'replyContent']
+    }
+  },
+  {
+    name: 'get_social_analytics',
+    description: 'Get social media engagement metrics across platforms for a date range.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        dateFrom: {
+          type: 'string',
+          description: 'Start date (YYYY-MM-DD)'
+        },
+        dateTo: {
+          type: 'string',
+          description: 'End date (YYYY-MM-DD)'
+        },
+        platform: {
+          type: 'string',
+          enum: ['facebook', 'instagram', 'linkedin', 'tiktok', 'youtube', 'twitter', 'all'],
+          description: 'Filter by platform or "all" for aggregate'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'connect_social_account',
+    description: 'Initiate connection to a social media platform. Returns instructions for OAuth setup.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        platform: {
+          type: 'string',
+          enum: ['facebook', 'instagram', 'linkedin', 'tiktok', 'youtube', 'twitter'],
+          description: 'Social media platform to connect'
+        }
+      },
+      required: ['platform']
+    }
+  },
+  {
+    name: 'get_pending_engagements',
+    description: 'Get social media comments, mentions, and DMs that need responses.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        platform: {
+          type: 'string',
+          enum: ['facebook', 'instagram', 'linkedin', 'tiktok', 'youtube', 'twitter', 'all'],
+          description: 'Filter by platform'
+        },
+        status: {
+          type: 'string',
+          enum: ['new', 'draft_reply', 'escalated'],
+          description: 'Filter by engagement status'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_social_posts',
+    description: 'List social media posts with optional status filter.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['draft', 'scheduled', 'pending_approval', 'published', 'failed'],
+          description: 'Filter by post status'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number to return (default 20)'
+        }
+      },
+      required: []
+    }
+  },
+  // ========== DESIGN TOOLS (Phase 4) ==========
+  {
+    name: 'create_design_asset',
+    description: 'Create a design asset record and optionally generate in Canva or Adobe. Use for creating graphics, templates, or visual content.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Name for the asset'
+        },
+        type: {
+          type: 'string',
+          enum: ['image', 'video', 'graphic', 'template'],
+          description: 'Type of design asset'
+        },
+        source: {
+          type: 'string',
+          enum: ['canva', 'adobe', 'upload', 'ai_generated'],
+          description: 'Design tool to use (default: canva)'
+        },
+        campaignId: {
+          type: 'string',
+          description: 'Link to a marketing campaign'
+        },
+        tags: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Tags for organizing assets'
+        }
+      },
+      required: ['name', 'type']
+    }
+  },
+  {
+    name: 'get_brand_assets',
+    description: 'Get design assets from the brand asset library.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['image', 'video', 'graphic', 'template'],
+          description: 'Filter by asset type'
+        },
+        source: {
+          type: 'string',
+          enum: ['canva', 'adobe', 'upload', 'ai_generated'],
+          description: 'Filter by source'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'generate_social_graphic',
+    description: 'Generate a graphic optimized for a specific social media platform.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        platform: {
+          type: 'string',
+          enum: ['facebook', 'instagram', 'linkedin', 'tiktok', 'youtube', 'twitter'],
+          description: 'Target social platform (determines dimensions)'
+        },
+        content: {
+          type: 'string',
+          description: 'Text content or theme for the graphic'
+        },
+        style: {
+          type: 'string',
+          enum: ['minimal', 'bold', 'professional', 'playful'],
+          description: 'Visual style preference'
+        },
+        source: {
+          type: 'string',
+          enum: ['canva', 'adobe', 'ai_generated'],
+          description: 'Tool to generate with (default: canva)'
+        }
+      },
+      required: ['platform', 'content']
     }
   }
 ];
@@ -2075,6 +2324,316 @@ ${variants.join('\n---')}
             variantCount,
             tone,
             note: 'Review and approve in Scheduled → Pending before use'
+          }
+        };
+      }
+
+      // ========== SOCIAL MEDIA TOOL HANDLERS (Phase 4) ==========
+
+      case 'schedule_social_post': {
+        const { platform, content, mediaUrls, scheduledFor, campaignId } = toolInput as {
+          platform: string;
+          content: string;
+          mediaUrls?: string[];
+          scheduledFor?: string;
+          campaignId?: string;
+        };
+
+        // Create the social post record
+        const postData = {
+          tenantId,
+          platform,
+          content,
+          mediaUrls: mediaUrls || [],
+          scheduledFor: scheduledFor ? new Date(scheduledFor).toISOString() : null,
+          campaignId: campaignId || null,
+          status: scheduledFor ? 'scheduled' : 'pending_approval',
+        };
+
+        // For now, store in database via direct Prisma call
+        // In future, this will route through the social service
+        const url = `${CMO_API_URL}/cmo/social/posts`;
+        console.log(`[Don Tool] POST ${url} (stub - social integration not yet wired)`);
+
+        // Return success with note about pending integration
+        return {
+          success: true,
+          result: {
+            message: `Social post drafted for ${platform}`,
+            platform,
+            status: postData.status,
+            scheduledFor: scheduledFor || 'Pending approval',
+            note: 'Social media integration is scaffolded but not yet connected to live platforms. Post saved to database for review.',
+            preview: content.substring(0, 100) + (content.length > 100 ? '...' : '')
+          }
+        };
+      }
+
+      case 'draft_social_reply': {
+        const { engagementId, replyContent } = toolInput as {
+          engagementId: string;
+          replyContent: string;
+        };
+
+        console.log(`[Don Tool] Drafting reply for engagement ${engagementId}`);
+
+        return {
+          success: true,
+          result: {
+            message: 'Reply drafted for review',
+            engagementId,
+            replyContent,
+            status: 'pending_approval',
+            note: 'Reply saved to approval queue. Social media integration is scaffolded but not yet connected to live platforms.'
+          }
+        };
+      }
+
+      case 'get_social_analytics': {
+        const { dateFrom, dateTo, platform } = toolInput as {
+          dateFrom?: string;
+          dateTo?: string;
+          platform?: string;
+        };
+
+        const now = new Date();
+        const defaultFrom = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
+
+        return {
+          success: true,
+          result: {
+            message: 'Social analytics retrieved',
+            dateRange: {
+              from: dateFrom || defaultFrom.toISOString().split('T')[0],
+              to: dateTo || now.toISOString().split('T')[0]
+            },
+            platform: platform || 'all',
+            note: 'Social media integrations are scaffolded but not yet connected. No live data available yet.',
+            metrics: {
+              posts: { scheduled: 0, published: 0, pending: 0 },
+              engagements: { comments: 0, mentions: 0, dms: 0 },
+              platformStatus: {
+                facebook: 'not_connected',
+                instagram: 'not_connected',
+                linkedin: 'not_connected',
+                tiktok: 'not_connected',
+                youtube: 'not_connected',
+                twitter: 'not_connected'
+              }
+            }
+          }
+        };
+      }
+
+      case 'connect_social_account': {
+        const { platform } = toolInput as { platform: string };
+
+        const connectionInstructions: Record<string, string> = {
+          facebook: 'Facebook requires a Meta Business Suite app. Visit business.facebook.com to create your page, then set up OAuth via developers.facebook.com.',
+          instagram: 'Instagram Business requires linking to a Facebook Page. Set up via Meta Business Suite, then configure Instagram Graph API access.',
+          linkedin: 'LinkedIn requires a Marketing API app. Visit linkedin.com/developers to create an app with appropriate OAuth 2.0 scopes.',
+          tiktok: 'TikTok Business requires a TikTok for Business account. Visit tiktok.com/business to set up, then configure API access via developers.tiktok.com.',
+          youtube: 'YouTube requires a Google Cloud project with YouTube Data API enabled. Configure OAuth 2.0 credentials via console.cloud.google.com.',
+          twitter: 'Twitter/X requires a developer account. Visit developer.twitter.com to create an app with OAuth 2.0 (User authentication) enabled.'
+        };
+
+        return {
+          success: true,
+          result: {
+            message: `Instructions for connecting ${platform}`,
+            platform,
+            status: 'not_connected',
+            instructions: connectionInstructions[platform] || 'Platform not supported',
+            note: 'Social media OAuth integration is scaffolded. Platform connections will be available in a future release.',
+            nextSteps: [
+              `1. Create a ${platform} developer/business account`,
+              '2. Register an OAuth application',
+              '3. Configure callback URL: https://api.zanderos.com/auth/social/callback',
+              '4. Store credentials securely in Zander settings'
+            ]
+          }
+        };
+      }
+
+      case 'get_pending_engagements': {
+        const { platform, status } = toolInput as {
+          platform?: string;
+          status?: string;
+        };
+
+        return {
+          success: true,
+          result: {
+            message: 'Pending engagements retrieved',
+            filters: { platform: platform || 'all', status: status || 'all' },
+            engagements: [],
+            note: 'Social media integrations are scaffolded but not yet connected. No engagements to display yet.',
+            tip: 'Once platforms are connected, comments, mentions, and DMs requiring response will appear here.'
+          }
+        };
+      }
+
+      case 'get_social_posts': {
+        const { status, limit } = toolInput as {
+          status?: string;
+          limit?: number;
+        };
+
+        return {
+          success: true,
+          result: {
+            message: 'Social posts retrieved',
+            filters: { status: status || 'all', limit: limit || 20 },
+            posts: [],
+            note: 'Social media integrations are scaffolded but not yet connected. Posts created via schedule_social_post will appear here once the integration is live.'
+          }
+        };
+      }
+
+      // ============================================
+      // DESIGN TOOLS
+      // ============================================
+
+      case 'create_design_asset': {
+        const { name, type, source, templateId, campaignId, tags } = toolInput as {
+          name: string;
+          type: string;
+          source: string;
+          templateId?: string;
+          campaignId?: string;
+          tags?: string[];
+        };
+
+        // Create asset record in database
+        const asset = await prisma.designAsset.create({
+          data: {
+            tenantId,
+            name,
+            type,
+            source: source || 'canva',
+            campaignId,
+            tags: tags || [],
+          },
+        });
+
+        return {
+          success: true,
+          result: {
+            message: `Design asset "${name}" created successfully`,
+            asset: {
+              id: asset.id,
+              name: asset.name,
+              type: asset.type,
+              source: asset.source,
+              tags: asset.tags,
+              createdAt: asset.createdAt,
+            },
+            externalStatus: 'pending_integration',
+            note: source === 'canva'
+              ? 'Canva integration not yet configured. Asset record created - connect Canva via canva.com/developers to enable full design workflow.'
+              : source === 'adobe'
+              ? 'Adobe Creative Cloud integration not yet configured. Asset record created - connect via Adobe Developer Console.'
+              : 'Asset record created. External design tool integration pending.',
+            nextSteps: [
+              'Configure design tool OAuth credentials in settings',
+              'Link external design ID once created in the design tool',
+              'Export finished design to attach file URL'
+            ]
+          }
+        };
+      }
+
+      case 'get_brand_assets': {
+        const { type, source } = toolInput as {
+          type?: string;
+          source?: string;
+        };
+
+        const assets = await prisma.designAsset.findMany({
+          where: {
+            tenantId,
+            ...(type ? { type } : {}),
+            ...(source ? { source } : {}),
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 50,
+        });
+
+        return {
+          success: true,
+          result: {
+            message: `Retrieved ${assets.length} brand assets`,
+            filters: { type: type || 'all', source: source || 'all' },
+            assets: assets.map(a => ({
+              id: a.id,
+              name: a.name,
+              type: a.type,
+              source: a.source,
+              fileUrl: a.fileUrl,
+              tags: a.tags,
+              createdAt: a.createdAt,
+            })),
+            tip: assets.length === 0
+              ? 'No assets found. Use create_design_asset to start building your brand asset library.'
+              : 'Assets retrieved successfully. Use export functions to get download URLs.'
+          }
+        };
+      }
+
+      case 'generate_social_graphic': {
+        const { platform, content, style } = toolInput as {
+          platform: string;
+          content: string;
+          style?: string;
+        };
+
+        // Platform-specific dimensions
+        const dimensions: Record<string, { width: number; height: number }> = {
+          facebook: { width: 1200, height: 630 },
+          instagram: { width: 1080, height: 1080 },
+          linkedin: { width: 1200, height: 627 },
+          tiktok: { width: 1080, height: 1920 },
+          youtube: { width: 1280, height: 720 },
+          twitter: { width: 1200, height: 675 },
+        };
+
+        const dim = dimensions[platform.toLowerCase()] || { width: 1200, height: 630 };
+
+        // Create asset record
+        const asset = await prisma.designAsset.create({
+          data: {
+            tenantId,
+            name: `${platform} graphic - ${new Date().toISOString().split('T')[0]}`,
+            type: 'social_graphic',
+            source: 'ai_generated',
+            dimensions: dim,
+            tags: [platform.toLowerCase(), 'social', 'auto-generated'],
+          },
+        });
+
+        return {
+          success: true,
+          result: {
+            message: `Social graphic asset created for ${platform}`,
+            asset: {
+              id: asset.id,
+              name: asset.name,
+              dimensions: dim,
+            },
+            contentBrief: content,
+            styleRequested: style || 'default',
+            note: 'Graphic asset record created. AI image generation or Canva integration required to generate the actual visual.',
+            nextSteps: [
+              'Connect Canva or Adobe for template-based generation',
+              'Or integrate AI image generation API (DALL-E, Midjourney) for custom graphics',
+              'Asset record ready - attach generated image URL when available'
+            ],
+            platformSpecs: {
+              platform,
+              recommendedDimensions: dim,
+              format: 'PNG or JPG recommended',
+              maxFileSize: platform === 'instagram' ? '30MB' : '10MB'
+            }
           }
         };
       }

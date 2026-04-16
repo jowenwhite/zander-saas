@@ -7,146 +7,88 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum DealStage {
-  LEAD
-  PROSPECT
-  QUALIFIED
-  PROPOSAL
-  NEGOTIATION
-  CLOSED_WON
-  CLOSED_LOST
-}
-
-enum DealPriority {
-  LOW
-  MEDIUM
-  HIGH
-  CRITICAL
-}
-
-enum PersonRole {
-  CLIENT
-  VENDOR
-  TEAM
-  PARTNER
-  REFERRAL
-}
-
-enum ProductType {
-  PHYSICAL
-  SERVICE
-  SUBSCRIPTION
-  DIGITAL
-  ACCESS
-  BUNDLE
-}
-
-enum ProductStatus {
-  ACTIVE
-  DRAFT
-  DISCONTINUED
-}
-
-enum PricingModel {
-  SIMPLE
-  TIERED
-  TIME_MATERIALS
-  SUBSCRIPTION
-  COST_PLUS
-  CUSTOM
-}
-
 model Tenant {
   id                      String                   @id @default(cuid())
   companyName             String
   subdomain               String                   @unique
-  tenantType              String                   @default("standard")
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
-  users                   User[]
-  contacts                Contact[]
-  deals                   Deal[]
-  activities              Activity[]
-  pipelineStages          PipelineStage[]
-  forms                   Form[]
-  emailTemplates          EmailTemplate[]
-  emailSequences          EmailSequence[]
-  scheduledCommunications ScheduledCommunication[]
-  emailMessages           EmailMessage[]
-  smsMessages             SmsMessage[]
-  callLogs                CallLog[]
-  calendarEvents          CalendarEvent[]
-  userTenantAccess        UserTenantAccess[]
-  products                Product[]
-  campaigns               Campaign[]
-  // Subscription fields
-  // Valid subscriptionTier values: FREE, STARTER, PRO, BUSINESS, ENTERPRISE
-  stripeCustomerId        String?                  @map("stripe_customer_id")
-  stripeSubscriptionId    String?                  @map("stripe_subscription_id")
-  subscriptionStatus      String?                  @map("subscription_status")
-  subscriptionTier        String                   @default("FREE") @map("subscription_tier")
-  subscriptionCohort      String?                  @map("subscription_cohort")
-  trialEndsAt             DateTime?
   rateLockExpiresAt       DateTime?
-  // Trial and override fields for tier management
-  trialTier               String?                  @map("trial_tier")
-  trialStartDate          DateTime?                @map("trial_start_date")
-  trialEndDate            DateTime?                @map("trial_end_date")
-  tierOverride            String?                  @map("tier_override")
-  tierOverrideNote        String?                  @map("tier_override_note")
-  // Token usage tracking (monthly rollup for fast cap checking)
-  monthlyTokensUsed       Int                      @default(0) @map("monthly_tokens_used")
-  tokenResetDate          DateTime?                @map("token_reset_date")
-  // Company settings
-  website                 String?
-  email                   String?
-  phone                   String?
+  tenantType              String                   @default("standard")
+  trialEndsAt             DateTime?
   address                 String?
   city                    String?
-  state                   String?
-  zip                     String?
-  industry                String?
-  fiscalYearStart         Int?                     @default(1)
   currency                String?                  @default("USD")
+  email                   String?
+  fiscalYearStart         Int?                     @default(1)
+  industry                String?
+  phone                   String?
+  state                   String?
   taxRate                 Float?                   @default(0)
-  headwinds               Headwind[]
-  supportTickets          SupportTicket[]
-  // CMO Module relations
-  workflows               Workflow[]
-  funnels                 Funnel[]
-  personas                Persona[]
-  monthlyThemes           MonthlyTheme[]
-  ideaParkingLot          IdeaParkingLot[]
-  segments                Segment[]
-  contentAssets           ContentAsset[]
-  brandProfile            BrandProfile?
-  marketingPlan           MarketingPlan?
-  // EA Module relations
-  tasks                   Task[]
-  tokenUsage              TokenUsage[]
-  // Assembly Module relations
+  website                 String?
+  zip                     String?
+  monthlyTokensUsed       Int                      @default(0) @map("monthly_tokens_used")
+  stripeCustomerId        String?                  @map("stripe_customer_id")
+  stripeSubscriptionId    String?                  @map("stripe_subscription_id")
+  subscriptionCohort      String?                  @map("subscription_cohort")
+  subscriptionStatus      String?                  @map("subscription_status")
+  subscriptionTier        String                   @default("FREE") @map("subscription_tier")
+  tierOverride            String?                  @map("tier_override")
+  tierOverrideNote        String?                  @map("tier_override_note")
+  tokenResetDate          DateTime?                @map("token_reset_date")
+  trialEndDate            DateTime?                @map("trial_end_date")
+  trialStartDate          DateTime?                @map("trial_start_date")
+  trialTier               String?                  @map("trial_tier")
+  archivedAt              DateTime?                @map("archived_at")
+  currentChurnRiskLevel   String?                  @map("current_churn_risk_level")
+  currentEngagementScore  Float?                   @map("current_engagement_score")
+  lastActivityAt          DateTime?                @map("last_activity_at")
+  activities              Activity[]
   assemblies              Assembly[]
-  // HQ Goals Module relations
+  calendarEvents          CalendarEvent[]
+  calendlyCredential      CalendlyCredential?
+  callLogs                CallLog[]
+  campaigns               Campaign[]
+  brandProfile            BrandProfile?
+  contentAssets           ContentAsset[]
+  funnels                 Funnel[]
+  ideaParkingLot          IdeaParkingLot[]
+  marketingPlan           MarketingPlan?
+  monthlyThemes           MonthlyTheme[]
+  personas                Persona[]
+  segments                Segment[]
+  workflows               Workflow[]
+  contacts                Contact[]
+  deals                   Deal[]
+  emailMessages           EmailMessage[]
+  emailSequences          EmailSequence[]
+  emailSignatures         EmailSignature[]
+  emailTemplates          EmailTemplate[]
+  forms                   Form[]
+  foundingDocument        FoundingDocument?
+  googleTokens            GoogleToken[]
+  headwinds               Headwind[]
   hqGoals                 HQGoal[]
-  // HQ Keystones & Ledger relations
   keystones               Keystone[]
   ledgerEntries           LedgerEntry[]
-  // HQ Founding & Legacy relations
-  foundingDocument        FoundingDocument?
   legacyMilestones        LegacyMilestone[]
-  // Integration credentials (tenant-scoped)
-  twilioCredential        TwilioCredential?
-  calendlyCredential      CalendlyCredential?
-  googleTokens            GoogleToken[]
-  emailSignatures         EmailSignature[]
-  // Phase 1: Tenant monitoring fields
-  archivedAt              DateTime?                @map("archived_at")
-  lastActivityAt          DateTime?                @map("last_activity_at")
-  currentEngagementScore  Float?                   @map("current_engagement_score")
-  currentChurnRiskLevel   String?                  @map("current_churn_risk_level")
-  // Phase 1: Activity & engagement relations
+  pipelineStages          PipelineStage[]
+  products                Product[]
+  scheduledCommunications ScheduledCommunication[]
+  smsMessages             SmsMessage[]
+  supportTickets          SupportTicket[]
+  tasks                   Task[]
   activityLogs            TenantActivityLog[]
+  tokenUsage              TokenUsage[]
+  twilioCredential        TwilioCredential?
   engagementSnapshots     UserEngagementSnapshot[]
+  userTenantAccess        UserTenantAccess[]
+  users                   User[]
+  // Social media integration (Phase 4)
+  socialAccounts          SocialAccount[]
+  socialPosts             SocialPost[]
+  socialEngagements       SocialEngagement[]
+  designAssets            DesignAsset[]
 
   @@map("tenants")
 }
@@ -157,64 +99,52 @@ model User {
   email                 String             @unique
   firstName             String
   lastName              String
-  password              String             @default("")
-  phone                 String?
-  role                  String             @default("member")
-  isSuperAdmin          Boolean            @default(false)
-  resetToken            String?
-  resetTokenExpiry      DateTime?
-  // User preferences
-  timezone              String?            @default("America/New_York")
-  emailNotifications    Boolean            @default(true)
-  dealAlerts            Boolean            @default(true)
-  taskReminders         Boolean            @default(true)
-  assemblyReminders     Boolean            @default(true)
-  weeklyDigest          Boolean            @default(true)
-  // Two-Factor Authentication
-  twoFactorEnabled      Boolean            @default(false)
-  twoFactorSecret       String?
-  // Terms & Conditions
-  termsAcceptedAt       DateTime?
-  termsVersion          String?
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
-  tenant                Tenant             @relation(fields: [tenantId], references: [id])
+  password              String             @default("")
+  firstLoginAt          DateTime?
+  isSuperAdmin          Boolean            @default(false)
+  onboardingChecklist   Json?
+  onboardingCompleted   Boolean            @default(false)
+  onboardingFocusArea   String?
+  onboardingStep        Int                @default(0)
+  phone                 String?
+  resetToken            String?
+  resetTokenExpiry      DateTime?
+  role                  String             @default("member")
+  assemblyReminders     Boolean            @default(true)
+  dealAlerts            Boolean            @default(true)
+  emailNotifications    Boolean            @default(true)
+  taskReminders         Boolean            @default(true)
+  timezone              String?            @default("America/New_York")
+  weeklyDigest          Boolean            @default(true)
+  twoFactorEnabled      Boolean            @default(false)
+  twoFactorSecret       String?
+  termsAcceptedAt       DateTime?
+  termsVersion          String?
   activities            Activity[]
   calendarEvents        CalendarEvent[]
+  campaignsCreated      Campaign[]         @relation("CampaignCreatedBy")
+  contactsAssigned      Contact[]          @relation("ContactAssignedTo")
+  contactsOwned         Contact[]          @relation("ContactOwner")
+  dealsAssigned         Deal[]             @relation("DealAssignedTo")
+  dealsOwned            Deal[]             @relation("DealOwner")
+  emailsSent            EmailMessage[]     @relation("UserEmails")
+  emailSignatures       EmailSignature[]
   eventAttendees        EventAttendee[]
-  googleToken           GoogleToken?
-  microsoftToken        MicrosoftToken?
-  tenantAccess          UserTenantAccess[]
   formSubmissionUpdates FormSubmission[]
-
-  // Onboarding
-  onboardingCompleted Boolean            @default(false)
-  onboardingStep      Int                @default(0)
-  onboardingFocusArea String?
-  onboardingChecklist Json?
-  firstLoginAt        DateTime?
-  // Support Admin
-  headwindsCreated    Headwind[]         @relation("HeadwindCreatedBy")
-  headwindsAssigned   Headwind[]         @relation("HeadwindAssignedTo")
-  knowledgeArticles   KnowledgeArticle[] @relation("KnowledgeCreatedBy")
-  supportTickets      SupportTicket[]
-
-  // HIGH-3: User-level data isolation relations
-  dealsOwned       Deal[]         @relation("DealOwner")
-  dealsAssigned    Deal[]         @relation("DealAssignedTo")
-  contactsOwned    Contact[]      @relation("ContactOwner")
-  contactsAssigned Contact[]      @relation("ContactAssignedTo")
-  emailsSent       EmailMessage[] @relation("UserEmails")
-  smsSent          SmsMessage[]   @relation("UserSms")
-  campaignsCreated Campaign[]     @relation("CampaignCreatedBy")
-  formsCreated     Form[]         @relation("FormCreatedBy")
-
-  // EA Module - Task relations
-  tasksAssigned Task[] @relation("TaskAssignee")
-  tasksCreated  Task[] @relation("TaskCreator")
-
-  // Email Signatures
-  emailSignatures EmailSignature[]
+  formsCreated          Form[]             @relation("FormCreatedBy")
+  googleToken           GoogleToken?
+  headwindsAssigned     Headwind[]         @relation("HeadwindAssignedTo")
+  headwindsCreated      Headwind[]         @relation("HeadwindCreatedBy")
+  knowledgeArticles     KnowledgeArticle[] @relation("KnowledgeCreatedBy")
+  microsoftToken        MicrosoftToken?
+  smsSent               SmsMessage[]       @relation("UserSms")
+  supportTickets        SupportTicket[]
+  tasksAssigned         Task[]             @relation("TaskAssignee")
+  tasksCreated          Task[]             @relation("TaskCreator")
+  tenantAccess          UserTenantAccess[]
+  tenant                Tenant             @relation(fields: [tenantId], references: [id])
 
   @@map("users")
 }
@@ -225,8 +155,8 @@ model UserTenantAccess {
   tenantId  String
   role      String   @default("member")
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, tenantId])
   @@map("user_tenant_access")
@@ -235,46 +165,45 @@ model UserTenantAccess {
 model Contact {
   id                      String                   @id @default(cuid())
   tenantId                String
-  ownerId                 String?
-  assignedToId            String?
   firstName               String
   lastName                String
   email                   String
-  phone                   String?
-  role                    String                   @default("member")
-  primaryRole             PersonRole               @default(CLIENT)
-  isSuperAdmin            Boolean                  @default(false)
-  resetToken              String?
-  resetTokenExpiry        DateTime?
-  company                 String?
-  title                   String?
-  source                  String?
-  notes                   String?
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
-  tenant                  Tenant                   @relation(fields: [tenantId], references: [id])
-  owner                   User?                    @relation("ContactOwner", fields: [ownerId], references: [id])
-  assignedTo              User?                    @relation("ContactAssignedTo", fields: [assignedToId], references: [id])
-  activities              Activity[]
-  deals                   Deal[]
-  formSubmissions         FormSubmission[]
-  sequenceEnrollments     SequenceEnrollment[]
-  scheduledCommunications ScheduledCommunication[]
-  emailMessages           EmailMessage[]
-  smsMessages             SmsMessage[]
-  callLogs                CallLog[]
-  calendarEvents          CalendarEvent[]
-  eventAttendees          EventAttendee[]
-  campaignEnrollments     CampaignEnrollment[]
-  // CMO Module fields
-  leadScore               Int                      @default(0)
-  marketingTags           String[]                 @default([])
+  company                 String?
+  notes                   String?
+  phone                   String?
+  source                  String?
+  title                   String?
+  isSuperAdmin            Boolean                  @default(false)
+  primaryRole             PersonRole               @default(CLIENT)
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  role                    String                   @default("member")
   lastMarketingActivity   DateTime?
+  leadScore               Int                      @default(0)
   lifecycleStage          String                   @default("subscriber")
+  marketingTags           String[]                 @default([])
   personaId               String?
-  persona                 Persona?                 @relation(fields: [personaId], references: [id])
+  assignedToId            String?
+  ownerId                 String?
+  activities              Activity[]
+  calendarEvents          CalendarEvent[]
+  callLogs                CallLog[]
+  campaignEnrollments     CampaignEnrollment[]
   segmentMemberships      ContactSegment[]
   workflowExecutions      WorkflowExecution[]
+  assignedTo              User?                    @relation("ContactAssignedTo", fields: [assignedToId], references: [id])
+  owner                   User?                    @relation("ContactOwner", fields: [ownerId], references: [id])
+  persona                 Persona?                 @relation(fields: [personaId], references: [id])
+  tenant                  Tenant                   @relation(fields: [tenantId], references: [id])
+  deals                   Deal[]
+  emailMessages           EmailMessage[]
+  eventAttendees          EventAttendee[]
+  formSubmissions         FormSubmission[]
+  scheduledCommunications ScheduledCommunication[]
+  sequenceEnrollments     SequenceEnrollment[]
+  smsMessages             SmsMessage[]
 
   @@index([ownerId])
   @@index([assignedToId])
@@ -286,28 +215,19 @@ model Deal {
   tenantId          String
   dealName          String
   contactId         String?
-  ownerId           String?
-  assignedToId      String?
   dealValue         Float
   probability       Int               @default(50)
-  stage             String            @default("Lead")
-  priority          DealPriority      @default(MEDIUM)
   status            String            @default("open")
-  expectedCloseDate DateTime?
-  actualCloseDate   DateTime?
-  forecastedValue   Float?
-  winProbability    Float             @default(0.5)
-  notes             String?
-  nextSteps         String?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
-  tenant            Tenant            @relation(fields: [tenantId], references: [id])
-  activities        Activity[]
-  contact           Contact?          @relation(fields: [contactId], references: [id])
-  owner             User?     @relation("DealOwner", fields: [ownerId], references: [id])
-  assignedTo        User?     @relation("DealAssignedTo", fields: [assignedToId], references: [id])
-  lineItems         ProjectLineItem[]
-  // Archive & Loss tracking
+  actualCloseDate   DateTime?
+  expectedCloseDate DateTime?
+  forecastedValue   Float?
+  nextSteps         String?
+  notes             String?
+  priority          DealPriority      @default(MEDIUM)
+  winProbability    Float             @default(0.5)
+  stage             String            @default("Lead")
   isArchived        Boolean           @default(false)
   archivedAt        DateTime?
   archiveReason     String?
@@ -315,7 +235,14 @@ model Deal {
   lostAt            DateTime?
   lossReason        String?
   stageAtLoss       String?
-
+  assignedToId      String?
+  ownerId           String?
+  activities        Activity[]
+  assignedTo        User?             @relation("DealAssignedTo", fields: [assignedToId], references: [id])
+  contact           Contact?          @relation(fields: [contactId], references: [id])
+  owner             User?             @relation("DealOwner", fields: [ownerId], references: [id])
+  tenant            Tenant            @relation(fields: [tenantId], references: [id])
+  lineItems         ProjectLineItem[]
 
   @@index([ownerId])
   @@index([assignedToId])
@@ -367,8 +294,8 @@ model ProjectLineItem {
   sortOrder     Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  project       Deal     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   product       Product? @relation(fields: [productId], references: [id])
+  project       Deal     @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
   @@index([productId])
@@ -378,7 +305,7 @@ model ProjectLineItem {
 model Activity {
   id          String   @id @default(cuid())
   tenantId    String
-  type        String // 'email', 'call', 'meeting', 'note', 'task'
+  type        String
   subject     String?
   description String?
   date        DateTime @default(now())
@@ -387,9 +314,9 @@ model Activity {
   userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
   contact     Contact? @relation(fields: [contactId], references: [id])
   deal        Deal?    @relation(fields: [dealId], references: [id])
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([tenantId])
@@ -415,18 +342,18 @@ model PipelineStage {
 model Form {
   id          String           @id @default(cuid())
   tenantId    String
-  createdById String?
   name        String
   description String?
   fields      Json             @default("[]")
   settings    Json             @default("{}")
   status      String           @default("draft")
-  formType    String           @default("form") // "form" | "sop"
-  submissions FormSubmission[]
+  formType    String           @default("form")
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  tenant      Tenant           @relation(fields: [tenantId], references: [id])
+  createdById String?
+  submissions FormSubmission[]
   createdBy   User?            @relation("FormCreatedBy", fields: [createdById], references: [id])
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
 
   @@index([createdById])
   @@map("forms")
@@ -438,14 +365,14 @@ model FormSubmission {
   data            Json
   contactId       String?
   calendarEventId String?
-  status          String   @default("draft") // "draft" | "completed"
+  status          String   @default("draft")
   version         Int      @default(1)
-  changeLog       Json     @default("[]") // Array of { version, updatedAt, updatedById, changes }
+  changeLog       Json     @default("[]")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   updatedById     String?
-  form            Form     @relation(fields: [formId], references: [id])
   contact         Contact? @relation(fields: [contactId], references: [id])
+  form            Form     @relation(fields: [formId], references: [id])
   updatedBy       User?    @relation(fields: [updatedById], references: [id])
 
   @@map("form_submissions")
@@ -457,15 +384,15 @@ model EmailTemplate {
   name          String
   subject       String?
   body          String?
-  type          String              @default("email") // email, sms, call
+  type          String              @default("email")
   category      String?
   stage         String?
-  status        String              @default("draft") // draft, active
+  status        String              @default("draft")
   variables     Json                @default("[]")
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
-  tenant        Tenant              @relation(fields: [tenantId], references: [id])
   sequenceSteps EmailSequenceStep[]
+  tenant        Tenant              @relation(fields: [tenantId], references: [id])
 
   @@map("email_templates")
 }
@@ -475,13 +402,13 @@ model EmailSequence {
   tenantId      String
   name          String
   description   String?
-  status        String               @default("draft") // draft, active, paused
-  triggerType   String? // manual, stage_change, form_submission
+  status        String               @default("draft")
+  triggerType   String?
   triggerConfig Json                 @default("{}")
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
-  tenant        Tenant               @relation(fields: [tenantId], references: [id])
   steps         EmailSequenceStep[]
+  tenant        Tenant               @relation(fields: [tenantId], references: [id])
   enrollments   SequenceEnrollment[]
 
   @@map("email_sequences")
@@ -507,12 +434,12 @@ model SequenceEnrollment {
   sequenceId  String
   contactId   String
   dealId      String?
-  status      String        @default("active") // active, completed, paused, cancelled
+  status      String        @default("active")
   currentStep Int           @default(0)
   enrolledAt  DateTime      @default(now())
   completedAt DateTime?
-  sequence    EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
   contact     Contact       @relation(fields: [contactId], references: [id])
+  sequence    EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
 
   @@map("sequence_enrollments")
 }
@@ -520,23 +447,23 @@ model SequenceEnrollment {
 model ScheduledCommunication {
   id             String    @id @default(cuid())
   tenantId       String
-  contactId      String?   // Nullable for ad-hoc recipients (vendors, support, external parties)
-  recipientEmail String?   // Stores email for ad-hoc communications when contactId is null
-  recipientName  String?   // Optional name for ad-hoc recipients
+  contactId      String?
   dealId         String?
   templateId     String?
-  type           String    // email, sms, call
+  type           String
   subject        String?
   body           String?
   scheduledFor   DateTime
-  status         String    @default("pending") // pending, approved, sent, cancelled
+  status         String    @default("pending")
   needsApproval  Boolean   @default(false)
   sentAt         DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-  createdBy      String?   // Track which AI executive created this (e.g., "pam-ai", "jordan-ai")
-  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  createdBy      String?
+  recipientEmail String?
+  recipientName  String?
   contact        Contact?  @relation(fields: [contactId], references: [id])
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
 
   @@map("scheduled_communications")
 }
@@ -546,17 +473,16 @@ model EmailMessage {
   tenantId    String
   contactId   String?
   dealId      String?
-  userId      String?
-  direction   String // 'inbound' | 'outbound'
+  direction   String
   fromAddress String
   toAddress   String
   subject     String
   body        String
   htmlBody    String?
-  messageId   String? // Resend message ID
-  inReplyTo   String? // For threading - references parent messageId
-  threadId    String? // Groups related emails
-  status      String    @default("sent") // sent, delivered, opened, failed, received
+  messageId   String?
+  inReplyTo   String?
+  threadId    String?
+  status      String    @default("sent")
   isRead      Boolean   @default(false)
   isArchived  Boolean   @default(false)
   isDeleted   Boolean   @default(false)
@@ -564,8 +490,9 @@ model EmailMessage {
   openedAt    DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  userId      String?
   contact     Contact?  @relation(fields: [contactId], references: [id])
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
   user        User?     @relation("UserEmails", fields: [userId], references: [id])
 
   @@index([tenantId])
@@ -580,17 +507,17 @@ model EmailSignature {
   id        String   @id @default(cuid())
   userId    String
   tenantId  String
-  name      String   // e.g., "Jonathan White - MCF" or "Jonathan White - Zander"
-  body      String   // Rich text/HTML signature content
+  name      String
+  body      String
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
+  @@unique([userId, name])
   @@index([userId])
   @@index([tenantId])
-  @@unique([userId, name]) // Prevent duplicate signature names per user
   @@map("email_signatures")
 }
 
@@ -599,19 +526,19 @@ model SmsMessage {
   tenantId    String
   contactId   String?
   dealId      String?
-  userId      String?
-  direction   String // 'inbound' | 'outbound'
+  direction   String
   fromNumber  String
   toNumber    String
   body        String
-  messageSid  String? // Twilio message SID
-  status      String    @default("sent") // sent, delivered, failed, received
+  messageSid  String?
+  status      String    @default("sent")
   sentAt      DateTime
   deliveredAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  userId      String?
   contact     Contact?  @relation(fields: [contactId], references: [id])
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
   user        User?     @relation("UserSms", fields: [userId], references: [id])
 
   @@index([tenantId])
@@ -626,37 +553,30 @@ model CallLog {
   tenantId            String
   contactId           String?
   dealId              String?
-  userId              String? // Who made/received the call
-  // Call Type & Direction
-  type                String // 'online_meeting' | 'voicemail_drop' | 'manual_call'
-  direction           String // 'inbound' | 'outbound'
-  // Phone/Meeting Details
+  userId              String?
+  type                String
+  direction           String
   fromNumber          String?
   toNumber            String?
-  platform            String? // 'zoom' | 'google_meet' | 'teams' | 'twilio' | 'phone'
+  platform            String?
   meetingUrl          String?
-  meetingId           String? // External meeting ID
-  // Call Outcome & Duration
-  duration            Int? // Duration in seconds
-  outcome             String? // 'completed' | 'voicemail' | 'no_answer' | 'busy' | 'cancelled' | 'scheduled'
-  status              String    @default("completed") // 'scheduled' | 'in_progress' | 'completed' | 'missed'
-  // Scripts & Notes
-  scriptId            String? // Reference to template/script used
+  meetingId           String?
+  duration            Int?
+  outcome             String?
+  status              String    @default("completed")
+  scriptId            String?
   notes               String?
-  // Recording & Transcription
   recordingUrl        String?
-  transcription       String? // Full transcription text
-  aiSummary           String? // AI-generated summary
-  // Voicemail Drop specific
-  voicemailTemplateId String? // Pre-recorded voicemail template
-  // Timestamps
+  transcription       String?
+  aiSummary           String?
+  voicemailTemplateId String?
   scheduledAt         DateTime?
   startedAt           DateTime?
   endedAt             DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
-  tenant              Tenant    @relation(fields: [tenantId], references: [id])
   contact             Contact?  @relation(fields: [contactId], references: [id])
+  tenant              Tenant    @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId])
   @@index([contactId])
@@ -669,57 +589,48 @@ model CalendarEvent {
   id                      String          @id @default(cuid())
   tenantId                String
   createdById             String
-  // Event Details
   title                   String
   description             String?
   location                String?
   meetingUrl              String?
-  meetingPlatform         String? // 'zoom' | 'google_meet' | 'teams' | 'phone' | 'in_person'
-  // Timing
+  meetingPlatform         String?
   startTime               DateTime
   endTime                 DateTime
   allDay                  Boolean         @default(false)
   timezone                String          @default("America/New_York")
-  // Type & Classification
-  eventType               String          @default("meeting") // 'meeting' | 'call' | 'task' | 'reminder' | 'block' | 'shift'
-  category                String? // 'client' | 'internal' | 'personal' | 'work_shift'
-  priority                String          @default("normal") // 'low' | 'normal' | 'high' | 'urgent'
+  eventType               String          @default("meeting")
+  category                String?
+  priority                String          @default("normal")
   color                   String?
-  // Recording Compliance
   willBeRecorded          Boolean         @default(false)
-  recordingConsentStatus  String? // 'pending' | 'obtained' | 'declined'
+  recordingConsentStatus  String?
   recordingConsentAt      DateTime?
   recordingDisclosureSent Boolean         @default(false)
-  // Linked Entities
   contactId               String?
   dealId                  String?
   callLogId               String?
-  // Agenda & Preparation
   agenda                  String?
-  attachedItems           Json? // Array of { treasuryItemId, type, name } from Treasury
+  attachedItems           Json?
   attachments             Json?           @default("[]")
   prepNotes               String?
-  // External Sync
   externalEventId         String?
-  externalCalendar        String? // 'google' | 'outlook' | 'calendly'
-  syncStatus              String? // 'synced' | 'pending' | 'conflict'
+  externalCalendar        String?
+  syncStatus              String?
   lastSyncedAt            DateTime?
-  // Status
-  status                  String          @default("scheduled") // 'scheduled' | 'confirmed' | 'tentative' | 'cancelled' | 'completed'
+  status                  String          @default("scheduled")
   createdAt               DateTime        @default(now())
   updatedAt               DateTime        @updatedAt
-  tenant                  Tenant          @relation(fields: [tenantId], references: [id])
-  createdBy               User            @relation(fields: [createdById], references: [id])
-  contact                 Contact?        @relation(fields: [contactId], references: [id])
-  attendees               EventAttendee[]
-  reminders               EventReminder[]
-  // CMO Module fields
-  linkedCampaignId        String?
-  monthlyThemeId          String?
-  marketingChannel        String?
   contentStatus           String?
+  linkedCampaignId        String?
+  marketingChannel        String?
+  monthlyThemeId          String?
+  contact                 Contact?        @relation(fields: [contactId], references: [id])
+  createdBy               User            @relation(fields: [createdById], references: [id])
   linkedCampaign          Campaign?       @relation(fields: [linkedCampaignId], references: [id])
   monthlyTheme            MonthlyTheme?   @relation(fields: [monthlyThemeId], references: [id])
+  tenant                  Tenant          @relation(fields: [tenantId], references: [id])
+  attendees               EventAttendee[]
+  reminders               EventReminder[]
 
   @@index([tenantId])
   @@index([createdById])
@@ -736,16 +647,16 @@ model EventAttendee {
   contactId              String?
   email                  String?
   name                   String?
-  responseStatus         String        @default("pending") // 'pending' | 'accepted' | 'declined' | 'tentative'
+  responseStatus         String        @default("pending")
   respondedAt            DateTime?
-  recordingConsentStatus String? // 'pending' | 'consented' | 'declined'
+  recordingConsentStatus String?
   recordingConsentAt     DateTime?
   inviteSentAt           DateTime?
   reminderSentAt         DateTime?
   createdAt              DateTime      @default(now())
+  contact                Contact?      @relation(fields: [contactId], references: [id])
   event                  CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user                   User?         @relation(fields: [userId], references: [id])
-  contact                Contact?      @relation(fields: [contactId], references: [id])
 
   @@index([eventId])
   @@index([userId])
@@ -756,8 +667,8 @@ model EventAttendee {
 model EventReminder {
   id      String        @id @default(cuid())
   eventId String
-  type    String // 'email' | 'sms' | 'push'
-  timing  Int // Minutes before event
+  type    String
+  timing  Int
   sent    Boolean       @default(false)
   sentAt  DateTime?
   event   CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -769,16 +680,16 @@ model EventReminder {
 model GoogleToken {
   id           String    @id @default(cuid())
   userId       String    @unique
-  tenantId     String
   email        String
-  accessToken  String    @db.Text
-  refreshToken String?   @db.Text
+  accessToken  String
+  refreshToken String?
   expiresAt    DateTime?
   scope        String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenantId     String
   tenant       Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([tenantId])
@@ -807,8 +718,8 @@ model MicrosoftToken {
   id           String    @id @default(cuid())
   userId       String    @unique
   email        String
-  accessToken  String    @db.Text
-  refreshToken String?   @db.Text
+  accessToken  String
+  refreshToken String?
   expiresAt    DateTime?
   scope        String?
   createdAt    DateTime  @default(now())
@@ -819,15 +730,11 @@ model MicrosoftToken {
   @@map("microsoft_tokens")
 }
 
-// ============================================
-// TENANT-SCOPED INTEGRATION CREDENTIALS
-// ============================================
-
 model TwilioCredential {
   id          String   @id @default(cuid())
   tenantId    String   @unique
   accountSid  String
-  authToken   String   @db.Text
+  authToken   String
   phoneNumber String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -840,8 +747,8 @@ model TwilioCredential {
 model CalendlyCredential {
   id        String   @id @default(cuid())
   tenantId  String   @unique
-  apiKey    String   @db.Text
-  userUri   String?  // Calendly user URI for API calls
+  apiKey    String
+  userUri   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -850,39 +757,33 @@ model CalendlyCredential {
   @@map("calendly_credentials")
 }
 
-// ============================================
-// CAMPAIGN SYSTEM (Replaces Templates + Sequences)
-// ============================================
-
 model Campaign {
-  id             String   @id @default(cuid())
-  tenantId       String
-  createdById    String?
-  name           String
-  description    String?
-  type           String   @default("multi") // "single" | "multi"
-  channels       String[] @default(["email"]) // ["email", "sms", "phone"]
-  status         String   @default("draft") // "draft" | "active" | "paused"
-  triggerType    String? // "manual" | "stage_change" | "form_submission"
-  triggerConfig  Json     @default("{}")
-  isFromTreasury Boolean  @default(false)
-  businessUnit   String?  // 'zander' | 'finance' | 'consulting' | 'all'
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  tenant          Tenant               @relation(fields: [tenantId], references: [id])
-  createdBy       User?                @relation("CampaignCreatedBy", fields: [createdById], references: [id])
-  steps           CampaignStep[]
-  enrollments     CampaignEnrollment[]
-  // CMO Module fields
-  goal            String?
+  id              String               @id @default(cuid())
+  tenantId        String
+  name            String
+  description     String?
+  type            String               @default("multi")
+  channels        String[]             @default(["email"])
+  status          String               @default("draft")
+  triggerType     String?
+  triggerConfig   Json                 @default("{}")
+  isFromTreasury  Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
   budget          Decimal?             @db.Decimal(10, 2)
-  startDate       DateTime?
   endDate         DateTime?
-  targetSegmentId String?
+  goal            String?
   metrics         Json?                @default("{}")
-  targetSegment   Segment?             @relation(fields: [targetSegmentId], references: [id])
+  startDate       DateTime?
+  targetSegmentId String?
+  businessUnit    String?
+  createdById     String?
   calendarEvents  CalendarEvent[]
+  enrollments     CampaignEnrollment[]
+  steps           CampaignStep[]
+  createdBy       User?                @relation("CampaignCreatedBy", fields: [createdById], references: [id])
+  targetSegment   Segment?             @relation(fields: [targetSegmentId], references: [id])
+  tenant          Tenant               @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId])
   @@index([createdById])
@@ -894,16 +795,15 @@ model CampaignStep {
   id         String   @id @default(cuid())
   campaignId String
   order      Int
-  channel    String // "email" | "sms" | "phone"
+  channel    String
   dayOffset  Int      @default(0)
   hourOffset Int      @default(0)
-  subject    String? // For email
-  content    String   @db.Text
+  subject    String?
+  content    String
   status     String   @default("active")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@index([campaignId])
   @@map("campaign_steps")
@@ -914,35 +814,30 @@ model CampaignEnrollment {
   campaignId  String
   contactId   String
   dealId      String?
-  status      String    @default("active") // "active" | "completed" | "paused" | "cancelled"
+  status      String    @default("active")
   currentStep Int       @default(0)
   enrolledAt  DateTime  @default(now())
   completedAt DateTime?
-
-  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  contact  Contact  @relation(fields: [contactId], references: [id])
+  campaign    Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact     Contact   @relation(fields: [contactId], references: [id])
 
   @@index([campaignId])
   @@index([contactId])
   @@map("campaign_enrollments")
 }
 
-// ============================================
-// THE TREASURY (Pre-built Templates Library)
-// ============================================
-
 model TreasuryItem {
   id          String   @id @default(cuid())
-  type        String // "campaign" | "form" | "sop" | "assembly" | "pipeline" | "product"
+  type        String
   name        String
   description String?
-  category    String? // "sales" | "operations" | "finance" | "hr" | "marketing"
-  executive   String? // "CRO" | "COO" | "CFO" | "CMO" | "CPO" | "CIO" | "EA"
-  industry    String? // "cabinet_millwork" | "home_services" | "professional_services" | "general"
-  channels    String[] @default([]) // For campaigns: ["email", "sms", "phone"]
-  content     Json // The actual template data
-  stepCount   Int? // For campaigns: number of steps
-  duration    String? // For campaigns: "7 days", "14 days", etc.
+  category    String?
+  executive   String?
+  industry    String?
+  channels    String[] @default([])
+  content     Json
+  stepCount   Int?
+  duration    String?
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
@@ -955,9 +850,779 @@ model TreasuryItem {
   @@map("treasury_items")
 }
 
-// ============================================
-// SUPPORT ADMIN (Platform Operations)
-// ============================================
+model Headwind {
+  id             String           @id @default(cuid())
+  title          String
+  description    String?
+  priority       HeadwindPriority @default(P2)
+  category       HeadwindCategory @default(BUG)
+  status         HeadwindStatus   @default(OPEN)
+  tenantId       String?
+  assignedToId   String?
+  gitCommit      String?
+  gitBranch      String?
+  resolution     String?
+  estimatedHours Float?
+  dueDate        DateTime?
+  createdById    String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  resolvedAt     DateTime?
+  assignedTo     User?            @relation("HeadwindAssignedTo", fields: [assignedToId], references: [id])
+  createdBy      User             @relation("HeadwindCreatedBy", fields: [createdById], references: [id])
+  tenant         Tenant?          @relation(fields: [tenantId], references: [id])
+  tickets        SupportTicket[]
+
+  @@index([priority])
+  @@index([status])
+  @@index([tenantId])
+  @@map("headwinds")
+}
+
+model SupportTicket {
+  id               String           @id @default(cuid())
+  ticketNumber     String           @unique
+  tenantId         String
+  userId           String
+  createdVia       TicketSource     @default(MANUAL)
+  subject          String
+  description      String
+  category         TicketCategory   @default(OTHER)
+  priority         HeadwindPriority @default(P3)
+  status           TicketStatus     @default(NEW)
+  aiSummary        String?
+  aiResponse       String?
+  linkedHeadwindId String?
+  resolution       String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  resolvedAt       DateTime?
+  firstResponseAt  DateTime?
+  firstResponseSLA Int?             @default(24)
+  resolutionSLA    Int?             @default(72)
+  linkedHeadwind   Headwind?        @relation(fields: [linkedHeadwindId], references: [id])
+  tenant           Tenant           @relation(fields: [tenantId], references: [id])
+  user             User             @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([ticketNumber])
+  @@map("support_tickets")
+}
+
+model KnowledgeArticle {
+  id          String            @id @default(cuid())
+  title       String
+  slug        String            @unique
+  content     String
+  summary     String?
+  category    KnowledgeCategory @default(PLATFORM_GUIDE)
+  tags        String[]          @default([])
+  searchTerms String?
+  isPublished Boolean           @default(true)
+  sortOrder   Int               @default(0)
+  viewCount   Int               @default(0)
+  createdById String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  createdBy   User              @relation("KnowledgeCreatedBy", fields: [createdById], references: [id])
+
+  @@index([category])
+  @@index([isPublished])
+  @@map("knowledge_articles")
+}
+
+model Workflow {
+  id              String              @id @default(cuid())
+  tenantId        String
+  name            String
+  description     String?
+  status          String              @default("draft")
+  triggerType     String
+  triggerConfig   Json                @default("{}")
+  entryCount      Int                 @default(0)
+  completionCount Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  executions      WorkflowExecution[]
+  nodes           WorkflowNode[]
+  tenant          Tenant              @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("cmo_workflows")
+}
+
+model WorkflowNode {
+  id            String   @id @default(cuid())
+  workflowId    String
+  nodeType      String
+  name          String
+  config        Json     @default("{}")
+  positionX     Int      @default(0)
+  positionY     Int      @default(0)
+  nextNodeId    String?
+  trueBranchId  String?
+  falseBranchId String?
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  workflow      Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("cmo_workflow_nodes")
+}
+
+model WorkflowExecution {
+  id            String    @id @default(cuid())
+  workflowId    String
+  contactId     String
+  currentNodeId String?
+  status        String    @default("active")
+  enteredAt     DateTime  @default(now())
+  completedAt   DateTime?
+  exitedAt      DateTime?
+  exitReason    String?
+  stepHistory   Json      @default("[]")
+  contact       Contact   @relation(fields: [contactId], references: [id])
+  workflow      Workflow  @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@index([contactId])
+  @@index([status])
+  @@map("cmo_workflow_executions")
+}
+
+model Funnel {
+  id               String        @id @default(cuid())
+  tenantId         String
+  name             String
+  description      String?
+  status           String        @default("draft")
+  conversionGoal   String?
+  totalVisits      Int           @default(0)
+  totalConversions Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  stages           FunnelStage[]
+  tenant           Tenant        @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@map("cmo_funnels")
+}
+
+model FunnelStage {
+  id             String   @id @default(cuid())
+  funnelId       String
+  name           String
+  stageType      String
+  stageOrder     Int
+  config         Json     @default("{}")
+  entryCount     Int      @default(0)
+  exitCount      Int      @default(0)
+  conversionRate Decimal? @db.Decimal(5, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  funnel         Funnel   @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+
+  @@index([funnelId])
+  @@map("cmo_funnel_stages")
+}
+
+model Persona {
+  id                String    @id @default(cuid())
+  tenantId          String
+  name              String
+  avatar            String?
+  tagline           String?
+  demographics      Json      @default("{}")
+  psychographics    Json      @default("{}")
+  behaviors         Json      @default("{}")
+  painPoints        String[]  @default([])
+  goals             String[]  @default([])
+  preferredChannels String[]  @default([])
+  brandAffinities   String[]  @default([])
+  interview         String?
+  isDefault         Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  tenant            Tenant    @relation(fields: [tenantId], references: [id])
+  contacts          Contact[]
+
+  @@index([tenantId])
+  @@map("cmo_personas")
+}
+
+model MonthlyTheme {
+  id             String          @id @default(cuid())
+  tenantId       String
+  year           Int
+  month          Int
+  name           String
+  description    String?
+  focusAreas     String[]        @default([])
+  colorCode      String?
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  calendarEvents CalendarEvent[]
+  tenant         Tenant          @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, year, month])
+  @@index([tenantId])
+  @@map("cmo_monthly_themes")
+}
+
+model IdeaParkingLot {
+  id          String    @id @default(cuid())
+  tenantId    String
+  title       String
+  description String?
+  category    String?
+  source      String?
+  priority    String    @default("normal")
+  status      String    @default("parked")
+  reviewedAt  DateTime?
+  reviewNotes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("cmo_idea_parking_lot")
+}
+
+model Segment {
+  id             String           @id @default(cuid())
+  tenantId       String
+  name           String
+  description    String?
+  segmentType    String           @default("dynamic")
+  filterCriteria Json             @default("{}")
+  contactCount   Int              @default(0)
+  lastCalculated DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  campaigns      Campaign[]
+  members        ContactSegment[]
+  tenant         Tenant           @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@map("cmo_segments")
+}
+
+model ContactSegment {
+  id        String   @id @default(cuid())
+  contactId String
+  segmentId String
+  addedAt   DateTime @default(now())
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  segment   Segment  @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, segmentId])
+  @@index([segmentId])
+  @@map("cmo_contact_segments")
+}
+
+model ContentAsset {
+  id           String   @id @default(cuid())
+  tenantId     String
+  name         String
+  assetType    String
+  description  String?
+  url          String
+  thumbnailUrl String?
+  mimeType     String?
+  fileSize     Int?
+  folder       String?
+  tags         String[] @default([])
+  metadata     Json     @default("{}")
+  isArchived   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([assetType])
+  @@map("cmo_content_assets")
+}
+
+model BrandProfile {
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  primaryColor    String?
+  secondaryColor  String?
+  accentColor     String?
+  fontPrimary     String?
+  fontSecondary   String?
+  logoUrl         String?
+  logoIconUrl     String?
+  voiceTone       String?
+  voiceGuidelines String?
+  tagline         String?
+  mission         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@map("cmo_brand_profiles")
+}
+
+model MarketingPlan {
+  id            String   @id @default(cuid())
+  tenantId      String   @unique
+  status        String   @default("draft")
+  mission       String?
+  vision        String?
+  strategy      String?
+  goals         String[] @default([])
+  swot          Json     @default("{\"threats\": [], \"strengths\": [], \"weaknesses\": [], \"opportunities\": []}")
+  monthlyThemes String[] @default([])
+  kpis          Json     @default("[]")
+  budget        String?
+  timeline      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@map("cmo_marketing_plans")
+}
+
+model TermsVersion {
+  id            String   @id @default(cuid())
+  version       String   @unique
+  content       String
+  effectiveDate DateTime
+  createdAt     DateTime @default(now())
+
+  @@map("terms_versions")
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  tenantId     String
+  userId       String?
+  action       String
+  resource     String
+  resourceId   String?
+  details      Json?
+  ipAddress    String?
+  userAgent    String?
+  status       String   @default("success")
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@index([tenantId, createdAt])
+  @@map("audit_logs")
+}
+
+model Task {
+  id              String       @id @default(cuid())
+  tenantId        String
+  title           String
+  description     String?
+  status          TaskStatus   @default(OPEN)
+  priority        TaskPriority @default(MEDIUM)
+  dueDate         DateTime?
+  completedAt     DateTime?
+  assignedToId    String?
+  createdById     String
+  linkedDealId    String?
+  linkedContactId String?
+  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  assignedTo      User?        @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  createdBy       User         @relation("TaskCreator", fields: [createdById], references: [id])
+  tenant          Tenant       @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+model TokenUsage {
+  id           String   @id @default(cuid())
+  tenantId     String
+  executive    String
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  totalTokens  Int      @default(0)
+  month        Int
+  year         Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, executive, month, year])
+  @@index([tenantId])
+  @@map("token_usage")
+}
+
+model ErrorLog {
+  id        String   @id @default(cuid())
+  tenantId  String?
+  level     String
+  message   String
+  stack     String?
+  endpoint  String?
+  userId    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([level])
+  @@index([createdAt])
+  @@map("error_logs")
+}
+
+model BuildSession {
+  id               String      @id @default(cuid())
+  buildNumber      String      @unique
+  title            String
+  description      String?
+  status           BuildStatus @default(QUEUED)
+  target           BuildTarget @default(BOTH)
+  priority         String      @default("P2")
+  gitBranch        String?
+  gitCommitHash    String?
+  version          String?
+  deployedAt       DateTime?
+  deployedBy       String?
+  parallelGroup    String?
+  isParallel       Boolean     @default(false)
+  borisPrompt      String?
+  buildOutput      String?
+  errorLog         String?
+  linkedHeadwindId String?
+  linkedTicketId   String?
+  queuedAt         DateTime    @default(now())
+  startedAt        DateTime?
+  completedAt      DateTime?
+  estimatedMinutes Int?
+  actualMinutes    Int?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([status])
+  @@index([parallelGroup])
+  @@index([priority])
+  @@index([target])
+  @@map("build_sessions")
+}
+
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  category    String   @default("general")
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@map("system_configs")
+}
+
+model ZanderActionLog {
+  id                String   @id @default(cuid())
+  action            String
+  level             String
+  input             Json?
+  output            Json?
+  success           Boolean  @default(true)
+  errorMessage      String?
+  tenantId          String?
+  targetUserId      String?
+  deploymentTarget  String?
+  deploymentVersion String?
+  executedAt        DateTime @default(now())
+  durationMs        Int?
+
+  @@index([action])
+  @@index([level])
+  @@index([success])
+  @@index([executedAt])
+  @@index([tenantId])
+  @@map("zander_action_logs")
+}
+
+model Assembly {
+  id                 String            @id @default(cuid())
+  tenantId           String
+  name               String
+  type               AssemblyType
+  cadence            AssemblyCadence   @default(ONCE)
+  status             AssemblyStatus    @default(DRAFT)
+  scheduledFor       DateTime?
+  completedAt        DateTime?
+  treasuryTemplateId String?
+  createdById        String
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  tenant             Tenant            @relation(fields: [tenantId], references: [id])
+  sections           AssemblySection[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([type])
+  @@map("assemblies")
+}
+
+model AssemblySection {
+  id          String        @id @default(cuid())
+  assemblyId  String
+  executive   String
+  title       String
+  prompt      String
+  content     String?
+  status      SectionStatus @default(PENDING)
+  order       Int
+  generatedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  assembly    Assembly      @relation(fields: [assemblyId], references: [id], onDelete: Cascade)
+
+  @@index([assemblyId])
+  @@index([status])
+  @@map("assembly_sections")
+}
+
+model HQGoal {
+  id           String    @id @default(cuid())
+  tenantId     String
+  title        String
+  description  String?
+  scope        String
+  status       String    @default("ACTIVE")
+  priority     String?
+  progress     Int       @default(0)
+  targetValue  Float?
+  currentValue Float?
+  ownerId      String?
+  ownerName    String?
+  dueDate      DateTime?
+  quarter      String?
+  year         Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  tenant       Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([scope])
+  @@index([status])
+  @@index([quarter, year])
+  @@map("hq_goals")
+}
+
+model Keystone {
+  id            String   @id @default(cuid())
+  tenantId      String
+  executive     String
+  label         String
+  value         String
+  numericValue  Float?
+  target        String?
+  numericTarget Float?
+  trend         String?
+  trendValue    String?
+  color         String?
+  icon          String?
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([executive])
+  @@map("keystones")
+}
+
+model LedgerEntry {
+  id            String   @id @default(cuid())
+  tenantId      String
+  category      String
+  name          String
+  keystone      String?
+  value         String
+  numericValue  Float?
+  target        String?
+  numericTarget Float?
+  progress      Int?
+  trend         String?
+  owner         String?
+  status        String   @default("ON_TRACK")
+  period        String?
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([category])
+  @@index([status])
+  @@map("ledger_entries")
+}
+
+model FoundingDocument {
+  id        String   @id @default(cuid())
+  tenantId  String   @unique
+  vision    String?
+  mission   String?
+  values    Json?
+  story     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@map("founding_documents")
+}
+
+model LegacyMilestone {
+  id          String   @id @default(cuid())
+  tenantId    String
+  year        Int
+  title       String
+  description String?
+  goals       Json?
+  progress    Int      @default(0)
+  status      String   @default("PLANNED")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([year])
+  @@index([status])
+  @@map("legacy_milestones")
+}
+
+model TenantActivityLog {
+  id                String   @id @default(cuid())
+  tenantId          String
+  action            String
+  actionPerformedBy String
+  timestamp         DateTime @default(now())
+  oldValue          Json?
+  newValue          Json?
+  reason            String?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@index([action])
+  @@map("tenant_activity_logs")
+}
+
+model UserEngagementSnapshot {
+  id               String   @id @default(cuid())
+  tenantId         String
+  snapshotDate     DateTime
+  activeUsersCount Int
+  totalUsersCount  Int
+  tasksCreated     Int
+  emailsSent       Int
+  eventsLogged     Int
+  avgResponseTime  Float
+  errorRate        Float
+  tokenUsage       Int
+  engagementScore  Float
+  churnRiskLevel   String
+  createdAt        DateTime @default(now())
+  tenant           Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, snapshotDate])
+  @@index([tenantId])
+  @@index([snapshotDate])
+  @@index([churnRiskLevel])
+  @@map("user_engagement_snapshots")
+}
+
+model SystemHealthSnapshot {
+  id                  String   @id @default(cuid())
+  apiHealthy          Boolean
+  apiResponseTime     Float
+  databaseHealthy     Boolean
+  databaseLatency     Float
+  emailServiceHealthy Boolean
+  stripeHealthy       Boolean
+  totalActiveUsers    Int
+  totalTenants        Int
+  totalRequests       Int
+  totalTokensUsed     Int
+  p95ResponseTime     Float
+  errorRatePercent    Float
+  overallStatus       String
+  createdAt           DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([overallStatus])
+  @@map("system_health_snapshots")
+}
+
+enum DealStage {
+  PROSPECT
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+  LEAD
+}
+
+enum DealPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum PersonRole {
+  CLIENT
+  VENDOR
+  TEAM
+  PARTNER
+  REFERRAL
+}
+
+enum ProductType {
+  PHYSICAL
+  SERVICE
+  SUBSCRIPTION
+  DIGITAL
+  ACCESS
+  BUNDLE
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  DISCONTINUED
+}
+
+enum PricingModel {
+  SIMPLE
+  TIERED
+  TIME_MATERIALS
+  SUBSCRIPTION
+  COST_PLUS
+  CUSTOM
+}
 
 enum HeadwindPriority {
   P1
@@ -1011,75 +1676,6 @@ enum TicketStatus {
   CLOSED
 }
 
-model Headwind {
-  id             String           @id @default(cuid())
-  title          String
-  description    String?
-  priority       HeadwindPriority @default(P2)
-  category       HeadwindCategory @default(BUG)
-  status         HeadwindStatus   @default(OPEN)
-  tenantId       String? // null = system-wide issue
-  assignedToId   String?
-  gitCommit      String?
-  gitBranch      String?
-  resolution     String?
-  estimatedHours Float?
-  dueDate        DateTime?
-  createdById    String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  resolvedAt     DateTime?
-  tenant         Tenant?          @relation(fields: [tenantId], references: [id])
-  createdBy      User             @relation("HeadwindCreatedBy", fields: [createdById], references: [id])
-  assignedTo     User?            @relation("HeadwindAssignedTo", fields: [assignedToId], references: [id])
-  tickets        SupportTicket[]
-
-  @@index([priority])
-  @@index([status])
-  @@index([tenantId])
-  @@map("headwinds")
-}
-
-model SupportTicket {
-  id               String           @id @default(cuid())
-  ticketNumber     String           @unique
-  tenantId         String
-  userId           String
-  createdVia       TicketSource     @default(MANUAL)
-  subject          String
-  description      String
-  category         TicketCategory   @default(OTHER)
-  priority         HeadwindPriority @default(P3)
-  status           TicketStatus     @default(NEW)
-  aiSummary        String?
-  aiResponse       String?
-  linkedHeadwindId String?
-  resolution       String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  resolvedAt       DateTime?
-
-  // SLA Tracking Fields
-  firstResponseAt  DateTime?        // When first response was made
-  firstResponseSLA Int?             @default(24) // Target hours for first response
-  resolutionSLA    Int?             @default(72) // Target hours for resolution
-
-  tenant           Tenant           @relation(fields: [tenantId], references: [id])
-  user             User             @relation(fields: [userId], references: [id])
-  linkedHeadwind   Headwind?        @relation(fields: [linkedHeadwindId], references: [id])
-
-  @@index([tenantId])
-  @@index([userId])
-  @@index([status])
-  @@index([priority])
-  @@index([ticketNumber])
-  @@map("support_tickets")
-}
-
-// ============================================
-// KNOWLEDGE BASE (Platform Documentation)
-// ============================================
-
 enum KnowledgeCategory {
   PLATFORM_GUIDE
   FAQ
@@ -1087,373 +1683,6 @@ enum KnowledgeCategory {
   RELEASE_NOTES
   API_DOCS
 }
-
-model KnowledgeArticle {
-  id          String            @id @default(cuid())
-  title       String
-  slug        String            @unique
-  content     String            @db.Text
-  summary     String? // Short description for lists
-  category    KnowledgeCategory @default(PLATFORM_GUIDE)
-  tags        String[]          @default([])
-  searchTerms String?           @db.Text // AI-friendly keywords
-  isPublished Boolean           @default(true)
-  sortOrder   Int               @default(0)
-  viewCount   Int               @default(0)
-
-  createdById String
-  createdBy   User   @relation("KnowledgeCreatedBy", fields: [createdById], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([category])
-  @@index([isPublished])
-  @@map("knowledge_articles")
-}
-
-// ============================================
-// CMO MODULE - WORKFLOW AUTOMATION
-// ============================================
-
-model Workflow {
-  id              String   @id @default(cuid())
-  tenantId        String
-  name            String
-  description     String?
-  status          String   @default("draft")
-  triggerType     String
-  triggerConfig   Json     @default("{}")
-  entryCount      Int      @default(0)
-  completionCount Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  tenant     Tenant              @relation(fields: [tenantId], references: [id])
-  nodes      WorkflowNode[]
-  executions WorkflowExecution[]
-
-  @@index([tenantId])
-  @@index([status])
-  @@map("cmo_workflows")
-}
-
-model WorkflowNode {
-  id            String   @id @default(cuid())
-  workflowId    String
-  nodeType      String
-  name          String
-  config        Json     @default("{}")
-  positionX     Int      @default(0)
-  positionY     Int      @default(0)
-  nextNodeId    String?
-  trueBranchId  String?
-  falseBranchId String?
-  sortOrder     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  @@index([workflowId])
-  @@map("cmo_workflow_nodes")
-}
-
-model WorkflowExecution {
-  id            String    @id @default(cuid())
-  workflowId    String
-  contactId     String
-  currentNodeId String?
-  status        String    @default("active")
-  enteredAt     DateTime  @default(now())
-  completedAt   DateTime?
-  exitedAt      DateTime?
-  exitReason    String?
-  stepHistory   Json      @default("[]")
-
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-  contact  Contact  @relation(fields: [contactId], references: [id])
-
-  @@index([workflowId])
-  @@index([contactId])
-  @@index([status])
-  @@map("cmo_workflow_executions")
-}
-
-// ============================================
-// CMO MODULE - FUNNELS
-// ============================================
-
-model Funnel {
-  id               String   @id @default(cuid())
-  tenantId         String
-  name             String
-  description      String?
-  status           String   @default("draft")
-  conversionGoal   String?
-  totalVisits      Int      @default(0)
-  totalConversions Int      @default(0)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  tenant Tenant        @relation(fields: [tenantId], references: [id])
-  stages FunnelStage[]
-
-  @@index([tenantId])
-  @@map("cmo_funnels")
-}
-
-model FunnelStage {
-  id             String   @id @default(cuid())
-  funnelId       String
-  name           String
-  stageType      String
-  stageOrder     Int
-  config         Json     @default("{}")
-  entryCount     Int      @default(0)
-  exitCount      Int      @default(0)
-  conversionRate Decimal? @db.Decimal(5, 2)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  funnel Funnel @relation(fields: [funnelId], references: [id], onDelete: Cascade)
-
-  @@index([funnelId])
-  @@map("cmo_funnel_stages")
-}
-
-// ============================================
-// CMO MODULE - PERSONAS
-// ============================================
-
-model Persona {
-  id                String   @id @default(cuid())
-  tenantId          String
-  name              String
-  avatar            String?
-  tagline           String?
-  demographics      Json     @default("{}")
-  psychographics    Json     @default("{}")
-  behaviors         Json     @default("{}")
-  painPoints        String[] @default([])
-  goals             String[] @default([])
-  preferredChannels String[] @default([])
-  brandAffinities   String[] @default([])
-  interview         String?  @db.Text
-  isDefault         Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  tenant   Tenant    @relation(fields: [tenantId], references: [id])
-  contacts Contact[]
-
-  @@index([tenantId])
-  @@map("cmo_personas")
-}
-
-// ============================================
-// CMO MODULE - CALENDAR & PLANNING
-// ============================================
-
-model MonthlyTheme {
-  id          String   @id @default(cuid())
-  tenantId    String
-  year        Int
-  month       Int
-  name        String
-  description String?
-  focusAreas  String[] @default([])
-  colorCode   String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  tenant         Tenant          @relation(fields: [tenantId], references: [id])
-  calendarEvents CalendarEvent[]
-
-  @@unique([tenantId, year, month])
-  @@index([tenantId])
-  @@map("cmo_monthly_themes")
-}
-
-model IdeaParkingLot {
-  id          String    @id @default(cuid())
-  tenantId    String
-  title       String
-  description String?
-  category    String?
-  source      String?
-  priority    String    @default("normal")
-  status      String    @default("parked")
-  reviewedAt  DateTime?
-  reviewNotes String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@index([tenantId])
-  @@index([status])
-  @@map("cmo_idea_parking_lot")
-}
-
-// ============================================
-// CMO MODULE - SEGMENTS
-// ============================================
-
-model Segment {
-  id             String    @id @default(cuid())
-  tenantId       String
-  name           String
-  description    String?
-  segmentType    String    @default("dynamic")
-  filterCriteria Json      @default("{}")
-  contactCount   Int       @default(0)
-  lastCalculated DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  tenant    Tenant           @relation(fields: [tenantId], references: [id])
-  members   ContactSegment[]
-  campaigns Campaign[]
-
-  @@index([tenantId])
-  @@map("cmo_segments")
-}
-
-model ContactSegment {
-  id        String   @id @default(cuid())
-  contactId String
-  segmentId String
-  addedAt   DateTime @default(now())
-
-  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  segment Segment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
-
-  @@unique([contactId, segmentId])
-  @@index([segmentId])
-  @@map("cmo_contact_segments")
-}
-
-// ============================================
-// CMO MODULE - BRAND ASSETS
-// ============================================
-
-model ContentAsset {
-  id           String   @id @default(cuid())
-  tenantId     String
-  name         String
-  assetType    String
-  description  String?
-  url          String
-  thumbnailUrl String?
-  mimeType     String?
-  fileSize     Int?
-  folder       String?
-  tags         String[] @default([])
-  metadata     Json     @default("{}")
-  isArchived   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@index([tenantId])
-  @@index([assetType])
-  @@map("cmo_content_assets")
-}
-
-model BrandProfile {
-  id              String   @id @default(cuid())
-  tenantId        String   @unique
-  primaryColor    String?
-  secondaryColor  String?
-  accentColor     String?
-  fontPrimary     String?
-  fontSecondary   String?
-  logoUrl         String?
-  logoIconUrl     String?
-  voiceTone       String?
-  voiceGuidelines String?  @db.Text
-  tagline         String?
-  mission         String?  @db.Text
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@map("cmo_brand_profiles")
-}
-
-// ============================================
-// CMO MODULE - MARKETING PLAN
-// ============================================
-
-model MarketingPlan {
-  id            String   @id @default(cuid())
-  tenantId      String   @unique
-  status        String   @default("draft") // draft, active, complete
-  mission       String?  @db.Text
-  vision        String?  @db.Text
-  strategy      String?  @db.Text
-  goals         String[] @default([])
-  swot          Json     @default("{\"strengths\":[],\"weaknesses\":[],\"opportunities\":[],\"threats\":[]}")
-  monthlyThemes String[] @default([])
-  kpis          Json     @default("[]")
-  budget        String?
-  timeline      String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@map("cmo_marketing_plans")
-}
-
-// ============================================
-// LEGAL - TERMS & CONDITIONS
-// ============================================
-
-model TermsVersion {
-  id            String   @id @default(cuid())
-  version       String   @unique
-  content       String   @db.Text
-  effectiveDate DateTime
-  createdAt     DateTime @default(now())
-
-  @@map("terms_versions")
-}
-
-// ============================================
-// MEDIUM-4: AUDIT LOGGING
-// ============================================
-
-model AuditLog {
-  id           String   @id @default(cuid())
-  tenantId     String
-  userId       String?
-  action       String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, FAILED_LOGIN, etc.
-  resource     String   // deals, contacts, users, etc.
-  resourceId   String?  // ID of affected resource
-  details      Json?    // Additional context (old values, new values, etc.)
-  ipAddress    String?
-  userAgent    String?
-  status       String   @default("success") // success, failure
-  errorMessage String?
-  createdAt    DateTime @default(now())
-
-  @@index([tenantId])
-  @@index([userId])
-  @@index([action])
-  @@index([resource])
-  @@index([createdAt])
-  @@index([tenantId, createdAt])
-  @@map("audit_logs")
-}
-
-// ============================================
-// EA MODULE - TASKS
-// ============================================
 
 enum TaskStatus {
   OPEN
@@ -1468,82 +1697,6 @@ enum TaskPriority {
   HIGH
 }
 
-model Task {
-  id              String       @id @default(cuid())
-  tenantId        String
-  title           String
-  description     String?
-  status          TaskStatus   @default(OPEN)
-  priority        TaskPriority @default(MEDIUM)
-  dueDate         DateTime?
-  completedAt     DateTime?
-  assignedToId    String?
-  createdById     String
-  linkedDealId    String?
-  linkedContactId String?
-  notes           String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-
-  tenant     Tenant  @relation(fields: [tenantId], references: [id])
-  assignedTo User?   @relation("TaskAssignee", fields: [assignedToId], references: [id])
-  createdBy  User    @relation("TaskCreator", fields: [createdById], references: [id])
-
-  @@index([tenantId])
-  @@index([assignedToId])
-  @@index([status])
-  @@index([dueDate])
-  @@map("tasks")
-}
-
-// ============================================
-// ADMIN - TOKEN USAGE TRACKING
-// ============================================
-
-model TokenUsage {
-  id           String   @id @default(cuid())
-  tenantId     String
-  executive    String   // "jordan" | "don" | "zander" | "pam"
-  inputTokens  Int      @default(0)
-  outputTokens Int      @default(0)
-  totalTokens  Int      @default(0)
-  month        Int      // 1-12
-  year         Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@unique([tenantId, executive, month, year])
-  @@index([tenantId])
-  @@map("token_usage")
-}
-
-// ============================================
-// ADMIN - ERROR LOGGING
-// ============================================
-
-model ErrorLog {
-  id        String   @id @default(cuid())
-  tenantId  String?  // nullable for system-level errors
-  level     String   // "error" | "warning" | "info"
-  message   String
-  stack     String?  @db.Text
-  endpoint  String?
-  userId    String?
-  metadata  Json?
-  createdAt DateTime @default(now())
-
-  @@index([tenantId])
-  @@index([level])
-  @@index([createdAt])
-  @@map("error_logs")
-}
-
-// ============================================
-// ZANDER PLATFORM MASTER - BUILD & CONFIG
-// ============================================
-
 enum BuildStatus {
   QUEUED
   IN_PROGRESS
@@ -1557,92 +1710,6 @@ enum BuildTarget {
   BACKEND
   BOTH
 }
-
-model BuildSession {
-  id            String      @id @default(cuid())
-  buildNumber   String      @unique // AUTO-001, AUTO-002, etc.
-  title         String
-  description   String?     @db.Text
-  status        BuildStatus @default(QUEUED)
-  target        BuildTarget @default(BOTH)
-  priority      String      @default("P2") // P1, P2, P3
-  // Git tracking
-  gitBranch     String?
-  gitCommitHash String?
-  // Deployment tracking
-  version       String?     // v22, v23, etc.
-  deployedAt    DateTime?
-  deployedBy    String?     // "zander" or user ID
-  // Parallel build tracking
-  parallelGroup String?     // Groups related parallel builds
-  isParallel    Boolean     @default(false)
-  // Prompts and results
-  borisPrompt   String?     @db.Text
-  buildOutput   String?     @db.Text
-  errorLog      String?     @db.Text
-  // Linked items
-  linkedHeadwindId String?
-  linkedTicketId   String?
-  // Timestamps
-  queuedAt      DateTime    @default(now())
-  startedAt     DateTime?
-  completedAt   DateTime?
-  estimatedMinutes Int?
-  actualMinutes    Int?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@index([status])
-  @@index([parallelGroup])
-  @@index([priority])
-  @@index([target])
-  @@map("build_sessions")
-}
-
-model SystemConfig {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     Json
-  category  String   @default("general") // general, briefing, deployment, notifications
-  description String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([category])
-  @@index([isActive])
-  @@map("system_configs")
-}
-
-model ZanderActionLog {
-  id          String   @id @default(cuid())
-  action      String   // Tool name executed
-  level       String   // L1, L2, L3, L4
-  input       Json?    // Tool input parameters
-  output      Json?    // Tool output/result
-  success     Boolean  @default(true)
-  errorMessage String?
-  // Context
-  tenantId    String?  // If tenant-scoped
-  targetUserId String? // If user-scoped
-  // Deployment specific
-  deploymentTarget String? // frontend, backend, both
-  deploymentVersion String?
-  // Timestamps
-  executedAt  DateTime @default(now())
-  durationMs  Int?
-
-  @@index([action])
-  @@index([level])
-  @@index([success])
-  @@index([executedAt])
-  @@index([tenantId])
-  @@map("zander_action_logs")
-}
-
-// ============================================
-// ASSEMBLY MODULE - MULTI-EXECUTIVE COLLABORATION
-// ============================================
 
 enum AssemblyType {
   WEEKLY_ALL_HANDS
@@ -1674,263 +1741,117 @@ enum SectionStatus {
   FAILED
 }
 
-model Assembly {
-  id                 String          @id @default(cuid())
-  tenantId           String
-  name               String
-  type               AssemblyType
-  cadence            AssemblyCadence @default(ONCE)
-  status             AssemblyStatus  @default(DRAFT)
-  scheduledFor       DateTime?
-  completedAt        DateTime?
-  treasuryTemplateId String?
-  createdById        String
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
+// ============================================
+// SOCIAL MEDIA INTEGRATION MODELS
+// Phase 4: Marketing Execution Architecture
+// ============================================
 
-  tenant   Tenant            @relation(fields: [tenantId], references: [id])
-  sections AssemblySection[]
+model SocialAccount {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  platform      String   // "facebook" | "instagram" | "linkedin" | "tiktok" | "youtube" | "twitter"
+  accountName   String   // display name
+  accountId     String   // platform-specific account/page ID
+  accessToken   String?  // encrypted OAuth token
+  refreshToken  String?  // encrypted refresh token
+  tokenExpiry   DateTime?
+  scopes        String[] // granted OAuth scopes
+  isActive      Boolean  @default(true)
+  connectedAt   DateTime @default(now())
+  connectedBy   String   // userId who connected
+  metadata      Json?    // platform-specific data (page ID, channel ID, etc.)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  posts         SocialPost[]
+  engagements   SocialEngagement[]
+
+  @@unique([tenantId, platform, accountId])
+  @@index([tenantId])
+  @@map("social_accounts")
+}
+
+model SocialPost {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  socialAccountId String
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id])
+  content         String   // post text
+  mediaUrls       String[] // attached images/videos
+  platformPostId  String?  // ID returned by platform after publishing
+  status          String   @default("draft") // "draft" | "scheduled" | "pending_approval" | "published" | "failed"
+  scheduledFor    DateTime?
+  publishedAt     DateTime?
+  approvedBy      String?  // userId who approved
+  approvedAt      DateTime?
+  campaignId      String?  // link to CMO campaign
+  calendarEventId String?  // link to CMO calendar event
+  metadata        Json?    // platform-specific data (hashtags, mentions, etc.)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  engagements     SocialEngagement[]
 
   @@index([tenantId])
+  @@index([socialAccountId])
+  @@index([status])
+  @@index([scheduledFor])
+  @@map("social_posts")
+}
+
+model SocialEngagement {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  socialAccountId String
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id])
+  socialPostId    String?
+  socialPost      SocialPost? @relation(fields: [socialPostId], references: [id])
+  type            String   // "comment" | "reply" | "dm" | "mention" | "like" | "share"
+  platformId      String   // platform-specific engagement ID
+  authorName      String
+  authorHandle    String?
+  authorFollowers Int?     // for escalation rules
+  content         String?  // the comment/message text
+  sentiment       String?  // "positive" | "neutral" | "negative" | "unknown"
+  status          String   @default("new") // "new" | "auto_replied" | "draft_reply" | "replied" | "escalated" | "ignored"
+  replyContent    String?  // Don's drafted/sent reply
+  replyStatus     String?  // "auto" | "pending_approval" | "approved" | "sent"
+  escalationReason String? // why it was escalated
+  respondedAt     DateTime?
+  respondedBy     String?  // "don_auto" | userId
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([socialAccountId])
   @@index([status])
   @@index([type])
-  @@map("assemblies")
+  @@map("social_engagements")
 }
 
-model AssemblySection {
-  id          String        @id @default(cuid())
-  assemblyId  String
-  executive   String        // "jordan" | "don" | "pam" | "ben" | "miranda" | "ted" | "jarvis"
-  title       String
-  prompt      String        @db.Text
-  content     String?       @db.Text
-  status      SectionStatus @default(PENDING)
-  order       Int
-  generatedAt DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  assembly Assembly @relation(fields: [assemblyId], references: [id], onDelete: Cascade)
-
-  @@index([assemblyId])
-  @@index([status])
-  @@map("assembly_sections")
-}
-
-// ============================================
-// HQ MODULE - GOALS (My Campaign, Quarterly, Annual)
-// ============================================
-
-model HQGoal {
-  id           String    @id @default(cuid())
-  tenantId     String
-  title        String
-  description  String?
-  scope        String    // PERSONAL, QUARTERLY, ANNUAL
-  status       String    @default("ACTIVE") // ACTIVE, COMPLETED, DEFERRED, CANCELLED
-  priority     String?   // P1, P2, P3
-  progress     Int       @default(0) // 0-100
-  targetValue  Float?
-  currentValue Float?
-  ownerId      String?
-  ownerName    String?
-  dueDate      DateTime?
-  quarter      String?   // Q1, Q2, Q3, Q4
-  year         Int?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@index([tenantId])
-  @@index([scope])
-  @@index([status])
-  @@index([quarter, year])
-  @@map("hq_goals")
-}
-
-// ============================================
-// HQ MODULE - KEYSTONES (Executive Vital Signs)
-// ============================================
-
-model Keystone {
+model DesignAsset {
   id            String   @id @default(cuid())
   tenantId      String
-  executive     String   // CRO, CFO, COO, CMO, CPO, CIO, EA — maps to AI executive
-  label         String   // Display label e.g. "Pipeline Value", "Monthly Revenue"
-  value         String   // Current value as string (allows "$139K", "94%", "4.2")
-  numericValue  Float?   // Numeric version for trend calculations
-  target        String?  // Target value as string
-  numericTarget Float?   // Numeric target for progress calc
-  trend         String?  // UP, DOWN, FLAT
-  trendValue    String?  // e.g. "+12%", "-3%"
-  color         String?  // Hex color for the card
-  icon          String?  // Emoji or icon identifier
-  sortOrder     Int      @default(0)
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  name          String
+  type          String   // "image" | "video" | "graphic" | "template"
+  source        String   // "canva" | "adobe" | "upload" | "ai_generated"
+  sourceId      String?  // external tool asset ID
+  fileUrl       String?  // stored file URL
+  thumbnailUrl  String?
+  dimensions    Json?    // { width, height }
+  format        String?  // "png" | "jpg" | "mp4" | "svg"
+  tags          String[]
+  usedInPosts   String[] // socialPostIds where this asset was used
+  campaignId    String?  // associated campaign
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
   @@index([tenantId])
-  @@index([executive])
-  @@map("keystones")
-}
-
-// ============================================
-// HQ MODULE - LEDGER (Company/Team/Personal Metrics)
-// ============================================
-
-model LedgerEntry {
-  id            String   @id @default(cuid())
-  tenantId      String
-  category      String   // COMPANY, TEAM, PERSONAL
-  name          String   // Metric name
-  keystone      String?  // Which executive owns this — links conceptually to Keystone.executive
-  value         String   // Current value
-  numericValue  Float?
-  target        String?
-  numericTarget Float?
-  progress      Int?     // 0-100 calculated or manual
-  trend         String?  // UP, DOWN, FLAT
-  owner         String?  // Person responsible
-  status        String   @default("ON_TRACK") // ON_TRACK, AT_RISK, BEHIND, EXCEEDED
-  period        String?  // WEEKLY, MONTHLY, QUARTERLY, ANNUAL
-  sortOrder     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@index([tenantId])
-  @@index([category])
-  @@index([status])
-  @@map("ledger_entries")
-}
-
-// ============================================
-// HQ MODULE - FOUNDING DOCUMENT (Vision/Mission/Values)
-// ============================================
-
-model FoundingDocument {
-  id        String   @id @default(cuid())
-  tenantId  String   @unique // One document per tenant - singleton pattern
-  vision    String?  @db.Text
-  mission   String?  @db.Text
-  values    Json?    // Array of { title: string, description: string }
-  story     String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@map("founding_documents")
-}
-
-// ============================================
-// HQ MODULE - LEGACY MILESTONES (3-5 Year Roadmap)
-// ============================================
-
-model LegacyMilestone {
-  id          String   @id @default(cuid())
-  tenantId    String
-  year        Int      // 2026, 2027, 2028, etc.
-  title       String
-  description String?  @db.Text
-  goals       Json?    // Array of { text: string, completed: boolean }
-  progress    Int      @default(0) // 0-100
-  status      String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, DEFERRED
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-
-  @@index([tenantId])
-  @@index([year])
-  @@index([status])
-  @@map("legacy_milestones")
-}
-
-// ============================================
-// PHASE 1: TENANT ACTIVITY & ENGAGEMENT MONITORING
-// ============================================
-
-model TenantActivityLog {
-  id                String   @id @default(cuid())
-  tenantId          String
-  tenant            Tenant   @relation(fields: [tenantId], references: [id])
-
-  action            String   // "RENAME", "ARCHIVE", "RESTORE", "TIER_OVERRIDE", "TRIAL_EXTEND"
-  actionPerformedBy String   // "JONATHAN_MANUAL" or "ZANDER_AUTO"
-  timestamp         DateTime @default(now())
-
-  oldValue          Json?    // Before state
-  newValue          Json?    // After state
-  reason            String?
-  metadata          Json?
-
-  createdAt         DateTime @default(now())
-
-  @@index([tenantId])
-  @@index([timestamp])
-  @@index([action])
-  @@map("tenant_activity_logs")
-}
-
-model UserEngagementSnapshot {
-  id                String   @id @default(cuid())
-  tenantId          String
-  tenant            Tenant   @relation(fields: [tenantId], references: [id])
-
-  snapshotDate      DateTime
-
-  activeUsersCount  Int
-  totalUsersCount   Int
-  tasksCreated      Int
-  emailsSent        Int
-  eventsLogged      Int
-
-  avgResponseTime   Float
-  errorRate         Float
-  tokenUsage        Int
-
-  engagementScore   Float    // 0-100
-  churnRiskLevel    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
-
-  createdAt         DateTime @default(now())
-
-  @@unique([tenantId, snapshotDate])
-  @@index([tenantId])
-  @@index([snapshotDate])
-  @@index([churnRiskLevel])
-  @@map("user_engagement_snapshots")
-}
-
-model SystemHealthSnapshot {
-  id                String   @id @default(cuid())
-
-  apiHealthy        Boolean
-  apiResponseTime   Float
-  databaseHealthy   Boolean
-  databaseLatency   Float
-
-  emailServiceHealthy Boolean
-  stripeHealthy     Boolean
-
-  totalActiveUsers  Int
-  totalTenants      Int
-  totalRequests     Int
-  totalTokensUsed   Int
-
-  p95ResponseTime   Float
-  errorRatePercent  Float
-
-  overallStatus     String   // "HEALTHY", "DEGRADED", "DOWN"
-
-  createdAt         DateTime @default(now())
-
-  @@index([createdAt])
-  @@index([overallStatus])
-  @@map("system_health_snapshots")
+  @@index([source])
+  @@map("design_assets")
 }
