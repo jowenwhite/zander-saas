@@ -260,3 +260,25 @@ Use this file to record session handoffs and major changes.
 4. Add public intake survey
 5. Create actual downloadable store content
 
+
+---
+
+## 2026-04-16 — Phase 5 Hours Fix (Session 3 Addendum)
+
+**Quick Fix Applied:**
+
+Corrected consulting package hours per PRD:
+- Business Analysis: 3 hours (was 0)
+- Compass: 10 hours (was 20)
+- Foundation: 20 hours (was 40)
+- Blueprint: 40 hours (was 80)
+- Extension: 3-month time extension (was 10 hours)
+
+Added `handlePackageExtension()` method for Extension purchases that adds 3 months to `packageExpirationDate` instead of creating a new engagement.
+
+Updated Stripe product descriptions to reflect correct hours.
+
+**Commit:** 6faba4d
+**Docker Image:** v57
+**Deployment:** ECS force deployed, health OK
+
