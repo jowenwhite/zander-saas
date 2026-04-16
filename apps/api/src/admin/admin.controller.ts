@@ -680,6 +680,35 @@ export class AdminController {
     });
   }
 
+  // ============================================
+  // ACTIVITY FEED ENDPOINT
+  // ============================================
+
+  /**
+   * GET /admin/activity-feed
+   * Cross-tenant activity feed for Support Admin
+   * Combines: tenant signups, tier changes, token usage spikes, errors
+   */
+  @Public()
+  @Get('activity-feed')
+  async getActivityFeed(
+    @Headers('x-admin-secret') secretKey: string,
+    @Query('tenantId') tenantId?: string,
+    @Query('eventType') eventType?: string,
+    @Query('hours') hours?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.getActivityFeed({
+      tenantId,
+      eventType,
+      hours: hours ? parseInt(hours) : 24,
+      limit: limit ? parseInt(limit) : 50,
+      offset: offset ? parseInt(offset) : 0,
+    });
+  }
+
   /**
    * Helper to validate admin secret key
    */

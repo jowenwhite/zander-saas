@@ -4925,4 +4925,266 @@ If at limit:
       hours,
     };
   }
+
+  // ============================================
+  // ACTIVITY FEED (Cross-Tenant)
+  // ============================================
+
+  /**
+   * Get unified activity feed across all tenants
+   * Combines: tenant signups, tier changes, token spikes, errors, Zander actions
+   */
+  async getActivityFeed(options: {
+    tenantId?: string;
+    eventType?: string;
+    hours?: number;
+    limit?: number;
+    offset?: number;
+  }) {
+    const { tenantId, eventType, hours = 24, limit = 50, offset = 0 } = options;
+    const startDate = new Date(Date.now() - hours * 60 * 60 * 1000);
+    const activities: Array<{
+      id: string;
+      type: string;
+      timestamp: Date;
+      tenantId: string | null;
+      tenantName: string | null;
+      description: string;
+      severity: 'info' | 'warning' | 'error' | 'success';
+      metadata: Record<string, any>;
+    }> = [];
+
+    // 1. Tenant Signups (new tenants created)
+    if (!eventType || eventType === 'signup') {
+      const newTenants = await this.prisma.tenant.findMany({
+        where: {
+          createdAt: { gte: startDate },
+          ...(tenantId ? { id: tenantId } : {}),
+        },
+        select: {
+          id: true,
+          companyName: true,
+          createdAt: true,
+          subscriptionTier: true,
+          _count: { select: { users: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      for (const t of newTenants) {
+        activities.push({
+          id: `signup-${t.id}`,
+          type: 'signup',
+          timestamp: t.createdAt,
+          tenantId: t.id,
+          tenantName: t.companyName,
+          description: `New tenant signup: ${t.companyName}`,
+          severity: 'success',
+          metadata: {
+            tier: t.subscriptionTier || 'FREE',
+            userCount: t._count.users,
+          },
+        });
+      }
+    }
+
+    // 2. Tier Changes (from TenantActivityLog)
+    if (!eventType || eventType === 'tier_change') {
+      const tierChanges = await this.prisma.tenantActivityLog.findMany({
+        where: {
+          action: { in: ['TIER_OVERRIDE', 'TRIAL_START', 'TRIAL_EXTEND', 'TRIAL_END', 'SUBSCRIPTION_UPDATE'] },
+          timestamp: { gte: startDate },
+          ...(tenantId ? { tenantId } : {}),
+        },
+        include: {
+          tenant: { select: { companyName: true } },
+        },
+        orderBy: { timestamp: 'desc' },
+      });
+
+      for (const tc of tierChanges) {
+        activities.push({
+          id: `tier-${tc.id}`,
+          type: 'tier_change',
+          timestamp: tc.timestamp,
+          tenantId: tc.tenantId,
+          tenantName: tc.tenant?.companyName || 'Unknown',
+          description: `${tc.action}: ${JSON.stringify(tc.newValue)}`,
+          severity: 'info',
+          metadata: {
+            action: tc.action,
+            oldValue: tc.oldValue,
+            newValue: tc.newValue,
+            performedBy: tc.actionPerformedBy,
+          },
+        });
+      }
+    }
+
+    // 3. Token Usage Spikes (aggregate high usage in the period)
+    if (!eventType || eventType === 'token_spike') {
+      const currentMonth = new Date().getMonth() + 1;
+      const currentYear = new Date().getFullYear();
+
+      const tokenUsage = await this.prisma.tokenUsage.findMany({
+        where: {
+          month: currentMonth,
+          year: currentYear,
+          ...(tenantId ? { tenantId } : {}),
+        },
+        include: {
+          tenant: { select: { companyName: true } },
+        },
+        orderBy: { totalTokens: 'desc' },
+        take: 20,
+      });
+
+      // Flag high usage (>10k tokens as spike)
+      for (const usage of tokenUsage.filter(u => u.totalTokens > 10000)) {
+        activities.push({
+          id: `token-${usage.id}`,
+          type: 'token_spike',
+          timestamp: usage.updatedAt,
+          tenantId: usage.tenantId,
+          tenantName: usage.tenant?.companyName || 'Unknown',
+          description: `High token usage: ${usage.totalTokens.toLocaleString()} tokens by ${usage.executive}`,
+          severity: usage.totalTokens > 50000 ? 'warning' : 'info',
+          metadata: {
+            executive: usage.executive,
+            inputTokens: usage.inputTokens,
+            outputTokens: usage.outputTokens,
+            totalTokens: usage.totalTokens,
+          },
+        });
+      }
+    }
+
+    // 4. Errors (from ErrorLog)
+    if (!eventType || eventType === 'error') {
+      const errors = await this.prisma.errorLog.findMany({
+        where: {
+          createdAt: { gte: startDate },
+          level: { in: ['error', 'critical'] },
+          ...(tenantId ? { tenantId } : {}),
+        },
+        include: {
+          tenant: { select: { companyName: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      });
+
+      for (const err of errors) {
+        activities.push({
+          id: `error-${err.id}`,
+          type: 'error',
+          timestamp: err.createdAt,
+          tenantId: err.tenantId,
+          tenantName: err.tenant?.companyName || 'System',
+          description: err.message.substring(0, 200),
+          severity: err.level === 'critical' ? 'error' : 'warning',
+          metadata: {
+            level: err.level,
+            endpoint: err.endpoint,
+            stack: err.stack?.substring(0, 500),
+          },
+        });
+      }
+    }
+
+    // 5. Zander Actions (from ZanderActionLog)
+    if (!eventType || eventType === 'zander_action') {
+      const zanderActions = await this.prisma.zanderActionLog.findMany({
+        where: {
+          executedAt: { gte: startDate },
+          ...(tenantId ? { tenantId } : {}),
+        },
+        orderBy: { executedAt: 'desc' },
+        take: 50,
+      });
+
+      for (const za of zanderActions) {
+        activities.push({
+          id: `zander-${za.id}`,
+          type: 'zander_action',
+          timestamp: za.executedAt,
+          tenantId: za.tenantId,
+          tenantName: null,
+          description: `Zander ${za.action} (${za.level})`,
+          severity: za.success ? 'info' : 'error',
+          metadata: {
+            action: za.action,
+            level: za.level,
+            success: za.success,
+            errorMessage: za.errorMessage,
+            durationMs: za.durationMs,
+          },
+        });
+      }
+    }
+
+    // 6. Tenant Management Actions (archive, restore, rename)
+    if (!eventType || eventType === 'tenant_management') {
+      const mgmtActions = await this.prisma.tenantActivityLog.findMany({
+        where: {
+          action: { in: ['ARCHIVE', 'RESTORE', 'RENAME'] },
+          timestamp: { gte: startDate },
+          ...(tenantId ? { tenantId } : {}),
+        },
+        include: {
+          tenant: { select: { companyName: true } },
+        },
+        orderBy: { timestamp: 'desc' },
+      });
+
+      for (const action of mgmtActions) {
+        activities.push({
+          id: `mgmt-${action.id}`,
+          type: 'tenant_management',
+          timestamp: action.timestamp,
+          tenantId: action.tenantId,
+          tenantName: action.tenant?.companyName || 'Unknown',
+          description: `Tenant ${action.action.toLowerCase()}: ${action.tenant?.companyName}`,
+          severity: action.action === 'ARCHIVE' ? 'warning' : 'info',
+          metadata: {
+            action: action.action,
+            oldValue: action.oldValue,
+            newValue: action.newValue,
+            performedBy: action.actionPerformedBy,
+          },
+        });
+      }
+    }
+
+    // Sort by timestamp descending and paginate
+    activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    const total = activities.length;
+    const paginatedActivities = activities.slice(offset, offset + limit);
+
+    // Get event type counts for filters
+    const typeCounts = activities.reduce((acc, a) => {
+      acc[a.type] = (acc[a.type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      success: true,
+      data: paginatedActivities,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + paginatedActivities.length < total,
+      },
+      filters: {
+        eventTypes: ['signup', 'tier_change', 'token_spike', 'error', 'zander_action', 'tenant_management'],
+        typeCounts,
+      },
+      timeRange: {
+        hours,
+        startDate: startDate.toISOString(),
+        endDate: new Date().toISOString(),
+      },
+    };
+  }
 }

@@ -6,6 +6,7 @@ import { HealthTab } from './components/HealthTab';
 import { TenantsTab } from './components/TenantsTab';
 import { DiagnosticsTab } from './components/DiagnosticsTab';
 import { UsersTab } from './components/UsersTab';
+import { ActivityFeedTab } from './components/ActivityFeedTab';
 import { useHealth } from './hooks/useHealth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
@@ -106,7 +107,7 @@ export default function SupportAdminPage() {
   const router = useRouter();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'headwinds' | 'tenants' | 'users' | 'tickets' | 'knowledge' | 'health' | 'diagnostics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'headwinds' | 'tenants' | 'users' | 'tickets' | 'knowledge' | 'health' | 'diagnostics' | 'activity'>('overview');
   
   // Data state
   const [health, setHealth] = useState<SystemHealth>(MOCK_HEALTH);
@@ -516,7 +517,7 @@ export default function SupportAdminPage() {
             borderRadius: '8px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
-            {(['overview', 'health', 'diagnostics', 'headwinds', 'tenants', 'users', 'tickets', 'knowledge'] as const).map(tab => (
+            {(['overview', 'health', 'diagnostics', 'activity', 'headwinds', 'tenants', 'users', 'tickets', 'knowledge'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -531,7 +532,7 @@ export default function SupportAdminPage() {
                   transition: 'all 0.2s ease'
                 }}
               >
-                {tab === 'overview' && '📊'} {tab === 'health' && '💓'} {tab === 'diagnostics' && '🔬'} {tab === 'headwinds' && '🔴'} {tab === 'tenants' && '🏢'} {tab === 'users' && '👥'} {tab === 'tickets' && '🎫'} {tab === 'knowledge' && '📚'}
+                {tab === 'overview' && '📊'} {tab === 'health' && '💓'} {tab === 'diagnostics' && '🔬'} {tab === 'activity' && '📡'} {tab === 'headwinds' && '🔴'} {tab === 'tenants' && '🏢'} {tab === 'users' && '👥'} {tab === 'tickets' && '🎫'} {tab === 'knowledge' && '📚'}
                 {' '}{tab.charAt(0).toUpperCase() + tab.slice(1)}
                 {tab === 'headwinds' && ` (${headwinds.filter(h => h.status !== 'CLOSED' && h.status !== 'DEPLOYED').length})`}
                 {tab === 'tickets' && ` (${tickets.filter(t => !['RESOLVED', 'CLOSED', 'AI_RESOLVED'].includes(t.status)).length})`}
@@ -668,6 +669,12 @@ export default function SupportAdminPage() {
 
           {activeTab === 'users' && (
             <UsersTab />
+          )}
+
+          {activeTab === 'activity' && (
+            <div style={{ background: '#1C1C26', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+              <ActivityFeedTab />
+            </div>
           )}
 
           {activeTab === 'knowledge' && (

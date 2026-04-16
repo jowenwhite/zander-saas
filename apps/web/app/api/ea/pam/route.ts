@@ -1028,19 +1028,18 @@ async function executeTool(
 
         if (markAll) {
           // Mark all unread as read
-          const url = `${EA_API_URL}/email-messages/mark-all-read?tenantId=${tenantId}`;
+          const url = `${EA_API_URL}/email-messages/mark-all-read`;
           const response = await fetch(url, {
-            method: 'PUT',
+            method: 'PATCH',
             headers
           });
 
           if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[Pam] mark-all-read error: ${response.status} - ${errorText}`);
             return {
-              success: true,
-              result: {
-                message: 'Bulk mark-read not yet implemented',
-                note: 'Requires PATCH /email-messages/mark-all-read endpoint'
-              }
+              success: false,
+              error: `Failed to mark all as read: ${response.status}`
             };
           }
 
