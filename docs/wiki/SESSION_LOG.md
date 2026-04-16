@@ -4,6 +4,43 @@ Use this file to record session handoffs and major changes.
 
 ---
 
+## 2026-04-16 — Phase 3 Support Admin Complete
+
+**What Shipped:**
+
+1. **3A: Tenant CRUD**
+   - Create Tenant dialog: company name, auto-subdomain, starting tier
+   - Backend: POST /admin/tenants endpoint with subdomain uniqueness check
+   - Added createTenant to useTenants hook
+
+2. **3B: Tier & Trial Management UI**
+   - Token usage column in Tenants table (with reset button)
+   - Token Reset dialog with reason/note
+   - Backend: Enhanced resetTenantTokens updates monthlyTokensUsed + logs activity
+   - Tenant list now returns monthlyTokensUsed, tokenResetDate
+
+3. **3C: User Management Tab**
+   - New UserManagementTab replaces engagement-focused UsersTab
+   - Lists all users across tenants with search, filter by tenant/role
+   - Edit modal to reassign user to different tenant or change role
+   - Backend: GET /admin/all-users, PATCH /admin/users/:id endpoints
+   - useAllUsers hook with pagination
+
+**Files Changed:**
+- `apps/api/src/admin/admin.controller.ts` — New endpoints for tenants, users
+- `apps/api/src/admin/admin.service.ts` — createTenant, getAllUsers, updateUser, enhanced listTenants
+- `apps/web/app/admin/support-admin/page.tsx` — Swapped UserManagementTab for UsersTab
+- `apps/web/app/admin/support-admin/components/TenantsTab.tsx` — Create button, token column
+- `apps/web/app/admin/support-admin/hooks/useTenants.ts` — createTenant, resetTokens
+- NEW: `apps/web/app/admin/support-admin/components/CreateTenantDialog.tsx`
+- NEW: `apps/web/app/admin/support-admin/components/TokenResetDialog.tsx`
+- NEW: `apps/web/app/admin/support-admin/components/UserManagementTab.tsx`
+- NEW: `apps/web/app/admin/support-admin/hooks/useAllUsers.ts`
+
+**Commit:** 9b35a1d
+
+---
+
 ## 2026-04-16 — Bug Fixes + Activity Feed Tab
 
 **What Shipped:**
