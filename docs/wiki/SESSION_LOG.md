@@ -182,3 +182,81 @@ Use this file to record session handoffs and major changes.
 **Next Priorities:**
 - What to work on next
 ```
+
+---
+
+## 2026-04-16 — Phase 5 Consulting Module (Session 3)
+
+**What Shipped:**
+
+1. **Phase 5A: Digital Store**
+   - Created /store page with 6 digital products
+   - Stripe checkout integration
+   - Success page with download link
+   - All products live with real Stripe price IDs
+
+2. **Phase 5B: Consulting Backend**
+   - ConsultingModule (NestJS) with DTOs, Service, Controller
+   - ConsultingEngagement, ConsultingTimeEntry, ConsultingDeliverable models
+   - ConsultingIntake model for intake surveys
+   - Prisma schema updated and synced to RDS
+   - CONSULTING tier added with 0 AI token cap
+
+3. **Phase 5C: Support Admin Integration**
+   - ConsultingTab component with engagement management
+   - Time entry logging with category tracking
+   - Deliverable management interface
+   - ConsultingIntakeSurvey component
+   - useConsulting hook for API interactions
+
+4. **Phase 5D: Billing Integration**
+   - Webhook handlers for consulting one-time payments
+   - Webhook handlers for digital store purchases
+   - Auto-create ConsultingEngagement on successful payment
+   - Welcome and admin notification emails
+
+5. **Stripe Products Created:**
+   - Consulting: Business Analysis ($500), Compass ($2,500), Foundation ($4,500), Blueprint ($8,000), Extension ($250)
+   - Store: Operations Playbook ($79), Startup Foundations ($99), Sales/Marketing ($99), Hiring/Team ($99), Financial Clarity ($79), Industry Starter ($149)
+
+**Version Numbers:**
+- API Docker Image: v56
+- Git Commit: 3fb6983
+- Prisma: 5.22.0
+- Stripe: 17.7.0
+
+**Files Changed:**
+- NEW: `apps/api/src/consulting/` (entire module)
+- `apps/api/src/billing/webhook.controller.ts` — consulting/store handlers
+- `apps/api/src/app.module.ts` — import ConsultingModule
+- NEW: `apps/web/app/admin/support-admin/components/ConsultingTab.tsx`
+- NEW: `apps/web/app/admin/support-admin/components/ConsultingIntakeSurvey.tsx`
+- NEW: `apps/web/app/admin/support-admin/hooks/useConsulting.ts`
+- `apps/web/app/admin/support-admin/page.tsx` — consulting tab
+- `apps/web/app/store/page.tsx` — live price IDs
+- `packages/database/prisma/schema.prisma` — consulting models
+- NEW: `scripts/create-consulting-stripe-products.ts`
+
+**Commits:**
+- ef0c2d3 — feat(consulting): complete Phase 5 consulting module implementation
+- 3fb6983 — feat: Phase 5 consulting module complete — store, tier, admin, intake, billing
+
+**Deployment:**
+- ECS: zander-api-service deployed v56
+- Health check: OK
+- App: 200 OK
+- Store: 200 OK
+
+**Outstanding:**
+- Digital product download files need upload
+- Consulting Stripe webhook endpoint registration
+- Client-facing HQ consulting dashboard
+- Public intake survey form
+
+**Next Session Priorities:**
+1. Test end-to-end consulting purchase flow
+2. Test digital store purchase/download flow
+3. Build client-facing consulting HQ view
+4. Add public intake survey
+5. Create actual downloadable store content
+
