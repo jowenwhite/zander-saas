@@ -4,6 +4,32 @@ Use this file to record session handoffs and major changes.
 
 ---
 
+## 2026-04-16 — Bug Fixes + Activity Feed Tab
+
+**What Shipped:**
+1. **Bug Fix: Bulk Mark-Read** — Changed HTTP method from PUT to PATCH in Pam route
+2. **Activity Feed Tab** — New Support Admin tab showing cross-tenant platform activity
+   - Backend: GET /admin/activity-feed endpoint
+   - Frontend: ActivityFeedTab component + useActivityFeed hook
+   - Shows: signups, tier changes, token spikes, errors, Zander actions
+   - Filterable by event type and time range
+3. **64 West Cleanup** — Archived 64 West Consulting and Finance tenants
+
+**Files Changed:**
+- `apps/api/src/admin/admin.controller.ts` — Added activity-feed endpoint
+- `apps/api/src/admin/admin.service.ts` — Added getActivityFeed method
+- `apps/web/app/api/ea/pam/route.ts` — Fixed mark-read HTTP method
+- `apps/web/app/admin/support-admin/page.tsx` — Added activity tab
+- NEW: `apps/web/app/admin/support-admin/components/ActivityFeedTab.tsx`
+- NEW: `apps/web/app/admin/support-admin/hooks/useActivityFeed.ts`
+
+**Bug Investigation:**
+- Calendar booking tenant identity issue — Implementation is correct. Events use tenant from JWT, Google Calendar syncs to user's primary calendar.
+
+**Commit:** 5dfb102
+
+---
+
 ## 2026-04-14 — Wiki Restructure
 
 **Changes:**
