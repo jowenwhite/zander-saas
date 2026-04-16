@@ -20,6 +20,9 @@ export interface Tenant {
   engagementScore: number | null;
   churnRiskLevel: string | null;
   status: 'ACTIVE' | 'ARCHIVED';
+  // Token usage fields
+  monthlyTokensUsed: number;
+  tokenResetDate: string | null;
 }
 
 interface TenantsResponse {
@@ -251,11 +254,60 @@ export function useTenants() {
     }
   };
 
+  const createTenant = async (data: {
+    companyName: string;
+    subdomain?: string;
+    tier?: string;
+    tierOverrideNote?: string;
+  }): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URL}/admin/tenants`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': ADMIN_SECRET,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to create tenant');
+      }
+      await fetchTenants();
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create tenant');
+      return false;
+    }
+  };
+
+  const resetTokens = async (tenantId: string, reason?: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URL}/admin/tenants/${tenantId}/reset-tokens`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': ADMIN_SECRET,
+        },
+        body: JSON.stringify({ reason }),
+      });
+
+      if (!response.ok) throw new Error('Failed to reset tokens');
+      await fetchTenants();
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reset tokens');
+      return false;
+    }
+  };
+
   return {
     tenants,
     loading,
     error,
     refresh: fetchTenants,
+    createTenant,
     renameTenant,
     setTierOverride,
     removeTierOverride,
@@ -264,6 +316,7 @@ export function useTenants() {
     cancelTrial,
     archiveTenant,
     restoreTenant,
+    resetTokens,
     bulkSetTierOverride,
     bulkExtendTrial,
     bulkArchive,

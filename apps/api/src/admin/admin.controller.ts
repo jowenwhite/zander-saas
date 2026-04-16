@@ -450,6 +450,26 @@ export class AdminController {
   }
 
   /**
+   * POST /admin/tenants
+   * Create a new tenant
+   */
+  @Public()
+  @Post('tenants')
+  @HttpCode(200)
+  async createTenant(
+    @Headers('x-admin-secret') secretKey: string,
+    @Body() data: {
+      companyName: string;
+      subdomain?: string;
+      tier?: string;
+      tierOverrideNote?: string;
+    },
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.createTenant(data);
+  }
+
+  /**
    * GET /admin/tenants/:id/subscription
    * Get tenant subscription details
    */
@@ -619,6 +639,49 @@ export class AdminController {
       return { success: false, error: 'segment query parameter is required' };
     }
     return this.adminService.getUsersBySegment(segment);
+  }
+
+  /**
+   * GET /admin/all-users
+   * List all users across all tenants (for Support Admin)
+   */
+  @Public()
+  @Get('all-users')
+  async getAllUsers(
+    @Headers('x-admin-secret') secretKey: string,
+    @Query('tenantId') tenantId?: string,
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.getAllUsers({
+      tenantId,
+      search,
+      role,
+      limit: limit ? parseInt(limit) : 50,
+      offset: offset ? parseInt(offset) : 0,
+    });
+  }
+
+  /**
+   * PATCH /admin/users/:id
+   * Update user details (tenant assignment, role, active status)
+   */
+  @Public()
+  @Patch('users/:id')
+  async updateUser(
+    @Param('id') userId: string,
+    @Headers('x-admin-secret') secretKey: string,
+    @Body() data: {
+      tenantId?: string;
+      role?: string;
+      isActive?: boolean;
+    },
+  ) {
+    this.validateAdminSecret(secretKey);
+    return this.adminService.updateUser(userId, data);
   }
 
   // ============================================

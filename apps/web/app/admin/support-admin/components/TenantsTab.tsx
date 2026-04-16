@@ -14,13 +14,15 @@ import { TenantTierDialog } from './TenantTierDialog';
 import { TenantTrialExtendDialog } from './TenantTrialExtendDialog';
 import { ArchiveConfirmDialog } from './ArchiveConfirmDialog';
 import { RestoreConfirmDialog } from './RestoreConfirmDialog';
+import { CreateTenantDialog } from './CreateTenantDialog';
+import { TokenResetDialog } from './TokenResetDialog';
 
 type FilterStatus = 'all' | 'active' | 'archived';
 type SortField = 'name' | 'tier' | 'users' | 'engagement' | 'churnRisk' | 'lastActivity';
 type SortDirection = 'asc' | 'desc';
 
 interface ModalState {
-  type: 'detail' | 'rename' | 'tier' | 'trial' | 'archive' | 'restore' | 'bulkTier' | 'bulkTrial' | 'bulkArchive' | null;
+  type: 'detail' | 'rename' | 'tier' | 'trial' | 'archive' | 'restore' | 'bulkTier' | 'bulkTrial' | 'bulkArchive' | 'create' | 'tokenReset' | null;
   tenant: Tenant | null;
 }
 
@@ -30,12 +32,14 @@ export function TenantsTab() {
     loading,
     error,
     refresh,
+    createTenant,
     renameTenant,
     setTierOverride,
     removeTierOverride,
     extendTrial,
     archiveTenant,
     restoreTenant,
+    resetTokens,
     bulkSetTierOverride,
     bulkExtendTrial,
     bulkArchive,
@@ -220,6 +224,24 @@ export function TenantsTab() {
     return success;
   };
 
+  const handleCreate = async (data: {
+    companyName: string;
+    subdomain?: string;
+    tier?: string;
+    tierOverrideNote?: string;
+  }) => {
+    const success = await createTenant(data);
+    if (success) closeModal();
+    return success;
+  };
+
+  const handleTokenReset = async (reason?: string) => {
+    if (!modal.tenant) return false;
+    const success = await resetTokens(modal.tenant.id, reason);
+    if (success) closeModal();
+    return success;
+  };
+
   if (loading && tenants.length === 0) {
     return (
       <div
@@ -391,6 +413,24 @@ export function TenantsTab() {
           >
             Refresh
           </button>
+          <button
+            onClick={() => setModal({ type: 'create', tenant: null })}
+            style={{
+              background: '#00CCEE',
+              color: '#1C1C26',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            + Create Tenant
+          </button>
         </div>
       </div>
 
@@ -464,6 +504,18 @@ export function TenantsTab() {
                   }}
                 >
                   Users {sortField === 'users' && (sortDirection === 'asc' ? '>' : '<')}
+                </th>
+                <th
+                  style={{
+                    padding: '1rem',
+                    textAlign: 'right',
+                    color: '#8888A0',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Tokens
                 </th>
                 <th
                   onClick={() => handleSort('lastActivity')}
@@ -568,6 +620,32 @@ export function TenantsTab() {
                   <td style={{ padding: '1rem', textAlign: 'center' }}>
                     <span style={{ color: '#F0F0F5', fontWeight: '500' }}>{tenant.userCount}</span>
                   </td>
+                  <td style={{ padding: '1rem', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                      <span style={{ color: '#F0F0F5', fontSize: '0.9rem', fontFamily: 'monospace' }}>
+                        {(tenant.monthlyTokensUsed || 0).toLocaleString()}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModal({ type: 'tokenReset', tenant });
+                        }}
+                        title="Reset tokens"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#8888A0',
+                          cursor: 'pointer',
+                          padding: '0.25rem',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          lineHeight: 1,
+                        }}
+                      >
+                        <span style={{ fontSize: '0.9rem' }}>&#x21bb;</span>
+                      </button>
+                    </div>
+                  </td>
                   <td style={{ padding: '1rem' }}>
                     <span style={{ color: '#8888A0', fontSize: '0.9rem' }}>
                       {formatRelativeTime(tenant.lastActivityAt)}
@@ -598,7 +676,7 @@ export function TenantsTab() {
               {filteredTenants.length === 0 && (
                 <tr>
                   <td
-                    colSpan={9}
+                    colSpan={10}
                     style={{
                       padding: '3rem',
                       textAlign: 'center',
@@ -683,6 +761,23 @@ export function TenantsTab() {
           tenantName={modal.tenant.name}
           onConfirm={handleRestore}
           onCancel={closeModal}
+        />
+      )}
+
+      {modal.type === 'create' && (
+        <CreateTenantDialog
+          isOpen={true}
+          onClose={closeModal}
+          onSubmit={handleCreate}
+        />
+      )}
+
+      {modal.type === 'tokenReset' && modal.tenant && (
+        <TokenResetDialog
+          isOpen={true}
+          tenant={modal.tenant}
+          onClose={closeModal}
+          onSubmit={handleTokenReset}
         />
       )}
 

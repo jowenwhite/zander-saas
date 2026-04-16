@@ -6,6 +6,7 @@ import { HealthTab } from './components/HealthTab';
 import { TenantsTab } from './components/TenantsTab';
 import { DiagnosticsTab } from './components/DiagnosticsTab';
 import { UsersTab } from './components/UsersTab';
+import { UserManagementTab } from './components/UserManagementTab';
 import { ActivityFeedTab } from './components/ActivityFeedTab';
 import { useHealth } from './hooks/useHealth';
 
@@ -668,7 +669,7 @@ export default function SupportAdminPage() {
           )}
 
           {activeTab === 'users' && (
-            <UsersTab />
+            <UserManagementTab />
           )}
 
           {activeTab === 'activity' && (

@@ -93,15 +93,43 @@ export class AdminService {
   /**
    * Reset token usage for a tenant (admin operation)
    */
-  async resetTenantTokens(tenantId: string) {
-    const deleted = await this.prisma.tokenUsage.deleteMany({
-      where: { tenantId },
+  async resetTenantTokens(tenantId: string, reason?: string) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { companyName: true, monthlyTokensUsed: true },
+    });
+
+    if (!tenant) {
+      throw new Error('Tenant not found');
+    }
+
+    const previousUsage = tenant.monthlyTokensUsed || 0;
+
+    // Reset the monthly tokens counter
+    await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        monthlyTokensUsed: 0,
+        tokenResetDate: new Date(),
+      },
+    });
+
+    // Log the action
+    await this.prisma.tenantActivityLog.create({
+      data: {
+        tenantId,
+        action: 'TOKEN_RESET',
+        oldValue: { monthlyTokensUsed: previousUsage },
+        newValue: { monthlyTokensUsed: 0, reason: reason || 'Manual reset via Support Admin' },
+        actionPerformedBy: 'Support Admin',
+      },
     });
 
     return {
       success: true,
-      message: `Reset token usage for tenant ${tenantId}`,
-      deletedRecords: deleted.count,
+      message: `Token usage reset for ${tenant.companyName}`,
+      previousUsage,
+      newUsage: 0,
     };
   }
 
@@ -3875,6 +3903,8 @@ If at limit:
         lastActivityAt: true,
         currentEngagementScore: true,
         currentChurnRiskLevel: true,
+        monthlyTokensUsed: true,
+        tokenResetDate: true,
         _count: {
           select: { users: true },
         },
@@ -3902,8 +3932,87 @@ If at limit:
         engagementScore: t.currentEngagementScore,
         churnRiskLevel: t.currentChurnRiskLevel,
         status: t.archivedAt ? 'ARCHIVED' : 'ACTIVE',
+        monthlyTokensUsed: t.monthlyTokensUsed || 0,
+        tokenResetDate: t.tokenResetDate,
       })),
       count: tenants.length,
+    };
+  }
+
+  /**
+   * Create a new tenant
+   */
+  async createTenant(data: {
+    companyName: string;
+    subdomain?: string;
+    tier?: string;
+    tierOverrideNote?: string;
+  }) {
+    if (!data.companyName || data.companyName.trim().length === 0) {
+      return { success: false, error: 'Company name is required' };
+    }
+
+    const trimmedName = data.companyName.trim();
+    if (trimmedName.length > 200) {
+      return { success: false, error: 'Company name must be 200 characters or less' };
+    }
+
+    // Generate subdomain from company name if not provided
+    const subdomain = data.subdomain || trimmedName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 50);
+
+    // Check for subdomain uniqueness
+    const existing = await this.prisma.tenant.findFirst({
+      where: { subdomain },
+    });
+
+    if (existing) {
+      return { success: false, error: `Subdomain "${subdomain}" is already taken` };
+    }
+
+    // Create the tenant
+    const tenant = await this.prisma.tenant.create({
+      data: {
+        companyName: trimmedName,
+        subdomain,
+        subscriptionTier: 'FREE',
+        tierOverride: data.tier && data.tier !== 'FREE' ? data.tier : null,
+        tierOverrideNote: data.tierOverrideNote || (data.tier ? 'Created via Support Admin' : null),
+      },
+      select: {
+        id: true,
+        companyName: true,
+        subdomain: true,
+        subscriptionTier: true,
+        tierOverride: true,
+        createdAt: true,
+      },
+    });
+
+    // Log the action
+    await this.prisma.tenantActivityLog.create({
+      data: {
+        tenantId: tenant.id,
+        action: 'CREATE',
+        actionPerformedBy: 'SUPPORT_ADMIN',
+        newValue: {
+          companyName: tenant.companyName,
+          subdomain: tenant.subdomain,
+          tier: data.tier || 'FREE',
+        },
+      },
+    });
+
+    return {
+      success: true,
+      message: `Tenant "${trimmedName}" created successfully`,
+      data: {
+        ...tenant,
+        effectiveTier: data.tier || 'FREE',
+      },
     };
   }
 
@@ -5067,12 +5176,19 @@ If at limit:
           level: { in: ['error', 'critical'] },
           ...(tenantId ? { tenantId } : {}),
         },
-        include: {
-          tenant: { select: { companyName: true } },
-        },
         orderBy: { createdAt: 'desc' },
         take: 50,
       });
+
+      // Get tenant names for errors that have tenantId
+      const errorTenantIds = [...new Set(errors.filter(e => e.tenantId).map(e => e.tenantId))];
+      const errorTenants = errorTenantIds.length > 0
+        ? await this.prisma.tenant.findMany({
+            where: { id: { in: errorTenantIds as string[] } },
+            select: { id: true, companyName: true },
+          })
+        : [];
+      const errorTenantMap = new Map(errorTenants.map(t => [t.id, t.companyName]));
 
       for (const err of errors) {
         activities.push({
@@ -5080,7 +5196,7 @@ If at limit:
           type: 'error',
           timestamp: err.createdAt,
           tenantId: err.tenantId,
-          tenantName: err.tenant?.companyName || 'System',
+          tenantName: err.tenantId ? errorTenantMap.get(err.tenantId) || 'Unknown' : 'System',
           description: err.message.substring(0, 200),
           severity: err.level === 'critical' ? 'error' : 'warning',
           metadata: {
@@ -5185,6 +5301,183 @@ If at limit:
         startDate: startDate.toISOString(),
         endDate: new Date().toISOString(),
       },
+    };
+  }
+
+  // ============================================
+  // USER MANAGEMENT (Cross-Tenant)
+  // ============================================
+
+  /**
+   * Get all users across all tenants for Support Admin
+   */
+  async getAllUsers(params: {
+    tenantId?: string;
+    search?: string;
+    role?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const { tenantId, search, role, limit = 50, offset = 0 } = params;
+
+    const where: any = {};
+
+    if (tenantId) {
+      where.tenantId = tenantId;
+    }
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { firstName: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        include: {
+          tenant: {
+            select: {
+              id: true,
+              companyName: true,
+              subscriptionTier: true,
+              tierOverride: true,
+            },
+          },
+        },
+        orderBy: [{ createdAt: 'desc' }],
+        take: limit,
+        skip: offset,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    // Get role counts for filtering
+    const roleCounts = await this.prisma.user.groupBy({
+      by: ['role'],
+      _count: { role: true },
+    });
+
+    const roleOptions = roleCounts.map((r) => ({
+      role: r.role,
+      count: r._count.role,
+    }));
+
+    return {
+      success: true,
+      data: users.map((u) => ({
+        id: u.id,
+        email: u.email,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email,
+        role: u.role,
+        isSuperAdmin: u.isSuperAdmin,
+        tenantId: u.tenantId,
+        tenantName: u.tenant?.companyName,
+        tenantTier: u.tenant?.tierOverride || u.tenant?.subscriptionTier,
+        createdAt: u.createdAt,
+        updatedAt: u.updatedAt,
+      })),
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + users.length < total,
+      },
+      filters: {
+        roleOptions,
+      },
+    };
+  }
+
+  /**
+   * Update user (tenant assignment, role, etc.)
+   */
+  async updateUser(
+    userId: string,
+    data: {
+      tenantId?: string;
+      role?: string;
+      isActive?: boolean;
+    },
+  ) {
+    // Get current user for logging
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { tenant: { select: { companyName: true } } },
+    });
+
+    if (!existingUser) {
+      throw new Error('User not found');
+    }
+
+    const updateData: any = {};
+    const changes: string[] = [];
+
+    // Handle tenant reassignment
+    if (data.tenantId !== undefined && data.tenantId !== existingUser.tenantId) {
+      // Verify new tenant exists
+      const newTenant = await this.prisma.tenant.findUnique({
+        where: { id: data.tenantId },
+        select: { companyName: true },
+      });
+
+      if (!newTenant) {
+        throw new Error('Target tenant not found');
+      }
+
+      updateData.tenantId = data.tenantId;
+      changes.push(
+        `Tenant: ${existingUser.tenant?.companyName || 'None'} → ${newTenant.companyName}`,
+      );
+    }
+
+    // Handle role change
+    if (data.role !== undefined && data.role !== existingUser.role) {
+      const validRoles = ['owner', 'admin', 'member', 'viewer'];
+      if (!validRoles.includes(data.role.toLowerCase())) {
+        throw new Error(`Invalid role. Must be one of: ${validRoles.join(', ')}`);
+      }
+
+      updateData.role = data.role.toLowerCase();
+      changes.push(`Role: ${existingUser.role} → ${data.role}`);
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return {
+        success: true,
+        message: 'No changes to apply',
+        user: existingUser,
+      };
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      include: {
+        tenant: { select: { companyName: true } },
+      },
+    });
+
+    return {
+      success: true,
+      message: `User updated: ${changes.join(', ')}`,
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: `${updatedUser.firstName || ''} ${updatedUser.lastName || ''}`.trim(),
+        role: updatedUser.role,
+        tenantId: updatedUser.tenantId,
+        tenantName: updatedUser.tenant?.companyName,
+      },
+      changes,
     };
   }
 }
