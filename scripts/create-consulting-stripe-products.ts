@@ -13,40 +13,42 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // Consulting packages (one-time payments)
+// Hours per PRD: Business Analysis=3, Compass=10, Foundation=20, Blueprint=40
+// Extension is a 3-month time extension, not additional hours
 const CONSULTING_PACKAGES = [
   {
     name: 'Comprehensive Business Analysis',
-    description: 'In-depth analysis of your business operations, financials, and strategic positioning.',
+    description: 'In-depth analysis of your business operations, financials, and strategic positioning. Includes 3 consulting hours.',
     price: 50000, // $500 in cents
-    hours: 0,
+    hours: 3,
     type: 'BUSINESS_ANALYSIS',
   },
   {
     name: 'Compass Package',
-    description: '20-hour consulting engagement for strategic direction and operational assessment.',
+    description: '10-hour consulting engagement for strategic direction and operational assessment.',
     price: 250000, // $2,500 in cents
-    hours: 20,
+    hours: 10,
     type: 'COMPASS',
   },
   {
     name: 'Foundation Package',
-    description: '40-hour consulting engagement for comprehensive business foundation building.',
+    description: '20-hour consulting engagement for comprehensive business foundation building.',
     price: 450000, // $4,500 in cents
-    hours: 40,
+    hours: 20,
     type: 'FOUNDATION',
   },
   {
     name: 'Blueprint Package',
-    description: '80-hour consulting engagement for full business transformation and implementation.',
+    description: '40-hour consulting engagement for full business transformation and implementation.',
     price: 800000, // $8,000 in cents
-    hours: 80,
+    hours: 40,
     type: 'BLUEPRINT',
   },
   {
     name: 'Package Extension',
-    description: '10 additional consulting hours for existing engagements.',
+    description: '3-month time extension for existing consulting engagements. Hours carry over.',
     price: 25000, // $250 in cents
-    hours: 10,
+    hours: 0, // Extension adds time, not hours
     type: 'EXTENSION',
   },
 ];

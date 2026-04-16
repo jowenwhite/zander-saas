@@ -28,12 +28,14 @@ const TIER_AMOUNTS: Record<string, number> = {
 };
 
 // Consulting package price IDs (from Stripe)
-const CONSULTING_PRICE_IDS: Record<string, { type: string; hours: number; price: number }> = {
-  'price_1TMrUlCesrE5OiIGm3P5qwpM': { type: 'BUSINESS_ANALYSIS', hours: 0, price: 500 },
-  'price_1TMrUmCesrE5OiIGFhluNodU': { type: 'COMPASS', hours: 20, price: 2500 },
-  'price_1TMrUnCesrE5OiIGe6YO8ROu': { type: 'FOUNDATION', hours: 40, price: 4500 },
-  'price_1TMrUoCesrE5OiIG4b894eDD': { type: 'BLUEPRINT', hours: 80, price: 8000 },
-  'price_1TMrUpCesrE5OiIGlGoEknqD': { type: 'EXTENSION', hours: 10, price: 250 },
+// Hours per PRD: Business Analysis=3, Compass=10, Foundation=20, Blueprint=40
+// Extension is a 3-month time extension, not additional hours
+const CONSULTING_PRICE_IDS: Record<string, { type: string; hours: number; price: number; isExtension?: boolean }> = {
+  'price_1TMrUlCesrE5OiIGm3P5qwpM': { type: 'BUSINESS_ANALYSIS', hours: 3, price: 500 },
+  'price_1TMrUmCesrE5OiIGFhluNodU': { type: 'COMPASS', hours: 10, price: 2500 },
+  'price_1TMrUnCesrE5OiIGe6YO8ROu': { type: 'FOUNDATION', hours: 20, price: 4500 },
+  'price_1TMrUoCesrE5OiIG4b894eDD': { type: 'BLUEPRINT', hours: 40, price: 8000 },
+  'price_1TMrUpCesrE5OiIGlGoEknqD': { type: 'EXTENSION', hours: 0, price: 250, isExtension: true },
 };
 
 // Digital store product price IDs (from Stripe)
@@ -256,6 +258,12 @@ export class WebhookController {
       return;
     }
 
+    // Handle Extension package differently - adds 3 months, not hours
+    if (packageInfo.isExtension) {
+      await this.handlePackageExtension(tenantId, session.id, customerId);
+      return;
+    }
+
     await this.createConsultingEngagement(
       tenantId,
       packageInfo.type,
@@ -263,6 +271,134 @@ export class WebhookController {
       session.id,
       customerId,
     );
+  }
+
+  private async handlePackageExtension(tenantId: string, paymentId: string, customerId: string) {
+    this.logger.log(`Processing 3-month package extension for tenant ${tenantId}`);
+
+    try {
+      // Get tenant with current consulting info
+      const tenant = await this.prisma.tenant.findUnique({
+        where: { id: tenantId },
+        include: { users: { take: 1, orderBy: { createdAt: 'asc' } } },
+      });
+
+      if (!tenant) {
+        this.logger.error(`Tenant ${tenantId} not found for extension`);
+        return;
+      }
+
+      // Calculate new expiration date (add 3 months to current expiration or from now)
+      const currentExpiration = tenant.packageExpirationDate || new Date();
+      const newExpiration = new Date(currentExpiration);
+      newExpiration.setMonth(newExpiration.getMonth() + 3);
+
+      // Update tenant with extended expiration
+      await this.prisma.tenant.update({
+        where: { id: tenantId },
+        data: {
+          stripeCustomerId: customerId,
+          packageExpirationDate: newExpiration,
+        },
+      });
+
+      this.logger.log(`Extended tenant ${tenantId} package expiration to ${newExpiration.toISOString()}`);
+
+      // Send confirmation email
+      const customerEmail = tenant.users?.[0]?.email || tenant.email;
+      const customerName = tenant.users?.[0]?.firstName || tenant.companyName || 'Valued Client';
+
+      if (customerEmail) {
+        await this.sendExtensionConfirmationEmail(customerEmail, customerName, newExpiration);
+      }
+
+      // Send admin notification
+      await this.sendExtensionAdminNotification(customerName, customerEmail || 'unknown', newExpiration);
+
+    } catch (error) {
+      this.logger.error(`Failed to process package extension: ${error.message}`);
+    }
+  }
+
+  private async sendExtensionConfirmationEmail(email: string, name: string, newExpiration: Date) {
+    try {
+      const expirationStr = newExpiration.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <h1 style="color: #0C2340; margin: 0 0 20px; font-size: 28px;">Package Extension Confirmed</h1>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Hi ${name},
+          </p>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Your consulting package has been extended by 3 months. Your new expiration date is:
+          </p>
+
+          <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 25px 0; text-align: center;">
+            <p style="font-size: 24px; font-weight: 700; color: #0C2340; margin: 0;">${expirationStr}</p>
+          </div>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Your remaining consulting hours carry over. Let's keep building!
+          </p>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Best,<br>
+            <strong>Jonathan White</strong><br>
+            <span style="color: #666;">Founder, Zander</span>
+          </p>
+        </div>
+      `;
+
+      await this.emailService.sendEmail({
+        to: email,
+        subject: 'Consulting Package Extended - New Expiration Date',
+        html,
+        from: 'Jonathan from Zander <jonathan@zanderos.com>',
+        replyTo: 'jonathan@zanderos.com',
+      });
+
+      this.logger.log(`Extension confirmation email sent to ${email}`);
+    } catch (err) {
+      this.logger.error(`Failed to send extension confirmation email: ${err.message}`);
+    }
+  }
+
+  private async sendExtensionAdminNotification(customerName: string, customerEmail: string, newExpiration: Date) {
+    try {
+      const expirationStr = newExpiration.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const html = `
+        <div style="font-family: -apple-system, sans-serif; padding: 20px;">
+          <h2 style="color: #0C2340;">📅 Package Extension Purchased</h2>
+          <p><strong>Client:</strong> ${customerName}</p>
+          <p><strong>Email:</strong> ${customerEmail}</p>
+          <p><strong>New Expiration:</strong> ${expirationStr}</p>
+          <p><strong>Extension:</strong> +3 months</p>
+        </div>
+      `;
+
+      await this.emailService.sendEmail({
+        to: 'jonathan@zanderos.com',
+        subject: `Package Extension: ${customerName}`,
+        html,
+        from: 'Zander System <noreply@zanderos.com>',
+      });
+
+      this.logger.log(`Extension admin notification sent for ${customerEmail}`);
+    } catch (err) {
+      this.logger.error(`Failed to send extension admin notification: ${err.message}`);
+    }
   }
 
   private async createConsultingEngagement(
