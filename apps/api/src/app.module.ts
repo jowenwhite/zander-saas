@@ -54,6 +54,7 @@ import { AuditLogFeatureModule } from './audit-log/audit-log.module';
 import { TasksModule } from './tasks/tasks.module';
 import { AssemblyModule } from './assembly/assembly.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { ConsultingModule } from './consulting/consulting.module';
 
 @Module({
   imports: [
@@ -109,6 +110,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
     TasksModule,           // EA Module: Task management for Pam
     AssemblyModule,        // HQ Module: Assembly document generation
     IntegrationsModule,    // Tenant-scoped integration credentials (Twilio, Calendly)
+    ConsultingModule,      // Phase 5: Consulting engagements, time entries, deliverables
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [

@@ -27,6 +27,22 @@ const TIER_AMOUNTS: Record<string, number> = {
   'BUSINESS': 599,
 };
 
+// Consulting package price IDs (populated after running create-consulting-stripe-products.ts)
+// These will be filled in after Stripe products are created
+const CONSULTING_PRICE_IDS: Record<string, { type: string; hours: number; price: number }> = {
+  // Example: 'price_xxx': { type: 'BUSINESS_ANALYSIS', hours: 0, price: 500 },
+  // 'price_xxx': { type: 'COMPASS', hours: 20, price: 2500 },
+  // 'price_xxx': { type: 'FOUNDATION', hours: 40, price: 4500 },
+  // 'price_xxx': { type: 'BLUEPRINT', hours: 80, price: 8000 },
+  // 'price_xxx': { type: 'EXTENSION', hours: 10, price: 250 },
+};
+
+// Digital store product price IDs
+const DIGITAL_STORE_PRICE_IDS: Record<string, { type: string; name: string }> = {
+  // These will be populated after running the Stripe products script
+  // 'price_xxx': { type: 'OPERATIONS_PLAYBOOK', name: 'Operations Playbook' },
+};
+
 @Controller('webhooks')
 export class WebhookController {
   private readonly logger = new Logger(WebhookController.name);
@@ -123,13 +139,31 @@ export class WebhookController {
   // ============================================
 
   private async handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-    this.logger.log(`Checkout completed: ${session.id}`);
+    this.logger.log(`Checkout completed: ${session.id}, mode: ${session.mode}`);
 
     const customerId = session.customer as string;
     const subscriptionId = session.subscription as string;
     const tenantId = session.metadata?.tenantId;
     const cohort = session.metadata?.cohort || 'public';
+    const checkoutType = session.metadata?.type; // 'consulting', 'digital_product', or undefined (subscription)
 
+    // Handle digital store purchases (no tenantId required)
+    if (session.mode === 'payment' && checkoutType === 'digital_product') {
+      await this.handleDigitalStorePurchase(session);
+      return;
+    }
+
+    // Handle consulting package purchases
+    if (session.mode === 'payment' && checkoutType === 'consulting') {
+      if (!tenantId) {
+        this.logger.warn('No tenantId for consulting purchase');
+        return;
+      }
+      await this.handleConsultingPurchase(session, tenantId, customerId);
+      return;
+    }
+
+    // Standard subscription checkout
     if (!tenantId) {
       this.logger.warn('No tenantId in checkout session metadata');
       return;
@@ -190,6 +224,370 @@ export class WebhookController {
 
     // Send admin notification
     await this.sendAdminNotification(customerName, customerEmail || 'unknown', tier);
+  }
+
+  // ============================================
+  // CONSULTING & DIGITAL STORE HANDLERS
+  // ============================================
+
+  private async handleConsultingPurchase(session: Stripe.Checkout.Session, tenantId: string, customerId: string) {
+    this.logger.log(`Processing consulting purchase for tenant ${tenantId}`);
+
+    // Get line items to determine the package
+    const lineItems = await this.stripe.checkout.sessions.listLineItems(session.id);
+    const priceId = lineItems.data[0]?.price?.id;
+
+    if (!priceId) {
+      this.logger.error('No price ID found in consulting checkout session');
+      return;
+    }
+
+    // Look up package details from price ID
+    const packageInfo = CONSULTING_PRICE_IDS[priceId];
+    if (!packageInfo) {
+      this.logger.warn(`Unknown consulting price ID: ${priceId}`);
+      // Fall back to metadata if available
+      const packageType = session.metadata?.packageType || 'UNKNOWN';
+      const totalHours = parseInt(session.metadata?.hours || '0', 10);
+      await this.createConsultingEngagement(tenantId, packageType, totalHours, session.id, customerId);
+      return;
+    }
+
+    await this.createConsultingEngagement(
+      tenantId,
+      packageInfo.type,
+      packageInfo.hours,
+      session.id,
+      customerId,
+    );
+  }
+
+  private async createConsultingEngagement(
+    tenantId: string,
+    packageType: string,
+    totalHours: number,
+    paymentId: string,
+    customerId: string,
+  ) {
+    try {
+      // Get tenant info
+      const tenant = await this.prisma.tenant.findUnique({
+        where: { id: tenantId },
+        include: { users: { take: 1, orderBy: { createdAt: 'asc' } } },
+      });
+
+      if (!tenant) {
+        this.logger.error(`Tenant ${tenantId} not found for consulting purchase`);
+        return;
+      }
+
+      // Calculate expiration (6 months from now for consulting packages)
+      const expirationDate = new Date();
+      expirationDate.setMonth(expirationDate.getMonth() + 6);
+
+      // Create consulting engagement
+      const engagement = await this.prisma.consultingEngagement.create({
+        data: {
+          tenantId,
+          packageType,
+          startDate: new Date(),
+          totalHours,
+          hoursUsed: 0,
+          billableHours: 0,
+          status: 'ACTIVE',
+          stripePaymentId: paymentId,
+          notes: `Auto-created from Stripe checkout ${paymentId}`,
+        },
+      });
+
+      this.logger.log(`Created consulting engagement ${engagement.id} for tenant ${tenantId}`);
+
+      // Update tenant with consulting fields
+      await this.prisma.tenant.update({
+        where: { id: tenantId },
+        data: {
+          stripeCustomerId: customerId,
+          consultingStatus: 'ACTIVE',
+          packageType,
+          hoursRemaining: totalHours,
+          hoursUsed: 0,
+          packagePurchaseDate: new Date(),
+          packageExpirationDate: expirationDate,
+          // Set tier override to CONSULTING if not already on a paid subscription
+          ...(tenant.subscriptionTier === 'FREE' && { tierOverride: 'CONSULTING' }),
+        },
+      });
+
+      this.logger.log(`Updated tenant ${tenantId} consulting status to ACTIVE`);
+
+      // Send confirmation email
+      const customerEmail = tenant.users?.[0]?.email || tenant.email;
+      const customerName = tenant.users?.[0]?.firstName || tenant.companyName || 'Valued Client';
+
+      if (customerEmail) {
+        await this.sendConsultingWelcomeEmail(customerEmail, customerName, packageType, totalHours);
+      }
+
+      // Send admin notification
+      await this.sendConsultingAdminNotification(
+        customerName,
+        customerEmail || 'unknown',
+        packageType,
+        totalHours,
+      );
+
+    } catch (error) {
+      this.logger.error(`Failed to create consulting engagement: ${error.message}`);
+    }
+  }
+
+  private async handleDigitalStorePurchase(session: Stripe.Checkout.Session) {
+    this.logger.log(`Processing digital store purchase: ${session.id}`);
+
+    const customerEmail = session.customer_email || session.customer_details?.email;
+    if (!customerEmail) {
+      this.logger.warn('No customer email for digital store purchase');
+      return;
+    }
+
+    // Get line items to determine the product
+    const lineItems = await this.stripe.checkout.sessions.listLineItems(session.id);
+    const priceId = lineItems.data[0]?.price?.id;
+    const productName = lineItems.data[0]?.description || 'Digital Product';
+
+    this.logger.log(`Digital product purchased: ${productName} by ${customerEmail}`);
+
+    // Send download link email
+    await this.sendDigitalProductEmail(customerEmail, productName, session.id);
+
+    // Send admin notification
+    await this.sendDigitalStoreAdminNotification(customerEmail, productName);
+  }
+
+  private async sendConsultingWelcomeEmail(email: string, name: string, packageType: string, hours: number) {
+    try {
+      const packageName = this.getConsultingPackageName(packageType);
+
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #0C2340; margin: 0; font-size: 28px;">Welcome to Zander Consulting</h1>
+            <p style="color: #666; margin: 10px 0 0;">Your ${packageName} engagement is confirmed</p>
+          </div>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Hi ${name},
+          </p>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Thank you for choosing Zander for your business consulting needs. Your <strong>${packageName}</strong> package is now active.
+          </p>
+
+          <div style="background: linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%); border-radius: 12px; padding: 25px; margin: 25px 0;">
+            <h2 style="color: #fff; margin: 0 0 15px; font-size: 18px;">Your Package Details:</h2>
+            <ul style="color: #fff; margin: 0; padding-left: 20px; line-height: 1.8;">
+              <li>Package: ${packageName}</li>
+              ${hours > 0 ? `<li>Consulting Hours: ${hours} hours</li>` : ''}
+              <li>Valid for: 6 months from purchase</li>
+              <li>Access: Zander HQ Dashboard</li>
+            </ul>
+          </div>
+
+          <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 25px 0;">
+            <h3 style="color: #0C2340; margin: 0 0 10px; font-size: 16px;">Next Steps:</h3>
+            <ol style="color: #333; margin: 0; padding-left: 20px; line-height: 1.8;">
+              <li>Jonathan will reach out within 24 hours to schedule your kickoff call</li>
+              <li>Complete your intake survey in the HQ Dashboard</li>
+              <li>Prepare any documents you'd like reviewed</li>
+            </ol>
+          </div>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            I'm looking forward to working with you and helping your business thrive.
+          </p>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Talk soon,<br>
+            <strong>Jonathan White</strong><br>
+            <span style="color: #666;">Founder, Zander</span>
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Zander - Operating Simply<br>
+            Powered by Zander Systems LLC
+          </p>
+        </div>
+      `;
+
+      const result = await this.emailService.sendEmail({
+        to: email,
+        subject: `Welcome to Zander Consulting — ${packageName}`,
+        html,
+        from: 'Jonathan from Zander <jonathan@zanderos.com>',
+        replyTo: 'jonathan@zanderos.com',
+      });
+
+      if (result.success) {
+        this.logger.log(`Consulting welcome email sent to ${email}`);
+      } else {
+        this.logger.warn(`Consulting welcome email failed: ${result.error}`);
+      }
+    } catch (err) {
+      this.logger.error(`Failed to send consulting welcome email: ${err.message}`);
+    }
+  }
+
+  private async sendConsultingAdminNotification(
+    customerName: string,
+    customerEmail: string,
+    packageType: string,
+    hours: number,
+  ) {
+    try {
+      const packageName = this.getConsultingPackageName(packageType);
+      const timestamp = new Date().toLocaleString('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'America/New_York',
+      });
+
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #0C2340; margin: 0 0 20px; font-size: 24px;">💼 New Consulting Client!</h1>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #666;">Client</td>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; color: #333;">${customerName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #666;">Email</td>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; color: #333;">${customerEmail}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #666;">Package</td>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; color: #333;"><strong>${packageName}</strong></td>
+            </tr>
+            ${hours > 0 ? `
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #666;">Hours</td>
+              <td style="padding: 12px; border-bottom: 1px solid #eee; color: #333;">${hours} hours</td>
+            </tr>
+            ` : ''}
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #666;">Timestamp</td>
+              <td style="padding: 12px; color: #333;">${timestamp} ET</td>
+            </tr>
+          </table>
+
+          <p style="color: #d97706; font-size: 14px; font-weight: bold;">
+            ⚡ Action Required: Schedule kickoff call within 24 hours
+          </p>
+        </div>
+      `;
+
+      await this.emailService.sendEmail({
+        to: 'jonathan@zanderos.com',
+        subject: `🎉 New Consulting Client: ${customerName} — ${packageName}`,
+        html,
+        from: 'Zander System <noreply@zanderos.com>',
+      });
+
+      this.logger.log(`Consulting admin notification sent for ${customerEmail}`);
+    } catch (err) {
+      this.logger.error(`Failed to send consulting admin notification: ${err.message}`);
+    }
+  }
+
+  private async sendDigitalProductEmail(email: string, productName: string, sessionId: string) {
+    try {
+      const downloadUrl = `https://app.zanderos.com/store/download?session_id=${sessionId}`;
+
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #0C2340; margin: 0; font-size: 28px;">Thank You for Your Purchase!</h1>
+            <p style="color: #666; margin: 10px 0 0;">Your download is ready</p>
+          </div>
+
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">
+            Thank you for purchasing <strong>${productName}</strong>. Your download is ready.
+          </p>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${downloadUrl}" style="display: inline-block; background: #00CFEB; color: #000; padding: 16px 32px; border-radius: 8px; font-weight: 700; font-size: 16px; text-decoration: none;">
+              Download Now
+            </a>
+          </div>
+
+          <p style="color: #666; font-size: 14px; text-align: center;">
+            This link will remain active for 30 days.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Questions? Reply to this email.<br>
+            Zander - Operating Simply
+          </p>
+        </div>
+      `;
+
+      await this.emailService.sendEmail({
+        to: email,
+        subject: `Your Download: ${productName}`,
+        html,
+        from: 'Zander <noreply@zanderos.com>',
+        replyTo: 'support@zanderos.com',
+      });
+
+      this.logger.log(`Digital product email sent to ${email}`);
+    } catch (err) {
+      this.logger.error(`Failed to send digital product email: ${err.message}`);
+    }
+  }
+
+  private async sendDigitalStoreAdminNotification(customerEmail: string, productName: string) {
+    try {
+      const timestamp = new Date().toLocaleString('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'America/New_York',
+      });
+
+      const html = `
+        <div style="font-family: -apple-system, sans-serif; padding: 20px;">
+          <h2 style="color: #0C2340;">📦 Digital Store Purchase</h2>
+          <p><strong>Product:</strong> ${productName}</p>
+          <p><strong>Customer:</strong> ${customerEmail}</p>
+          <p><strong>Time:</strong> ${timestamp} ET</p>
+        </div>
+      `;
+
+      await this.emailService.sendEmail({
+        to: 'jonathan@zanderos.com',
+        subject: `Store Purchase: ${productName}`,
+        html,
+        from: 'Zander System <noreply@zanderos.com>',
+      });
+
+      this.logger.log(`Digital store admin notification sent for ${customerEmail}`);
+    } catch (err) {
+      this.logger.error(`Failed to send digital store admin notification: ${err.message}`);
+    }
+  }
+
+  private getConsultingPackageName(packageType: string): string {
+    const packageNames: Record<string, string> = {
+      'BUSINESS_ANALYSIS': 'Comprehensive Business Analysis',
+      'COMPASS': 'Compass Package',
+      'FOUNDATION': 'Foundation Package',
+      'BLUEPRINT': 'Blueprint Package',
+      'EXTENSION': 'Package Extension',
+    };
+    return packageNames[packageType] || packageType;
   }
 
   // ============================================

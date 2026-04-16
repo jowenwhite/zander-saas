@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -100,6 +101,7 @@ model Tenant {
   consultingEngagements   ConsultingEngagement[]
   consultingTimeEntries   ConsultingTimeEntry[]
   consultingDeliverables  ConsultingDeliverable[]
+  consultingIntakes       ConsultingIntake[]
 
   @@map("tenants")
 }
@@ -155,6 +157,8 @@ model User {
   tasksAssigned         Task[]             @relation("TaskAssignee")
   tasksCreated          Task[]             @relation("TaskCreator")
   tenantAccess          UserTenantAccess[]
+  intakesSubmitted      ConsultingIntake[] @relation("IntakeSubmitter")
+  intakesReviewed       ConsultingIntake[] @relation("IntakeReviewer")
   tenant                Tenant             @relation(fields: [tenantId], references: [id])
 
   @@map("users")
@@ -1758,25 +1762,25 @@ enum SectionStatus {
 // ============================================
 
 model SocialAccount {
-  id            String   @id @default(cuid())
-  tenantId      String
-  tenant        Tenant   @relation(fields: [tenantId], references: [id])
-  platform      String   // "facebook" | "instagram" | "linkedin" | "tiktok" | "youtube" | "twitter"
-  accountName   String   // display name
-  accountId     String   // platform-specific account/page ID
-  accessToken   String?  // encrypted OAuth token
-  refreshToken  String?  // encrypted refresh token
-  tokenExpiry   DateTime?
-  scopes        String[] // granted OAuth scopes
-  isActive      Boolean  @default(true)
-  connectedAt   DateTime @default(now())
-  connectedBy   String   // userId who connected
-  metadata      Json?    // platform-specific data (page ID, channel ID, etc.)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String    @id @default(cuid())
+  tenantId     String
+  tenant       Tenant    @relation(fields: [tenantId], references: [id])
+  platform     String // "facebook" | "instagram" | "linkedin" | "tiktok" | "youtube" | "twitter"
+  accountName  String // display name
+  accountId    String // platform-specific account/page ID
+  accessToken  String? // encrypted OAuth token
+  refreshToken String? // encrypted refresh token
+  tokenExpiry  DateTime?
+  scopes       String[] // granted OAuth scopes
+  isActive     Boolean   @default(true)
+  connectedAt  DateTime  @default(now())
+  connectedBy  String // userId who connected
+  metadata     Json? // platform-specific data (page ID, channel ID, etc.)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  posts         SocialPost[]
-  engagements   SocialEngagement[]
+  posts       SocialPost[]
+  engagements SocialEngagement[]
 
   @@unique([tenantId, platform, accountId])
   @@index([tenantId])
@@ -1784,26 +1788,26 @@ model SocialAccount {
 }
 
 model SocialPost {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   tenantId        String
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  tenant          Tenant        @relation(fields: [tenantId], references: [id])
   socialAccountId String
   socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id])
-  content         String   // post text
+  content         String // post text
   mediaUrls       String[] // attached images/videos
-  platformPostId  String?  // ID returned by platform after publishing
-  status          String   @default("draft") // "draft" | "scheduled" | "pending_approval" | "published" | "failed"
+  platformPostId  String? // ID returned by platform after publishing
+  status          String        @default("draft") // "draft" | "scheduled" | "pending_approval" | "published" | "failed"
   scheduledFor    DateTime?
   publishedAt     DateTime?
-  approvedBy      String?  // userId who approved
+  approvedBy      String? // userId who approved
   approvedAt      DateTime?
-  campaignId      String?  // link to CMO campaign
-  calendarEventId String?  // link to CMO calendar event
-  metadata        Json?    // platform-specific data (hashtags, mentions, etc.)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  campaignId      String? // link to CMO campaign
+  calendarEventId String? // link to CMO calendar event
+  metadata        Json? // platform-specific data (hashtags, mentions, etc.)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  engagements     SocialEngagement[]
+  engagements SocialEngagement[]
 
   @@index([tenantId])
   @@index([socialAccountId])
@@ -1813,29 +1817,29 @@ model SocialPost {
 }
 
 model SocialEngagement {
-  id              String   @id @default(cuid())
-  tenantId        String
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  socialAccountId String
-  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id])
-  socialPostId    String?
-  socialPost      SocialPost? @relation(fields: [socialPostId], references: [id])
-  type            String   // "comment" | "reply" | "dm" | "mention" | "like" | "share"
-  platformId      String   // platform-specific engagement ID
-  authorName      String
-  authorHandle    String?
-  authorFollowers Int?     // for escalation rules
-  content         String?  // the comment/message text
-  sentiment       String?  // "positive" | "neutral" | "negative" | "unknown"
-  status          String   @default("new") // "new" | "auto_replied" | "draft_reply" | "replied" | "escalated" | "ignored"
-  replyContent    String?  // Don's drafted/sent reply
-  replyStatus     String?  // "auto" | "pending_approval" | "approved" | "sent"
+  id               String        @id @default(cuid())
+  tenantId         String
+  tenant           Tenant        @relation(fields: [tenantId], references: [id])
+  socialAccountId  String
+  socialAccount    SocialAccount @relation(fields: [socialAccountId], references: [id])
+  socialPostId     String?
+  socialPost       SocialPost?   @relation(fields: [socialPostId], references: [id])
+  type             String // "comment" | "reply" | "dm" | "mention" | "like" | "share"
+  platformId       String // platform-specific engagement ID
+  authorName       String
+  authorHandle     String?
+  authorFollowers  Int? // for escalation rules
+  content          String? // the comment/message text
+  sentiment        String? // "positive" | "neutral" | "negative" | "unknown"
+  status           String        @default("new") // "new" | "auto_replied" | "draft_reply" | "replied" | "escalated" | "ignored"
+  replyContent     String? // Don's drafted/sent reply
+  replyStatus      String? // "auto" | "pending_approval" | "approved" | "sent"
   escalationReason String? // why it was escalated
-  respondedAt     DateTime?
-  respondedBy     String?  // "don_auto" | userId
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  respondedAt      DateTime?
+  respondedBy      String? // "don_auto" | userId
+  metadata         Json?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   @@index([tenantId])
   @@index([socialAccountId])
@@ -1845,22 +1849,22 @@ model SocialEngagement {
 }
 
 model DesignAsset {
-  id            String   @id @default(cuid())
-  tenantId      String
-  tenant        Tenant   @relation(fields: [tenantId], references: [id])
-  name          String
-  type          String   // "image" | "video" | "graphic" | "template"
-  source        String   // "canva" | "adobe" | "upload" | "ai_generated"
-  sourceId      String?  // external tool asset ID
-  fileUrl       String?  // stored file URL
-  thumbnailUrl  String?
-  dimensions    Json?    // { width, height }
-  format        String?  // "png" | "jpg" | "mp4" | "svg"
-  tags          String[]
-  usedInPosts   String[] // socialPostIds where this asset was used
-  campaignId    String?  // associated campaign
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  name         String
+  type         String // "image" | "video" | "graphic" | "template"
+  source       String // "canva" | "adobe" | "upload" | "ai_generated"
+  sourceId     String? // external tool asset ID
+  fileUrl      String? // stored file URL
+  thumbnailUrl String?
+  dimensions   Json? // { width, height }
+  format       String? // "png" | "jpg" | "mp4" | "svg"
+  tags         String[]
+  usedInPosts  String[] // socialPostIds where this asset was used
+  campaignId   String? // associated campaign
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([tenantId])
   @@index([source])
@@ -1893,19 +1897,19 @@ enum EngagementStatus {
 }
 
 model ConsultingEngagement {
-  id              String            @id @default(cuid())
+  id              String           @id @default(cuid())
   tenantId        String
   packageType     String
   startDate       DateTime
   endDate         DateTime?
-  status          EngagementStatus  @default(ACTIVE)
-  totalHours      Float             @default(0)
-  hoursUsed       Float             @default(0)
-  billableHours   Float             @default(0)
+  status          EngagementStatus @default(ACTIVE)
+  totalHours      Float            @default(0)
+  hoursUsed       Float            @default(0)
+  billableHours   Float            @default(0)
   stripePaymentId String?
   notes           String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   tenant       Tenant                  @relation(fields: [tenantId], references: [id])
   timeEntries  ConsultingTimeEntry[]
@@ -1957,4 +1961,65 @@ model ConsultingDeliverable {
   @@index([engagementId])
   @@index([status])
   @@map("consulting_deliverables")
+}
+
+model ConsultingIntake {
+  id            String  @id @default(cuid())
+  tenantId      String
+  submittedById String?
+
+  // Business Information
+  businessName    String
+  industry        String?
+  yearsInBusiness Int?
+  annualRevenue   String?
+  employeeCount   String?
+
+  // Contact Information
+  contactName      String
+  contactEmail     String
+  contactPhone     String?
+  preferredContact String? @default("email")
+
+  // Goals & Objectives
+  primaryGoals      String[]
+  biggestChallenges String[]
+  desiredOutcomes   String?
+
+  // Scope & Budget
+  packageInterest String?
+  budgetRange     String?
+  timeline        String?
+  urgency         String? @default("normal")
+
+  // Additional Context
+  currentTools       String[]
+  previousConsulting Boolean  @default(false)
+  additionalNotes    String?
+  howHeardAboutUs    String?
+
+  // Meta
+  status                IntakeStatus @default(PENDING)
+  reviewedAt            DateTime?
+  reviewedById          String?
+  notes                 String?
+  convertedToEngagement String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  tenant      Tenant @relation(fields: [tenantId], references: [id])
+  submittedBy User?  @relation("IntakeSubmitter", fields: [submittedById], references: [id])
+  reviewedBy  User?  @relation("IntakeReviewer", fields: [reviewedById], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("consulting_intakes")
+}
+
+enum IntakeStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  CONVERTED
+  DECLINED
 }
