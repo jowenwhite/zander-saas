@@ -9,13 +9,6 @@ import {
   Radar,
   ResponsiveContainer,
   Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Cell,
 } from 'recharts';
 import { OPERATING_SIMPLY_PILLARS, PillarScores, ScorecardSnapshot } from './Scorecard';
 
@@ -33,7 +26,6 @@ export default function ScorecardComparison({
   const [selectedSnapshot, setSelectedSnapshot] = useState<number>(
     snapshots.length > 0 ? 0 : -1
   );
-  const [viewMode, setViewMode] = useState<'radar' | 'bar'>('radar');
 
   const comparisonScores = selectedSnapshot >= 0 ? snapshots[selectedSnapshot]?.scores : undefined;
   const comparisonLabel = selectedSnapshot >= 0
@@ -53,21 +45,6 @@ export default function ScorecardComparison({
     current: currentScores[pillar.key as keyof PillarScores] || 0,
     previous: comparisonScores?.[pillar.key as keyof PillarScores] || 0,
   }));
-
-  // Bar chart data
-  const barChartData = OPERATING_SIMPLY_PILLARS.map((pillar) => {
-    const current = currentScores[pillar.key as keyof PillarScores] || 0;
-    const previous = comparisonScores?.[pillar.key as keyof PillarScores] || 0;
-    const change = current - previous;
-
-    return {
-      pillar: pillar.label,
-      key: pillar.key,
-      current,
-      previous: comparisonScores ? previous : undefined,
-      change,
-    };
-  });
 
   // Calculate totals
   const totalImprovement = comparisonScores
@@ -194,47 +171,6 @@ export default function ScorecardComparison({
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          {/* View mode toggle */}
-          <div
-            style={{
-              display: 'flex',
-              background: '#13131A',
-              borderRadius: '6px',
-              padding: '2px',
-            }}
-          >
-            <button
-              onClick={() => setViewMode('radar')}
-              style={{
-                padding: '0.4rem 0.75rem',
-                borderRadius: '4px',
-                border: 'none',
-                background: viewMode === 'radar' ? '#2A2A38' : 'transparent',
-                color: viewMode === 'radar' ? '#00D4FF' : '#8888A0',
-                fontSize: '0.8rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-              }}
-            >
-              Radar
-            </button>
-            <button
-              onClick={() => setViewMode('bar')}
-              style={{
-                padding: '0.4rem 0.75rem',
-                borderRadius: '4px',
-                border: 'none',
-                background: viewMode === 'bar' ? '#2A2A38' : 'transparent',
-                color: viewMode === 'bar' ? '#00D4FF' : '#8888A0',
-                fontSize: '0.8rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-              }}
-            >
-              Bar
-            </button>
-          </div>
-
           {/* Snapshot selector */}
           {snapshots.length > 1 && (
             <select
@@ -324,149 +260,74 @@ export default function ScorecardComparison({
         </div>
       )}
 
-      {/* Chart */}
-      {viewMode === 'radar' ? (
-        <div style={{ height: '380px', display: 'flex', alignItems: 'center', justifyContent: 'center', maxWidth: '600px', margin: '0 auto' }}>
-          <ResponsiveContainer width="100%" height={350}>
-            <RadarChart
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              outerRadius={140}
-            >
-              <PolarGrid
-                stroke="#2A2A38"
-                strokeWidth={1}
-                gridType="polygon"
-              />
-              <PolarAngleAxis
-                dataKey="pillar"
-                tick={renderPolarAngleAxisTick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <PolarRadiusAxis
-                angle={90}
-                domain={[0, 10]}
-                tick={false}
-                axisLine={false}
-                tickCount={6}
-              />
-              {/* Previous/baseline - dashed, violet */}
-              {comparisonScores && (
-                <Radar
-                  name={comparisonLabel}
-                  dataKey="previous"
-                  stroke="#7C3AED"
-                  fill="#7C3AED"
-                  fillOpacity={0.15}
-                  strokeWidth={1.5}
-                  strokeDasharray="4 4"
-                />
-              )}
-              {/* Current - solid, cyan */}
+      {/* Radar Chart */}
+      <div style={{ height: '380px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <ResponsiveContainer width="100%" height={350}>
+          <RadarChart
+            data={chartData}
+            cx="50%"
+            cy="50%"
+            outerRadius="68%"
+          >
+            <PolarGrid
+              stroke="#2A2A38"
+              strokeWidth={1}
+              gridType="polygon"
+            />
+            <PolarAngleAxis
+              dataKey="pillar"
+              tick={renderPolarAngleAxisTick}
+              tickLine={false}
+              axisLine={false}
+            />
+            <PolarRadiusAxis
+              angle={90}
+              domain={[0, 10]}
+              tick={false}
+              axisLine={false}
+              tickCount={6}
+            />
+            {/* Previous/baseline - dashed, violet */}
+            {comparisonScores && (
               <Radar
-                name="Current"
-                dataKey="current"
-                stroke="#00D4FF"
-                fill="#00D4FF"
-                fillOpacity={0.2}
-                strokeWidth={2}
+                name={comparisonLabel}
+                dataKey="previous"
+                stroke="#7C3AED"
+                fill="#7C3AED"
+                fillOpacity={0.15}
+                strokeWidth={1.5}
+                strokeDasharray="4 4"
               />
-              <Tooltip
-                contentStyle={{
-                  background: '#13131A',
-                  border: '1px solid #2A2A38',
-                  borderRadius: '8px',
-                  padding: '8px 12px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                }}
-                labelStyle={{ color: '#F0F0F5', fontWeight: 600, marginBottom: '4px' }}
-                itemStyle={{ color: '#B8B8C8', fontSize: '13px' }}
-                formatter={(value, name) => [
-                  `${value}/10`,
-                  name === 'current' ? 'Current' : comparisonLabel,
-                ]}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
-          {/* Manual legend below chart */}
-          {comparisonScores && renderLegend()}
-        </div>
-      ) : (
-        <div style={{ height: '250px', maxWidth: '700px' }}>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart
-              data={barChartData}
-              layout="vertical"
-              margin={{ top: 5, right: 30, bottom: 5, left: 80 }}
-              barCategoryGap="20%"
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#2A2A38" horizontal={false} />
-              <XAxis
-                type="number"
-                domain={[0, 10]}
-                tick={{ fill: '#9090A8', fontSize: 8 }}
-                tickLine={false}
-                tickCount={6}
-                axisLine={{ stroke: '#2A2A38' }}
-              />
-              <YAxis
-                type="category"
-                dataKey="pillar"
-                tick={{ fill: '#E8E8F0', fontSize: 10, fontWeight: 400 }}
-                tickLine={false}
-                axisLine={false}
-                width={75}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: '#13131A',
-                  border: '1px solid #2A2A38',
-                  borderRadius: '8px',
-                  padding: '8px 12px',
-                }}
-                labelStyle={{ color: '#F0F0F5', fontWeight: 600 }}
-                formatter={(value, name) => [
-                  `${value}/10`,
-                  name === 'current' ? 'Current' : 'Previous',
-                ]}
-              />
-              <Legend
-                verticalAlign="top"
-                align="right"
-                iconType="circle"
-                wrapperStyle={{ fontSize: '11px', paddingBottom: '10px' }}
-              />
-              {comparisonScores && (
-                <Bar
-                  dataKey="previous"
-                  name="Previous"
-                  fill="#7C3AED"
-                  fillOpacity={0.7}
-                  radius={[0, 4, 4, 0]}
-                  barSize={8}
-                />
-              )}
-              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={8}>
-                {barChartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={
-                      entry.change > 0
-                        ? '#22C55E'
-                        : entry.change < 0
-                        ? '#EF4444'
-                        : '#00D4FF'
-                    }
-                    fillOpacity={0.85}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+            )}
+            {/* Current - solid, cyan */}
+            <Radar
+              name="Current"
+              dataKey="current"
+              stroke="#00D4FF"
+              fill="#00D4FF"
+              fillOpacity={0.2}
+              strokeWidth={2}
+            />
+            <Tooltip
+              contentStyle={{
+                background: '#13131A',
+                border: '1px solid #2A2A38',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              }}
+              labelStyle={{ color: '#F0F0F5', fontWeight: 600, marginBottom: '4px' }}
+              itemStyle={{ color: '#B8B8C8', fontSize: '13px' }}
+              formatter={(value, name) => [
+                `${value}/10`,
+                name === 'current' ? 'Current' : comparisonLabel,
+              ]}
+            />
+          </RadarChart>
+        </ResponsiveContainer>
+        {/* Manual legend below chart */}
+        {comparisonScores && renderLegend()}
+      </div>
 
       {/* Pillar-by-pillar changes - compact grid */}
       {comparisonScores && (

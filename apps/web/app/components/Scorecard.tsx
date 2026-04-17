@@ -10,12 +10,6 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Cell,
 } from 'recharts';
 
 // The 10 pillars of Operating Simply
@@ -72,7 +66,6 @@ export default function Scorecard({
   compact = false,
 }: ScorecardProps) {
   const [hoveredPillar, setHoveredPillar] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'radar' | 'bar'>('radar');
 
   // Transform scores to recharts format
   const chartData = OPERATING_SIMPLY_PILLARS.map((pillar) => ({
@@ -238,69 +231,21 @@ export default function Scorecard({
         </div>
       )}
 
-      {/* View Mode Toggle */}
-      {!compact && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
-          <div
-            style={{
-              display: 'flex',
-              background: '#13131A',
-              borderRadius: '6px',
-              padding: '2px',
-            }}
+      {/* Radar Chart */}
+      <div style={{
+        height: '380px',
+        marginBottom: compact ? 0 : '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <ResponsiveContainer width="100%" height={350}>
+          <RadarChart
+            data={chartData}
+            cx="50%"
+            cy="50%"
+            outerRadius="72%"
           >
-            <button
-              onClick={() => setViewMode('radar')}
-              style={{
-                padding: '0.4rem 0.75rem',
-                borderRadius: '4px',
-                border: 'none',
-                background: viewMode === 'radar' ? '#2A2A38' : 'transparent',
-                color: viewMode === 'radar' ? '#00D4FF' : '#8888A0',
-                fontSize: '0.8rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-              }}
-            >
-              Radar
-            </button>
-            <button
-              onClick={() => setViewMode('bar')}
-              style={{
-                padding: '0.4rem 0.75rem',
-                borderRadius: '4px',
-                border: 'none',
-                background: viewMode === 'bar' ? '#2A2A38' : 'transparent',
-                color: viewMode === 'bar' ? '#00D4FF' : '#8888A0',
-                fontSize: '0.8rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-              }}
-            >
-              Bar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Chart - Radar or Bar */}
-      {viewMode === 'radar' ? (
-        <div style={{
-          height: '380px',
-          marginBottom: compact ? 0 : '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          maxWidth: '600px',
-          margin: '0 auto',
-        }}>
-          <ResponsiveContainer width="100%" height={350}>
-            <RadarChart
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              outerRadius={140}
-            >
             {/* Grid lines - thin and subtle */}
             <PolarGrid
               stroke="#2A2A38"
@@ -375,78 +320,6 @@ export default function Scorecard({
           </RadarChart>
         </ResponsiveContainer>
       </div>
-      ) : (
-        <div style={{ height: '250px', maxWidth: '700px', marginBottom: compact ? 0 : '1rem' }}>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 5, right: 30, bottom: 5, left: 80 }}
-              barCategoryGap="20%"
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#2A2A38" horizontal={false} />
-              <XAxis
-                type="number"
-                domain={[0, 10]}
-                tick={{ fill: '#9090A8', fontSize: 8 }}
-                tickLine={false}
-                tickCount={6}
-                axisLine={{ stroke: '#2A2A38' }}
-              />
-              <YAxis
-                type="category"
-                dataKey="pillar"
-                tick={{ fill: '#E8E8F0', fontSize: 10, fontWeight: 400 }}
-                tickLine={false}
-                axisLine={false}
-                width={75}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: '#13131A',
-                  border: '1px solid #2A2A38',
-                  borderRadius: '8px',
-                  padding: '8px 12px',
-                }}
-                labelStyle={{ color: '#F0F0F5', fontWeight: 600 }}
-                formatter={(value, name) => [
-                  `${value}/10`,
-                  name === 'current' ? 'Current' : comparisonLabel,
-                ]}
-              />
-              {comparisonScores && (
-                <Bar
-                  dataKey="previous"
-                  name={comparisonLabel}
-                  fill="#7C3AED"
-                  fillOpacity={0.7}
-                  radius={[0, 4, 4, 0]}
-                  barSize={8}
-                />
-              )}
-              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={8}>
-                {chartData.map((entry, index) => {
-                  const prevScore = comparisonScores?.[entry.key as keyof PillarScores];
-                  const change = prevScore !== undefined ? entry.current - prevScore : 0;
-                  return (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={
-                        change > 0
-                          ? '#22C55E'
-                          : change < 0
-                          ? '#EF4444'
-                          : '#00D4FF'
-                      }
-                      fillOpacity={0.85}
-                    />
-                  );
-                })}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
 
       {/* Pillar Details Grid - Hidden in compact mode */}
       {!compact && (
