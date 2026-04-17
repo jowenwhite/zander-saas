@@ -148,7 +148,7 @@ All PDFs should include:
 - Primary: #00CCEE (Zander Cyan)
 - Dark: #09090F, #1C1C26
 - Light: #F0F0F5
-- Accents: #F0B429 (Gold), #22C55E (Success)
+- Accents: #7C3AED (Violet), #22C55E (Success), #F59E0B (Amber/Warning)
 
 ---
 

@@ -156,13 +156,13 @@ export default function UpgradeModal({ executive, currentTier, onClose }: Upgrad
                   width: '24px',
                   height: '24px',
                   borderRadius: '50%',
-                  background: '#F0B429',
+                  background: '#7C3AED',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Lock size={12} style={{ color: '#1C1C26' }} />
+                <Lock size={12} style={{ color: '#F0F0F5' }} />
               </div>
             </div>
             <div>
@@ -180,8 +180,8 @@ export default function UpgradeModal({ executive, currentTier, onClose }: Upgrad
         <div style={{ padding: '1.5rem' }}>
           <div
             style={{
-              background: isConsultingTier ? 'rgba(0,204,238,0.1)' : 'rgba(240,180,41,0.1)',
-              border: isConsultingTier ? '1px solid rgba(0,204,238,0.3)' : '1px solid rgba(240,180,41,0.3)',
+              background: isConsultingTier ? 'rgba(0,204,238,0.1)' : 'rgba(124,58,237,0.1)',
+              border: isConsultingTier ? '1px solid rgba(0,204,238,0.3)' : '1px solid rgba(124,58,237,0.3)',
               borderRadius: '8px',
               padding: '1rem',
               marginBottom: '1.5rem',
@@ -190,7 +190,7 @@ export default function UpgradeModal({ executive, currentTier, onClose }: Upgrad
               gap: '0.75rem',
             }}
           >
-            <Zap size={20} style={{ color: isConsultingTier ? '#00CCEE' : '#F0B429' }} />
+            <Zap size={20} style={{ color: isConsultingTier ? '#00CCEE' : '#7C3AED' }} />
             <span style={{ color: '#F0F0F5', fontSize: '0.95rem' }}>
               {isConsultingTier
                 ? `Your consulting package includes HQ access. Add a subscription to unlock ${executive.label}.`

@@ -436,7 +436,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                           {isExecComingSoon ? (
                             <Clock size={10} style={{ color: '#55556A' }} />
                           ) : (
-                            <Lock size={10} style={{ color: '#F0B429' }} />
+                            <Lock size={10} style={{ color: '#7C3AED' }} />
                           )}
                         </div>
                       </div>
