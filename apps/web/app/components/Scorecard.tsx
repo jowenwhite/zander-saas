@@ -291,6 +291,8 @@ export default function Scorecard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          maxWidth: '600px',
+          margin: '0 auto',
         }}>
           <ResponsiveContainer width="100%" height={350}>
             <RadarChart

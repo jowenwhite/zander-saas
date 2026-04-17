@@ -326,7 +326,7 @@ export default function ScorecardComparison({
 
       {/* Chart */}
       {viewMode === 'radar' ? (
-        <div style={{ height: '380px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ height: '380px', display: 'flex', alignItems: 'center', justifyContent: 'center', maxWidth: '600px', margin: '0 auto' }}>
           <ResponsiveContainer width="100%" height={350}>
             <RadarChart
               data={chartData}
