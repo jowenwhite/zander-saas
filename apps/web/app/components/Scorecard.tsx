@@ -103,7 +103,7 @@ export default function Scorecard({
 
     // Calculate angle and adjust position to push labels further out
     const angle = Math.atan2(y - cy, x - cx);
-    const labelRadius = 1.08; // Push labels 8% further out
+    const labelRadius = 1.05; // Labels tight to chart edge
     const newX = cx + (x - cx) * labelRadius;
     const newY = cy + (y - cy) * labelRadius;
 
@@ -286,18 +286,19 @@ export default function Scorecard({
       {/* Chart - Radar or Bar */}
       {viewMode === 'radar' ? (
         <div style={{
-          height: compact ? '320px' : '360px',
+          height: '380px',
           marginBottom: compact ? 0 : '1rem',
-          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={350}>
             <RadarChart
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            outerRadius="72%"
-            margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
-          >
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              outerRadius={140}
+            >
             {/* Grid lines - thin and subtle */}
             <PolarGrid
               stroke="#2A2A38"
@@ -329,7 +330,7 @@ export default function Scorecard({
                 dataKey="previous"
                 stroke="#7C3AED"
                 fill="#7C3AED"
-                fillOpacity={0.12}
+                fillOpacity={0.15}
                 strokeWidth={1.5}
                 strokeDasharray="4 4"
               />
@@ -341,7 +342,7 @@ export default function Scorecard({
               dataKey="current"
               stroke="#00D4FF"
               fill="#00D4FF"
-              fillOpacity={0.18}
+              fillOpacity={0.2}
               strokeWidth={2}
             />
 
@@ -373,19 +374,20 @@ export default function Scorecard({
         </ResponsiveContainer>
       </div>
       ) : (
-        <div style={{ height: compact ? '320px' : '360px', marginBottom: compact ? 0 : '1rem' }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <div style={{ height: '350px', marginBottom: compact ? 0 : '1rem' }}>
+          <ResponsiveContainer width="100%" height={350}>
             <BarChart
               data={chartData}
               layout="vertical"
-              margin={{ top: 10, right: 20, left: 70, bottom: 10 }}
+              margin={{ top: 10, right: 30, bottom: 10, left: 100 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#2A2A38" horizontal={false} />
               <XAxis
                 type="number"
                 domain={[0, 10]}
-                tick={{ fill: '#8888A0', fontSize: 10 }}
+                tick={{ fill: '#9090A8', fontSize: 10 }}
                 tickLine={false}
+                tickCount={6}
                 axisLine={{ stroke: '#2A2A38' }}
               />
               <YAxis
@@ -394,7 +396,7 @@ export default function Scorecard({
                 tick={{ fill: '#E8E8F0', fontSize: 11, fontWeight: 400 }}
                 tickLine={false}
                 axisLine={false}
-                width={65}
+                width={90}
               />
               <Tooltip
                 contentStyle={{
@@ -414,11 +416,12 @@ export default function Scorecard({
                   dataKey="previous"
                   name={comparisonLabel}
                   fill="#7C3AED"
-                  radius={[0, 3, 3, 0]}
-                  barSize={10}
+                  fillOpacity={0.7}
+                  radius={[0, 4, 4, 0]}
+                  barSize={12}
                 />
               )}
-              <Bar dataKey="current" name="Current" radius={[0, 3, 3, 0]} barSize={10}>
+              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={12}>
                 {chartData.map((entry, index) => {
                   const prevScore = comparisonScores?.[entry.key as keyof PillarScores];
                   const change = prevScore !== undefined ? entry.current - prevScore : 0;
@@ -432,6 +435,7 @@ export default function Scorecard({
                           ? '#EF4444'
                           : '#00D4FF'
                       }
+                      fillOpacity={0.85}
                     />
                   );
                 })}

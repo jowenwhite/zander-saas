@@ -87,7 +87,7 @@ export default function ScorecardComparison({
     const { payload, x, y, cx, cy } = props;
 
     const angle = Math.atan2(y - cy, x - cx);
-    const labelRadius = 1.08;
+    const labelRadius = 1.05;
     const newX = cx + (x - cx) * labelRadius;
     const newY = cy + (y - cy) * labelRadius;
 
@@ -326,14 +326,13 @@ export default function ScorecardComparison({
 
       {/* Chart */}
       {viewMode === 'radar' ? (
-        <div style={{ height: '320px', position: 'relative' }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <div style={{ height: '380px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <ResponsiveContainer width="100%" height={350}>
             <RadarChart
               data={chartData}
               cx="50%"
               cy="50%"
-              outerRadius="68%"
-              margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+              outerRadius={140}
             >
               <PolarGrid
                 stroke="#2A2A38"
@@ -360,7 +359,7 @@ export default function ScorecardComparison({
                   dataKey="previous"
                   stroke="#7C3AED"
                   fill="#7C3AED"
-                  fillOpacity={0.12}
+                  fillOpacity={0.15}
                   strokeWidth={1.5}
                   strokeDasharray="4 4"
                 />
@@ -371,7 +370,7 @@ export default function ScorecardComparison({
                 dataKey="current"
                 stroke="#00D4FF"
                 fill="#00D4FF"
-                fillOpacity={0.18}
+                fillOpacity={0.2}
                 strokeWidth={2}
               />
               <Tooltip
@@ -396,27 +395,28 @@ export default function ScorecardComparison({
         </div>
       ) : (
         <div style={{ height: '350px' }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={350}>
             <BarChart
               data={barChartData}
               layout="vertical"
-              margin={{ top: 10, right: 20, left: 60, bottom: 10 }}
+              margin={{ top: 10, right: 30, bottom: 10, left: 100 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#2A2A38" horizontal={false} />
               <XAxis
                 type="number"
                 domain={[0, 10]}
-                tick={{ fill: '#8888A0', fontSize: 10 }}
+                tick={{ fill: '#9090A8', fontSize: 10 }}
                 tickLine={false}
+                tickCount={6}
                 axisLine={{ stroke: '#2A2A38' }}
               />
               <YAxis
                 type="category"
                 dataKey="pillar"
-                tick={{ fill: '#C8C8D0', fontSize: 11 }}
+                tick={{ fill: '#E8E8F0', fontSize: 11, fontWeight: 400 }}
                 tickLine={false}
                 axisLine={false}
-                width={55}
+                width={90}
               />
               <Tooltip
                 contentStyle={{
@@ -435,18 +435,19 @@ export default function ScorecardComparison({
                 verticalAlign="top"
                 align="right"
                 iconType="circle"
-                wrapperStyle={{ fontSize: '12px', paddingBottom: '10px' }}
+                wrapperStyle={{ fontSize: '11px', paddingBottom: '10px' }}
               />
               {comparisonScores && (
                 <Bar
                   dataKey="previous"
                   name="Previous"
                   fill="#7C3AED"
-                  radius={[0, 3, 3, 0]}
-                  barSize={10}
+                  fillOpacity={0.7}
+                  radius={[0, 4, 4, 0]}
+                  barSize={12}
                 />
               )}
-              <Bar dataKey="current" name="Current" radius={[0, 3, 3, 0]} barSize={10}>
+              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={12}>
                 {barChartData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
@@ -457,6 +458,7 @@ export default function ScorecardComparison({
                         ? '#EF4444'
                         : '#00D4FF'
                     }
+                    fillOpacity={0.85}
                   />
                 ))}
               </Bar>
