@@ -319,4 +319,74 @@ export class ConsultingController {
     }
     return this.consultingService.getConsultingOverview(req.user.tenantId);
   }
+
+  // ============================================
+  // SCORECARD (Operating Simply Pillars)
+  // ============================================
+
+  /**
+   * Get scorecard for an engagement
+   */
+  @Get('scorecard')
+  async getScorecard(
+    @Request() req: any,
+    @Query('engagementId') engagementId?: string,
+  ) {
+    if (req.user.isSuperAdmin) {
+      return this.consultingService.getScorecard(engagementId);
+    }
+    return this.consultingService.getScorecard(engagementId, req.user.tenantId);
+  }
+
+  /**
+   * Update pillar scores for an engagement
+   */
+  @Post('scorecard')
+  async updateScorecard(
+    @Request() req: any,
+    @Body() body: { engagementId: string; pillarScores: Record<string, number> },
+  ) {
+    if (!req.user.isSuperAdmin && req.user.tenantId) {
+      // Verify engagement belongs to tenant
+      const engagement = await this.consultingService.getEngagement(body.engagementId, req.user.tenantId);
+      if (!engagement) {
+        throw new ForbiddenException('Cannot update scorecard for this engagement');
+      }
+    }
+    return this.consultingService.updateScorecard(body.engagementId, body.pillarScores);
+  }
+
+  /**
+   * Add a snapshot for before/after comparison
+   */
+  @Post('scorecard/snapshot')
+  async addScorecardSnapshot(
+    @Request() req: any,
+    @Body() body: { engagementId: string; label?: string },
+  ) {
+    if (!req.user.isSuperAdmin) {
+      throw new ForbiddenException('Only superadmins can create snapshots');
+    }
+    return this.consultingService.addScorecardSnapshot(body.engagementId, body.label);
+  }
+
+  // ============================================
+  // HQ POPULATION FROM INTAKE
+  // ============================================
+
+  /**
+   * Auto-populate HQ sections from a business analysis intake survey
+   * Maps: desiredOutcomes → Vision, biggestChallenges → Headwinds, primaryGoals → Goals
+   */
+  @Post('intakes/:id/populate-hq')
+  async populateHQFromIntake(
+    @Request() req: any,
+    @Param('id') intakeId: string,
+    @Body() body: { createHeadwinds?: boolean; createGoals?: boolean; updateVision?: boolean },
+  ) {
+    if (!req.user.isSuperAdmin) {
+      throw new ForbiddenException('Only superadmins can populate HQ from intakes');
+    }
+    return this.consultingService.populateHQFromIntake(intakeId, body);
+  }
 }

@@ -5,7 +5,7 @@ import OnboardingChecklist from './OnboardingChecklist';
 import TenantSwitcher from './TenantSwitcher';
 import { LayoutDashboard, FolderKanban, Users, Package, Mail, Calendar, ClipboardList, Bot, Landmark, Shield, ClipboardCheck, UserCircle2, ChevronLeft, ChevronRight, Lock, Clock, Megaphone, DollarSign, Settings, Users2, Server } from 'lucide-react';
 import { useTier, SubscriptionTier } from '../contexts/TierContext';
-import { EXECUTIVE_TIERS, hasExecutiveAccess, getRequiredTier, getTierConfig, isComingSoon } from '../../lib/tier-config';
+import { EXECUTIVE_TIERS, hasExecutiveAccess, getRequiredTier, getTierConfig, isComingSoon, isSpecialTier } from '../../lib/tier-config';
 import UpgradeModal from './UpgradeModal';
 import ComingSoonModal from './ComingSoonModal';
 
@@ -132,20 +132,24 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
   ];
 
   // Determine executive access states
-  const getExecutiveState = (exec: typeof EXECUTIVE_CONFIGS[0]): 'active' | 'locked' | 'coming_soon' => {
+  const getExecutiveState = (exec: typeof EXECUTIVE_CONFIGS[0]): 'active' | 'locked' | 'coming_soon' | 'consulting_locked' => {
     // Check if coming soon (null tier in config = coming soon)
     if (isComingSoon(exec.id)) return 'coming_soon';
     if (!tier) return 'locked'; // Loading or not authenticated
-    const effectiveTier = tier.effectiveTier;
+    const effectiveTier = tier.effectiveTier as SubscriptionTier;
+
+    // CONSULTING tier: all AI executives are locked (HQ-only access)
+    if (effectiveTier === 'CONSULTING') return 'consulting_locked';
+
     const hasAccess = hasExecutiveAccess(effectiveTier, exec.id);
     return hasAccess ? 'active' : 'locked';
   };
 
-  const handleExecutiveClick = (exec: typeof EXECUTIVE_CONFIGS[0], state: 'active' | 'locked' | 'coming_soon') => {
+  const handleExecutiveClick = (exec: typeof EXECUTIVE_CONFIGS[0], state: 'active' | 'locked' | 'coming_soon' | 'consulting_locked') => {
     if (state === 'coming_soon') {
       setSelectedExecutive(exec);
       setComingSoonModalOpen(true);
-    } else if (state === 'locked') {
+    } else if (state === 'locked' || state === 'consulting_locked') {
       setSelectedExecutive(exec);
       setUpgradeModalOpen(true);
     }
@@ -333,7 +337,8 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {EXECUTIVE_CONFIGS.map((exec) => {
               const state = getExecutiveState(exec);
-              const isLocked = state === 'locked';
+              const isLocked = state === 'locked' || state === 'consulting_locked';
+              const isConsultingLocked = state === 'consulting_locked';
               const isExecComingSoon = state === 'coming_soon';
               const isExecActive = isActive(exec.href);
 
@@ -391,7 +396,7 @@ export default function Sidebar({ collapsed: controlledCollapsed, onCollapsedCha
                         justifyContent: isCollapsed ? 'center' : 'flex-start',
                         opacity: isExecComingSoon ? 0.6 : 0.8,
                       }}
-                      title={isCollapsed ? `${exec.label} (${exec.role}) - ${isExecComingSoon ? 'Coming Q4 2026' : 'Upgrade Required'}` : undefined}
+                      title={isCollapsed ? `${exec.label} (${exec.role}) - ${isExecComingSoon ? 'Coming Q4 2026' : isConsultingLocked ? 'Consulting Package - Upgrade for AI Access' : 'Upgrade Required'}` : undefined}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
                       }}

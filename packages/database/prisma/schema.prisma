@@ -44,13 +44,12 @@ model Tenant {
   currentChurnRiskLevel   String?                  @map("current_churn_risk_level")
   currentEngagementScore  Float?                   @map("current_engagement_score")
   lastActivityAt          DateTime?                @map("last_activity_at")
-  // Consulting fields
   consultingStatus        ConsultingStatus?        @map("consulting_status")
-  packageType             String?                  @map("package_type")
   hoursRemaining          Float                    @default(0) @map("hours_remaining")
   hoursUsed               Float                    @default(0) @map("hours_used")
-  packagePurchaseDate     DateTime?                @map("package_purchase_date")
   packageExpirationDate   DateTime?                @map("package_expiration_date")
+  packagePurchaseDate     DateTime?                @map("package_purchase_date")
+  packageType             String?                  @map("package_type")
   activities              Activity[]
   assemblies              Assembly[]
   calendarEvents          CalendarEvent[]
@@ -66,8 +65,13 @@ model Tenant {
   personas                Persona[]
   segments                Segment[]
   workflows               Workflow[]
+  consultingDeliverables  ConsultingDeliverable[]
+  consultingEngagements   ConsultingEngagement[]
+  consultingIntakes       ConsultingIntake[]
+  consultingTimeEntries   ConsultingTimeEntry[]
   contacts                Contact[]
   deals                   Deal[]
+  designAssets            DesignAsset[]
   emailMessages           EmailMessage[]
   emailSequences          EmailSequence[]
   emailSignatures         EmailSignature[]
@@ -84,6 +88,9 @@ model Tenant {
   products                Product[]
   scheduledCommunications ScheduledCommunication[]
   smsMessages             SmsMessage[]
+  socialAccounts          SocialAccount[]
+  socialEngagements       SocialEngagement[]
+  socialPosts             SocialPost[]
   supportTickets          SupportTicket[]
   tasks                   Task[]
   activityLogs            TenantActivityLog[]
@@ -92,16 +99,6 @@ model Tenant {
   engagementSnapshots     UserEngagementSnapshot[]
   userTenantAccess        UserTenantAccess[]
   users                   User[]
-  // Social media integration (Phase 4)
-  socialAccounts          SocialAccount[]
-  socialPosts             SocialPost[]
-  socialEngagements       SocialEngagement[]
-  designAssets            DesignAsset[]
-  // Consulting module (Phase 5)
-  consultingEngagements   ConsultingEngagement[]
-  consultingTimeEntries   ConsultingTimeEntry[]
-  consultingDeliverables  ConsultingDeliverable[]
-  consultingIntakes       ConsultingIntake[]
 
   @@map("tenants")
 }
@@ -138,6 +135,8 @@ model User {
   activities            Activity[]
   calendarEvents        CalendarEvent[]
   campaignsCreated      Campaign[]         @relation("CampaignCreatedBy")
+  intakesReviewed       ConsultingIntake[] @relation("IntakeReviewer")
+  intakesSubmitted      ConsultingIntake[] @relation("IntakeSubmitter")
   contactsAssigned      Contact[]          @relation("ContactAssignedTo")
   contactsOwned         Contact[]          @relation("ContactOwner")
   dealsAssigned         Deal[]             @relation("DealAssignedTo")
@@ -157,8 +156,6 @@ model User {
   tasksAssigned         Task[]             @relation("TaskAssignee")
   tasksCreated          Task[]             @relation("TaskCreator")
   tenantAccess          UserTenantAccess[]
-  intakesSubmitted      ConsultingIntake[] @relation("IntakeSubmitter")
-  intakesReviewed       ConsultingIntake[] @relation("IntakeReviewer")
   tenant                Tenant             @relation(fields: [tenantId], references: [id])
 
   @@map("users")
@@ -1590,6 +1587,221 @@ model SystemHealthSnapshot {
   @@map("system_health_snapshots")
 }
 
+model SocialAccount {
+  id           String             @id @default(cuid())
+  tenantId     String
+  platform     String
+  accountName  String
+  accountId    String
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+  scopes       String[]
+  isActive     Boolean            @default(true)
+  connectedAt  DateTime           @default(now())
+  connectedBy  String
+  metadata     Json?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  tenant       Tenant             @relation(fields: [tenantId], references: [id])
+  engagements  SocialEngagement[]
+  posts        SocialPost[]
+
+  @@unique([tenantId, platform, accountId])
+  @@index([tenantId])
+  @@map("social_accounts")
+}
+
+model SocialPost {
+  id              String             @id @default(cuid())
+  tenantId        String
+  socialAccountId String
+  content         String
+  mediaUrls       String[]
+  platformPostId  String?
+  status          String             @default("draft")
+  scheduledFor    DateTime?
+  publishedAt     DateTime?
+  approvedBy      String?
+  approvedAt      DateTime?
+  campaignId      String?
+  calendarEventId String?
+  metadata        Json?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  engagements     SocialEngagement[]
+  socialAccount   SocialAccount      @relation(fields: [socialAccountId], references: [id])
+  tenant          Tenant             @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([socialAccountId])
+  @@index([status])
+  @@index([scheduledFor])
+  @@map("social_posts")
+}
+
+model SocialEngagement {
+  id               String        @id @default(cuid())
+  tenantId         String
+  socialAccountId  String
+  socialPostId     String?
+  type             String
+  platformId       String
+  authorName       String
+  authorHandle     String?
+  authorFollowers  Int?
+  content          String?
+  sentiment        String?
+  status           String        @default("new")
+  replyContent     String?
+  replyStatus      String?
+  escalationReason String?
+  respondedAt      DateTime?
+  respondedBy      String?
+  metadata         Json?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  socialAccount    SocialAccount @relation(fields: [socialAccountId], references: [id])
+  socialPost       SocialPost?   @relation(fields: [socialPostId], references: [id])
+  tenant           Tenant        @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([socialAccountId])
+  @@index([status])
+  @@index([type])
+  @@map("social_engagements")
+}
+
+model DesignAsset {
+  id           String   @id @default(cuid())
+  tenantId     String
+  name         String
+  type         String
+  source       String
+  sourceId     String?
+  fileUrl      String?
+  thumbnailUrl String?
+  dimensions   Json?
+  format       String?
+  tags         String[]
+  usedInPosts  String[]
+  campaignId   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([source])
+  @@map("design_assets")
+}
+
+model ConsultingEngagement {
+  id              String                  @id @default(cuid())
+  tenantId        String
+  packageType     String
+  startDate       DateTime
+  endDate         DateTime?
+  status          EngagementStatus        @default(ACTIVE)
+  totalHours      Float                   @default(0)
+  hoursUsed       Float                   @default(0)
+  billableHours   Float                   @default(0)
+  stripePaymentId String?
+  notes           String?
+  // Operating Simply Scorecard - pillar scores (1-10 for each of 10 pillars)
+  pillarScores    Json?                   // Initial assessment: {vision: 5, mission: 7, ...}
+  snapshotScores  Json?                   // Snapshots for before/after: [{date: "2026-01-15", scores: {...}}]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  deliverables    ConsultingDeliverable[]
+  tenant          Tenant                  @relation(fields: [tenantId], references: [id])
+  timeEntries     ConsultingTimeEntry[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("consulting_engagements")
+}
+
+model ConsultingTimeEntry {
+  id            String               @id @default(cuid())
+  tenantId      String
+  engagementId  String
+  date          DateTime
+  hours         Float
+  billableHours Float                @default(0)
+  description   String
+  category      String
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  engagement    ConsultingEngagement @relation(fields: [engagementId], references: [id])
+  tenant        Tenant               @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([engagementId])
+  @@index([date])
+  @@map("consulting_time_entries")
+}
+
+model ConsultingDeliverable {
+  id           String               @id @default(cuid())
+  tenantId     String
+  engagementId String
+  packageTier  String
+  name         String
+  description  String?
+  status       DeliverableStatus    @default(PENDING)
+  deliveredAt  DateTime?
+  documentUrl  String?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  engagement   ConsultingEngagement @relation(fields: [engagementId], references: [id])
+  tenant       Tenant               @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([engagementId])
+  @@index([status])
+  @@map("consulting_deliverables")
+}
+
+model ConsultingIntake {
+  id                    String       @id @default(cuid())
+  tenantId              String
+  submittedById         String?
+  businessName          String
+  industry              String?
+  yearsInBusiness       Int?
+  annualRevenue         String?
+  employeeCount         String?
+  contactName           String
+  contactEmail          String
+  contactPhone          String?
+  preferredContact      String?      @default("email")
+  primaryGoals          String[]
+  biggestChallenges     String[]
+  desiredOutcomes       String?
+  packageInterest       String?
+  budgetRange           String?
+  timeline              String?
+  urgency               String?      @default("normal")
+  currentTools          String[]
+  previousConsulting    Boolean      @default(false)
+  additionalNotes       String?
+  howHeardAboutUs       String?
+  status                IntakeStatus @default(PENDING)
+  reviewedAt            DateTime?
+  reviewedById          String?
+  notes                 String?
+  convertedToEngagement String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  reviewedBy            User?        @relation("IntakeReviewer", fields: [reviewedById], references: [id])
+  submittedBy           User?        @relation("IntakeSubmitter", fields: [submittedById], references: [id])
+  tenant                Tenant       @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("consulting_intakes")
+}
+
 enum DealStage {
   PROSPECT
   QUALIFIED
@@ -1756,126 +1968,6 @@ enum SectionStatus {
   FAILED
 }
 
-// ============================================
-// SOCIAL MEDIA INTEGRATION MODELS
-// Phase 4: Marketing Execution Architecture
-// ============================================
-
-model SocialAccount {
-  id           String    @id @default(cuid())
-  tenantId     String
-  tenant       Tenant    @relation(fields: [tenantId], references: [id])
-  platform     String // "facebook" | "instagram" | "linkedin" | "tiktok" | "youtube" | "twitter"
-  accountName  String // display name
-  accountId    String // platform-specific account/page ID
-  accessToken  String? // encrypted OAuth token
-  refreshToken String? // encrypted refresh token
-  tokenExpiry  DateTime?
-  scopes       String[] // granted OAuth scopes
-  isActive     Boolean   @default(true)
-  connectedAt  DateTime  @default(now())
-  connectedBy  String // userId who connected
-  metadata     Json? // platform-specific data (page ID, channel ID, etc.)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  posts       SocialPost[]
-  engagements SocialEngagement[]
-
-  @@unique([tenantId, platform, accountId])
-  @@index([tenantId])
-  @@map("social_accounts")
-}
-
-model SocialPost {
-  id              String        @id @default(cuid())
-  tenantId        String
-  tenant          Tenant        @relation(fields: [tenantId], references: [id])
-  socialAccountId String
-  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id])
-  content         String // post text
-  mediaUrls       String[] // attached images/videos
-  platformPostId  String? // ID returned by platform after publishing
-  status          String        @default("draft") // "draft" | "scheduled" | "pending_approval" | "published" | "failed"
-  scheduledFor    DateTime?
-  publishedAt     DateTime?
-  approvedBy      String? // userId who approved
-  approvedAt      DateTime?
-  campaignId      String? // link to CMO campaign
-  calendarEventId String? // link to CMO calendar event
-  metadata        Json? // platform-specific data (hashtags, mentions, etc.)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  engagements SocialEngagement[]
-
-  @@index([tenantId])
-  @@index([socialAccountId])
-  @@index([status])
-  @@index([scheduledFor])
-  @@map("social_posts")
-}
-
-model SocialEngagement {
-  id               String        @id @default(cuid())
-  tenantId         String
-  tenant           Tenant        @relation(fields: [tenantId], references: [id])
-  socialAccountId  String
-  socialAccount    SocialAccount @relation(fields: [socialAccountId], references: [id])
-  socialPostId     String?
-  socialPost       SocialPost?   @relation(fields: [socialPostId], references: [id])
-  type             String // "comment" | "reply" | "dm" | "mention" | "like" | "share"
-  platformId       String // platform-specific engagement ID
-  authorName       String
-  authorHandle     String?
-  authorFollowers  Int? // for escalation rules
-  content          String? // the comment/message text
-  sentiment        String? // "positive" | "neutral" | "negative" | "unknown"
-  status           String        @default("new") // "new" | "auto_replied" | "draft_reply" | "replied" | "escalated" | "ignored"
-  replyContent     String? // Don's drafted/sent reply
-  replyStatus      String? // "auto" | "pending_approval" | "approved" | "sent"
-  escalationReason String? // why it was escalated
-  respondedAt      DateTime?
-  respondedBy      String? // "don_auto" | userId
-  metadata         Json?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-
-  @@index([tenantId])
-  @@index([socialAccountId])
-  @@index([status])
-  @@index([type])
-  @@map("social_engagements")
-}
-
-model DesignAsset {
-  id           String   @id @default(cuid())
-  tenantId     String
-  tenant       Tenant   @relation(fields: [tenantId], references: [id])
-  name         String
-  type         String // "image" | "video" | "graphic" | "template"
-  source       String // "canva" | "adobe" | "upload" | "ai_generated"
-  sourceId     String? // external tool asset ID
-  fileUrl      String? // stored file URL
-  thumbnailUrl String?
-  dimensions   Json? // { width, height }
-  format       String? // "png" | "jpg" | "mp4" | "svg"
-  tags         String[]
-  usedInPosts  String[] // socialPostIds where this asset was used
-  campaignId   String? // associated campaign
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@index([tenantId])
-  @@index([source])
-  @@map("design_assets")
-}
-
-// ============================================
-// CONSULTING MODULE MODELS
-// Phase 5: Consulting & Professional Services
-// ============================================
-
 enum ConsultingStatus {
   ACTIVE
   COMPLETED
@@ -1894,126 +1986,6 @@ enum EngagementStatus {
   COMPLETED
   PAUSED
   EXPIRED
-}
-
-model ConsultingEngagement {
-  id              String           @id @default(cuid())
-  tenantId        String
-  packageType     String
-  startDate       DateTime
-  endDate         DateTime?
-  status          EngagementStatus @default(ACTIVE)
-  totalHours      Float            @default(0)
-  hoursUsed       Float            @default(0)
-  billableHours   Float            @default(0)
-  stripePaymentId String?
-  notes           String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  tenant       Tenant                  @relation(fields: [tenantId], references: [id])
-  timeEntries  ConsultingTimeEntry[]
-  deliverables ConsultingDeliverable[]
-
-  @@index([tenantId])
-  @@index([status])
-  @@map("consulting_engagements")
-}
-
-model ConsultingTimeEntry {
-  id            String   @id @default(cuid())
-  tenantId      String
-  engagementId  String
-  date          DateTime
-  hours         Float
-  billableHours Float    @default(0)
-  description   String
-  category      String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  tenant     Tenant               @relation(fields: [tenantId], references: [id])
-  engagement ConsultingEngagement @relation(fields: [engagementId], references: [id])
-
-  @@index([tenantId])
-  @@index([engagementId])
-  @@index([date])
-  @@map("consulting_time_entries")
-}
-
-model ConsultingDeliverable {
-  id           String            @id @default(cuid())
-  tenantId     String
-  engagementId String
-  packageTier  String
-  name         String
-  description  String?
-  status       DeliverableStatus @default(PENDING)
-  deliveredAt  DateTime?
-  documentUrl  String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-
-  tenant     Tenant               @relation(fields: [tenantId], references: [id])
-  engagement ConsultingEngagement @relation(fields: [engagementId], references: [id])
-
-  @@index([tenantId])
-  @@index([engagementId])
-  @@index([status])
-  @@map("consulting_deliverables")
-}
-
-model ConsultingIntake {
-  id            String  @id @default(cuid())
-  tenantId      String
-  submittedById String?
-
-  // Business Information
-  businessName    String
-  industry        String?
-  yearsInBusiness Int?
-  annualRevenue   String?
-  employeeCount   String?
-
-  // Contact Information
-  contactName      String
-  contactEmail     String
-  contactPhone     String?
-  preferredContact String? @default("email")
-
-  // Goals & Objectives
-  primaryGoals      String[]
-  biggestChallenges String[]
-  desiredOutcomes   String?
-
-  // Scope & Budget
-  packageInterest String?
-  budgetRange     String?
-  timeline        String?
-  urgency         String? @default("normal")
-
-  // Additional Context
-  currentTools       String[]
-  previousConsulting Boolean  @default(false)
-  additionalNotes    String?
-  howHeardAboutUs    String?
-
-  // Meta
-  status                IntakeStatus @default(PENDING)
-  reviewedAt            DateTime?
-  reviewedById          String?
-  notes                 String?
-  convertedToEngagement String?
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
-
-  tenant      Tenant @relation(fields: [tenantId], references: [id])
-  submittedBy User?  @relation("IntakeSubmitter", fields: [submittedById], references: [id])
-  reviewedBy  User?  @relation("IntakeReviewer", fields: [reviewedById], references: [id])
-
-  @@index([tenantId])
-  @@index([status])
-  @@map("consulting_intakes")
 }
 
 enum IntakeStatus {

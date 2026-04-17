@@ -5,7 +5,7 @@
  * Also includes pricing and feature information for upgrade flows.
  */
 
-export type SubscriptionTier = 'FREE' | 'STARTER' | 'PRO' | 'BUSINESS' | 'ENTERPRISE';
+export type SubscriptionTier = 'FREE' | 'STARTER' | 'PRO' | 'BUSINESS' | 'ENTERPRISE' | 'CONSULTING';
 
 export interface TierConfig {
   name: string;
@@ -110,10 +110,36 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
       'Priority access to new executives',
     ],
   },
+  CONSULTING: {
+    name: 'CONSULTING',
+    displayName: 'Consulting',
+    monthlyPrice: null,
+    stripePriceId: null, // Package pricing, not subscription
+    description: 'Hands-on consulting with HQ access - no AI executives',
+    executiveIds: [], // NO AI executive access
+    features: [
+      'HQ (Headquarters) access',
+      'Business Analysis Scorecard',
+      'Document library',
+      'Survey & intake tools',
+      'Direct consulting support',
+    ],
+  },
 };
 
-// Tier hierarchy for comparison
+// Tier hierarchy for comparison (standard subscription tiers)
+// CONSULTING is special - not in hierarchy, has no AI executive access
 export const TIER_HIERARCHY: SubscriptionTier[] = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
+
+// Special tiers that don't follow standard hierarchy
+export const SPECIAL_TIERS: SubscriptionTier[] = ['CONSULTING'];
+
+/**
+ * Check if a tier is a special tier (not in standard hierarchy)
+ */
+export function isSpecialTier(tier: SubscriptionTier): boolean {
+  return SPECIAL_TIERS.includes(tier);
+}
 
 /**
  * Check if an executive is coming soon (null tier means coming soon)
@@ -125,8 +151,12 @@ export function isComingSoon(executiveId: string): boolean {
 /**
  * Check if a tier has access to an executive
  * Returns false for coming soon executives (they're not accessible to anyone)
+ * Returns false for CONSULTING tier (no AI executive access)
  */
 export function hasExecutiveAccess(tier: SubscriptionTier, executiveId: string): boolean {
+  // CONSULTING tier has NO AI executive access - HQ only
+  if (tier === 'CONSULTING') return false;
+
   const requiredTier = EXECUTIVE_TIERS[executiveId];
 
   // null means coming soon - no one has access

@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { getToken } from '../utils/auth';
 
-export type SubscriptionTier = 'FREE' | 'STARTER' | 'PRO' | 'BUSINESS' | 'ENTERPRISE';
+export type SubscriptionTier = 'FREE' | 'STARTER' | 'PRO' | 'BUSINESS' | 'ENTERPRISE' | 'CONSULTING';
 
 export interface TierInfo {
   tenantId: string;
@@ -25,7 +25,12 @@ interface TierContextValue {
   hasTier: (requiredTier: SubscriptionTier) => boolean;
 }
 
+// Standard subscription tier hierarchy
+// CONSULTING is special - not in hierarchy, treated as FREE for feature access but has HQ access
 const TIER_HIERARCHY: SubscriptionTier[] = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
+
+// Special tiers that don't follow standard hierarchy
+const SPECIAL_TIERS: SubscriptionTier[] = ['CONSULTING'];
 
 const TierContext = createContext<TierContextValue | undefined>(undefined);
 
@@ -71,8 +76,16 @@ export function TierProvider({ children }: { children: ReactNode }) {
   }, [fetchTier]);
 
   // Check if tenant has at least the required tier
+  // CONSULTING tier is special - treated as FREE for subscription features, but has HQ access
   const hasTier = useCallback((requiredTier: SubscriptionTier): boolean => {
     if (!tier) return false;
+
+    // CONSULTING is a special tier - for standard feature gating, treat as FREE
+    // This means CONSULTING users won't pass hasTier checks for paid features
+    if (SPECIAL_TIERS.includes(tier.effectiveTier as SubscriptionTier)) {
+      // CONSULTING only passes if checking for FREE
+      return requiredTier === 'FREE';
+    }
 
     const requiredLevel = TIER_HIERARCHY.indexOf(requiredTier);
     const currentLevel = TIER_HIERARCHY.indexOf(tier.effectiveTier);

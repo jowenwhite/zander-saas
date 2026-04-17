@@ -22,18 +22,22 @@ export default function UpgradeModal({ executive, currentTier, onClose }: Upgrad
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isConsultingTier = currentTier === 'CONSULTING';
   const requiredTier = getRequiredTier(executive.id);
-  const tierConfig = requiredTier ? getTierConfig(requiredTier) : null;
+  // For CONSULTING tier users, default to STARTER as the suggested upgrade
+  const effectiveRequiredTier = isConsultingTier ? 'STARTER' : requiredTier;
+  const tierConfig = effectiveRequiredTier ? getTierConfig(effectiveRequiredTier) : null;
   const currentTierConfig = getTierConfig(currentTier);
 
   const handleUpgrade = async () => {
-    if (!requiredTier) {
+    // For CONSULTING tier users, direct them to add a subscription
+    if (!effectiveRequiredTier) {
       setError('Upgrade not available. Please contact support.');
       return;
     }
 
     // Enterprise tier requires contacting sales
-    if (requiredTier === 'ENTERPRISE') {
+    if (effectiveRequiredTier === 'ENTERPRISE') {
       window.location.href = '/contact?reason=enterprise';
       return;
     }
@@ -52,8 +56,8 @@ export default function UpgradeModal({ executive, currentTier, onClose }: Upgrad
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tier: requiredTier,
-          successUrl: `${window.location.origin}/upgrade-success?tier=${requiredTier}`,
+          tier: effectiveRequiredTier,
+          successUrl: `${window.location.origin}/upgrade-success?tier=${effectiveRequiredTier}`,
           cancelUrl: window.location.href,
         }),
       });
@@ -176,8 +180,8 @@ export default function UpgradeModal({ executive, currentTier, onClose }: Upgrad
         <div style={{ padding: '1.5rem' }}>
           <div
             style={{
-              background: 'rgba(240,180,41,0.1)',
-              border: '1px solid rgba(240,180,41,0.3)',
+              background: isConsultingTier ? 'rgba(0,204,238,0.1)' : 'rgba(240,180,41,0.1)',
+              border: isConsultingTier ? '1px solid rgba(0,204,238,0.3)' : '1px solid rgba(240,180,41,0.3)',
               borderRadius: '8px',
               padding: '1rem',
               marginBottom: '1.5rem',
@@ -186,9 +190,12 @@ export default function UpgradeModal({ executive, currentTier, onClose }: Upgrad
               gap: '0.75rem',
             }}
           >
-            <Zap size={20} style={{ color: '#F0B429' }} />
+            <Zap size={20} style={{ color: isConsultingTier ? '#00CCEE' : '#F0B429' }} />
             <span style={{ color: '#F0F0F5', fontSize: '0.95rem' }}>
-              {executive.label} requires {tierConfig?.displayName || 'a higher tier'} plan
+              {isConsultingTier
+                ? `Your consulting package includes HQ access. Add a subscription to unlock ${executive.label}.`
+                : `${executive.label} requires ${tierConfig?.displayName || 'a higher tier'} plan`
+              }
             </span>
           </div>
 

@@ -690,4 +690,234 @@ export class ConsultingService {
     this.logger.log(`Converted intake ${intakeId} to engagement ${engagement.id}`);
     return engagement;
   }
+
+  // ============================================
+  // SCORECARD
+  // ============================================
+
+  async getScorecard(engagementId?: string, tenantId?: string) {
+    // If engagementId provided, get specific engagement
+    if (engagementId) {
+      const where: any = { id: engagementId };
+      if (tenantId) where.tenantId = tenantId;
+
+      const engagement = await this.prisma.consultingEngagement.findFirst({
+        where,
+        select: {
+          id: true,
+          tenantId: true,
+          packageType: true,
+          pillarScores: true,
+          snapshotScores: true,
+          status: true,
+          tenant: {
+            select: {
+              id: true,
+              companyName: true,
+            },
+          },
+        },
+      });
+
+      if (!engagement) {
+        throw new NotFoundException(`Engagement ${engagementId} not found`);
+      }
+
+      return engagement;
+    }
+
+    // Otherwise, get most recent active engagement for tenant
+    const where: any = { status: EngagementStatus.ACTIVE };
+    if (tenantId) where.tenantId = tenantId;
+
+    const engagement = await this.prisma.consultingEngagement.findFirst({
+      where,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        tenantId: true,
+        packageType: true,
+        pillarScores: true,
+        snapshotScores: true,
+        status: true,
+        tenant: {
+          select: {
+            id: true,
+            companyName: true,
+          },
+        },
+      },
+    });
+
+    return engagement;
+  }
+
+  async updateScorecard(engagementId: string, pillarScores: Record<string, number>) {
+    // Validate pillar scores (must be 1-10)
+    const validPillars = ['vision', 'mission', 'values', 'strategy', 'people', 'process', 'product', 'finance', 'marketing', 'growth'];
+
+    for (const [key, value] of Object.entries(pillarScores)) {
+      if (!validPillars.includes(key)) {
+        throw new BadRequestException(`Invalid pillar: ${key}`);
+      }
+      if (typeof value !== 'number' || value < 1 || value > 10) {
+        throw new BadRequestException(`Score for ${key} must be between 1 and 10`);
+      }
+    }
+
+    const engagement = await this.prisma.consultingEngagement.update({
+      where: { id: engagementId },
+      data: {
+        pillarScores: pillarScores as any,
+      },
+      select: {
+        id: true,
+        pillarScores: true,
+        snapshotScores: true,
+      },
+    });
+
+    this.logger.log(`Updated scorecard for engagement ${engagementId}`);
+    return engagement;
+  }
+
+  async addScorecardSnapshot(engagementId: string, label?: string) {
+    const engagement = await this.prisma.consultingEngagement.findUnique({
+      where: { id: engagementId },
+      select: {
+        id: true,
+        pillarScores: true,
+        snapshotScores: true,
+      },
+    });
+
+    if (!engagement) {
+      throw new NotFoundException(`Engagement ${engagementId} not found`);
+    }
+
+    if (!engagement.pillarScores) {
+      throw new BadRequestException('No pillar scores to snapshot');
+    }
+
+    // Create snapshot entry
+    const snapshot = {
+      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+      label: label || `Snapshot ${new Date().toLocaleDateString()}`,
+      scores: engagement.pillarScores,
+    };
+
+    // Add to existing snapshots array
+    const existingSnapshots = (engagement.snapshotScores as any[]) || [];
+    const newSnapshots = [...existingSnapshots, snapshot];
+
+    const updated = await this.prisma.consultingEngagement.update({
+      where: { id: engagementId },
+      data: {
+        snapshotScores: newSnapshots as any,
+      },
+      select: {
+        id: true,
+        pillarScores: true,
+        snapshotScores: true,
+      },
+    });
+
+    this.logger.log(`Added scorecard snapshot for engagement ${engagementId}`);
+    return updated;
+  }
+
+  // ============================================
+  // HQ POPULATION FROM INTAKE
+  // ============================================
+
+  async populateHQFromIntake(
+    intakeId: string,
+    options: { createHeadwinds?: boolean; createGoals?: boolean; updateVision?: boolean },
+  ) {
+    const { createHeadwinds = true, createGoals = true, updateVision = true } = options;
+
+    // Get the intake
+    const intake = await this.prisma.consultingIntake.findUnique({
+      where: { id: intakeId },
+    });
+
+    if (!intake) {
+      throw new NotFoundException(`Intake ${intakeId} not found`);
+    }
+
+    const results = {
+      intakeId,
+      tenantId: intake.tenantId,
+      visionUpdated: false,
+      headwindsCreated: 0,
+      goalsCreated: 0,
+    };
+
+    // 1. Update Vision from desiredOutcomes
+    if (updateVision && intake.desiredOutcomes) {
+      // Find or create founding document
+      let foundingDoc = await this.prisma.foundingDocument.findFirst({
+        where: { tenantId: intake.tenantId },
+      });
+
+      if (foundingDoc) {
+        await this.prisma.foundingDocument.update({
+          where: { id: foundingDoc.id },
+          data: { vision: intake.desiredOutcomes },
+        });
+      } else {
+        await this.prisma.foundingDocument.create({
+          data: {
+            tenantId: intake.tenantId,
+            vision: intake.desiredOutcomes,
+          },
+        });
+      }
+      results.visionUpdated = true;
+      this.logger.log(`Updated vision for tenant ${intake.tenantId} from intake`);
+    }
+
+    // 2. Create Headwinds from biggestChallenges
+    if (createHeadwinds && intake.biggestChallenges && Array.isArray(intake.biggestChallenges)) {
+      for (const challenge of intake.biggestChallenges) {
+        if (typeof challenge === 'string' && challenge.trim()) {
+          await this.prisma.headwind.create({
+            data: {
+              tenantId: intake.tenantId,
+              title: challenge.trim(),
+              description: `Identified in business analysis intake on ${new Date(intake.createdAt).toLocaleDateString()}`,
+              priority: 'P2',
+              category: 'TASK',
+              status: 'OPEN',
+            },
+          });
+          results.headwindsCreated++;
+        }
+      }
+      this.logger.log(`Created ${results.headwindsCreated} headwinds from intake for tenant ${intake.tenantId}`);
+    }
+
+    // 3. Create Goals from primaryGoals
+    if (createGoals && intake.primaryGoals && Array.isArray(intake.primaryGoals)) {
+      for (const goal of intake.primaryGoals) {
+        if (typeof goal === 'string' && goal.trim()) {
+          await this.prisma.hQGoal.create({
+            data: {
+              tenantId: intake.tenantId,
+              title: goal.trim(),
+              description: `Business goal identified in intake survey`,
+              scope: 'QUARTERLY',
+              status: 'ACTIVE',
+              priority: 'P2',
+              progress: 0,
+            },
+          });
+          results.goalsCreated++;
+        }
+      }
+      this.logger.log(`Created ${results.goalsCreated} goals from intake for tenant ${intake.tenantId}`);
+    }
+
+    return results;
+  }
 }
