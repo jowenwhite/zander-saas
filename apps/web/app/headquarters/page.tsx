@@ -7,7 +7,10 @@ import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { AssemblyModal } from '../components/assembly';
 import { logout, getStoredAuth } from '../utils/auth';
-import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Building2, Swords, Wind, FileText, Trophy, BookOpen, Calendar, Target, Rocket, Star, Map, Sparkles, Check, Scale, Loader2, AlertCircle, Plus, X } from 'lucide-react';
+import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList, Building2, Swords, Wind, FileText, Trophy, BookOpen, Calendar, Target, Rocket, Star, Map, Sparkles, Check, Scale, Loader2, AlertCircle, Plus, X, TrendingUp } from 'lucide-react';
+import { useTier } from '../contexts/TierContext';
+import Scorecard, { PillarScores, ScorecardSnapshot } from '../components/Scorecard';
+import ScorecardComparison from '../components/ScorecardComparison';
 
 // ============ TYPES ============
 
@@ -153,6 +156,19 @@ export default function HeadquartersPage() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showAssemblyModal, setShowAssemblyModal] = useState(false);
   const [authData, setAuthData] = useState<{ token: string | null; tenantId: string | null }>({ token: null, tenantId: null });
+
+  // Get tier context for CONSULTING tier features
+  const { tier, loading: tierLoading } = useTier();
+  const isConsultingTier = tier?.effectiveTier === 'CONSULTING';
+
+  // Consulting Scorecard state
+  const [scorecardData, setScorecardData] = useState<{
+    pillarScores: PillarScores | null;
+    snapshots: ScorecardSnapshot[];
+    engagementId: string | null;
+  }>({ pillarScores: null, snapshots: [], engagementId: null });
+  const [scorecardLoading, setScorecardLoading] = useState(false);
+  const [scorecardError, setScorecardError] = useState<string | null>(null);
 
   // ============ API STATE ============
 
@@ -544,12 +560,52 @@ export default function HeadquartersPage() {
     }
   }, [authData.token, authData.tenantId]);
 
+  // Fetch scorecard data for CONSULTING tier users
+  const fetchScorecard = useCallback(async () => {
+    if (!authData.token || !isConsultingTier) return;
+    setScorecardLoading(true);
+    setScorecardError(null);
+    try {
+      const response = await fetch('/api/consulting/scorecard', {
+        headers: {
+          'Authorization': `Bearer ${authData.token}`,
+          'x-tenant-id': authData.tenantId || '',
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) {
+          // No engagement found - that's OK, just show empty state
+          setScorecardData({ pillarScores: null, snapshots: [], engagementId: null });
+          return;
+        }
+        throw new Error('Failed to fetch scorecard');
+      }
+      const data = await response.json();
+      setScorecardData({
+        pillarScores: data.pillarScores || null,
+        snapshots: data.snapshotScores || [],
+        engagementId: data.id || null,
+      });
+    } catch (error) {
+      setScorecardError(error instanceof Error ? error.message : 'Failed to load scorecard');
+    } finally {
+      setScorecardLoading(false);
+    }
+  }, [authData.token, authData.tenantId, isConsultingTier]);
+
   // Fetch all dashboard data when auth is available (single API call)
   useEffect(() => {
     if (authData.token) {
       fetchDashboard();
     }
   }, [authData.token, fetchDashboard]);
+
+  // Fetch scorecard when user is CONSULTING tier
+  useEffect(() => {
+    if (authData.token && isConsultingTier && !tierLoading) {
+      fetchScorecard();
+    }
+  }, [authData.token, isConsultingTier, tierLoading, fetchScorecard]);
 
   // ============ CRUD FUNCTIONS ============
 
@@ -2302,6 +2358,112 @@ export default function HeadquartersPage() {
               </div>
             )}
           </div>
+
+          {/* Consulting Scorecard - Only for CONSULTING tier users */}
+          {isConsultingTier && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              {/* Consulting Welcome Banner */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(0,204,238,0.1) 100%)',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                marginBottom: '1.5rem',
+                border: '1px solid rgba(124,58,237,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #7C3AED 0%, #00CCEE 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <TrendingUp size={24} style={{ color: 'white' }} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.1rem', fontWeight: '700' }}>
+                    Consulting Package Active
+                  </h3>
+                  <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
+                    Your Operating Simply Scorecard tracks progress across the 10 pillars of business health
+                  </p>
+                </div>
+              </div>
+
+              {/* Scorecard Loading State */}
+              {scorecardLoading && (
+                <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '3rem', textAlign: 'center', border: '2px solid #2A2A38' }}>
+                  <Loader2 size={32} style={{ color: '#00CCEE', animation: 'spin 1s linear infinite' }} />
+                  <p style={{ margin: '1rem 0 0', color: '#8888A0' }}>Loading your scorecard...</p>
+                </div>
+              )}
+
+              {/* Scorecard Error State */}
+              {scorecardError && !scorecardLoading && (
+                <div style={{ background: '#1C1C26', borderRadius: '12px', padding: '1.5rem', border: '2px solid #DC3545' }}>
+                  <p style={{ color: '#DC3545', margin: 0 }}>{scorecardError}</p>
+                  <button
+                    onClick={fetchScorecard}
+                    style={{
+                      marginTop: '1rem',
+                      padding: '0.5rem 1rem',
+                      background: '#DC3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {/* Scorecard Display */}
+              {!scorecardLoading && !scorecardError && scorecardData.pillarScores && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                  {/* Current Scorecard */}
+                  <Scorecard
+                    scores={scorecardData.pillarScores}
+                    title="Operating Simply Scorecard"
+                  />
+
+                  {/* Scorecard Comparison */}
+                  {scorecardData.snapshots && scorecardData.snapshots.length > 0 && (
+                    <ScorecardComparison
+                      currentScores={scorecardData.pillarScores}
+                      snapshots={scorecardData.snapshots}
+                      title="Progress Over Time"
+                    />
+                  )}
+                </div>
+              )}
+
+              {/* No Scorecard Data State */}
+              {!scorecardLoading && !scorecardError && !scorecardData.pillarScores && (
+                <div style={{
+                  background: '#1C1C26',
+                  borderRadius: '12px',
+                  padding: '3rem',
+                  textAlign: 'center',
+                  border: '2px solid #2A2A38'
+                }}>
+                  <TrendingUp size={48} style={{ color: '#55556A', marginBottom: '1rem' }} />
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#F0F0F5', fontSize: '1.25rem' }}>
+                    Scorecard Coming Soon
+                  </h3>
+                  <p style={{ margin: 0, color: '#8888A0', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+                    Your consultant will complete your initial business assessment and your Operating Simply Scorecard will appear here.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Quick Navigation Buttons */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
