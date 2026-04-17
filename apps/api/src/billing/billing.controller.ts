@@ -70,10 +70,18 @@ export class BillingController {
     // Resolve priceId from tier if not provided directly
     let priceId = body.priceId;
     if (!priceId && body.tier) {
+      // Hardcoded fallback price IDs (from Stripe acct_1SisqdCryiiyM4ce)
+      // These are the live subscription prices created Apr 1, 2026
+      const TIER_PRICE_IDS: Record<string, string> = {
+        STARTER: 'price_1THMKiCryiiyM4ceRYP44O8T',  // $199/mo
+        PRO: 'price_1THMKiCryiiyM4ceQjddUKNI',      // $349/mo
+        BUSINESS: 'price_1THMKjCryiiyM4ceaJIYMyfI', // $599/mo
+      };
+      // Prefer env var if set, fallback to hardcoded
       const tierPriceMap: Record<string, string | undefined> = {
-        STARTER: process.env.STRIPE_PRICE_STARTER,
-        PRO: process.env.STRIPE_PRICE_PRO,
-        BUSINESS: process.env.STRIPE_PRICE_BUSINESS,
+        STARTER: process.env.STRIPE_PRICE_STARTER || TIER_PRICE_IDS.STARTER,
+        PRO: process.env.STRIPE_PRICE_PRO || TIER_PRICE_IDS.PRO,
+        BUSINESS: process.env.STRIPE_PRICE_BUSINESS || TIER_PRICE_IDS.BUSINESS,
       };
       priceId = tierPriceMap[body.tier];
       if (!priceId) {

@@ -233,7 +233,13 @@ export default function PersistentExecutivePanel() {
   };
 
   // Robot icon - shown when panel is hidden
+  // SUPERADMIN GATE: PEP floating button is only visible to superadmin users
   if (panelState === 'hidden') {
+    // Don't render the floating button for non-superadmin users
+    if (!isSuperAdmin) {
+      return null;
+    }
+
     return (
       <button
         onClick={openPanel}
@@ -269,6 +275,11 @@ export default function PersistentExecutivePanel() {
   }
 
   const panelWidth = panelState === 'fullscreen' ? '100vw' : '380px';
+
+  // SUPERADMIN GATE: Entire PEP panel is only visible to superadmin users
+  if (!isSuperAdmin) {
+    return null;
+  }
 
   return (
     <>
