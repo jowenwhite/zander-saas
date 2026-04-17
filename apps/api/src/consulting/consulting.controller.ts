@@ -387,6 +387,6 @@ export class ConsultingController {
     if (!req.user.isSuperAdmin) {
       throw new ForbiddenException('Only superadmins can populate HQ from intakes');
     }
-    return this.consultingService.populateHQFromIntake(intakeId, body);
+    return this.consultingService.populateHQFromIntake(intakeId, body, req.user.id);
   }
 }

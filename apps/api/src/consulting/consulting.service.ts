@@ -833,6 +833,7 @@ export class ConsultingService {
   async populateHQFromIntake(
     intakeId: string,
     options: { createHeadwinds?: boolean; createGoals?: boolean; updateVision?: boolean },
+    userId: string,
   ) {
     const { createHeadwinds = true, createGoals = true, updateVision = true } = options;
 
@@ -884,6 +885,7 @@ export class ConsultingService {
           await this.prisma.headwind.create({
             data: {
               tenantId: intake.tenantId,
+              createdById: userId,
               title: challenge.trim(),
               description: `Identified in business analysis intake on ${new Date(intake.createdAt).toLocaleDateString()}`,
               priority: 'P2',
