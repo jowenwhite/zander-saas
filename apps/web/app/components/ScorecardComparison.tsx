@@ -399,13 +399,13 @@ export default function ScorecardComparison({
             <BarChart
               data={barChartData}
               layout="vertical"
-              margin={{ top: 10, right: 30, bottom: 10, left: 100 }}
+              margin={{ top: 5, right: 20, bottom: 5, left: 100 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#2A2A38" horizontal={false} />
               <XAxis
                 type="number"
                 domain={[0, 10]}
-                tick={{ fill: '#9090A8', fontSize: 10 }}
+                tick={{ fill: '#9090A8', fontSize: 9 }}
                 tickLine={false}
                 tickCount={6}
                 axisLine={{ stroke: '#2A2A38' }}
@@ -444,10 +444,10 @@ export default function ScorecardComparison({
                   fill="#7C3AED"
                   fillOpacity={0.7}
                   radius={[0, 4, 4, 0]}
-                  barSize={12}
+                  barSize={10}
                 />
               )}
-              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={12}>
+              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={10}>
                 {barChartData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
