@@ -4,6 +4,64 @@ Use this file to record session handoffs and major changes.
 
 ---
 
+## 2026-04-17 — Phase 5F Premium PDF Generation + Download Flow
+
+**What Shipped:**
+
+1. **Premium PDF Generation System**
+   - Created Puppeteer-based PDF generator with McKinsey/Bain quality styling
+   - Generated 6 premium branded PDFs from markdown content:
+     - operations-playbook.pdf (680 KB)
+     - startup-foundations-kit.pdf (712 KB)
+     - sales-marketing-kit.pdf (703 KB)
+     - hiring-team-building-kit.pdf (706 KB)
+     - financial-clarity-kit.pdf (651 KB)
+     - industry-pack-construction.pdf (660 KB)
+   - Premium design features: Dark cover pages (#0A0A0F), cyan accents (#00D4FF), styled TOC, section dividers, back covers with CTA
+
+2. **Download Endpoint Wired**
+   - Updated `/api/store/download` to serve local PDFs
+   - Stripe price IDs mapped to PDF filenames
+   - Success page integration complete
+
+3. **PDF Generation Infrastructure**
+   - Created `scripts/generate-pdfs/generate-pdfs.js` - Main generation script
+   - Created `scripts/generate-pdfs/styles.css` - Premium CSS styling
+   - Output: `apps/web/public/downloads/`
+
+**Files Changed:**
+- NEW: `scripts/generate-pdfs/generate-pdfs.js`
+- NEW: `scripts/generate-pdfs/styles.css`
+- NEW: `apps/web/public/downloads/*.pdf` (6 files)
+- `apps/web/app/api/store/download/route.ts` — Wired to local PDFs
+- `docs/digital-products/README.md` — Updated status
+
+**Stripe Price ID → PDF Mapping:**
+| Price ID | Product | Filename |
+|----------|---------|----------|
+| price_1TN9EjCryiiyM4ce1JuVPzP7 | Operations Playbook | operations-playbook.pdf |
+| price_1TN9KECryiiyM4ce4GUDL3G0 | Startup Foundations Kit | startup-foundations-kit.pdf |
+| price_1TN9LdCryiiyM4cedyseEGCe | Sales and Marketing Kit | sales-marketing-kit.pdf |
+| price_1TN9NfCryiiyM4ceJhjP9acm | Hiring and Team Building Kit | hiring-team-building-kit.pdf |
+| price_1TN9OeCryiiyM4ceegNAxeI5 | Financial Clarity Kit | financial-clarity-kit.pdf |
+| price_1TN9PrCryiiyM4cetv9u1wIM | Industry Starter Pack | industry-pack-construction.pdf |
+
+**Dependencies Added:**
+- puppeteer (dev)
+- marked (dev)
+
+**To Regenerate PDFs:**
+```bash
+node scripts/generate-pdfs/generate-pdfs.js
+```
+
+**Next Steps:**
+1. Test end-to-end purchase flow with test Stripe card
+2. Deploy to production (Vercel)
+3. Optional: Move PDFs to S3/CDN for better delivery
+
+---
+
 ## 2026-04-17 — Phase 5E Digital Products + Branding Audit
 
 **What Shipped:**

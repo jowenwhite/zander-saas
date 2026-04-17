@@ -1,0 +1,766 @@
+/* Zander Premium PDF Styles - McKinsey/Bain Quality */
+
+/* ============================================
+   BRAND SYSTEM
+   ============================================ */
+:root {
+  /* Core Colors */
+  --dark-bg: #0A0A0F;
+  --elevated-surface: #111118;
+  --accent-cyan: #00D4FF;
+  --secondary-violet: #7C3AED;
+  --text-light: #F0F0F5;
+  --text-muted: #9090A8;
+  --text-dark: #1A1A24;
+  --success-green: #10B981;
+
+  /* Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+
+  /* Spacing */
+  --page-margin: 0.75in;
+}
+
+/* ============================================
+   PAGE SETUP
+   ============================================ */
+@page {
+  size: letter;
+  margin: 0;
+}
+
+@page :first {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: 11pt;
+  line-height: 1.6;
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   COVER PAGE
+   ============================================ */
+.cover-page {
+  width: 100%;
+  height: 11in;
+  background: var(--dark-bg);
+  color: var(--text-light);
+  padding: 1in;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+  position: relative;
+}
+
+.cover-logo {
+  width: 160px;
+  height: auto;
+  margin-bottom: auto;
+}
+
+.cover-accent-bar {
+  width: 80px;
+  height: 4px;
+  background: var(--accent-cyan);
+  margin-bottom: 24px;
+}
+
+.cover-title {
+  font-size: 42pt;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  max-width: 80%;
+}
+
+.cover-subtitle {
+  font-size: 16pt;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+}
+
+.cover-tagline {
+  font-size: 11pt;
+  color: var(--accent-cyan);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: auto;
+}
+
+.cover-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cover-attribution {
+  font-size: 10pt;
+  color: var(--text-muted);
+}
+
+.cover-price {
+  font-size: 14pt;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+/* ============================================
+   TABLE OF CONTENTS
+   ============================================ */
+.toc-page {
+  width: 100%;
+  min-height: 11in;
+  background: #FFFFFF;
+  padding: var(--page-margin);
+  page-break-after: always;
+}
+
+.toc-header {
+  font-size: 28pt;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.toc-accent {
+  width: 60px;
+  height: 4px;
+  background: var(--accent-cyan);
+  margin-bottom: 40px;
+}
+
+.toc-item {
+  display: flex;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+.toc-number {
+  width: 40px;
+  font-size: 14pt;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  flex-shrink: 0;
+}
+
+.toc-title {
+  font-size: 13pt;
+  font-weight: 600;
+  color: var(--text-dark);
+  flex-grow: 1;
+}
+
+.toc-dots {
+  flex-grow: 1;
+  margin: 0 12px;
+  border-bottom: 2px dotted var(--accent-cyan);
+  opacity: 0.3;
+  height: 8px;
+}
+
+.toc-page-num {
+  font-size: 12pt;
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   SECTION DIVIDER PAGES
+   ============================================ */
+.section-divider {
+  width: 100%;
+  height: 11in;
+  background: var(--dark-bg);
+  color: var(--text-light);
+  padding: var(--page-margin);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  page-break-after: always;
+}
+
+.section-number {
+  font-size: 72pt;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  opacity: 0.3;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 32pt;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  max-width: 70%;
+}
+
+.section-subtitle {
+  font-size: 14pt;
+  color: var(--text-muted);
+  margin-top: 16px;
+  max-width: 60%;
+  line-height: 1.6;
+}
+
+/* ============================================
+   CONTENT PAGES
+   ============================================ */
+.content-page {
+  width: 100%;
+  min-height: 11in;
+  background: #FFFFFF;
+  padding: var(--page-margin);
+  padding-top: 1in;
+  page-break-after: always;
+  position: relative;
+}
+
+.page-header {
+  position: absolute;
+  top: 0.4in;
+  left: var(--page-margin);
+  right: var(--page-margin);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+.page-header-title {
+  font-size: 9pt;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.page-header-logo {
+  width: 80px;
+  opacity: 0.5;
+}
+
+.page-footer {
+  position: absolute;
+  bottom: 0.4in;
+  left: var(--page-margin);
+  right: var(--page-margin);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9pt;
+  color: var(--text-muted);
+}
+
+.page-number {
+  font-weight: 600;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+h1 {
+  font-size: 28pt;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 20pt;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-top: 32px;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 14pt;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+h4 {
+  font-size: 12pt;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+p {
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+strong {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  background: #F8F9FA;
+  border-left: 4px solid var(--accent-cyan);
+  padding: 20px 24px;
+  margin: 24px 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.callout-title {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.callout-content {
+  font-size: 11pt;
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+.callout.tip {
+  border-left-color: var(--success-green);
+}
+
+.callout.tip .callout-title {
+  color: var(--success-green);
+}
+
+.callout.warning {
+  border-left-color: #F59E0B;
+}
+
+.callout.warning .callout-title {
+  color: #F59E0B;
+}
+
+/* ============================================
+   PULL QUOTES
+   ============================================ */
+.pull-quote {
+  padding: 32px 40px;
+  margin: 32px 0;
+  position: relative;
+}
+
+.pull-quote::before {
+  content: '"';
+  font-size: 72pt;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  opacity: 0.2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  line-height: 1;
+}
+
+.pull-quote-text {
+  font-size: 16pt;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--text-dark);
+  line-height: 1.5;
+  padding-left: 24px;
+  border-left: 3px solid var(--accent-cyan);
+}
+
+.pull-quote-attribution {
+  font-size: 10pt;
+  color: var(--text-muted);
+  margin-top: 12px;
+  padding-left: 24px;
+}
+
+/* ============================================
+   LISTS
+   ============================================ */
+ul, ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+ul li::marker {
+  color: var(--accent-cyan);
+}
+
+ol li::marker {
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+/* Numbered steps with cyan background */
+.numbered-steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+}
+
+.numbered-steps li {
+  position: relative;
+  padding-left: 48px;
+  margin-bottom: 16px;
+  counter-increment: step;
+}
+
+.numbered-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  background: var(--accent-cyan);
+  color: var(--dark-bg);
+  font-size: 14pt;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 10pt;
+}
+
+thead {
+  background: var(--dark-bg);
+  color: var(--text-light);
+}
+
+th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+tr:nth-child(even) {
+  background: #F8F9FA;
+}
+
+/* ============================================
+   CODE BLOCKS / CHECKLISTS
+   ============================================ */
+pre, code {
+  font-family: var(--font-mono);
+  font-size: 10pt;
+}
+
+pre {
+  background: var(--elevated-surface);
+  color: var(--text-light);
+  padding: 20px 24px;
+  border-radius: 8px;
+  margin: 20px 0;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+code {
+  background: #F0F0F5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--secondary-violet);
+}
+
+/* Checklist styling */
+.checklist {
+  background: #F8F9FA;
+  border: 1px solid #E5E5EA;
+  border-radius: 8px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.checklist-title {
+  font-size: 12pt;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checklist-title::before {
+  content: '✓';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--accent-cyan);
+  color: var(--dark-bg);
+  border-radius: 50%;
+  font-size: 12pt;
+  font-weight: 700;
+}
+
+.checklist ul {
+  list-style: none;
+  padding: 0;
+}
+
+.checklist li {
+  padding: 8px 0;
+  padding-left: 32px;
+  position: relative;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+.checklist li:last-child {
+  border-bottom: none;
+}
+
+.checklist li::before {
+  content: '☐';
+  position: absolute;
+  left: 0;
+  font-size: 16pt;
+  color: var(--accent-cyan);
+}
+
+/* ============================================
+   FRAMEWORK DIAGRAMS
+   ============================================ */
+.framework-diagram {
+  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--elevated-surface) 100%);
+  color: var(--text-light);
+  border-radius: 12px;
+  padding: 32px;
+  margin: 32px 0;
+}
+
+.framework-title {
+  font-size: 14pt;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 24px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.framework-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.framework-item {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.framework-item-number {
+  font-size: 24pt;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.framework-item-label {
+  font-size: 10pt;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+/* ============================================
+   TEMPLATES / FORMS
+   ============================================ */
+.template-box {
+  border: 2px solid var(--accent-cyan);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+  background: #FFFFFF;
+}
+
+.template-header {
+  background: var(--dark-bg);
+  color: var(--text-light);
+  margin: -24px -24px 24px -24px;
+  padding: 16px 24px;
+  border-radius: 10px 10px 0 0;
+}
+
+.template-title {
+  font-size: 14pt;
+  font-weight: 700;
+}
+
+.template-field {
+  margin-bottom: 16px;
+}
+
+.template-label {
+  font-size: 9pt;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.template-input {
+  border: 1px solid #E5E5EA;
+  border-radius: 4px;
+  padding: 12px;
+  width: 100%;
+  background: #F8F9FA;
+  min-height: 40px;
+}
+
+.template-input.large {
+  min-height: 80px;
+}
+
+/* ============================================
+   BACK COVER
+   ============================================ */
+.back-cover {
+  width: 100%;
+  height: 11in;
+  background: var(--dark-bg);
+  color: var(--text-light);
+  padding: 1in;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.back-logo {
+  width: 200px;
+  margin-bottom: 40px;
+}
+
+.back-tagline {
+  font-size: 24pt;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.back-description {
+  font-size: 12pt;
+  color: var(--text-muted);
+  max-width: 400px;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.back-cta {
+  background: var(--accent-cyan);
+  color: var(--dark-bg);
+  font-size: 12pt;
+  font-weight: 700;
+  padding: 16px 32px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-bottom: 40px;
+}
+
+.back-contact {
+  font-size: 11pt;
+  color: var(--text-muted);
+}
+
+.back-contact a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+.back-copyright {
+  position: absolute;
+  bottom: 0.5in;
+  font-size: 9pt;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+
+.text-cyan { color: var(--accent-cyan); }
+.text-violet { color: var(--secondary-violet); }
+.text-muted { color: var(--text-muted); }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+
+.page-break { page-break-after: always; }
+.avoid-break { page-break-inside: avoid; }

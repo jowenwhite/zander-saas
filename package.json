@@ -14,6 +14,9 @@
     "db:studio": "cd packages/database && npx prisma studio"
   },
   "devDependencies": {
+    "docx": "^9.6.1",
+    "marked": "^18.0.1",
+    "puppeteer": "^24.41.0",
     "turbo": "^1.11.0"
   },
   "dependencies": {

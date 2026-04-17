@@ -12,50 +12,36 @@ function getStripe() {
 }
 
 // Product metadata for downloads
-// Files will be stored in S3 at: s3://zander-digital-products/{product-key}.pdf
+// Files are served from: public/downloads/{filename}
 interface ProductDownload {
   name: string;
   filename: string;
-  s3Key: string;
-  placeholder: boolean; // true while waiting for real content
 }
 
 const PRODUCT_DOWNLOADS: Record<string, ProductDownload> = {
   'price_1TN9EjCryiiyM4ce1JuVPzP7': {
     name: 'Operations Playbook',
     filename: 'operations-playbook.pdf',
-    s3Key: 'products/operations-playbook.pdf',
-    placeholder: true,
   },
   'price_1TN9KECryiiyM4ce4GUDL3G0': {
     name: 'Startup Foundations Kit',
     filename: 'startup-foundations-kit.pdf',
-    s3Key: 'products/startup-foundations-kit.pdf',
-    placeholder: true,
   },
   'price_1TN9LdCryiiyM4cedyseEGCe': {
     name: 'Sales and Marketing Kit',
     filename: 'sales-marketing-kit.pdf',
-    s3Key: 'products/sales-marketing-kit.pdf',
-    placeholder: true,
   },
   'price_1TN9NfCryiiyM4ceJhjP9acm': {
     name: 'Hiring and Team Building Kit',
     filename: 'hiring-team-building-kit.pdf',
-    s3Key: 'products/hiring-team-building-kit.pdf',
-    placeholder: true,
   },
   'price_1TN9OeCryiiyM4ceegNAxeI5': {
     name: 'Financial Clarity Kit',
     filename: 'financial-clarity-kit.pdf',
-    s3Key: 'products/financial-clarity-kit.pdf',
-    placeholder: true,
   },
   'price_1TN9PrCryiiyM4cetv9u1wIM': {
-    name: 'Industry Starter Packs',
-    filename: 'industry-starter-packs.pdf',
-    s3Key: 'products/industry-starter-packs.pdf',
-    placeholder: true,
+    name: 'Industry Starter Pack (Construction)',
+    filename: 'industry-pack-construction.pdf',
   },
 };
 
@@ -94,26 +80,15 @@ export async function GET(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // If this is still a placeholder, return info about email delivery
-    if (product.placeholder) {
-      return NextResponse.json({
-        success: true,
-        product: product.name,
-        message: `Thank you for purchasing ${product.name}! Your download link will be emailed to ${session.customer_details?.email || 'your email address'} within 24 hours.`,
-        deliveryMethod: 'email',
-        downloadUrl: null,
-      });
-    }
-
-    // For real files, generate a presigned S3 URL or return the download URL
-    // TODO: Implement S3 presigned URL generation
-    const downloadUrl = `https://cdn.zanderos.com/${product.s3Key}`;
+    // Return JSON with the download URL (static file served by Next.js)
+    const downloadUrl = `/downloads/${product.filename}`;
 
     return NextResponse.json({
       success: true,
       product: product.name,
       filename: product.filename,
       downloadUrl,
+      message: `Your ${product.name} is ready to download.`,
     });
   } catch (error: unknown) {
     console.error('Download error:', error);

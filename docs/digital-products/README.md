@@ -207,19 +207,30 @@ For polished, designed PDFs:
 
 ## Current Status
 
-| Product | Content | S3 Uploaded | Download Tested |
-|---------|---------|-------------|-----------------|
-| Operations Playbook | ✅ Complete | ⏳ Pending | ⏳ Pending |
-| Startup Foundations Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
-| Sales and Marketing Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
-| Hiring and Team Building Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
-| Financial Clarity Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
-| Industry Starter Pack (Construction) | ✅ Complete | ⏳ Pending | ⏳ Pending |
+| Product | Content | PDF Generated | Download Wired |
+|---------|---------|---------------|----------------|
+| Operations Playbook | ✅ Complete | ✅ 680 KB | ✅ Ready |
+| Startup Foundations Kit | ✅ Complete | ✅ 712 KB | ✅ Ready |
+| Sales and Marketing Kit | ✅ Complete | ✅ 703 KB | ✅ Ready |
+| Hiring and Team Building Kit | ✅ Complete | ✅ 706 KB | ✅ Ready |
+| Financial Clarity Kit | ✅ Complete | ✅ 651 KB | ✅ Ready |
+| Industry Starter Pack (Construction) | ✅ Complete | ✅ 660 KB | ✅ Ready |
 
-### Next Steps
-1. Convert markdown content to branded PDFs
-2. Upload PDFs to S3 bucket `zander-digital-products`
-3. Update `placeholder: false` in download route
-4. Test end-to-end purchase and download flow
+### PDF Generation
+
+PDFs are generated using Puppeteer with premium branded HTML/CSS templates.
+
+**To regenerate PDFs:**
+```bash
+node scripts/generate-pdfs/generate-pdfs.js
+```
+
+**Output location:** `apps/web/public/downloads/`
+
+### Download Flow
+1. Customer purchases via Stripe checkout
+2. Redirected to `/store/success?session_id=xxx`
+3. Success page calls `/api/store/download` to get download URL
+4. Download URL points to static PDF in `/downloads/`
 
 Last Updated: 2026-04-17
