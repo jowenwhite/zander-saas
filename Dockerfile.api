@@ -23,7 +23,7 @@ RUN npx prisma generate
 
 # Back to api and compile TypeScript
 WORKDIR /app/apps/api
-RUN npx tsc --outDir dist
+RUN NODE_OPTIONS="--max-old-space-size=4096" npx tsc --outDir dist
 
 # Expose port
 EXPOSE 3001
