@@ -64,9 +64,14 @@ body {
 }
 
 .cover-logo {
-  width: 160px;
+  width: 100px;
   height: auto;
   margin-bottom: auto;
+}
+
+.cover-logo svg {
+  width: 100%;
+  height: auto;
 }
 
 .cover-accent-bar {
@@ -130,6 +135,20 @@ body {
   background: #FFFFFF;
   padding: var(--page-margin);
   page-break-after: always;
+  position: relative;
+}
+
+.toc-logo {
+  position: absolute;
+  top: var(--page-margin);
+  right: var(--page-margin);
+  width: 50px;
+  height: auto;
+}
+
+.toc-logo svg {
+  width: 100%;
+  height: auto;
 }
 
 .toc-header {
@@ -260,8 +279,14 @@ body {
 }
 
 .page-header-logo {
-  width: 80px;
-  opacity: 0.5;
+  width: 35px;
+  height: auto;
+  opacity: 0.7;
+}
+
+.page-header-logo svg {
+  width: 100%;
+  height: auto;
 }
 
 .page-footer {
@@ -691,8 +716,14 @@ code {
 }
 
 .back-logo {
-  width: 200px;
+  width: 140px;
+  height: auto;
   margin-bottom: 40px;
+}
+
+.back-logo svg {
+  width: 100%;
+  height: auto;
 }
 
 .back-tagline {
