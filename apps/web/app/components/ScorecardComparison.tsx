@@ -87,7 +87,7 @@ export default function ScorecardComparison({
     const { payload, x, y, cx, cy } = props;
 
     const angle = Math.atan2(y - cy, x - cx);
-    const labelRadius = 1.15;
+    const labelRadius = 1.08;
     const newX = cx + (x - cx) * labelRadius;
     const newY = cy + (y - cy) * labelRadius;
 
@@ -332,7 +332,7 @@ export default function ScorecardComparison({
               data={chartData}
               cx="50%"
               cy="50%"
-              outerRadius="62%"
+              outerRadius="68%"
               margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
             >
               <PolarGrid
@@ -406,7 +406,7 @@ export default function ScorecardComparison({
               <XAxis
                 type="number"
                 domain={[0, 10]}
-                tick={{ fill: '#8888A0', fontSize: 11 }}
+                tick={{ fill: '#8888A0', fontSize: 10 }}
                 tickLine={false}
                 axisLine={{ stroke: '#2A2A38' }}
               />

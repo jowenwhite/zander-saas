@@ -10,6 +10,12 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Cell,
 } from 'recharts';
 
 // The 10 pillars of Operating Simply
@@ -66,6 +72,7 @@ export default function Scorecard({
   compact = false,
 }: ScorecardProps) {
   const [hoveredPillar, setHoveredPillar] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'radar' | 'bar'>('radar');
 
   // Transform scores to recharts format
   const chartData = OPERATING_SIMPLY_PILLARS.map((pillar) => ({
@@ -96,7 +103,7 @@ export default function Scorecard({
 
     // Calculate angle and adjust position to push labels further out
     const angle = Math.atan2(y - cy, x - cx);
-    const labelRadius = 1.15; // Push labels 15% further out
+    const labelRadius = 1.08; // Push labels 8% further out
     const newX = cx + (x - cx) * labelRadius;
     const newY = cy + (y - cy) * labelRadius;
 
@@ -231,18 +238,64 @@ export default function Scorecard({
         </div>
       )}
 
-      {/* Radar Chart - Premium Styling */}
-      <div style={{
-        height: compact ? '320px' : '360px',
-        marginBottom: compact ? 0 : '1rem',
-        position: 'relative',
-      }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <RadarChart
+      {/* View Mode Toggle */}
+      {!compact && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              background: '#13131A',
+              borderRadius: '6px',
+              padding: '2px',
+            }}
+          >
+            <button
+              onClick={() => setViewMode('radar')}
+              style={{
+                padding: '0.4rem 0.75rem',
+                borderRadius: '4px',
+                border: 'none',
+                background: viewMode === 'radar' ? '#2A2A38' : 'transparent',
+                color: viewMode === 'radar' ? '#00D4FF' : '#8888A0',
+                fontSize: '0.8rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              Radar
+            </button>
+            <button
+              onClick={() => setViewMode('bar')}
+              style={{
+                padding: '0.4rem 0.75rem',
+                borderRadius: '4px',
+                border: 'none',
+                background: viewMode === 'bar' ? '#2A2A38' : 'transparent',
+                color: viewMode === 'bar' ? '#00D4FF' : '#8888A0',
+                fontSize: '0.8rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              Bar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Chart - Radar or Bar */}
+      {viewMode === 'radar' ? (
+        <div style={{
+          height: compact ? '320px' : '360px',
+          marginBottom: compact ? 0 : '1rem',
+          position: 'relative',
+        }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart
             data={chartData}
             cx="50%"
             cy="50%"
-            outerRadius="62%"
+            outerRadius="72%"
             margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
           >
             {/* Grid lines - thin and subtle */}
@@ -319,6 +372,74 @@ export default function Scorecard({
           </RadarChart>
         </ResponsiveContainer>
       </div>
+      ) : (
+        <div style={{ height: compact ? '320px' : '360px', marginBottom: compact ? 0 : '1rem' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ top: 10, right: 20, left: 70, bottom: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#2A2A38" horizontal={false} />
+              <XAxis
+                type="number"
+                domain={[0, 10]}
+                tick={{ fill: '#8888A0', fontSize: 10 }}
+                tickLine={false}
+                axisLine={{ stroke: '#2A2A38' }}
+              />
+              <YAxis
+                type="category"
+                dataKey="pillar"
+                tick={{ fill: '#E8E8F0', fontSize: 11, fontWeight: 400 }}
+                tickLine={false}
+                axisLine={false}
+                width={65}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: '#13131A',
+                  border: '1px solid #2A2A38',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                }}
+                labelStyle={{ color: '#F0F0F5', fontWeight: 600 }}
+                formatter={(value, name) => [
+                  `${value}/10`,
+                  name === 'current' ? 'Current' : comparisonLabel,
+                ]}
+              />
+              {comparisonScores && (
+                <Bar
+                  dataKey="previous"
+                  name={comparisonLabel}
+                  fill="#7C3AED"
+                  radius={[0, 3, 3, 0]}
+                  barSize={10}
+                />
+              )}
+              <Bar dataKey="current" name="Current" radius={[0, 3, 3, 0]} barSize={10}>
+                {chartData.map((entry, index) => {
+                  const prevScore = comparisonScores?.[entry.key as keyof PillarScores];
+                  const change = prevScore !== undefined ? entry.current - prevScore : 0;
+                  return (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        change > 0
+                          ? '#22C55E'
+                          : change < 0
+                          ? '#EF4444'
+                          : '#00D4FF'
+                      }
+                    />
+                  );
+                })}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Pillar Details Grid - Hidden in compact mode */}
       {!compact && (
