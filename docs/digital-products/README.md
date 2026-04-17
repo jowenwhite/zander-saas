@@ -162,15 +162,64 @@ All PDFs should include:
 
 ---
 
+## Content Files
+
+Full content has been written for each product in markdown format. These files contain the complete, professional content ready for PDF conversion.
+
+### Content Location: `docs/digital-products/content/`
+
+| Product | Content File | Word Count |
+|---------|--------------|------------|
+| Operations Playbook | `operations-playbook.md` | ~3,200 |
+| Startup Foundations Kit | `startup-foundations-kit.md` | ~3,500 |
+| Sales and Marketing Kit | `sales-marketing-kit.md` | ~3,800 |
+| Hiring and Team Building Kit | `hiring-team-building-kit.md` | ~4,000 |
+| Financial Clarity Kit | `financial-clarity-kit.md` | ~3,400 |
+| Industry Starter Pack (Construction) | `industry-pack-construction.md` | ~4,200 |
+
+### PDF Generation Instructions
+
+**Option 1: Using Pandoc (Recommended)**
+```bash
+# Install pandoc and wkhtmltopdf
+brew install pandoc wkhtmltopdf
+
+# Generate PDF with branding
+pandoc content/operations-playbook.md \
+  -o operations-playbook.pdf \
+  --pdf-engine=wkhtmltopdf \
+  --css=branding.css \
+  --metadata title="Operations Playbook"
+```
+
+**Option 2: Using Markdown Preview (VS Code)**
+1. Open markdown file in VS Code
+2. Install "Markdown PDF" extension
+3. Right-click → "Markdown PDF: Export (pdf)"
+
+**Option 3: Professional Design**
+For polished, designed PDFs:
+1. Import content into Figma/Canva
+2. Apply Zander brand templates
+3. Export as PDF
+
+---
+
 ## Current Status
 
-| Product | Status | S3 Uploaded | Download Tested |
-|---------|--------|-------------|-----------------|
-| Operations Playbook | Placeholder | No | No |
-| Startup Foundations Kit | Placeholder | No | No |
-| Sales and Marketing Kit | Placeholder | No | No |
-| Hiring and Team Building Kit | Placeholder | No | No |
-| Financial Clarity Kit | Placeholder | No | No |
-| Industry Starter Packs | Placeholder | No | No |
+| Product | Content | S3 Uploaded | Download Tested |
+|---------|---------|-------------|-----------------|
+| Operations Playbook | ✅ Complete | ⏳ Pending | ⏳ Pending |
+| Startup Foundations Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
+| Sales and Marketing Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
+| Hiring and Team Building Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
+| Financial Clarity Kit | ✅ Complete | ⏳ Pending | ⏳ Pending |
+| Industry Starter Pack (Construction) | ✅ Complete | ⏳ Pending | ⏳ Pending |
+
+### Next Steps
+1. Convert markdown content to branded PDFs
+2. Upload PDFs to S3 bucket `zander-digital-products`
+3. Update `placeholder: false` in download route
+4. Test end-to-end purchase and download flow
 
 Last Updated: 2026-04-17
