@@ -376,18 +376,19 @@ export default function Scorecard({
         </ResponsiveContainer>
       </div>
       ) : (
-        <div style={{ height: '350px', marginBottom: compact ? 0 : '1rem' }}>
-          <ResponsiveContainer width="100%" height={350}>
+        <div style={{ height: '250px', maxWidth: '700px', marginBottom: compact ? 0 : '1rem' }}>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart
               data={chartData}
               layout="vertical"
-              margin={{ top: 5, right: 20, bottom: 5, left: 100 }}
+              margin={{ top: 5, right: 30, bottom: 5, left: 80 }}
+              barCategoryGap="20%"
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#2A2A38" horizontal={false} />
               <XAxis
                 type="number"
                 domain={[0, 10]}
-                tick={{ fill: '#9090A8', fontSize: 9 }}
+                tick={{ fill: '#9090A8', fontSize: 8 }}
                 tickLine={false}
                 tickCount={6}
                 axisLine={{ stroke: '#2A2A38' }}
@@ -395,10 +396,10 @@ export default function Scorecard({
               <YAxis
                 type="category"
                 dataKey="pillar"
-                tick={{ fill: '#E8E8F0', fontSize: 11, fontWeight: 400 }}
+                tick={{ fill: '#E8E8F0', fontSize: 10, fontWeight: 400 }}
                 tickLine={false}
                 axisLine={false}
-                width={90}
+                width={75}
               />
               <Tooltip
                 contentStyle={{
@@ -420,10 +421,10 @@ export default function Scorecard({
                   fill="#7C3AED"
                   fillOpacity={0.7}
                   radius={[0, 4, 4, 0]}
-                  barSize={10}
+                  barSize={8}
                 />
               )}
-              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={10}>
+              <Bar dataKey="current" name="Current" radius={[0, 4, 4, 0]} barSize={8}>
                 {chartData.map((entry, index) => {
                   const prevScore = comparisonScores?.[entry.key as keyof PillarScores];
                   const change = prevScore !== undefined ? entry.current - prevScore : 0;
