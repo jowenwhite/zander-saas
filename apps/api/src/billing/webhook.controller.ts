@@ -11,7 +11,9 @@ import Stripe from 'stripe';
 import { PrismaService } from '../prisma/prisma.service';
 import { Public } from '../auth/jwt-auth.decorator';
 import { EmailService } from '../integrations/email/email.service';
+import { ConsultingEmailService } from '../consulting/consulting-email.service';
 import { TIER_TOKEN_CAPS, formatTokenCount } from '../common/config/tier-config';
+import { getEmailSignature } from '../shared/email-signature';
 
 // Stripe LIVE price IDs -> Tier mapping
 const PRICE_TO_TIER: Record<string, string> = {
@@ -56,6 +58,7 @@ export class WebhookController {
   constructor(
     private prisma: PrismaService,
     private emailService: EmailService,
+    private consultingEmailService: ConsultingEmailService,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
   }
@@ -348,11 +351,7 @@ export class WebhookController {
             Your remaining consulting hours carry over. Let's keep building!
           </p>
 
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">
-            Best,<br>
-            <strong>Jonathan White</strong><br>
-            <span style="color: #666;">Founder, Zander</span>
-          </p>
+          ${getEmailSignature()}
         </div>
       `;
 
@@ -459,12 +458,19 @@ export class WebhookController {
 
       this.logger.log(`Updated tenant ${tenantId} consulting status to ACTIVE`);
 
-      // Send confirmation email
+      // Send confirmation email using new ConsultingEmailService
       const customerEmail = tenant.users?.[0]?.email || tenant.email;
       const customerName = tenant.users?.[0]?.firstName || tenant.companyName || 'Valued Client';
+      const loginUrl = 'https://app.zanderos.com/headquarters';
 
       if (customerEmail) {
-        await this.sendConsultingWelcomeEmail(customerEmail, customerName, packageType, totalHours);
+        const packageName = this.getConsultingPackageName(packageType);
+        await this.consultingEmailService.sendWelcomeEmail(
+          customerEmail,
+          customerName,
+          packageName,
+          loginUrl,
+        );
       }
 
       // Send admin notification
@@ -503,80 +509,7 @@ export class WebhookController {
     await this.sendDigitalStoreAdminNotification(customerEmail, productName);
   }
 
-  private async sendConsultingWelcomeEmail(email: string, name: string, packageType: string, hours: number) {
-    try {
-      const packageName = this.getConsultingPackageName(packageType);
-
-      const html = `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #0C2340; margin: 0; font-size: 28px;">Welcome to Zander Consulting</h1>
-            <p style="color: #666; margin: 10px 0 0;">Your ${packageName} engagement is confirmed</p>
-          </div>
-
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">
-            Hi ${name},
-          </p>
-
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">
-            Thank you for choosing Zander for your business consulting needs. Your <strong>${packageName}</strong> package is now active.
-          </p>
-
-          <div style="background: linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%); border-radius: 12px; padding: 25px; margin: 25px 0;">
-            <h2 style="color: #fff; margin: 0 0 15px; font-size: 18px;">Your Package Details:</h2>
-            <ul style="color: #fff; margin: 0; padding-left: 20px; line-height: 1.8;">
-              <li>Package: ${packageName}</li>
-              ${hours > 0 ? `<li>Consulting Hours: ${hours} hours</li>` : ''}
-              <li>Valid for: 6 months from purchase</li>
-              <li>Access: Zander HQ Dashboard</li>
-            </ul>
-          </div>
-
-          <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 25px 0;">
-            <h3 style="color: #0C2340; margin: 0 0 10px; font-size: 16px;">Next Steps:</h3>
-            <ol style="color: #333; margin: 0; padding-left: 20px; line-height: 1.8;">
-              <li>Jonathan will reach out within 24 hours to schedule your kickoff call</li>
-              <li>Complete your intake survey in the HQ Dashboard</li>
-              <li>Prepare any documents you'd like reviewed</li>
-            </ol>
-          </div>
-
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">
-            I'm looking forward to working with you and helping your business thrive.
-          </p>
-
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">
-            Talk soon,<br>
-            <strong>Jonathan White</strong><br>
-            <span style="color: #666;">Founder, Zander</span>
-          </p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-
-          <p style="color: #999; font-size: 12px; text-align: center;">
-            Zander - Operating Simply<br>
-            Powered by Zander Systems LLC
-          </p>
-        </div>
-      `;
-
-      const result = await this.emailService.sendEmail({
-        to: email,
-        subject: `Welcome to Zander Consulting — ${packageName}`,
-        html,
-        from: 'Jonathan from Zander <jonathan@zanderos.com>',
-        replyTo: 'jonathan@zanderos.com',
-      });
-
-      if (result.success) {
-        this.logger.log(`Consulting welcome email sent to ${email}`);
-      } else {
-        this.logger.warn(`Consulting welcome email failed: ${result.error}`);
-      }
-    } catch (err) {
-      this.logger.error(`Failed to send consulting welcome email: ${err.message}`);
-    }
-  }
+  // NOTE: sendConsultingWelcomeEmail removed - now using ConsultingEmailService.sendWelcomeEmail
 
   private async sendConsultingAdminNotification(
     customerName: string,
@@ -665,12 +598,7 @@ export class WebhookController {
             This link will remain active for 30 days.
           </p>
 
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-
-          <p style="color: #999; font-size: 12px; text-align: center;">
-            Questions? Reply to this email.<br>
-            Zander - Operating Simply
-          </p>
+          ${getEmailSignature()}
         </div>
       `;
 
@@ -773,18 +701,7 @@ export class WebhookController {
             Questions? Just reply to this email or reach out through the app. We're here to help you succeed.
           </p>
 
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">
-            Welcome aboard,<br>
-            <strong>Pam</strong><br>
-            <span style="color: #666;">Your Executive Assistant at Zander</span>
-          </p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-
-          <p style="color: #999; font-size: 12px; text-align: center;">
-            Zander - Operating Simply<br>
-            Powered by Zander Systems LLC
-          </p>
+          ${getEmailSignature()}
         </div>
       `;
 

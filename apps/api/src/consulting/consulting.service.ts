@@ -1,16 +1,21 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEngagementDto, UpdateEngagementDto } from './dto/create-engagement.dto';
 import { CreateTimeEntryDto, UpdateTimeEntryDto } from './dto/create-time-entry.dto';
 import { CreateDeliverableDto, UpdateDeliverableDto } from './dto/create-deliverable.dto';
 import { CreateIntakeDto, UpdateIntakeDto } from './dto/create-intake.dto';
 import { EngagementStatus, DeliverableStatus, IntakeStatus } from '@prisma/client';
+import { ConsultingEmailService } from './consulting-email.service';
 
 @Injectable()
 export class ConsultingService {
   private readonly logger = new Logger(ConsultingService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => ConsultingEmailService))
+    private consultingEmailService: ConsultingEmailService,
+  ) {}
 
   // ============================================
   // ENGAGEMENTS
@@ -173,7 +178,56 @@ export class ConsultingService {
     ]);
 
     this.logger.log(`Created time entry ${timeEntry.id} (${dto.hours}h) for engagement ${dto.engagementId}`);
+
+    // Check if hours are running low and send notification
+    await this.checkAndNotifyLowHours(dto.engagementId);
+
     return timeEntry;
+  }
+
+  /**
+   * Check if engagement hours are running low and send notification
+   * Triggers at 25% remaining (e.g., 5 hours left on 20-hour package)
+   */
+  private async checkAndNotifyLowHours(engagementId: string) {
+    try {
+      const engagement = await this.prisma.consultingEngagement.findUnique({
+        where: { id: engagementId },
+        include: {
+          tenant: {
+            include: {
+              users: {
+                take: 1,
+                orderBy: { createdAt: 'asc' },
+              },
+            },
+          },
+        },
+      });
+
+      if (!engagement) return;
+
+      const hoursRemaining = engagement.totalHours - engagement.hoursUsed;
+      const percentRemaining = (hoursRemaining / engagement.totalHours) * 100;
+
+      // Trigger email at 25% remaining (but only if we have some hours used)
+      if (percentRemaining <= 25 && percentRemaining > 0 && engagement.hoursUsed > 0) {
+        const user = engagement.tenant?.users?.[0];
+        if (user?.email) {
+          await this.consultingEmailService.sendHoursLowEmail(
+            user.email,
+            user.firstName || engagement.tenant.companyName || 'Client',
+            hoursRemaining,
+            engagement.totalHours,
+            engagement.packageType,
+          );
+          this.logger.log(`Sent hours-low email for engagement ${engagementId} (${hoursRemaining}h remaining)`);
+        }
+      }
+    } catch (error) {
+      // Don't fail the time entry creation if email fails
+      this.logger.error(`Failed to check/send hours-low notification: ${error.message}`);
+    }
   }
 
   async listTimeEntries(tenantId?: string, engagementId?: string) {
@@ -381,6 +435,16 @@ export class ConsultingService {
   async updateDeliverable(id: string, dto: UpdateDeliverableDto) {
     const existing = await this.prisma.consultingDeliverable.findUnique({
       where: { id },
+      include: {
+        tenant: {
+          include: {
+            users: {
+              take: 1,
+              orderBy: { createdAt: 'asc' },
+            },
+          },
+        },
+      },
     });
 
     if (!existing) {
@@ -388,6 +452,8 @@ export class ConsultingService {
     }
 
     const updateData: any = {};
+    const wasNotDelivered = existing.status !== DeliverableStatus.COMPLETED && existing.status !== DeliverableStatus.DELIVERED;
+
     if (dto.status !== undefined) {
       updateData.status = dto.status;
       // Set deliveredAt when status changes to DELIVERED
@@ -413,6 +479,24 @@ export class ConsultingService {
     });
 
     this.logger.log(`Updated deliverable ${id}`);
+
+    // Send notification if deliverable was just completed/delivered
+    if (wasNotDelivered && (dto.status === DeliverableStatus.COMPLETED || dto.status === DeliverableStatus.DELIVERED)) {
+      try {
+        const user = existing.tenant?.users?.[0];
+        if (user?.email) {
+          await this.consultingEmailService.sendDeliverableReadyEmail(
+            user.email,
+            user.firstName || existing.tenant?.companyName || 'Client',
+            existing.name,
+          );
+          this.logger.log(`Sent deliverable-ready email for ${id}`);
+        }
+      } catch (error) {
+        this.logger.error(`Failed to send deliverable-ready email: ${error.message}`);
+      }
+    }
+
     return deliverable;
   }
 
