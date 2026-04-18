@@ -68,6 +68,7 @@ model Tenant {
   consultingDeliverables  ConsultingDeliverable[]
   consultingEngagements   ConsultingEngagement[]
   consultingIntakes       ConsultingIntake[]
+  consultingLeads         ConsultingLead[]         @relation("ConsultingLeads")
   consultingTimeEntries   ConsultingTimeEntry[]
   contacts                Contact[]
   deals                   Deal[]
@@ -1708,8 +1709,8 @@ model ConsultingEngagement {
   stripePaymentId String?
   notes           String?
   // Operating Simply Scorecard - pillar scores (1-10 for each of 10 pillars)
-  pillarScores    Json?                   // Initial assessment: {vision: 5, mission: 7, ...}
-  snapshotScores  Json?                   // Snapshots for before/after: [{date: "2026-01-15", scores: {...}}]
+  pillarScores    Json? // Initial assessment: {vision: 5, mission: 7, ...}
+  snapshotScores  Json? // Snapshots for before/after: [{date: "2026-01-15", scores: {...}}]
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
   deliverables    ConsultingDeliverable[]
@@ -1994,4 +1995,197 @@ enum IntakeStatus {
   APPROVED
   CONVERTED
   DECLINED
+}
+
+// ============================================
+// CONSULTING LEAD PIPELINE (Phase 5B)
+// ============================================
+
+enum LeadSource {
+  INQUIRY // From /consulting inquiry form
+  CALENDLY // From Calendly booking
+  MANUAL // Manually created by Jonathan
+  REFERRAL // Referral from existing client
+  WEBSITE // General website contact
+}
+
+enum LeadStatus {
+  NEW // Just received
+  CONTACTED // Initial outreach made
+  MEETING_SCHEDULED // Discovery call booked
+  MEETING_COMPLETED // Discovery call done
+  PROPOSAL_SENT // Proposal sent
+  NEGOTIATING // In discussion
+  WON // Converted to engagement
+  LOST // Did not convert
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum DocumentType {
+  NDA // Non-Disclosure Agreement
+  CSA // Consulting Services Agreement
+  SOW // Statement of Work
+  INVOICE // Invoice document
+  OTHER
+}
+
+enum ConsultingEventType {
+  INQUIRY_RECEIVED // New inquiry from form
+  MEETING_SCHEDULED // Calendly booking created
+  MEETING_CANCELED // Calendly booking canceled
+  MEETING_COMPLETED // Discovery/kickoff call done
+  PROPOSAL_CREATED // Proposal drafted
+  PROPOSAL_SENT // Proposal emailed
+  PROPOSAL_VIEWED // Proposal opened
+  DOCUMENT_SIGNED // NDA/CSA/SOW signed
+  PAYMENT_RECEIVED // Stripe checkout completed
+  ENGAGEMENT_STARTED // Engagement began
+  STATUS_CHANGED // Lead/engagement status update
+  NOTE_ADDED // Manual note
+}
+
+model ConsultingLead {
+  id     String     @id @default(cuid())
+  source LeadSource
+  status LeadStatus @default(NEW)
+
+  // Contact info (captured from inquiry/Calendly)
+  name    String
+  email   String
+  company String?
+  phone   String?
+
+  // Interest
+  interestedPackage String? // BUSINESS_ANALYSIS, COMPASS, FOUNDATION, BLUEPRINT
+  message           String? // From inquiry form
+
+  // Meeting info (from Calendly)
+  calendlyEventUri   String? // Calendly event URI for deduplication
+  meetingScheduledAt DateTime?
+  meetingCompletedAt DateTime?
+
+  // Sales tracking
+  estimatedValue Float? // Estimated deal size
+  lostReason     String? // If status = LOST, why
+  notes          String? // Internal notes
+
+  // Conversion
+  tenantId                String? // Set when converted (new or existing tenant)
+  convertedToEngagementId String? // Links to ConsultingEngagement once won
+  convertedAt             DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tenant          Tenant?              @relation("ConsultingLeads", fields: [tenantId], references: [id])
+  proposals       ConsultingProposal[]
+  signedDocuments SignedDocument[]
+  events          ConsultingEvent[]
+
+  @@index([email])
+  @@index([status])
+  @@index([source])
+  @@index([createdAt])
+  @@map("consulting_leads")
+}
+
+model ConsultingProposal {
+  id     String @id @default(cuid())
+  leadId String
+
+  // Proposal details
+  packageType String // BUSINESS_ANALYSIS, COMPASS, FOUNDATION, BLUEPRINT
+  totalAmount Float // Quoted price
+  hourlyRate  Float? // If ad-hoc
+  customTerms String? // Any custom terms
+
+  // Status tracking
+  status      ProposalStatus @default(DRAFT)
+  validUntil  DateTime? // Expiration date
+  sentAt      DateTime? // When emailed
+  viewedAt    DateTime? // When opened (if trackable)
+  respondedAt DateTime? // When accepted/declined
+
+  // Document
+  documentUrl String? // PDF URL in S3
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lead ConsultingLead @relation(fields: [leadId], references: [id])
+
+  @@index([leadId])
+  @@index([status])
+  @@map("consulting_proposals")
+}
+
+model SignedDocument {
+  id   String       @id @default(cuid())
+  type DocumentType
+
+  // Can be linked to lead OR engagement
+  leadId       String?
+  engagementId String?
+
+  // Document details
+  documentName    String // e.g., "NDA - Acme Corp"
+  documentUrl     String? // Generated PDF URL
+  templateVersion String? // Version of template used
+
+  // Signature audit trail
+  signedAt         DateTime?
+  signerName       String?
+  signerEmail      String?
+  signerIp         String?
+  signatureDataUrl String? // Base64 of signature canvas
+
+  // Status
+  isSigned Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lead ConsultingLead? @relation(fields: [leadId], references: [id])
+
+  @@index([leadId])
+  @@index([engagementId])
+  @@index([type])
+  @@map("signed_documents")
+}
+
+model ConsultingEvent {
+  id   String              @id @default(cuid())
+  type ConsultingEventType
+
+  // Linked to lead and/or engagement
+  leadId       String?
+  engagementId String?
+
+  // Event details
+  description String? // Human-readable description
+  metadata    Json? // Any additional structured data
+
+  // Actor
+  actorType String? // "system", "user", "webhook"
+  actorId   String? // User ID if manual
+
+  createdAt DateTime @default(now())
+
+  lead ConsultingLead? @relation(fields: [leadId], references: [id])
+
+  @@index([leadId])
+  @@index([engagementId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("consulting_events")
 }

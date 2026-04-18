@@ -12,6 +12,8 @@ import {
 import { Request } from 'express';
 import { Public } from '../auth/jwt-auth.decorator';
 import { EmailService } from '../integrations/email/email.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { LeadSource, LeadStatus, ConsultingEventType } from '@prisma/client';
 import * as crypto from 'crypto';
 
 /**
@@ -94,7 +96,10 @@ export class CalendlyWebhookController {
   private readonly logger = new Logger(CalendlyWebhookController.name);
   private readonly webhookSigningKey = process.env.CALENDLY_WEBHOOK_SIGNING_KEY;
 
-  constructor(private emailService: EmailService) {}
+  constructor(
+    private emailService: EmailService,
+    private prisma: PrismaService,
+  ) {}
 
   /**
    * Handle Calendly webhook events
@@ -172,22 +177,86 @@ export class CalendlyWebhookController {
 
   /**
    * Handle new call booking (invitee.created)
+   * Creates or updates a ConsultingLead and logs the event
    */
   private async handleInviteeCreated(payload: CalendlyWebhookPayload) {
     const { payload: data } = payload;
     const event = data.scheduled_event;
 
     const inviteeName = data.name || `${data.first_name || ''} ${data.last_name || ''}`.trim() || 'Guest';
-    const inviteeEmail = data.email;
+    const inviteeEmail = data.email.toLowerCase();
     const eventName = event.name;
     const startTime = new Date(event.start_time);
     const endTime = new Date(event.end_time);
     const timezone = data.timezone;
+    const calendlyEventUri = data.uri;
 
     // Extract Q&A responses if available
     const questionsAndAnswers = data.questions_and_answers || [];
 
+    // Extract company from Q&A if present
+    const companyAnswer = questionsAndAnswers.find(qa =>
+      qa.question.toLowerCase().includes('company') ||
+      qa.question.toLowerCase().includes('business')
+    )?.answer;
+
     this.logger.log(`New call booked: ${inviteeName} (${inviteeEmail}) for ${eventName}`);
+
+    // Find or create consulting lead
+    let lead = await this.prisma.consultingLead.findFirst({
+      where: {
+        email: inviteeEmail,
+        status: { notIn: [LeadStatus.WON, LeadStatus.LOST] },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (lead) {
+      // Update existing lead
+      lead = await this.prisma.consultingLead.update({
+        where: { id: lead.id },
+        data: {
+          status: LeadStatus.MEETING_SCHEDULED,
+          calendlyEventUri,
+          meetingScheduledAt: startTime,
+          company: companyAnswer || lead.company,
+        },
+      });
+      this.logger.log(`Updated lead ${lead.id} with Calendly meeting`);
+    } else {
+      // Create new lead from Calendly
+      lead = await this.prisma.consultingLead.create({
+        data: {
+          source: LeadSource.CALENDLY,
+          status: LeadStatus.MEETING_SCHEDULED,
+          name: inviteeName,
+          email: inviteeEmail,
+          company: companyAnswer,
+          calendlyEventUri,
+          meetingScheduledAt: startTime,
+        },
+      });
+      this.logger.log(`Created new lead ${lead.id} from Calendly booking`);
+    }
+
+    // Log the meeting scheduled event
+    await this.prisma.consultingEvent.create({
+      data: {
+        type: ConsultingEventType.MEETING_SCHEDULED,
+        leadId: lead.id,
+        description: `${eventName} scheduled for ${startTime.toLocaleDateString()}`,
+        metadata: {
+          eventName,
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+          timezone,
+          calendlyEventUri,
+          meetingUrl: event.location?.join_url,
+          questionsAndAnswers,
+        },
+        actorType: 'webhook',
+      },
+    });
 
     // Send admin notification
     await this.sendCallBookedNotification({
@@ -201,22 +270,64 @@ export class CalendlyWebhookController {
       meetingUrl: event.location?.join_url,
       rescheduleUrl: data.reschedule_url,
       cancelUrl: data.cancel_url,
+      leadId: lead.id,
     });
   }
 
   /**
    * Handle call cancellation (invitee.canceled)
+   * Updates lead status and logs the event
    */
   private async handleInviteeCanceled(payload: CalendlyWebhookPayload) {
     const { payload: data } = payload;
     const event = data.scheduled_event;
 
     const inviteeName = data.name || 'Guest';
-    const inviteeEmail = data.email;
+    const inviteeEmail = data.email.toLowerCase();
     const eventName = event.name;
     const startTime = new Date(event.start_time);
+    const calendlyEventUri = data.uri;
 
     this.logger.log(`Call canceled: ${inviteeName} (${inviteeEmail}) for ${eventName}`);
+
+    // Find and update lead if exists
+    const lead = await this.prisma.consultingLead.findFirst({
+      where: {
+        OR: [
+          { calendlyEventUri },
+          { email: inviteeEmail, status: LeadStatus.MEETING_SCHEDULED },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (lead) {
+      // Revert to CONTACTED status (they were contacted via Calendly)
+      await this.prisma.consultingLead.update({
+        where: { id: lead.id },
+        data: {
+          status: LeadStatus.CONTACTED,
+          meetingScheduledAt: null,
+        },
+      });
+
+      // Log cancellation event
+      await this.prisma.consultingEvent.create({
+        data: {
+          type: ConsultingEventType.MEETING_CANCELED,
+          leadId: lead.id,
+          description: `${eventName} canceled (was scheduled for ${startTime.toLocaleDateString()})`,
+          metadata: {
+            eventName,
+            originalStartTime: startTime.toISOString(),
+            calendlyEventUri,
+          },
+          actorType: 'webhook',
+        },
+      });
+
+      this.logger.log(`Updated lead ${lead.id} after Calendly cancellation`);
+    }
 
     // Send admin notification
     await this.sendCallCanceledNotification({
@@ -224,6 +335,7 @@ export class CalendlyWebhookController {
       inviteeEmail,
       eventName,
       startTime,
+      leadId: lead?.id,
     });
   }
 
@@ -241,6 +353,7 @@ export class CalendlyWebhookController {
     meetingUrl?: string;
     rescheduleUrl?: string;
     cancelUrl?: string;
+    leadId?: string;
   }) {
     const formattedDate = data.startTime.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -407,6 +520,7 @@ export class CalendlyWebhookController {
     inviteeEmail: string;
     eventName: string;
     startTime: Date;
+    leadId?: string;
   }) {
     const formattedDate = data.startTime.toLocaleDateString('en-US', {
       weekday: 'long',

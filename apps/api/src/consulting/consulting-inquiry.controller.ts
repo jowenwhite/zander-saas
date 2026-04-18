@@ -8,7 +8,9 @@ import {
 } from '@nestjs/common';
 import { Public } from '../auth/jwt-auth.decorator';
 import { EmailService } from '../integrations/email/email.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { LeadSource, ConsultingEventType } from '@prisma/client';
 
 /**
  * DTO for consulting inquiry submission
@@ -50,11 +52,14 @@ export class ConsultingInquiryDto {
 export class ConsultingInquiryController {
   private readonly logger = new Logger(ConsultingInquiryController.name);
 
-  constructor(private emailService: EmailService) {}
+  constructor(
+    private emailService: EmailService,
+    private prisma: PrismaService,
+  ) {}
 
   /**
    * Handle consulting inquiry form submission
-   * Sends notification email to jonathan@zanderos.com
+   * Creates a ConsultingLead, logs event, and sends notification emails
    */
   @Public()
   @Post('inquiry')
@@ -63,8 +68,66 @@ export class ConsultingInquiryController {
     this.logger.log(`New consulting inquiry from: ${dto.name} (${dto.email})`);
 
     try {
+      // Check if lead already exists with this email
+      const existingLead = await this.prisma.consultingLead.findFirst({
+        where: {
+          email: dto.email.toLowerCase(),
+          status: { notIn: ['WON', 'LOST'] },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      let lead;
+
+      if (existingLead) {
+        // Update existing lead with new message/info
+        lead = await this.prisma.consultingLead.update({
+          where: { id: existingLead.id },
+          data: {
+            message: dto.message,
+            interestedPackage: dto.interestedPackage || existingLead.interestedPackage,
+            company: dto.company || existingLead.company,
+            phone: dto.phone || existingLead.phone,
+          },
+        });
+        this.logger.log(`Updated existing lead ${lead.id} with new inquiry`);
+      } else {
+        // Create new lead
+        lead = await this.prisma.consultingLead.create({
+          data: {
+            source: LeadSource.INQUIRY,
+            name: dto.name,
+            email: dto.email.toLowerCase(),
+            company: dto.company,
+            phone: dto.phone,
+            interestedPackage: dto.interestedPackage,
+            message: dto.message,
+          },
+        });
+        this.logger.log(`Created new lead ${lead.id} from inquiry`);
+      }
+
+      // Log the inquiry event
+      await this.prisma.consultingEvent.create({
+        data: {
+          type: ConsultingEventType.INQUIRY_RECEIVED,
+          leadId: lead.id,
+          description: `Inquiry received via consulting form${dto.interestedPackage ? ` - interested in ${dto.interestedPackage}` : ''}`,
+          metadata: {
+            name: dto.name,
+            email: dto.email,
+            company: dto.company,
+            phone: dto.phone,
+            interestedPackage: dto.interestedPackage,
+            messagePreview: dto.message.substring(0, 200),
+            isExistingLead: !!existingLead,
+          },
+          actorType: 'webhook',
+        },
+      });
+
       // Send admin notification
-      await this.sendInquiryNotification(dto);
+      await this.sendInquiryNotification(dto, lead.id);
 
       // Send auto-response to customer
       await this.sendInquiryAutoResponse(dto);
@@ -72,6 +135,7 @@ export class ConsultingInquiryController {
       return {
         success: true,
         message: 'Thank you for your inquiry. Jonathan will be in touch within 24 hours.',
+        leadId: lead.id,
       };
     } catch (error) {
       this.logger.error(`Failed to process inquiry: ${error.message}`);
@@ -85,7 +149,7 @@ export class ConsultingInquiryController {
   /**
    * Send notification email to Jonathan for new consulting inquiry
    */
-  private async sendInquiryNotification(dto: ConsultingInquiryDto) {
+  private async sendInquiryNotification(dto: ConsultingInquiryDto, leadId?: string) {
     const timestamp = new Date().toLocaleString('en-US', {
       dateStyle: 'full',
       timeStyle: 'short',
