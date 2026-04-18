@@ -754,9 +754,21 @@ Could you tell me more specifically what you'd like help with? I'm ready to dive
 
   async zanderChat(userId: string, message: string, conversationHistory: any[] = []) {
     // Zander is the master AI - Jonathan only, full platform visibility
-    
-    // Get platform-wide context
-    const [tickets, headwinds, tenants, knowledgeArticles, users] = await Promise.all([
+
+    // Get platform-wide context including consulting data
+    const [
+      tickets,
+      headwinds,
+      tenants,
+      knowledgeArticles,
+      users,
+      // Consulting data (Phase 5B)
+      consultingLeads,
+      consultingEngagements,
+      pendingContracts,
+      recentConsultingEvents,
+      consultingTimeEntries,
+    ] = await Promise.all([
       // All support tickets across platform
       this.prisma.supportTicket.findMany({
         orderBy: { createdAt: 'desc' },
@@ -785,6 +797,55 @@ Could you tell me more specifically what you'd like help with? I'm ready to dive
       }),
       // Total user count
       this.prisma.user.count(),
+      // Consulting Leads Pipeline
+      this.prisma.consultingLead.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 30,
+        include: {
+          proposals: { select: { id: true, status: true, packageType: true, totalAmount: true } },
+          signedDocuments: { select: { id: true, type: true, isSigned: true } },
+          _count: { select: { events: true } },
+        },
+      }),
+      // Active Consulting Engagements
+      this.prisma.consultingEngagement.findMany({
+        where: { status: 'ACTIVE' },
+        include: {
+          tenant: { select: { id: true, companyName: true, email: true } },
+          _count: { select: { timeEntries: true, deliverables: true } },
+        },
+        orderBy: { startDate: 'desc' },
+      }),
+      // Pending Contracts (unsigned documents)
+      this.prisma.signedDocument.findMany({
+        where: { isSigned: false },
+        include: {
+          lead: { select: { name: true, email: true, company: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      // Recent Consulting Events (last 7 days)
+      this.prisma.consultingEvent.findMany({
+        where: {
+          createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        },
+        include: {
+          lead: { select: { name: true, company: true, status: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+      }),
+      // Recent Time Entries (for revenue tracking)
+      this.prisma.consultingTimeEntry.findMany({
+        where: {
+          date: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        },
+        include: {
+          tenant: { select: { companyName: true } },
+        },
+        orderBy: { date: 'desc' },
+        take: 50,
+      }),
     ]);
 
     // Calculate platform stats
@@ -792,11 +853,56 @@ Could you tell me more specifically what you'd like help with? I'm ready to dive
     const p1Headwinds = headwinds.filter(h => h.priority === 'P1' && h.status !== 'CLOSED').length;
     const activeHeadwinds = headwinds.filter(h => h.status !== 'CLOSED').length;
 
+    // ========================================
+    // CONSULTING PIPELINE METRICS (Phase 5B)
+    // ========================================
+
+    // Lead Pipeline Summary
+    const leadsByStatus = {
+      NEW: consultingLeads.filter(l => l.status === 'NEW').length,
+      CONTACTED: consultingLeads.filter(l => l.status === 'CONTACTED').length,
+      MEETING_SCHEDULED: consultingLeads.filter(l => l.status === 'MEETING_SCHEDULED').length,
+      MEETING_COMPLETED: consultingLeads.filter(l => l.status === 'MEETING_COMPLETED').length,
+      PROPOSAL_SENT: consultingLeads.filter(l => l.status === 'PROPOSAL_SENT').length,
+      NEGOTIATING: consultingLeads.filter(l => l.status === 'NEGOTIATING').length,
+      WON: consultingLeads.filter(l => l.status === 'WON').length,
+      LOST: consultingLeads.filter(l => l.status === 'LOST').length,
+    };
+    const activePipelineLeads = consultingLeads.filter(l => !['WON', 'LOST'].includes(l.status));
+    const pipelineValue = activePipelineLeads.reduce((sum, l) => sum + (l.estimatedValue || 0), 0);
+
+    // Upcoming Meetings
+    const upcomingMeetings = consultingLeads
+      .filter(l => l.meetingScheduledAt && new Date(l.meetingScheduledAt) > new Date())
+      .sort((a, b) => new Date(a.meetingScheduledAt!).getTime() - new Date(b.meetingScheduledAt!).getTime())
+      .slice(0, 5);
+
+    // Engagement Metrics
+    const totalActiveEngagements = consultingEngagements.length;
+    const totalHoursRemaining = consultingEngagements.reduce((sum, e) => sum + ((e.totalHours || 0) - (e.hoursUsed || 0)), 0);
+    const totalBillableHours30d = consultingTimeEntries.reduce((sum, e) => sum + (e.billableHours || 0), 0);
+
+    // Revenue calculation (rough estimate based on package types)
+    const packageRates: Record<string, number> = {
+      'BUSINESS_ANALYSIS': 2500,
+      'COMPASS': 4500,
+      'FOUNDATION': 7500,
+      'BLUEPRINT': 15000,
+    };
+    const estimatedMRR = consultingEngagements.reduce((sum, e) => {
+      return sum + (packageRates[e.packageType] || 0);
+    }, 0);
+
+    // Contracts needing signatures
+    const pendingNDAs = pendingContracts.filter(d => d.type === 'NDA');
+    const pendingCSAs = pendingContracts.filter(d => d.type === 'CSA');
+    const pendingSOWs = pendingContracts.filter(d => d.type === 'SOW');
+
     // Build comprehensive platform context
     const platformContext = `
 ZANDER PLATFORM OPERATIONS CONTEXT
 ==================================
-You are Zander, the master operations AI for the Zander SaaS platform. You report directly to Jonathan White, the founder and CEO. Your role is to help Jonathan manage platform operations, analyze support patterns, and maintain system health.
+You are Zander, the master operations AI for the Zander SaaS platform. You report directly to Jonathan White, the founder and CEO. Your role is to help Jonathan manage platform operations, analyze support patterns, maintain system health, and MANAGE THE CONSULTING BUSINESS.
 
 CURRENT PLATFORM STATUS:
 - Total Tenants: ${tenants.length}
@@ -804,6 +910,46 @@ CURRENT PLATFORM STATUS:
 - Open Support Tickets: ${openTickets}
 - Active Headwinds: ${activeHeadwinds} (${p1Headwinds} P1 critical)
 - Knowledge Articles: ${knowledgeArticles.length}
+
+========================================
+CONSULTING BUSINESS DASHBOARD
+========================================
+
+PIPELINE OVERVIEW:
+- Total Active Leads: ${activePipelineLeads.length}
+- Pipeline Value: $${pipelineValue.toLocaleString()}
+- Leads by Status:
+  • NEW: ${leadsByStatus.NEW}
+  • CONTACTED: ${leadsByStatus.CONTACTED}
+  • MEETING_SCHEDULED: ${leadsByStatus.MEETING_SCHEDULED}
+  • MEETING_COMPLETED: ${leadsByStatus.MEETING_COMPLETED}
+  • PROPOSAL_SENT: ${leadsByStatus.PROPOSAL_SENT}
+  • NEGOTIATING: ${leadsByStatus.NEGOTIATING}
+  • WON (converted): ${leadsByStatus.WON}
+  • LOST: ${leadsByStatus.LOST}
+
+ACTIVE ENGAGEMENTS:
+- Total Active: ${totalActiveEngagements}
+- Hours Remaining (all engagements): ${totalHoursRemaining.toFixed(1)} hrs
+- Billable Hours (last 30 days): ${totalBillableHours30d.toFixed(1)} hrs
+- Estimated Consulting MRR: $${estimatedMRR.toLocaleString()}
+${consultingEngagements.map(e => `  • ${e.tenant?.companyName || 'Unknown'}: ${e.packageType} - ${(e.totalHours - e.hoursUsed).toFixed(1)} hrs remaining`).join('\n') || '  (none active)'}
+
+PENDING CONTRACTS (need signature):
+- NDAs: ${pendingNDAs.length}${pendingNDAs.length > 0 ? ` (${pendingNDAs.map(d => d.lead?.name || 'Unknown').join(', ')})` : ''}
+- CSAs: ${pendingCSAs.length}${pendingCSAs.length > 0 ? ` (${pendingCSAs.map(d => d.lead?.name || 'Unknown').join(', ')})` : ''}
+- SOWs: ${pendingSOWs.length}${pendingSOWs.length > 0 ? ` (${pendingSOWs.map(d => d.lead?.name || 'Unknown').join(', ')})` : ''}
+
+UPCOMING MEETINGS:
+${upcomingMeetings.length > 0 ? upcomingMeetings.map(m => `- ${new Date(m.meetingScheduledAt!).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}: ${m.name} (${m.company || 'no company'}) - ${m.interestedPackage || 'undecided'}`).join('\n') : '(no upcoming meetings)'}
+
+RECENT CONSULTING ACTIVITY (7 days):
+${recentConsultingEvents.slice(0, 8).map(e => `- ${e.type}: ${e.description || ''} ${e.lead ? `(${e.lead.name})` : ''}`).join('\n') || '(no recent activity)'}
+
+LEAD DETAILS (active pipeline):
+${activePipelineLeads.slice(0, 10).map(l => `- ${l.name} (${l.company || 'no company'}) | ${l.status} | ${l.interestedPackage || '?'} | $${l.estimatedValue?.toLocaleString() || '0'}`).join('\n') || '(no active leads)'}
+
+========================================
 
 TENANT BREAKDOWN:
 ${tenants.map(t => `- ${t.companyName}: ${t._count.users} users (${t.subscriptionTier || 'TRIAL'})`).join('\n')}
@@ -825,12 +971,26 @@ YOUR CAPABILITIES:
 5. Help draft responses to support tickets
 6. Suggest operational improvements
 
+CONSULTING CAPABILITIES (NEW):
+7. get_consulting_pipeline - Show pipeline overview and lead statuses
+8. get_engagement_details - Show details on active engagements, hours used
+9. get_pending_contracts - Show contracts awaiting signature
+10. get_consulting_revenue - Show revenue metrics and projections
+11. get_upcoming_consulting_meetings - Show scheduled discovery/kickoff calls
+12. get_consulting_leads - Show lead details with contact info
+13. draft_meeting_agenda - Generate agenda for upcoming meetings (L3 DRAFT)
+14. draft_progress_report - Generate client progress report (L3 DRAFT)
+
+When drafting content (agendas, reports), ALWAYS mark as:
+"[L3 DRAFT - Requires Jonathan's review before sending]"
+
 COMMUNICATION STYLE:
 - Be direct and professional - Jonathan is busy
 - Lead with the most important information
 - Use data to support recommendations
 - Proactively identify patterns and issues
 - Suggest specific actions when relevant
+- For consulting: highlight urgent items (meetings today, contracts awaiting signature, leads going cold)
 `;
 
     const systemPrompt = platformContext;
@@ -846,7 +1006,18 @@ COMMUNICATION STYLE:
     // Call Claude API
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return this.getZanderMockResponse(message, { openTickets, activeHeadwinds, p1Headwinds });
+      return this.getZanderMockResponse(message, {
+        openTickets,
+        activeHeadwinds,
+        p1Headwinds,
+        consulting: {
+          pipelineLeads: activePipelineLeads.length,
+          pipelineValue,
+          activeEngagements: totalActiveEngagements,
+          pendingContracts: pendingContracts.length,
+          upcomingMeetings: upcomingMeetings.length,
+        },
+      });
     }
 
     try {
@@ -868,14 +1039,100 @@ COMMUNICATION STYLE:
       if (!response.ok) {
         const error = await response.text();
         console.error('Claude API error:', error);
-        return this.getZanderMockResponse(message, { openTickets, activeHeadwinds, p1Headwinds });
+        return this.getZanderMockResponse(message, {
+        openTickets,
+        activeHeadwinds,
+        p1Headwinds,
+        consulting: {
+          pipelineLeads: activePipelineLeads.length,
+          pipelineValue,
+          activeEngagements: totalActiveEngagements,
+          pendingContracts: pendingContracts.length,
+          upcomingMeetings: upcomingMeetings.length,
+        },
+      });
       }
 
       const data = await response.json();
       
       // Generate suggested actions based on current state
       const actions: any[] = [];
-      
+
+      // ========================================
+      // CONSULTING PRIORITY ACTIONS (check first)
+      // ========================================
+
+      // Priority 1: Meetings happening today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const meetingsToday = upcomingMeetings.filter(m => {
+        const meetingDate = new Date(m.meetingScheduledAt!);
+        return meetingDate >= today && meetingDate < tomorrow;
+      });
+      if (meetingsToday.length > 0) {
+        actions.push({
+          label: `📅 Meeting today: ${meetingsToday[0].name}`,
+          action: 'view_lead',
+          leadId: meetingsToday[0].id,
+          priority: 'high'
+        });
+      }
+
+      // Priority 2: Pending contracts (need signatures)
+      if (pendingContracts.length > 0) {
+        actions.push({
+          label: `📝 ${pendingContracts.length} contract(s) awaiting signature`,
+          action: 'view_pending_contracts',
+          count: pendingContracts.length,
+          priority: 'high'
+        });
+      }
+
+      // Priority 3: New leads requiring follow-up
+      const newLeads = consultingLeads.filter(l => l.status === 'NEW');
+      if (newLeads.length > 0) {
+        actions.push({
+          label: `🔔 ${newLeads.length} new lead(s) need follow-up`,
+          action: 'view_new_leads',
+          count: newLeads.length,
+          priority: 'medium'
+        });
+      }
+
+      // Priority 4: Leads going cold (contacted but no meeting scheduled, 3+ days old)
+      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+      const coldLeads = consultingLeads.filter(l =>
+        l.status === 'CONTACTED' &&
+        new Date(l.updatedAt) < threeDaysAgo
+      );
+      if (coldLeads.length > 0) {
+        actions.push({
+          label: `⚠️ ${coldLeads.length} lead(s) going cold`,
+          action: 'view_cold_leads',
+          count: coldLeads.length,
+          priority: 'medium'
+        });
+      }
+
+      // Priority 5: Engagements with low hours remaining (<10 hours)
+      const lowHoursEngagements = consultingEngagements.filter(e =>
+        (e.totalHours - e.hoursUsed) < 10
+      );
+      if (lowHoursEngagements.length > 0) {
+        actions.push({
+          label: `⏱️ ${lowHoursEngagements.length} engagement(s) low on hours`,
+          action: 'view_low_hours',
+          count: lowHoursEngagements.length,
+          priority: 'medium'
+        });
+      }
+
+      // ========================================
+      // PLATFORM ACTIONS (existing)
+      // ========================================
+
       // If there are open tickets, suggest viewing them
       const newTickets = tickets.filter(t => t.status === 'NEW');
       if (newTickets.length > 0) {
@@ -887,13 +1144,12 @@ COMMUNICATION STYLE:
           ticketNumber: firstTicket.ticketNumber
         });
       }
-      
+
       // If there are unlinked tickets and active headwinds, suggest linking
       const unlinkedTickets = tickets.filter(t => !t.linkedHeadwindId && t.status !== 'CLOSED' && t.status !== 'RESOLVED');
       const activeHW = headwinds.filter(h => h.status !== 'CLOSED');
       if (unlinkedTickets.length > 0 && activeHW.length > 0) {
         const ticket = unlinkedTickets[0];
-        const headwind = activeHW[0];
         actions.push({
           label: `Link ${ticket.ticketNumber} to Headwind`,
           action: 'suggest_link',
@@ -901,44 +1157,351 @@ COMMUNICATION STYLE:
           ticketNumber: ticket.ticketNumber
         });
       }
-      
+
       // Always add a dismiss option if there are actions
       if (actions.length > 0) {
         actions.push({ label: 'Dismiss', action: 'dismiss' });
       }
-      
+
       return {
         content: data.content[0].text,
         context: {
+          // Platform stats
           openTickets,
           activeHeadwinds,
           p1Headwinds,
           totalTenants: tenants.length,
           totalUsers: users,
+          // Consulting stats (NEW)
+          consulting: {
+            pipelineLeads: activePipelineLeads.length,
+            pipelineValue,
+            activeEngagements: totalActiveEngagements,
+            hoursRemaining: totalHoursRemaining,
+            billableHours30d: totalBillableHours30d,
+            estimatedMRR,
+            pendingContracts: pendingContracts.length,
+            upcomingMeetings: upcomingMeetings.length,
+            recentEvents: recentConsultingEvents.length,
+          },
         },
         actions: actions.length > 0 ? actions : undefined,
       };
     } catch (error) {
       console.error('Error calling Claude API:', error);
-      return this.getZanderMockResponse(message, { openTickets, activeHeadwinds, p1Headwinds });
+      return this.getZanderMockResponse(message, {
+        openTickets,
+        activeHeadwinds,
+        p1Headwinds,
+        consulting: {
+          pipelineLeads: activePipelineLeads.length,
+          pipelineValue,
+          activeEngagements: totalActiveEngagements,
+          pendingContracts: pendingContracts.length,
+          upcomingMeetings: upcomingMeetings.length,
+        },
+      });
     }
   }
 
   private getZanderMockResponse(message: string, stats: any): any {
     return {
-      content: `**Platform Status Summary**
+      content: `**Platform & Consulting Status Summary**
 
-Based on current data:
+**Platform:**
 - **${stats.openTickets}** open support tickets
 - **${stats.activeHeadwinds}** active headwinds (${stats.p1Headwinds} P1)
 
+**Consulting Business:**
+- **${stats.consulting?.pipelineLeads || 0}** leads in pipeline ($${(stats.consulting?.pipelineValue || 0).toLocaleString()} value)
+- **${stats.consulting?.activeEngagements || 0}** active engagements
+- **${stats.consulting?.pendingContracts || 0}** contracts awaiting signature
+- **${stats.consulting?.upcomingMeetings || 0}** upcoming meetings
+
 Regarding your question about "${message.substring(0, 50)}...":
 
-I'm ready to help analyze this. The full AI integration will provide deeper insights, but I can tell you the system is operational and I'm tracking all incoming issues.
+I'm ready to help analyze this. The full AI integration will provide deeper insights, but I can tell you the system is operational and I'm tracking all platform and consulting activity.
 
 What specific aspect would you like me to focus on?`,
       context: stats,
     };
+  }
+
+  /**
+   * Generate a comprehensive daily briefing for Jonathan
+   * Includes platform health, consulting pipeline, and priority items
+   */
+  async getZanderDailyBriefing(): Promise<any> {
+    // Fetch all the data we need for the briefing
+    const [
+      // Platform data
+      tickets,
+      headwinds,
+      tenants,
+      // Consulting data
+      consultingLeads,
+      consultingEngagements,
+      pendingContracts,
+      recentEvents,
+      timeEntries30d,
+    ] = await Promise.all([
+      // Support tickets
+      this.prisma.supportTicket.findMany({
+        where: {
+          status: { in: ['NEW', 'IN_PROGRESS'] },
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          tenant: { select: { companyName: true } },
+        },
+      }),
+      // Headwinds
+      this.prisma.headwind.findMany({
+        where: { status: { not: 'CLOSED' } },
+        orderBy: { priority: 'asc' },
+      }),
+      // Tenants summary
+      this.prisma.tenant.findMany({
+        include: { _count: { select: { users: true } } },
+      }),
+      // Consulting leads
+      this.prisma.consultingLead.findMany({
+        where: { status: { notIn: ['WON', 'LOST'] } },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          proposals: { select: { id: true, status: true } },
+          signedDocuments: { where: { isSigned: false }, select: { id: true, type: true } },
+        },
+      }),
+      // Active engagements
+      this.prisma.consultingEngagement.findMany({
+        where: { status: 'ACTIVE' },
+        include: {
+          tenant: { select: { companyName: true, email: true } },
+          deliverables: { where: { status: { not: 'DELIVERED' } } },
+        },
+      }),
+      // Pending contracts
+      this.prisma.signedDocument.findMany({
+        where: { isSigned: false },
+        include: { lead: { select: { name: true, company: true } } },
+      }),
+      // Recent events (7 days)
+      this.prisma.consultingEvent.findMany({
+        where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      }),
+      // Time entries last 30 days
+      this.prisma.consultingTimeEntry.findMany({
+        where: { date: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+        include: { tenant: { select: { companyName: true } } },
+      }),
+    ]);
+
+    // Calculate metrics
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Meetings today
+    const meetingsToday = consultingLeads.filter(l => {
+      if (!l.meetingScheduledAt) return false;
+      const meetingDate = new Date(l.meetingScheduledAt);
+      return meetingDate >= today && meetingDate < tomorrow;
+    });
+
+    // Leads by status
+    const leadsByStatus = {
+      NEW: consultingLeads.filter(l => l.status === 'NEW'),
+      CONTACTED: consultingLeads.filter(l => l.status === 'CONTACTED'),
+      MEETING_SCHEDULED: consultingLeads.filter(l => l.status === 'MEETING_SCHEDULED'),
+      MEETING_COMPLETED: consultingLeads.filter(l => l.status === 'MEETING_COMPLETED'),
+      PROPOSAL_SENT: consultingLeads.filter(l => l.status === 'PROPOSAL_SENT'),
+      NEGOTIATING: consultingLeads.filter(l => l.status === 'NEGOTIATING'),
+    };
+
+    // Cold leads (contacted but stale)
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+    const coldLeads = consultingLeads.filter(l =>
+      l.status === 'CONTACTED' && new Date(l.updatedAt) < threeDaysAgo
+    );
+
+    // Engagements with low hours
+    const lowHoursEngagements = consultingEngagements.filter(e =>
+      (e.totalHours - e.hoursUsed) < 10
+    );
+
+    // Pipeline value
+    const pipelineValue = consultingLeads.reduce((sum, l) => sum + (l.estimatedValue || 0), 0);
+
+    // Billable hours last 30 days
+    const billableHours30d = timeEntries30d.reduce((sum, e) => sum + (e.billableHours || 0), 0);
+
+    // Build the briefing structure
+    const briefing = {
+      generatedAt: new Date().toISOString(),
+      greeting: this.getTimeBasedGreeting(),
+
+      // Priority items requiring attention
+      priorityItems: [] as any[],
+
+      // Platform summary
+      platform: {
+        openTickets: tickets.length,
+        p1Headwinds: headwinds.filter(h => h.priority === 'P1').length,
+        activeHeadwinds: headwinds.length,
+        totalTenants: tenants.length,
+        totalUsers: tenants.reduce((sum, t) => sum + t._count.users, 0),
+      },
+
+      // Consulting summary
+      consulting: {
+        pipeline: {
+          totalLeads: consultingLeads.length,
+          pipelineValue,
+          byStatus: {
+            NEW: leadsByStatus.NEW.length,
+            CONTACTED: leadsByStatus.CONTACTED.length,
+            MEETING_SCHEDULED: leadsByStatus.MEETING_SCHEDULED.length,
+            MEETING_COMPLETED: leadsByStatus.MEETING_COMPLETED.length,
+            PROPOSAL_SENT: leadsByStatus.PROPOSAL_SENT.length,
+            NEGOTIATING: leadsByStatus.NEGOTIATING.length,
+          },
+        },
+        engagements: {
+          active: consultingEngagements.length,
+          hoursRemaining: consultingEngagements.reduce((sum, e) => sum + (e.totalHours - e.hoursUsed), 0),
+          billableHours30d,
+        },
+        meetings: {
+          today: meetingsToday.map(m => ({
+            name: m.name,
+            company: m.company,
+            time: m.meetingScheduledAt,
+            package: m.interestedPackage,
+          })),
+        },
+        pendingContracts: pendingContracts.map(d => ({
+          type: d.type,
+          leadName: d.lead?.name,
+          company: d.lead?.company,
+        })),
+        recentActivity: recentEvents.slice(0, 5).map(e => ({
+          type: e.type,
+          description: e.description,
+          timestamp: e.createdAt,
+        })),
+      },
+
+      // Detailed lists for each section
+      details: {
+        meetingsToday: meetingsToday.map(m => ({
+          id: m.id,
+          name: m.name,
+          company: m.company,
+          email: m.email,
+          time: m.meetingScheduledAt,
+          package: m.interestedPackage,
+          status: m.status,
+        })),
+        newLeads: leadsByStatus.NEW.map(l => ({
+          id: l.id,
+          name: l.name,
+          company: l.company,
+          email: l.email,
+          source: l.source,
+          estimatedValue: l.estimatedValue,
+          createdAt: l.createdAt,
+        })),
+        coldLeads: coldLeads.map(l => ({
+          id: l.id,
+          name: l.name,
+          company: l.company,
+          daysSinceUpdate: Math.floor((Date.now() - new Date(l.updatedAt).getTime()) / (24 * 60 * 60 * 1000)),
+        })),
+        lowHoursEngagements: lowHoursEngagements.map(e => ({
+          id: e.id,
+          company: e.tenant?.companyName,
+          package: e.packageType,
+          hoursRemaining: e.totalHours - e.hoursUsed,
+          pendingDeliverables: e.deliverables?.length || 0,
+        })),
+        openTickets: tickets.slice(0, 5).map(t => ({
+          id: t.id,
+          ticketNumber: t.ticketNumber,
+          subject: t.subject,
+          status: t.status,
+          company: t.tenant?.companyName,
+        })),
+      },
+    };
+
+    // Build priority items (things needing immediate attention)
+    if (meetingsToday.length > 0) {
+      briefing.priorityItems.push({
+        type: 'MEETING_TODAY',
+        priority: 'HIGH',
+        message: `${meetingsToday.length} meeting(s) scheduled today`,
+        items: meetingsToday.map(m => `${m.name} (${m.company || 'no company'}) - ${m.interestedPackage || 'undecided'}`),
+      });
+    }
+
+    if (pendingContracts.length > 0) {
+      briefing.priorityItems.push({
+        type: 'PENDING_CONTRACTS',
+        priority: 'HIGH',
+        message: `${pendingContracts.length} contract(s) awaiting signature`,
+        items: pendingContracts.map(d => `${d.type}: ${d.lead?.name || 'Unknown'}`),
+      });
+    }
+
+    if (leadsByStatus.NEW.length > 0) {
+      briefing.priorityItems.push({
+        type: 'NEW_LEADS',
+        priority: 'MEDIUM',
+        message: `${leadsByStatus.NEW.length} new lead(s) need follow-up`,
+        items: leadsByStatus.NEW.map(l => `${l.name} (${l.company || 'no company'}) - $${(l.estimatedValue || 0).toLocaleString()}`),
+      });
+    }
+
+    if (coldLeads.length > 0) {
+      briefing.priorityItems.push({
+        type: 'COLD_LEADS',
+        priority: 'MEDIUM',
+        message: `${coldLeads.length} lead(s) going cold (no activity 3+ days)`,
+        items: coldLeads.map(l => `${l.name} - contacted ${Math.floor((Date.now() - new Date(l.updatedAt).getTime()) / (24 * 60 * 60 * 1000))} days ago`),
+      });
+    }
+
+    if (lowHoursEngagements.length > 0) {
+      briefing.priorityItems.push({
+        type: 'LOW_HOURS',
+        priority: 'MEDIUM',
+        message: `${lowHoursEngagements.length} engagement(s) running low on hours`,
+        items: lowHoursEngagements.map(e => `${e.tenant?.companyName}: ${(e.totalHours - e.hoursUsed).toFixed(1)} hrs remaining`),
+      });
+    }
+
+    if (tickets.filter(t => t.status === 'NEW').length > 0) {
+      const newTickets = tickets.filter(t => t.status === 'NEW');
+      briefing.priorityItems.push({
+        type: 'NEW_TICKETS',
+        priority: 'LOW',
+        message: `${newTickets.length} new support ticket(s)`,
+        items: newTickets.slice(0, 3).map(t => `[${t.ticketNumber}] ${t.subject}`),
+      });
+    }
+
+    return briefing;
+  }
+
+  private getTimeBasedGreeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning, Jonathan.';
+    if (hour < 17) return 'Good afternoon, Jonathan.';
+    return 'Good evening, Jonathan.';
   }
 
 }

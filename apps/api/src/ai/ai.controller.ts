@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, UseGuards } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ExecutiveChatDto, ZanderChatDto } from './dto';
@@ -35,4 +35,18 @@ export class AiController {
     );
   }
 
+  /**
+   * GET /ai/zander/briefing
+   * Zander Daily Briefing - comprehensive dashboard for Jonathan
+   * Includes: platform health, consulting pipeline, priority items
+   * SuperAdmin only
+   */
+  @Get('zander/briefing')
+  async zanderDailyBriefing(@Req() req: any) {
+    // Only SuperAdmin can access Zander
+    if (!req.user?.isSuperAdmin) {
+      throw new Error('Unauthorized: Zander is only accessible to SuperAdmin');
+    }
+    return this.aiService.getZanderDailyBriefing();
+  }
 }
