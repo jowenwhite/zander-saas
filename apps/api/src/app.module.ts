@@ -55,6 +55,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { AssemblyModule } from './assembly/assembly.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { ConsultingModule } from './consulting/consulting.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -111,6 +112,7 @@ import { ConsultingModule } from './consulting/consulting.module';
     AssemblyModule,        // HQ Module: Assembly document generation
     IntegrationsModule,    // Tenant-scoped integration credentials (Twilio, Calendly)
     ConsultingModule,      // Phase 5: Consulting engagements, time entries, deliverables
+    WebhooksModule,        // External webhooks: Calendly
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [

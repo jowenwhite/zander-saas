@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 // Operating Simply 4 Pillars
 const PILLARS = [
   {
@@ -106,7 +108,52 @@ const PROCESS_STEPS = [
   },
 ];
 
+// Inquiry form state and handlers
+function useInquiryForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    phone: '',
+    interestedPackage: '',
+    message: '',
+  });
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('submitting');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/consulting/inquiry`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatus('success');
+        setFormData({ name: '', email: '', company: '', phone: '', interestedPackage: '', message: '' });
+      } else {
+        setStatus('error');
+        setErrorMessage(result.message || 'Something went wrong. Please try again.');
+      }
+    } catch {
+      setStatus('error');
+      setErrorMessage('Unable to submit. Please email jonathan@zanderos.com directly.');
+    }
+  };
+
+  return { formData, setFormData, status, errorMessage, handleSubmit };
+}
+
 export default function ConsultingPage() {
+  const { formData, setFormData, status, errorMessage, handleSubmit } = useInquiryForm();
+
   return (
     <div style={{
         fontFamily: "'Inter', system-ui, sans-serif",
@@ -669,6 +716,345 @@ export default function ConsultingPage() {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Section Divider */}
+        <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(0,207,235,0.4) 50%, transparent 100%)',
+          maxWidth: '600px',
+          margin: '0 auto',
+        }} />
+
+        {/* Inquiry Form Section */}
+        <section id="inquiry" style={{
+          padding: '5rem 2rem',
+          maxWidth: '900px',
+          margin: '0 auto',
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <span style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#00CFEB',
+              marginBottom: '12px',
+              display: 'block',
+            }}>
+              Get Started
+            </span>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              marginBottom: '1rem',
+            }}>
+              Send an Inquiry
+            </h2>
+            <p style={{
+              fontSize: '1.1rem',
+              color: 'rgba(255,255,255,0.6)',
+              maxWidth: '600px',
+              margin: '0 auto',
+            }}>
+              Tell me about your business and what you&apos;re looking to accomplish. I&apos;ll respond within 24 hours.
+            </p>
+          </div>
+
+          {status === 'success' ? (
+            <div style={{
+              background: 'rgba(34, 197, 94, 0.1)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              borderRadius: '16px',
+              padding: '3rem 2rem',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✓</div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#22C55E' }}>
+                Inquiry Received
+              </h3>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.1rem', marginBottom: '1.5rem' }}>
+                Thank you for reaching out. I&apos;ll review your message and respond within 24 hours.
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.95rem' }}>
+                In the meantime, feel free to{' '}
+                <a
+                  href="https://calendly.com/jonathan-zanderos/discovery-call"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#00CFEB', textDecoration: 'none' }}
+                >
+                  book a discovery call
+                </a>{' '}
+                directly.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{
+              background: '#0E1017',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '16px',
+              padding: '2.5rem',
+            }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '1.5rem',
+              }}>
+                {/* Name */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.9rem',
+                    color: 'rgba(255,255,255,0.6)',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}>
+                    Your Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.875rem 1rem',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      color: '#FFFFFF',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'rgba(0,207,235,0.5)'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.9rem',
+                    color: 'rgba(255,255,255,0.6)',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}>
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.875rem 1rem',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      color: '#FFFFFF',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'rgba(0,207,235,0.5)'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  />
+                </div>
+
+                {/* Company */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.9rem',
+                    color: 'rgba(255,255,255,0.6)',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}>
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.875rem 1rem',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      color: '#FFFFFF',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'rgba(0,207,235,0.5)'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  />
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.9rem',
+                    color: 'rgba(255,255,255,0.6)',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}>
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.875rem 1rem',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      color: '#FFFFFF',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'rgba(0,207,235,0.5)'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  />
+                </div>
+              </div>
+
+              {/* Interested Package */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.9rem',
+                  color: 'rgba(255,255,255,0.6)',
+                  marginBottom: '0.5rem',
+                  fontWeight: 500,
+                }}>
+                  Interested Package
+                </label>
+                <select
+                  value={formData.interestedPackage}
+                  onChange={(e) => setFormData({ ...formData, interestedPackage: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 1rem',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    color: formData.interestedPackage ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                    fontSize: '1rem',
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="" style={{ background: '#0E1017' }}>Select a package (optional)</option>
+                  <option value="Business Analysis" style={{ background: '#0E1017', color: '#FFFFFF' }}>Business Analysis — $500</option>
+                  <option value="Compass" style={{ background: '#0E1017', color: '#FFFFFF' }}>Compass — $2,500 (10 hours)</option>
+                  <option value="Foundation" style={{ background: '#0E1017', color: '#FFFFFF' }}>Foundation — $4,500 (20 hours)</option>
+                  <option value="Blueprint" style={{ background: '#0E1017', color: '#FFFFFF' }}>Blueprint — $8,000 (40 hours)</option>
+                  <option value="Not sure yet" style={{ background: '#0E1017', color: '#FFFFFF' }}>Not sure yet — Let&apos;s discuss</option>
+                </select>
+              </div>
+
+              {/* Message */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.9rem',
+                  color: 'rgba(255,255,255,0.6)',
+                  marginBottom: '0.5rem',
+                  fontWeight: 500,
+                }}>
+                  Tell me about your business and what you&apos;re looking to accomplish *
+                </label>
+                <textarea
+                  required
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="What challenges are you facing? What would success look like for you?"
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 1rem',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    fontSize: '1rem',
+                    outline: 'none',
+                    resize: 'vertical',
+                    minHeight: '120px',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = 'rgba(0,207,235,0.5)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              {/* Error Message */}
+              {status === 'error' && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  marginBottom: '1.5rem',
+                  color: '#EF4444',
+                  fontSize: '0.95rem',
+                }}>
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={status === 'submitting'}
+                style={{
+                  width: '100%',
+                  padding: '1rem 2rem',
+                  background: status === 'submitting' ? 'rgba(0,207,235,0.5)' : '#00CFEB',
+                  color: '#000',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  cursor: status === 'submitting' ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.2s',
+                }}
+              >
+                {status === 'submitting' ? 'Sending...' : 'Send Inquiry'}
+              </button>
+
+              <p style={{
+                textAlign: 'center',
+                marginTop: '1rem',
+                fontSize: '0.9rem',
+                color: 'rgba(255,255,255,0.4)',
+              }}>
+                Or{' '}
+                <a
+                  href="https://calendly.com/jonathan-zanderos/discovery-call"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#00CFEB', textDecoration: 'none' }}
+                >
+                  book a discovery call
+                </a>{' '}
+                directly on my calendar.
+              </p>
+            </form>
+          )}
         </section>
 
         {/* Section Divider */}
