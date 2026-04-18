@@ -4,6 +4,66 @@ Use this file to record session handoffs and major changes.
 
 ---
 
+## 2026-04-18 — Phase 5B Consulting Lead Pipeline (Deployment Verified)
+
+**What Shipped:**
+
+1. **Consulting Lead Pipeline Models (B1)**
+   - `ConsultingLead` — Full lead lifecycle tracking (NEW → MEETING_SCHEDULED → WON/LOST)
+   - `ConsultingProposal` — Proposal management with status tracking
+   - `SignedDocument` — E-signature audit trail with signer IP/timestamp
+   - `ConsultingEvent` — Activity logging for Zander briefings
+   - New enums: LeadSource, LeadStatus, ProposalStatus, DocumentType, ConsultingEventType
+
+2. **API Controllers (B2-B4)**
+   - `ConsultingLeadController` — Full CRUD + convert-to-engagement endpoint
+   - `ConsultingDocumentController` — Document creation and e-signature capture
+   - `ConsultingEventController` — Event logging + stats for dashboard
+
+3. **Pipeline Wiring (B5)**
+   - Inquiry form now creates ConsultingLead + logs INQUIRY_RECEIVED event
+   - Calendly webhook updates lead status to MEETING_SCHEDULED + logs event
+   - Existing leads updated (deduplication by email)
+
+**New API Endpoints:**
+| Endpoint | Description |
+|----------|-------------|
+| `POST /consulting/leads` | Create new lead |
+| `GET /consulting/leads` | List leads (filter by status/source) |
+| `GET /consulting/leads/:id` | Get lead details |
+| `PATCH /consulting/leads/:id` | Update lead |
+| `POST /consulting/leads/:id/convert` | Convert to engagement |
+| `POST /consulting/documents` | Create document |
+| `GET /consulting/documents` | List documents |
+| `PATCH /consulting/documents/:id/sign` | Record signature |
+| `GET /consulting/events` | List events |
+| `GET /consulting/events/recent` | Recent events for Zander briefing |
+| `GET /consulting/events/stats` | Dashboard stats |
+
+**Files Changed:**
+- `packages/database/prisma/schema.prisma` — New models and enums
+- NEW: `apps/api/src/consulting/dto/create-lead.dto.ts`
+- NEW: `apps/api/src/consulting/dto/create-document.dto.ts`
+- NEW: `apps/api/src/consulting/dto/create-event.dto.ts`
+- NEW: `apps/api/src/consulting/consulting-lead.controller.ts`
+- NEW: `apps/api/src/consulting/consulting-document.controller.ts`
+- NEW: `apps/api/src/consulting/consulting-event.controller.ts`
+- `apps/api/src/consulting/consulting-inquiry.controller.ts` — Lead creation
+- `apps/api/src/webhooks/calendly-webhook.controller.ts` — Lead status updates
+- `apps/api/src/consulting/consulting.module.ts` — Controller registration
+- `apps/api/src/webhooks/webhooks.module.ts` — PrismaModule import
+
+**Deployment:**
+- Docker image: `v63`
+- ECS task definition: revision `58`
+- Deployment: COMPLETED ✅
+- All endpoints verified (401 Unauthorized = correct, auth required)
+- Public inquiry tested: creates lead + event successfully
+
+**Commit:** `c8aa5de feat(consulting): add ConsultingLead, SignedDocument, ConsultingEvent models and APIs`
+
+---
+
 ## 2026-04-17 — Phase 5F Premium PDF Generation + Download Flow
 
 **What Shipped:**
