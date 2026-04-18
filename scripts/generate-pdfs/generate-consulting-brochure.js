@@ -802,7 +802,7 @@ function generateHTML() {
       <div class="package-card">
         <div class="package-name">Compass</div>
         <div class="package-price">$2,500</div>
-        <div class="package-hours">20 hours</div>
+        <div class="package-hours">10 hours</div>
         <div class="package-description">
           Strategic direction setting, priority identification, 90-day action plan.
         </div>
@@ -810,7 +810,7 @@ function generateHTML() {
       <div class="package-card featured">
         <div class="package-name">Foundation</div>
         <div class="package-price">$4,500</div>
-        <div class="package-hours">40 hours</div>
+        <div class="package-hours">20 hours</div>
         <div class="package-description">
           Full operational foundation build, SOPs, process documentation, team alignment.
         </div>
@@ -818,7 +818,7 @@ function generateHTML() {
       <div class="package-card">
         <div class="package-name">Blueprint</div>
         <div class="package-price">$8,000</div>
-        <div class="package-hours">80 hours</div>
+        <div class="package-hours">40 hours</div>
         <div class="package-description">
           Complete business transformation, all Foundation deliverables plus ongoing strategic partnership.
         </div>
@@ -826,7 +826,7 @@ function generateHTML() {
       <div class="package-card">
         <div class="package-name">Extension</div>
         <div class="package-price">$250</div>
-        <div class="package-hours">10 hours / 3 months</div>
+        <div class="package-hours">3-month timeline extension</div>
         <div class="package-description">
           Continue working together after any package. Extend your engagement timeline.
         </div>

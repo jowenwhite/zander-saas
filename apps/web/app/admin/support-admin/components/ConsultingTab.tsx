@@ -16,11 +16,11 @@ interface ConsultingTabProps {
 }
 
 const PACKAGE_TYPES = [
-  { value: 'BUSINESS_ANALYSIS', label: 'Business Analysis', hours: 0, price: 500 },
-  { value: 'COMPASS', label: 'Compass', hours: 20, price: 2500 },
-  { value: 'FOUNDATION', label: 'Foundation', hours: 40, price: 4500 },
-  { value: 'BLUEPRINT', label: 'Blueprint', hours: 80, price: 8000 },
-  { value: 'EXTENSION', label: 'Package Extension', hours: 10, price: 250 },
+  { value: 'BUSINESS_ANALYSIS', label: 'Business Analysis', hours: 3, price: 500 },
+  { value: 'COMPASS', label: 'Compass', hours: 10, price: 2500 },
+  { value: 'FOUNDATION', label: 'Foundation', hours: 20, price: 4500 },
+  { value: 'BLUEPRINT', label: 'Blueprint', hours: 40, price: 8000 },
+  { value: 'EXTENSION', label: 'Package Extension', hours: 0, price: 250 },
 ];
 
 const TIME_CATEGORIES = [

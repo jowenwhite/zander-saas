@@ -37,10 +37,10 @@ interface Intake {
 }
 
 const PACKAGE_TYPES = [
-  { value: 'BUSINESS_ANALYSIS', label: 'Business Analysis', hours: 0 },
-  { value: 'COMPASS', label: 'Compass', hours: 20 },
-  { value: 'FOUNDATION', label: 'Foundation', hours: 40 },
-  { value: 'BLUEPRINT', label: 'Blueprint', hours: 80 },
+  { value: 'BUSINESS_ANALYSIS', label: 'Business Analysis', hours: 3 },
+  { value: 'COMPASS', label: 'Compass', hours: 10 },
+  { value: 'FOUNDATION', label: 'Foundation', hours: 20 },
+  { value: 'BLUEPRINT', label: 'Blueprint', hours: 40 },
 ];
 
 export function ConsultingIntakeSurvey() {
