@@ -253,51 +253,253 @@ export default function StorePage() {
         </div>
       </section>
 
-      {/* Consulting CTA Section */}
+      {/* Consulting Preview Section */}
       <section style={{
         padding: '5rem 2rem',
-        background: 'linear-gradient(180deg, transparent 0%, rgba(0,207,235,0.03) 50%, transparent 100%)',
+        background: 'linear-gradient(180deg, rgba(0,207,235,0.02) 0%, rgba(0,207,235,0.06) 50%, rgba(0,207,235,0.02) 100%)',
+        borderTop: '1px solid rgba(0,207,235,0.1)',
+        borderBottom: '1px solid rgba(0,207,235,0.1)',
       }}>
-        <div style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          textAlign: 'center',
-        }}>
-          <h2 style={{
-            fontSize: 'clamp(2rem, 4vw, 3rem)',
-            fontWeight: 800,
-            marginBottom: '1.5rem',
-            letterSpacing: '-0.02em',
-          }}>
-            Need more than templates?
-          </h2>
-          <p style={{
-            fontSize: '1.25rem',
-            color: 'rgba(255,255,255,0.65)',
-            lineHeight: 1.7,
-            marginBottom: '2rem',
-          }}>
-            Book a consulting session for hands-on help building systems,
-            solving problems, and getting your business running the way it should.
-          </p>
-          <a
-            href="https://calendly.com/jonathan-zanderos"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <span style={{
               display: 'inline-block',
-              background: '#00CFEB',
-              color: '#000',
-              padding: '16px 32px',
-              borderRadius: '10px',
+              background: 'rgba(0,207,235,0.15)',
+              border: '1px solid rgba(0,207,235,0.4)',
+              color: '#00CFEB',
+              padding: '8px 16px',
+              borderRadius: '50px',
+              fontSize: '12px',
               fontWeight: 700,
-              fontSize: '1.125rem',
-              textDecoration: 'none',
-              transition: 'opacity 0.2s ease',
-            }}
-          >
-            Book a Consulting Session
-          </a>
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              marginBottom: '1.5rem',
+            }}>
+              Expert Guidance
+            </span>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 800,
+              marginBottom: '1rem',
+              letterSpacing: '-0.02em',
+            }}>
+              Need a Partner, Not Just a Playbook?
+            </h2>
+            <p style={{
+              fontSize: '1.15rem',
+              color: 'rgba(255,255,255,0.65)',
+              lineHeight: 1.7,
+              maxWidth: '700px',
+              margin: '0 auto',
+            }}>
+              Our digital products give you the systems. Operating Simply Consulting gives you
+              a partner who works alongside you to assess, organize, and transform your business operations.
+            </p>
+          </div>
+
+          {/* Consulting Packages Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '1.25rem',
+            marginBottom: '2.5rem',
+          }}>
+            {/* Business Analysis */}
+            <div style={{
+              background: 'rgba(14, 16, 23, 0.8)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              padding: '1.75rem',
+              transition: 'border-color 0.2s ease',
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '10px',
+                background: 'rgba(0,207,235,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                fontSize: '1.5rem',
+              }}>
+                📊
+              </div>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                marginBottom: '0.5rem',
+                color: '#FFFFFF',
+              }}>
+                Business Analysis
+              </h3>
+              <p style={{
+                fontSize: '0.95rem',
+                color: 'rgba(255,255,255,0.55)',
+                lineHeight: 1.6,
+              }}>
+                Comprehensive assessment and Operating Simply Scorecard baseline with written recommendations.
+              </p>
+            </div>
+
+            {/* Compass */}
+            <div style={{
+              background: 'rgba(14, 16, 23, 0.8)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              padding: '1.75rem',
+              transition: 'border-color 0.2s ease',
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '10px',
+                background: 'rgba(0,207,235,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                fontSize: '1.5rem',
+              }}>
+                🧭
+              </div>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                marginBottom: '0.5rem',
+                color: '#FFFFFF',
+              }}>
+                Compass
+              </h3>
+              <p style={{
+                fontSize: '0.95rem',
+                color: 'rgba(255,255,255,0.55)',
+                lineHeight: 1.6,
+              }}>
+                Strategic direction setting, priority identification, and a clear 90-day action plan.
+              </p>
+            </div>
+
+            {/* Foundation */}
+            <div style={{
+              background: 'rgba(14, 16, 23, 0.8)',
+              border: '1px solid rgba(0,207,235,0.3)',
+              borderRadius: '12px',
+              padding: '1.75rem',
+              position: 'relative',
+              transition: 'border-color 0.2s ease',
+            }}>
+              <span style={{
+                position: 'absolute',
+                top: '-10px',
+                right: '16px',
+                background: '#00CFEB',
+                color: '#000',
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                padding: '4px 10px',
+                borderRadius: '50px',
+              }}>
+                Popular
+              </span>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '10px',
+                background: 'rgba(0,207,235,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                fontSize: '1.5rem',
+              }}>
+                🏗️
+              </div>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                marginBottom: '0.5rem',
+                color: '#FFFFFF',
+              }}>
+                Foundation
+              </h3>
+              <p style={{
+                fontSize: '0.95rem',
+                color: 'rgba(255,255,255,0.55)',
+                lineHeight: 1.6,
+              }}>
+                Full operational foundation build with SOPs, process documentation, and team alignment.
+              </p>
+            </div>
+
+            {/* Blueprint */}
+            <div style={{
+              background: 'rgba(14, 16, 23, 0.8)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              padding: '1.75rem',
+              transition: 'border-color 0.2s ease',
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '10px',
+                background: 'rgba(0,207,235,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                fontSize: '1.5rem',
+              }}>
+                🗺️
+              </div>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                marginBottom: '0.5rem',
+                color: '#FFFFFF',
+              }}>
+                Blueprint
+              </h3>
+              <p style={{
+                fontSize: '0.95rem',
+                color: 'rgba(255,255,255,0.55)',
+                lineHeight: 1.6,
+              }}>
+                Complete business transformation with all Foundation deliverables plus ongoing strategic partnership.
+              </p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div style={{ textAlign: 'center' }}>
+            <a
+              href="/consulting"
+              style={{
+                display: 'inline-block',
+                background: '#00CFEB',
+                color: '#000',
+                padding: '16px 32px',
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '1.125rem',
+                textDecoration: 'none',
+                transition: 'opacity 0.2s ease',
+              }}
+            >
+              Explore Consulting
+            </a>
+            <p style={{
+              marginTop: '1rem',
+              fontSize: '0.95rem',
+              color: 'rgba(255,255,255,0.45)',
+            }}>
+              Learn about the methodology, packages, and how we work together.
+            </p>
+          </div>
         </div>
       </section>
 
