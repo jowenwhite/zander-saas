@@ -56,6 +56,7 @@ import { AssemblyModule } from './assembly/assembly.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { ConsultingModule } from './consulting/consulting.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { MeetingIntelligenceModule } from './meeting-intelligence/meeting-intelligence.module';
 
 @Module({
   imports: [
@@ -112,7 +113,8 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     AssemblyModule,        // HQ Module: Assembly document generation
     IntegrationsModule,    // Tenant-scoped integration credentials (Twilio, Calendly)
     ConsultingModule,      // Phase 5: Consulting engagements, time entries, deliverables
-    WebhooksModule,        // External webhooks: Calendly
+    WebhooksModule,        // External webhooks: Calendly, Twilio recordings
+    MeetingIntelligenceModule, // Phase C: Meeting recording, transcription, AI summaries
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [

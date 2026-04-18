@@ -11,11 +11,13 @@ import {
   Download,
   Loader2,
   Package,
-  Calendar,
-  TrendingUp,
   ClipboardList,
   Timer,
-  FileSignature
+  FileSignature,
+  Video,
+  PlayCircle,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface Engagement {
@@ -60,6 +62,23 @@ interface Document {
   signerName?: string;
 }
 
+interface Meeting {
+  id: string;
+  title: string;
+  scheduledAt?: string;
+  durationMinutes?: number;
+  platform?: string;
+  summaryStatus: string;
+  summaryText?: string;
+  summaryJson?: {
+    keyDecisions?: Array<{ decision: string; impact?: string }>;
+    actionItems?: Array<{ task: string; assignee?: string; dueDate?: string }>;
+    followUps?: string[];
+    nextSteps?: string[];
+  };
+  createdAt: string;
+}
+
 interface PortalData {
   engagement: Engagement | null;
   deliverables: Deliverable[];
@@ -72,6 +91,12 @@ interface PortalData {
   documents: {
     pending: Document[];
     signed: Document[];
+  };
+  meetings: Meeting[];
+  meetingStats: {
+    total: number;
+    withSummary: number;
+    processing: number;
   };
   hasActiveEngagement: boolean;
 }
@@ -103,6 +128,7 @@ export default function ConsultingPortal({ authToken, tenantId }: ConsultingPort
   const [data, setData] = useState<PortalData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedMeetingId, setExpandedMeetingId] = useState<string | null>(null);
 
   const fetchPortalData = useCallback(async () => {
     if (!authToken) return;
@@ -227,7 +253,7 @@ export default function ConsultingPortal({ authToken, tenantId }: ConsultingPort
     );
   }
 
-  const { engagement, deliverables, deliverableStats, timeEntries, documents } = data;
+  const { engagement, deliverables, deliverableStats, timeEntries, documents, meetings = [], meetingStats } = data;
   const pkg = PACKAGE_LABELS[engagement.packageType] || { name: engagement.packageType, color: '#00CFEB' };
 
   return (
@@ -639,6 +665,216 @@ export default function ConsultingPortal({ authToken, tenantId }: ConsultingPort
           </div>
         </div>
       </div>
+
+      {/* Meetings Section - Full Width */}
+      {meetings.length > 0 && (
+        <div style={{
+          background: '#1C1C26',
+          borderRadius: '12px',
+          padding: '1.25rem',
+          border: '2px solid #2A2A38',
+          marginTop: '1rem',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Video size={18} style={{ color: '#00CFEB' }} />
+              <h4 style={{ margin: 0, color: '#F0F0F5', fontSize: '0.95rem', fontWeight: '600' }}>
+                Meeting Recordings
+              </h4>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem' }}>
+              <span style={{ color: '#22C55E' }}>{meetingStats?.withSummary || 0} summarized</span>
+              {(meetingStats?.processing || 0) > 0 && (
+                <>
+                  <span style={{ color: '#8888A0' }}>|</span>
+                  <span style={{ color: '#F59E0B' }}>{meetingStats.processing} processing</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {meetings.map((meeting) => {
+              const isExpanded = expandedMeetingId === meeting.id;
+              const hasSummary = meeting.summaryStatus === 'completed' && meeting.summaryJson;
+
+              return (
+                <div
+                  key={meeting.id}
+                  style={{
+                    background: '#09090F',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Meeting Header - Clickable to expand */}
+                  <div
+                    onClick={() => hasSummary && setExpandedMeetingId(isExpanded ? null : meeting.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.75rem 1rem',
+                      cursor: hasSummary ? 'pointer' : 'default',
+                      transition: 'background 0.2s ease',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '6px',
+                        background: meeting.summaryStatus === 'completed'
+                          ? 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)'
+                          : meeting.summaryStatus === 'processing'
+                          ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'
+                          : '#2A2A38',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        {meeting.summaryStatus === 'processing' ? (
+                          <Loader2 size={16} style={{ color: 'white', animation: 'spin 1s linear infinite' }} />
+                        ) : (
+                          <PlayCircle size={16} style={{ color: 'white' }} />
+                        )}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{
+                          color: '#F0F0F5',
+                          fontSize: '0.9rem',
+                          fontWeight: '500',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}>
+                          {meeting.title}
+                        </div>
+                        <div style={{ color: '#8888A0', fontSize: '0.75rem', marginTop: '0.15rem' }}>
+                          {meeting.scheduledAt ? formatDate(meeting.scheduledAt) : formatDate(meeting.createdAt)}
+                          {meeting.durationMinutes && ` • ${meeting.durationMinutes} min`}
+                          {meeting.platform && ` • ${meeting.platform.replace('_', ' ')}`}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span style={{
+                        fontSize: '0.7rem',
+                        fontWeight: '600',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '4px',
+                        textTransform: 'uppercase',
+                        background: meeting.summaryStatus === 'completed'
+                          ? 'rgba(34, 197, 94, 0.2)'
+                          : meeting.summaryStatus === 'processing'
+                          ? 'rgba(245, 158, 11, 0.2)'
+                          : '#2A2A38',
+                        color: meeting.summaryStatus === 'completed'
+                          ? '#22C55E'
+                          : meeting.summaryStatus === 'processing'
+                          ? '#F59E0B'
+                          : '#8888A0',
+                      }}>
+                        {meeting.summaryStatus === 'completed' ? 'Summary Ready' : meeting.summaryStatus}
+                      </span>
+                      {hasSummary && (
+                        isExpanded ? (
+                          <ChevronUp size={18} style={{ color: '#8888A0' }} />
+                        ) : (
+                          <ChevronDown size={18} style={{ color: '#8888A0' }} />
+                        )
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expanded Summary Content */}
+                  {isExpanded && hasSummary && (
+                    <div style={{
+                      padding: '0 1rem 1rem',
+                      borderTop: '1px solid #2A2A38',
+                    }}>
+                      {/* Summary Text */}
+                      {meeting.summaryText && (
+                        <div style={{ marginTop: '1rem' }}>
+                          <div style={{ color: '#8888A0', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                            Summary
+                          </div>
+                          <p style={{ margin: 0, color: '#F0F0F5', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                            {meeting.summaryText}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Key Decisions */}
+                      {meeting.summaryJson?.keyDecisions && meeting.summaryJson.keyDecisions.length > 0 && (
+                        <div style={{ marginTop: '1rem' }}>
+                          <div style={{ color: '#8888A0', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                            Key Decisions
+                          </div>
+                          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#F0F0F5', fontSize: '0.85rem' }}>
+                            {meeting.summaryJson.keyDecisions.map((item, idx) => (
+                              <li key={idx} style={{ marginBottom: '0.25rem' }}>{item.decision}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Action Items */}
+                      {meeting.summaryJson?.actionItems && meeting.summaryJson.actionItems.length > 0 && (
+                        <div style={{ marginTop: '1rem' }}>
+                          <div style={{ color: '#8888A0', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                            Action Items
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {meeting.summaryJson.actionItems.map((item, idx) => (
+                              <div key={idx} style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '0.5rem',
+                                padding: '0.5rem',
+                                background: 'rgba(0, 207, 235, 0.1)',
+                                borderRadius: '6px',
+                              }}>
+                                <CheckCircle2 size={14} style={{ color: '#00CFEB', marginTop: '0.1rem', flexShrink: 0 }} />
+                                <div>
+                                  <div style={{ color: '#F0F0F5', fontSize: '0.85rem' }}>{item.task}</div>
+                                  {(item.assignee || item.dueDate) && (
+                                    <div style={{ color: '#8888A0', fontSize: '0.75rem', marginTop: '0.15rem' }}>
+                                      {item.assignee && `Assigned to: ${item.assignee}`}
+                                      {item.assignee && item.dueDate && ' • '}
+                                      {item.dueDate && `Due: ${item.dueDate}`}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Next Steps */}
+                      {meeting.summaryJson?.nextSteps && meeting.summaryJson.nextSteps.length > 0 && (
+                        <div style={{ marginTop: '1rem' }}>
+                          <div style={{ color: '#8888A0', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                            Next Steps
+                          </div>
+                          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#F0F0F5', fontSize: '0.85rem' }}>
+                            {meeting.summaryJson.nextSteps.map((step, idx) => (
+                              <li key={idx} style={{ marginBottom: '0.25rem' }}>{step}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -240,6 +240,81 @@ When responding:
     return `- ${events.length} upcoming event${events.length !== 1 ? 's' : ''}: ${events.slice(0, 3).map(e => `"${e.title}"`).join(', ')}`;
   }
 
+  /**
+   * Get meeting intelligence context for Don (CMO)
+   * Focuses on marketing discussions and client feedback from meetings
+   */
+  private async getMeetingIntelligenceContext(tenantId: string): Promise<string> {
+    try {
+      const meetings = await this.prisma.meetingRecord.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        include: {
+          lead: { select: { name: true, company: true } },
+        },
+      });
+
+      if (meetings.length === 0) {
+        return '';
+      }
+
+      const processed = meetings.filter(m => m.summaryStatus === 'completed');
+      if (processed.length === 0) {
+        return `\nMeeting Intelligence: ${meetings.length} meetings recorded, summaries processing`;
+      }
+
+      // Extract marketing-related insights from meetings
+      const marketingInsights: string[] = [];
+      const clientFeedback: string[] = [];
+
+      processed.forEach(m => {
+        const summary = m.summaryJson as any;
+        const client = m.lead?.company || 'Unknown client';
+
+        // Look for marketing-related topics
+        const topicsSummary = summary?.topicsSummary || '';
+        const marketingKeywords = ['marketing', 'brand', 'campaign', 'content', 'social', 'advertising', 'website', 'seo', 'email'];
+        const hasMarketingTopics = marketingKeywords.some(k => topicsSummary.toLowerCase().includes(k));
+
+        if (hasMarketingTopics) {
+          marketingInsights.push(`- "${m.title}" (${client}): ${topicsSummary.substring(0, 150)}...`);
+        }
+
+        // Extract client concerns related to marketing
+        const concerns = summary?.clientConcerns || [];
+        concerns.forEach((c: any) => {
+          if (marketingKeywords.some(k => c.concern.toLowerCase().includes(k))) {
+            clientFeedback.push(`- [${c.severity || 'MEDIUM'}] ${c.concern} (${client})`);
+          }
+        });
+      });
+
+      let context = `
+MEETING INTELLIGENCE FOR MARKETING:
+- ${processed.length} meetings with AI summaries`;
+
+      if (marketingInsights.length > 0) {
+        context += `
+
+MARKETING DISCUSSIONS IN RECENT MEETINGS:
+${marketingInsights.slice(0, 5).join('\n')}`;
+      }
+
+      if (clientFeedback.length > 0) {
+        context += `
+
+CLIENT MARKETING FEEDBACK/CONCERNS:
+${clientFeedback.slice(0, 5).join('\n')}`;
+      }
+
+      return context;
+    } catch (error) {
+      console.error('Error fetching meeting intelligence for Don:', error);
+      return '';
+    }
+  }
+
   private async queryKnowledge(query: string, limit: number = 3) {
     try {
       const articles = await this.prisma.knowledgeArticle.findMany({
@@ -272,6 +347,7 @@ When responding:
       brandProfile,
       contactStats,
       calendar,
+      meetingIntelligence,
     ] = await Promise.all([
       this.getCampaignsSummary(tenantId),
       this.getWorkflowsSummary(tenantId),
@@ -282,6 +358,7 @@ When responding:
       this.getBrandProfile(tenantId),
       this.getContactStats(tenantId),
       this.getCalendarSummary(tenantId),
+      this.getMeetingIntelligenceContext(tenantId),
     ]);
 
     return `
@@ -295,7 +372,8 @@ Segments: ${segments}
 This Month's Theme: ${currentTheme}
 Brand: ${brandProfile}
 Contacts: ${contactStats}
-Calendar: ${calendar}`;
+Calendar: ${calendar}
+${meetingIntelligence}`;
   }
 
   async chat(tenantId: string, message: string, conversationHistory: any[] = []) {

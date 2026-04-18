@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zander Support Admin User Manual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --zander-navy: #0C2340;
+            --zander-orange: #F57C00;
+            --zander-gold: #F0B323;
+            --zander-light-gray: #f8f9fa;
+            --zander-dark-gray: #333;
+            --zander-text: #444;
+            --zander-green: #28a745;
+            --zander-red: #dc3545;
+            --zander-yellow: #ffc107;
+            --zander-blue: #0066cc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: var(--zander-text);
+            background: white;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                font-size: 10pt;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Cover Page */
+        .cover-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 50%, var(--zander-navy) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        .cover-logo {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .cover-logo span {
+            color: var(--zander-orange);
+        }
+
+        .cover-subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 3rem;
+        }
+
+        .cover-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .cover-description {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.8);
+            max-width: 600px;
+            margin-bottom: 4rem;
+        }
+
+        .cover-meta {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .cover-badge {
+            display: inline-block;
+            background: var(--zander-orange);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Table of Contents */
+        .toc-page {
+            padding: 4rem;
+            min-height: 100vh;
+        }
+
+        .toc-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--zander-navy);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--zander-orange);
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toc-item a {
+            color: var(--zander-navy);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+        }
+
+        .toc-item a:hover {
+            color: var(--zander-orange);
+        }
+
+        .toc-chapter-num {
+            color: var(--zander-orange);
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .toc-page-num {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Chapter Pages */
+        .chapter {
+            padding: 3rem 4rem;
+            min-height: 100vh;
+        }
+
+        .chapter-header {
+            margin-bottom: 3rem;
+        }
+
+        .nav-path {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+
+        .nav-path span {
+            color: var(--zander-orange);
+        }
+
+        .chapter-number {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--zander-orange);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .chapter-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--zander-navy);
+            margin-bottom: 1rem;
+        }
+
+        .chapter-intro {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 800px;
+            line-height: 1.8;
+        }
+
+        /* Content Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--zander-navy);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--zander-light-gray);
+        }
+
+        .subsection-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--zander-dark-gray);
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        /* Info Boxes */
+        .tip-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-left: 4px solid var(--zander-green);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tip-box-title {
+            font-weight: 700;
+            color: var(--zander-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #fff8e1 100%);
+            border-left: 4px solid var(--zander-yellow);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box-title {
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8f4fd 100%);
+            border-left: 4px solid var(--zander-blue);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            color: var(--zander-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 3.5rem;
+            margin-bottom: 1.25rem;
+            min-height: 2.5rem;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.25rem;
+            height: 2.25rem;
+            background: var(--zander-navy);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .steps li strong {
+            color: var(--zander-navy);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: var(--zander-navy);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background: var(--zander-light-gray);
+        }
+
+        tr:hover {
+            background: #f0f0f0;
+        }
+
+        /* Code blocks */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: var(--zander-navy);
+        }
+
+        .code-block {
+            background: var(--zander-navy);
+            color: #f8f8f2;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0 1rem 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--zander-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Status indicators */
+        .status-green {
+            color: var(--zander-green);
+            font-weight: 600;
+        }
+
+        .status-yellow {
+            color: var(--zander-yellow);
+            font-weight: 600;
+        }
+
+        .status-red {
+            color: var(--zander-red);
+            font-weight: 600;
+        }
+
+        /* Feature list */
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--zander-green);
+            font-weight: 700;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+            margin: 2rem 0;
+        }
+
+        /* Footer */
+        .chapter-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--zander-navy) 0%, #1a3a5c 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .highlight-box h3 {
+            color: var(--zander-gold);
+            margin-bottom: 1rem;
+        }
+
+        /* Quick reference card */
+        .ref-card {
+            background: var(--zander-light-gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .ref-card-title {
+            font-weight: 600;
+            color: var(--zander-navy);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover-page">
+    <div class="cover-logo">Zander<span>.</span></div>
+    <div class="cover-subtitle">Your AI-Powered Operating System</div>
+
+    <div class="cover-badge">User Manual</div>
+
+    <h1 class="cover-title">Support Admin</h1>
+    <p class="cover-description">
+        System Visibility & Tenant Management<br>
+        Your command center for monitoring health, managing customers, and keeping everything running smoothly.
+    </p>
+
+    <div class="cover-meta">
+        <p>Version 1.0 | April 2026</p>
+        <p>For Zander Platform Administrators</p>
+    </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-page page-break">
+    <h1 class="toc-title">Table of Contents</h1>
+
+    <ul class="toc-list">
+        <li class="toc-item">
+            <a href="#introduction">
+                <span class="toc-chapter-num"></span>Introduction
+            </a>
+        </li>
+        <li class="toc-item">
+            <a href="#chapter1">
+                <span class="toc-chapter-num">1</span>Dashboard Overview
+            </a>
+        </li>
+        <li class="toc-item">
+            <a href="#chapter2">
+                <span class="toc-chapter-num">2</span>Health Tab
+            </a>
+        </li>
+        <li class="toc-item">
+            <a href="#chapter3">
+                <span class="toc-chapter-num">3</span>Tenants Tab
+            </a>
+        </li>
+        <li class="toc-item">
+            <a href="#chapter4">
+                <span class="toc-chapter-num">4</span>Diagnostics Tab
+            </a>
+        </li>
+        <li class="toc-item">
+            <a href="#chapter5">
+                <span class="toc-chapter-num">5</span>Users Tab
+            </a>
+        </li>
+        <li class="toc-item">
+            <a href="#chapter6">
+                <span class="toc-chapter-num">6</span>Zander Workflows
+            </a>
+        </li>
+        <li class="toc-item">
+            <a href="#chapter7">
+                <span class="toc-chapter-num">7</span>Quick Reference
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- INTRODUCTION -->
+<div class="chapter page-break" id="introduction">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Introduction</div>
+        <div class="chapter-number">Introduction</div>
+        <h1 class="chapter-title">Welcome to Support Admin</h1>
+        <p class="chapter-intro">
+            Support Admin is your command center for managing the Zander platform. It gives you complete visibility into system health, customer accounts, and potential issues before they become problems.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">What is Support Admin?</h2>
+        <p>
+            Think of Support Admin like the dashboard in your car. It tells you everything you need to know about how your system is running. Is the engine healthy? Are there any warning lights? How are your customers doing?
+        </p>
+        <p>
+            Support Admin answers all these questions in one place. No more guessing, no more surprises. You'll know exactly what's happening with your platform at all times.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Why Does This Matter?</h2>
+        <p>
+            When you can see problems early, you can fix them before customers notice. When you understand which customers are thriving and which might be struggling, you can take action to help them succeed.
+        </p>
+        <p>
+            Happy customers stay. Unhappy customers leave. Support Admin helps you keep more customers happy by giving you the insights to act proactively.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Who Uses Support Admin?</h2>
+        <p>Support Admin is designed for:</p>
+        <ul>
+            <li><strong>Platform Administrators</strong> - Monitor system health and manage tenant accounts</li>
+            <li><strong>Customer Success Teams</strong> - Identify at-risk customers and take proactive action</li>
+            <li><strong>Technical Support</strong> - Diagnose issues and track system performance</li>
+            <li><strong>Leadership</strong> - Get a bird's-eye view of platform health and customer status</li>
+        </ul>
+    </div>
+
+    <div class="highlight-box">
+        <h3>Getting Started</h3>
+        <p>Access Support Admin at: <code style="background: rgba(255,255,255,0.2); color: white;">https://app.zanderos.com/admin/support-admin</code></p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">You'll need administrator privileges to access this area.</p>
+    </div>
+</div>
+
+<!-- CHAPTER 1: DASHBOARD OVERVIEW -->
+<div class="chapter page-break" id="chapter1">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Chapter 1</div>
+        <div class="chapter-number">Chapter 1</div>
+        <h1 class="chapter-title">Dashboard Overview</h1>
+        <p class="chapter-intro">
+            The Support Admin dashboard is organized into tabs. Each tab focuses on a different aspect of your platform. Let's explore what each one does.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Your Command Center</h2>
+        <p>
+            When you open Support Admin, you'll see a row of tabs at the top. Think of each tab as a different window into your system. Together, they give you complete visibility.
+        </p>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon" style="background: #e8f5e9;">&#9829;</div>
+                <div class="card-title">Health Tab</div>
+                <div class="card-description">See if all your systems are running properly. Green means good, red means attention needed.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon" style="background: #e3f2fd;">&#9733;</div>
+                <div class="card-title">Tenants Tab</div>
+                <div class="card-description">Manage all your customers from one place. View, edit, and organize tenant accounts.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon" style="background: #fff3e0;">&#9888;</div>
+                <div class="card-title">Diagnostics Tab</div>
+                <div class="card-description">Find and investigate problems. See error logs and performance trends.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon" style="background: #f3e5f5;">&#9786;</div>
+                <div class="card-title">Users Tab</div>
+                <div class="card-description">Understand user behavior. See who's thriving and who might need help.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">How to Navigate</h2>
+        <p>
+            Click any tab to switch views. The current tab is highlighted so you always know where you are. Each tab remembers your settings, so switching back and forth is seamless.
+        </p>
+
+        <div class="code-block">
+            https://app.zanderos.com/admin/support-admin
+        </div>
+
+        <p>
+            Bookmark this URL for quick access. You can also reach Support Admin from the main admin menu by clicking "Support Admin" in the navigation.
+        </p>
+    </div>
+
+    <div class="tip-box">
+        <div class="tip-box-title">&#128161; Pro Tip</div>
+        <p>Start your day with the Health Tab. If everything is green, you're good to go. If something is yellow or red, investigate before your first meeting.</p>
+    </div>
+</div>
+
+<!-- CHAPTER 2: HEALTH TAB -->
+<div class="chapter page-break" id="chapter2">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Chapter 2</div>
+        <div class="chapter-number">Chapter 2</div>
+        <h1 class="chapter-title">Health Tab</h1>
+        <p class="chapter-intro">
+            The Health Tab tells you if everything is working properly. It's the first place to check when you want to confirm the system is healthy.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The Four Status Cards</h2>
+        <p>
+            At the top of the Health Tab, you'll see four cards. Each one monitors a critical part of your system:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Card</th>
+                    <th>What It Monitors</th>
+                    <th>Why It Matters</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>API</strong></td>
+                    <td>The main system that handles all requests</td>
+                    <td>If this is down, nothing works</td>
+                </tr>
+                <tr>
+                    <td><strong>Database</strong></td>
+                    <td>Where all your data lives</td>
+                    <td>Slow database = slow everything</td>
+                </tr>
+                <tr>
+                    <td><strong>Email</strong></td>
+                    <td>The email sending service</td>
+                    <td>Important for notifications and outreach</td>
+                </tr>
+                <tr>
+                    <td><strong>Stripe</strong></td>
+                    <td>Payment processing system</td>
+                    <td>Critical for subscriptions and billing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Understanding the Colors</h2>
+        <p>Each card shows a colored status indicator:</p>
+        <ul>
+            <li><span class="status-green">&#9679; Green</span> - Everything is working normally. No action needed.</li>
+            <li><span class="status-yellow">&#9679; Yellow</span> - Something might be slow or degraded. Worth investigating.</li>
+            <li><span class="status-red">&#9679; Red</span> - There's a problem that needs attention now.</li>
+        </ul>
+
+        <div class="info-box">
+            <div class="info-box-title">&#9432; Auto-Refresh</div>
+            <p>The Health Tab updates automatically every 5 seconds. You'll always see the current status without refreshing the page.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The 7-Day History Charts</h2>
+        <p>
+            Below the status cards, you'll see charts showing the last 7 days of performance data. These charts help you spot patterns and trends.
+        </p>
+        <p>
+            For example, if response times are gradually increasing over the week, that might indicate a growing problem that needs investigation before it becomes critical.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">What to Do If Something Is Red</h2>
+        <p>If you see a red status card, here's what to do:</p>
+
+        <ol class="steps">
+            <li><strong>Don't panic.</strong> Take note of which service is affected.</li>
+            <li><strong>Check the Diagnostics Tab</strong> for recent error logs related to that service.</li>
+            <li><strong>Look at the charts</strong> to see when the problem started.</li>
+            <li><strong>Check if users are affected</strong> by looking at recent support tickets or complaints.</li>
+            <li><strong>Escalate if needed</strong> by contacting the technical team with your findings.</li>
+        </ol>
+    </div>
+
+    <div class="tip-box">
+        <div class="tip-box-title">&#128161; Pro Tip</div>
+        <p>Check the Health Tab first whenever users report slow performance. Nine times out of ten, the answer is right there in the status cards.</p>
+    </div>
+</div>
+
+<!-- CHAPTER 3: TENANTS TAB -->
+<div class="chapter page-break" id="chapter3">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Chapter 3</div>
+        <div class="chapter-number">Chapter 3</div>
+        <h1 class="chapter-title">Tenants Tab</h1>
+        <p class="chapter-intro">
+            The Tenants Tab is where you manage all your customers. View their status, make changes, and keep everything organized from one central place.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Understanding the Tenant Table</h2>
+        <p>
+            The main view shows a table with all your tenants. Each row is one customer. Here's what each column means:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Column</th>
+                    <th>What It Shows</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Company Name</strong></td>
+                    <td>The customer's business name</td>
+                </tr>
+                <tr>
+                    <td><strong>Tier</strong></td>
+                    <td>Subscription level (Starter, Pro, Business, Enterprise)</td>
+                </tr>
+                <tr>
+                    <td><strong>Status</strong></td>
+                    <td>Active, Trial, or Archived</td>
+                </tr>
+                <tr>
+                    <td><strong>Engagement</strong></td>
+                    <td>How actively they use the platform (0-100 score)</td>
+                </tr>
+                <tr>
+                    <td><strong>Churn Risk</strong></td>
+                    <td>Low, Medium, High, or Critical risk of leaving</td>
+                </tr>
+                <tr>
+                    <td><strong>Last Activity</strong></td>
+                    <td>When they last logged in or used the system</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Finding a Tenant</h2>
+        <p>Use the search and filter tools at the top of the table:</p>
+        <ul>
+            <li><strong>Search box</strong> - Type any part of the company name to find them instantly</li>
+            <li><strong>Tier filter</strong> - Show only Starter, Pro, or Enterprise customers</li>
+            <li><strong>Status filter</strong> - Show Active, Trial, or Archived tenants</li>
+            <li><strong>Column sorting</strong> - Click any column header to sort by that field</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">What You Can Do With Each Tenant</h2>
+        <p>Click the actions menu (three dots) on any tenant row to see available actions:</p>
+
+        <ul class="feature-list">
+            <li><strong>View Details</strong> - See everything about this tenant including users, activity, and billing</li>
+            <li><strong>Rename</strong> - Change the company name</li>
+            <li><strong>Change Tier</strong> - Upgrade or downgrade their subscription level</li>
+            <li><strong>Extend Trial</strong> - Give them more time before the trial expires</li>
+            <li><strong>Archive</strong> - Hide inactive customers while keeping their data safe</li>
+            <li><strong>Restore</strong> - Bring back an archived tenant</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Step-by-Step: How to Rename a Tenant</h2>
+        <ol class="steps">
+            <li>Find the tenant in the table using search or scroll</li>
+            <li>Click the <strong>three dots</strong> menu on their row</li>
+            <li>Select <strong>"Rename"</strong> from the dropdown</li>
+            <li>Type the new company name in the dialog</li>
+            <li>Click <strong>"Save"</strong> to confirm</li>
+        </ol>
+        <p>The change takes effect immediately and is logged in the Activity Log.</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Step-by-Step: How to Extend a Trial</h2>
+        <ol class="steps">
+            <li>Find the tenant who needs more trial time</li>
+            <li>Click the <strong>three dots</strong> menu on their row</li>
+            <li>Select <strong>"Extend Trial"</strong></li>
+            <li>Choose how many days to add: <strong>7, 14, or 30 days</strong></li>
+            <li>Click <strong>"Extend"</strong> to confirm</li>
+        </ol>
+        <p>The extension happens immediately. The tenant will see their new trial end date on their next login.</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Multi-Select: Batch Actions</h2>
+        <p>
+            Need to do the same action to multiple tenants? Use multi-select. Check the boxes next to each tenant you want to modify, then use the batch actions toolbar that appears.
+        </p>
+        <p>
+            This is especially useful for archiving multiple inactive tenants at once or extending trials for a whole cohort.
+        </p>
+    </div>
+
+    <div class="warning-box">
+        <div class="warning-box-title">&#9888; Important</div>
+        <p>Archiving hides a tenant from your main view, but it keeps all their data safe. You can always restore an archived tenant later. No data is ever deleted by archiving.</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Activity Log</h2>
+        <p>
+            Every change you make to a tenant is recorded in the Activity Log. Click "View Details" on any tenant, then scroll down to see the complete history of changes.
+        </p>
+        <p>
+            This is your audit trail. It shows who made each change, when, and what was changed. Perfect for accountability and troubleshooting.
+        </p>
+    </div>
+</div>
+
+<!-- CHAPTER 4: DIAGNOSTICS TAB -->
+<div class="chapter page-break" id="chapter4">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Chapter 4</div>
+        <div class="chapter-number">Chapter 4</div>
+        <h1 class="chapter-title">Diagnostics Tab</h1>
+        <p class="chapter-intro">
+            The Diagnostics Tab helps you find and fix problems. It shows error logs, performance metrics, and trend charts so you can investigate issues quickly.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The Four Stat Cards</h2>
+        <p>At the top, you'll see four key metrics that summarize system performance:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>What It Means</th>
+                    <th>Good Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Uptime %</strong></td>
+                    <td>How often the system is available</td>
+                    <td>99.9% or higher</td>
+                </tr>
+                <tr>
+                    <td><strong>API Response Time</strong></td>
+                    <td>How fast requests are processed</td>
+                    <td>Under 200ms</td>
+                </tr>
+                <tr>
+                    <td><strong>Database Latency</strong></td>
+                    <td>How fast database queries run</td>
+                    <td>Under 50ms</td>
+                </tr>
+                <tr>
+                    <td><strong>Error Rate</strong></td>
+                    <td>Percentage of requests that fail</td>
+                    <td>Under 0.1%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The Error Log Table</h2>
+        <p>
+            Below the stat cards, you'll see a table of recent errors. Each row represents something that went wrong in the system.
+        </p>
+
+        <h3 class="subsection-title">Understanding Error Levels</h3>
+        <ul>
+            <li><span class="status-red">ERROR</span> - Something failed. A request didn't complete successfully.</li>
+            <li><span class="status-yellow">WARNING</span> - Something unusual happened, but the request still worked.</li>
+        </ul>
+
+        <h3 class="subsection-title">Filtering Errors</h3>
+        <p>Use the filter toolbar to narrow down what you're looking at:</p>
+        <ul>
+            <li><strong>Level filter</strong> - Show only errors, only warnings, or both</li>
+            <li><strong>Tenant filter</strong> - See errors for a specific customer</li>
+            <li><strong>Status code filter</strong> - Find specific HTTP error codes (400, 500, etc.)</li>
+            <li><strong>Time range</strong> - Look at errors from the last hour, day, or week</li>
+        </ul>
+
+        <h3 class="subsection-title">Viewing Error Details</h3>
+        <p>Click any error row to expand it and see the full details including the stack trace, request URL, and any additional metadata that can help you diagnose the problem.</p>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">&#9432; Auto-Refresh</div>
+        <p>The Diagnostics Tab updates every 30 seconds. New errors appear automatically without refreshing the page.</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The 7-Day Trend Charts</h2>
+        <p>The charts show historical data to help you spot patterns:</p>
+
+        <ul>
+            <li><strong>Response Time Trend</strong> - Two lines showing API and database response times over time</li>
+            <li><strong>Error Rate Trend</strong> - An area chart showing how error rates change through the week</li>
+            <li><strong>Service Uptime Bars</strong> - A bar chart showing uptime for each service by day</li>
+        </ul>
+
+        <p>
+            Look for patterns. Are errors higher on certain days? Does response time spike at specific hours? These patterns can reveal underlying issues.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">What to Do If Error Rate Is High</h2>
+        <ol class="steps">
+            <li><strong>Check the time range</strong> - When did errors start increasing?</li>
+            <li><strong>Look at error details</strong> - Click the most recent errors to see what's failing</li>
+            <li><strong>Check if it's tenant-specific</strong> - Filter by tenant to see if one account is causing issues</li>
+            <li><strong>Cross-reference with Health Tab</strong> - Is a service showing yellow or red?</li>
+            <li><strong>Document your findings</strong> before escalating to the technical team</li>
+        </ol>
+    </div>
+
+    <div class="tip-box">
+        <div class="tip-box-title">&#128161; Pro Tip</div>
+        <p>High error rates usually mean one of three things: a database connection issue, an API overload, or a third-party service outage. Check the Health Tab to narrow it down quickly.</p>
+    </div>
+</div>
+
+<!-- CHAPTER 5: USERS TAB -->
+<div class="chapter page-break" id="chapter5">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Chapter 5</div>
+        <div class="chapter-number">Chapter 5</div>
+        <h1 class="chapter-title">Users Tab</h1>
+        <p class="chapter-intro">
+            The Users Tab helps you understand how your customers are doing. It groups tenants into segments based on their engagement, so you can take the right action at the right time.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The Three Segments</h2>
+        <p>
+            Tenants are automatically grouped into three segments based on their behavior. Each segment tells a different story:
+        </p>
+
+        <div class="cards-grid">
+            <div class="card" style="border-left: 4px solid var(--zander-yellow);">
+                <div class="card-title" style="color: var(--zander-yellow);">At-Risk</div>
+                <div class="card-description">
+                    <strong>What it means:</strong> These tenants haven't been active in 2-4 weeks. They might be losing interest.
+                    <br><br>
+                    <strong>What to do:</strong> Reach out with a friendly check-in. Ask if they need help. A small nudge can bring them back.
+                </div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--zander-blue);">
+                <div class="card-title" style="color: var(--zander-blue);">Power Users</div>
+                <div class="card-description">
+                    <strong>What it means:</strong> These tenants are very active. They use lots of features and log in frequently. They're happy.
+                    <br><br>
+                    <strong>What to do:</strong> Celebrate them! Offer upgrades, ask for feedback, or invite them to be references.
+                </div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--zander-red);">
+                <div class="card-title" style="color: var(--zander-red);">Churning</div>
+                <div class="card-description">
+                    <strong>What it means:</strong> These tenants haven't been active in 4+ weeks. They're at serious risk of canceling.
+                    <br><br>
+                    <strong>What to do:</strong> Act fast! Win-back campaigns, exit surveys, or personal outreach might save them.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Segment Tables</h2>
+        <p>
+            Each segment has its own table showing the tenants in that group. You'll see their company name, engagement score (0-100), days since last activity, and other relevant metrics.
+        </p>
+        <p>
+            Higher engagement scores are better. Think of it like a health score for the customer relationship.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Quick Actions</h2>
+        <p>
+            Each tenant in the segments has action buttons you can click to take immediate action. The available actions depend on which segment they're in:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Segment</th>
+                    <th>Available Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>At-Risk</strong></td>
+                    <td>Send reactivation email, Offer discount, Extend trial</td>
+                </tr>
+                <tr>
+                    <td><strong>Power Users</strong></td>
+                    <td>Send upgrade offer, Schedule demo, Ask for feedback</td>
+                </tr>
+                <tr>
+                    <td><strong>Churning</strong></td>
+                    <td>Win-back campaign, Exit survey, Check support tickets</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Understanding "Draft" vs "Execute"</h2>
+        <p>
+            Some actions create drafts, others execute immediately. Here's the difference:
+        </p>
+        <ul>
+            <li><strong>Draft actions</strong> (emails, campaigns) - Create a message for you to review before sending. Nothing goes out without your approval.</li>
+            <li><strong>Execute actions</strong> (extend trial) - Happen immediately. The change takes effect right away.</li>
+        </ul>
+        <p>
+            You'll always see a confirmation dialog before any action, so there are no surprises.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Step-by-Step: Send a Reactivation Email</h2>
+        <ol class="steps">
+            <li>Open the <strong>Users Tab</strong></li>
+            <li>Find the tenant in the <strong>At-Risk</strong> segment</li>
+            <li>Click the <strong>"Actions"</strong> button on their row</li>
+            <li>Select <strong>"Send reactivation email"</strong></li>
+            <li>Review the email draft that appears in the dialog</li>
+            <li>Customize the message if needed</li>
+            <li>Click <strong>"Create Draft"</strong> to save it for review, or <strong>"Send"</strong> if approved</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Step-by-Step: Offer an Upgrade to a Power User</h2>
+        <ol class="steps">
+            <li>Open the <strong>Users Tab</strong></li>
+            <li>Find the tenant in the <strong>Power Users</strong> segment</li>
+            <li>Click the <strong>"Actions"</strong> button on their row</li>
+            <li>Select <strong>"Send upgrade offer"</strong></li>
+            <li>Review the upgrade offer email draft</li>
+            <li>Click <strong>"Create Draft"</strong> to save for review</li>
+        </ol>
+    </div>
+
+    <div class="tip-box">
+        <div class="tip-box-title">&#128161; Pro Tip</div>
+        <p>Check the Users Tab weekly. Early action with at-risk customers prevents churn. A simple check-in email can make all the difference.</p>
+    </div>
+</div>
+
+<!-- CHAPTER 6: ZANDER WORKFLOWS -->
+<div class="chapter page-break" id="chapter6">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Chapter 6</div>
+        <div class="chapter-number">Chapter 6</div>
+        <h1 class="chapter-title">Zander Workflows</h1>
+        <p class="chapter-intro">
+            Zander works for you 24/7. While you sleep, Zander is analyzing your customers, spotting opportunities, and drafting communications for your review.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">How It Works</h2>
+        <p>
+            Every night at 11 PM, Zander runs four automated workflows. Each one looks at your customer data and identifies opportunities for action. In the morning at 7 AM, Zander sends you a briefing with everything you need to know.
+        </p>
+        <p>
+            <strong>Important:</strong> Zander creates drafts, but never sends without your approval. You're always in control.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The Four Nightly Workflows</h2>
+
+        <div class="ref-card">
+            <div class="ref-card-title">&#128269; Churn Risk Mitigation</div>
+            <p>Zander finds tenants showing signs of disengagement. For each one, Zander drafts a personalized check-in email. You review and approve before anything goes out.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">&#11088; Power User Upgrades</div>
+            <p>Zander spots highly engaged users who might be ready for more. Zander drafts upgrade offers highlighting benefits relevant to their usage. You decide if and when to send.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">&#9200; Trial Expiration Warnings</div>
+            <p>When trials are about to expire (3 days or less), Zander creates alerts and drafts conversion emails. You'll never miss a trial deadline again.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">&#9829; System Health Alerts</div>
+            <p>Zander monitors error rates, response times, and critical churn risks. If something looks concerning, you'll see an alert in your morning briefing.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Morning Briefing</h2>
+        <p>
+            Every morning at 7 AM, Zander compiles a summary of what happened overnight:
+        </p>
+        <ul>
+            <li>How many drafts are waiting for your review</li>
+            <li>Any new signups or waitlist entries</li>
+            <li>Critical alerts that need attention</li>
+            <li>Summary of workflow results (how many tenants processed, drafts created)</li>
+        </ul>
+        <p>
+            This briefing is stored in the system and accessible from the Support Admin dashboard. Start your day by reviewing it before your first meeting.
+        </p>
+    </div>
+
+    <div class="highlight-box">
+        <h3>Workflow Schedule</h3>
+        <table style="background: transparent; color: white;">
+            <tr>
+                <td style="border: none; padding: 0.5rem 1rem;">&#9788; <strong>11:00 PM EST</strong></td>
+                <td style="border: none; padding: 0.5rem 1rem;">All four workflows run</td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 0.5rem 1rem;">&#9728; <strong>7:00 AM EST</strong></td>
+                <td style="border: none; padding: 0.5rem 1rem;">Morning briefing delivered</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">The Golden Rule: No Auto-Sending</h2>
+        <p>
+            Zander is smart, but you're the boss. All emails and communications created by Zander are saved as drafts. They wait for your approval before sending.
+        </p>
+        <p>
+            This means:
+        </p>
+        <ul>
+            <li>You can review and edit every message</li>
+            <li>You can discard drafts you don't want to send</li>
+            <li>You maintain complete control over customer communication</li>
+            <li>Zander handles the research and writing; you handle the decision</li>
+        </ul>
+    </div>
+
+    <div class="tip-box">
+        <div class="tip-box-title">&#128161; Pro Tip</div>
+        <p>Review the morning briefing before your first meeting. It's usually 3-5 quick decisions: approve this draft, extend that trial, check on this alert. Takes 5 minutes, saves hours.</p>
+    </div>
+</div>
+
+<!-- CHAPTER 7: QUICK REFERENCE -->
+<div class="chapter page-break" id="chapter7">
+    <div class="chapter-header">
+        <div class="nav-path">Support Admin Manual <span>></span> Chapter 7</div>
+        <div class="chapter-number">Chapter 7</div>
+        <h1 class="chapter-title">Quick Reference</h1>
+        <p class="chapter-intro">
+            Everything you need at a glance. URLs, schedules, common questions, and tips for getting the most out of Support Admin.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Direct Access URLs</h2>
+
+        <div class="code-block">
+Support Admin Dashboard: https://app.zanderos.com/admin/support-admin
+Health Tab:             https://app.zanderos.com/admin/support-admin (default tab)
+Tenants Tab:            Click "Tenants" tab in dashboard
+Diagnostics Tab:        Click "Diagnostics" tab in dashboard
+Users Tab:              Click "Users" tab in dashboard
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">When to Check Each Tab</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tab</th>
+                    <th>When to Check</th>
+                    <th>Why</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Health Tab</strong></td>
+                    <td>Every morning, or if users report problems</td>
+                    <td>Quick confirmation that everything is working</td>
+                </tr>
+                <tr>
+                    <td><strong>Tenants Tab</strong></td>
+                    <td>Weekly, or when you need to manage accounts</td>
+                    <td>Routine account management and updates</td>
+                </tr>
+                <tr>
+                    <td><strong>Diagnostics Tab</strong></td>
+                    <td>When something seems slow or broken</td>
+                    <td>Investigate specific issues with error logs</td>
+                </tr>
+                <tr>
+                    <td><strong>Users Tab</strong></td>
+                    <td>Weekly, to check for at-risk customers</td>
+                    <td>Proactive customer success and churn prevention</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Common Questions</h2>
+
+        <div class="ref-card">
+            <div class="ref-card-title">Q: What does "engagement score" mean?</div>
+            <p><strong>A:</strong> It's a measure of how actively a tenant uses the system, from 0 to 100. 0-50 is low engagement, 50-75 is good, 75+ is excellent. It factors in logins, feature usage, and recent activity.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">Q: Can I undo an archive?</div>
+            <p><strong>A:</strong> Yes! Click "Restore" on any archived tenant to bring them back. All their data is preserved. Archiving is not deletion.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">Q: How often do the charts update?</div>
+            <p><strong>A:</strong> Health Tab updates every 5 seconds. Diagnostics Tab updates every 30 seconds. Both auto-refresh without you needing to reload the page.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">Q: What's the difference between a draft and executing?</div>
+            <p><strong>A:</strong> Drafts are created but not sent until you approve them. Executing (like extending a trial) happens immediately. You'll always see a confirmation dialog before any action.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">Q: Can Zander send emails without my approval?</div>
+            <p><strong>A:</strong> No. All emails created by Zander workflows are saved as drafts. They wait for your review and approval before sending. You're always in control.</p>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-title">Q: What if I see lots of errors in the Diagnostics Tab?</div>
+            <p><strong>A:</strong> First, check when they started (look at the time range). Then check if it's tenant-specific (use the filter). Finally, cross-reference with the Health Tab to see if a service is down. Document your findings before escalating.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Keyboard Shortcuts</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Shortcut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/</code></td>
+                    <td>Focus the search box (when available)</td>
+                </tr>
+                <tr>
+                    <td><code>Esc</code></td>
+                    <td>Close any open dialog</td>
+                </tr>
+                <tr>
+                    <td><code>R</code></td>
+                    <td>Refresh the current tab data</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Getting Help</h2>
+        <p>If you need assistance with Support Admin:</p>
+        <ul>
+            <li><strong>Technical issues:</strong> Check the Diagnostics Tab first, then contact support</li>
+            <li><strong>Feature questions:</strong> Refer to this manual or contact your Zander representative</li>
+            <li><strong>Feedback and suggestions:</strong> We'd love to hear from you! Email feedback@zanderos.com</li>
+        </ul>
+    </div>
+
+    <div class="highlight-box">
+        <h3>Remember</h3>
+        <p style="font-size: 1.1rem;">Support Admin is your command center. Start each day with the Health Tab, check Users weekly for at-risk customers, and let Zander handle the overnight work. You've got this!</p>
+    </div>
+
+    <div class="chapter-footer">
+        <p>Zander Support Admin User Manual | Version 1.0 | April 2026</p>
+        <p>&copy; 2026 Zander OS. All rights reserved.</p>
+    </div>
+</div>
+
+</body>
+</html>

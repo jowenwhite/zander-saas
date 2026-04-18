@@ -30,6 +30,23 @@ interface Document {
   isSigned?: boolean;
 }
 
+interface Meeting {
+  id: string;
+  title: string;
+  scheduledAt?: string;
+  durationMinutes?: number;
+  platform?: string;
+  summaryStatus: string;
+  summaryText?: string;
+  summaryJson?: {
+    keyDecisions?: Array<{ decision: string; impact?: string }>;
+    actionItems?: Array<{ task: string; assignee?: string; dueDate?: string }>;
+    followUps?: string[];
+    nextSteps?: string[];
+  };
+  createdAt: string;
+}
+
 /**
  * GET /api/consulting/my-engagement
  *
@@ -54,7 +71,7 @@ export async function GET(request: NextRequest) {
       'Content-Type': 'application/json',
     };
 
-    // Fetch engagement, deliverables, time entries, and documents in parallel
+    // Fetch engagement, deliverables, time entries, documents, and meetings in parallel
     const [engagementsRes, deliverablesRes, timeEntriesRes, documentsRes] = await Promise.all([
       fetch(`${API_URL}/consulting/engagements`, { headers }),
       fetch(`${API_URL}/consulting/deliverables`, { headers }),
@@ -63,13 +80,29 @@ export async function GET(request: NextRequest) {
       fetch(`${API_URL}/consulting/documents`, { headers }).catch(() => null),
     ]);
 
-    // Parse engagement data
+    // Parse engagement first to get ID for meetings fetch
     let engagement: Engagement | null = null;
     if (engagementsRes.ok) {
       const engagements: Engagement[] = await engagementsRes.json();
-      // Get the most recent active engagement, or the most recent overall
       if (Array.isArray(engagements) && engagements.length > 0) {
         engagement = engagements.find((e) => e.status === 'ACTIVE') || engagements[0];
+      }
+    }
+
+    // Fetch meetings separately after we have the engagement ID
+    let meetings: Meeting[] = [];
+    if (engagement?.id) {
+      try {
+        const meetingsRes = await fetch(
+          `${API_URL}/meetings?engagementId=${engagement.id}&limit=20`,
+          { headers }
+        );
+        if (meetingsRes.ok) {
+          const data = await meetingsRes.json();
+          meetings = Array.isArray(data) ? data : [];
+        }
+      } catch {
+        // Meetings endpoint may not be accessible to clients, that's OK
       }
     }
 
@@ -152,6 +185,12 @@ export async function GET(request: NextRequest) {
       documents: {
         pending: pendingDocuments,
         signed: signedDocuments,
+      },
+      meetings,
+      meetingStats: {
+        total: meetings.length,
+        withSummary: meetings.filter((m) => m.summaryStatus === 'completed').length,
+        processing: meetings.filter((m) => m.summaryStatus === 'processing').length,
       },
       hasActiveEngagement: engagement?.status === 'ACTIVE',
     });

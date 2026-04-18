@@ -1,0 +1,65 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "Zander" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Zander" [ref=e5]
+      - link "Sign In" [ref=e6] [cursor=pointer]:
+        - /url: /login
+    - generic [ref=e7]:
+      - generic [ref=e8]: Operating Simply Resources
+      - heading "Downloadable tools for running your business better" [level=1] [ref=e9]:
+        - text: Downloadable tools for
+        - text: running your business better
+      - paragraph [ref=e10]: Templates, playbooks, and systems built from decades of real-world business experience. Each resource is designed to help you get organized, stay consistent, and move forward.
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - heading "Operations Playbook" [level=3] [ref=e14]
+        - paragraph [ref=e15]: The complete system for organizing your business operations. Includes SOPs, checklists, and templates for daily, weekly, and monthly rhythms.
+        - generic [ref=e16]:
+          - generic [ref=e17]: $79
+          - button "Purchase" [ref=e18] [cursor=pointer]
+      - generic [ref=e19]:
+        - heading "Startup Foundations Kit" [level=3] [ref=e20]
+        - paragraph [ref=e21]: Everything you need to launch with structure. Business plan templates, legal checklists, financial projections, and go-to-market frameworks.
+        - generic [ref=e22]:
+          - generic [ref=e23]: $99
+          - button "Purchase" [ref=e24] [cursor=pointer]
+      - generic [ref=e25]:
+        - heading "Sales and Marketing Kit" [level=3] [ref=e26]
+        - paragraph [ref=e27]: Build your pipeline and brand. Includes email sequences, social media calendars, lead scoring systems, and sales scripts.
+        - generic [ref=e28]:
+          - generic [ref=e29]: $99
+          - button "Purchase" [ref=e30] [cursor=pointer]
+      - generic [ref=e31]:
+        - heading "Hiring and Team Building Kit" [level=3] [ref=e32]
+        - paragraph [ref=e33]: Recruit, onboard, and retain great people. Job description templates, interview guides, onboarding checklists, and performance frameworks.
+        - generic [ref=e34]:
+          - generic [ref=e35]: $99
+          - button "Purchase" [ref=e36] [cursor=pointer]
+      - generic [ref=e37]:
+        - heading "Financial Clarity Kit" [level=3] [ref=e38]
+        - paragraph [ref=e39]: Take control of your numbers. Cash flow templates, budgeting frameworks, pricing calculators, and financial dashboards.
+        - generic [ref=e40]:
+          - generic [ref=e41]: $79
+          - button "Purchase" [ref=e42] [cursor=pointer]
+      - generic [ref=e43]:
+        - heading "Industry Starter Packs" [level=3] [ref=e44]
+        - paragraph [ref=e45]: Pre-built systems for specific industries. Choose from construction, professional services, retail, or e-commerce bundles.
+        - generic [ref=e46]:
+          - generic [ref=e47]: $149
+          - button "Purchase" [ref=e48] [cursor=pointer]
+    - generic [ref=e50]:
+      - heading "Need more than templates?" [level=2] [ref=e51]
+      - paragraph [ref=e52]: Book a consulting session for hands-on help building systems, solving problems, and getting your business running the way it should.
+      - link "Book a Consulting Session" [ref=e53] [cursor=pointer]:
+        - /url: https://calendly.com/jonathan-zanderos
+    - generic [ref=e55]:
+      - generic [ref=e56]: Coming Soon
+      - heading "\"Well Shit\" - The Book" [level=3] [ref=e57]
+      - paragraph [ref=e58]: A no-nonsense guide to running a business when things get real. Sign up to be notified when it launches.
+    - contentinfo [ref=e59]:
+      - paragraph [ref=e60]: © 2026 Zander Systems LLC. All rights reserved.
+  - button "Your executive team is ready" [ref=e61] [cursor=pointer]:
+    - img [ref=e62]
+  - alert [ref=e65]

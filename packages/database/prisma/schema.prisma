@@ -100,6 +100,7 @@ model Tenant {
   engagementSnapshots     UserEngagementSnapshot[]
   userTenantAccess        UserTenantAccess[]
   users                   User[]
+  meetingRecords          MeetingRecord[]
 
   @@map("tenants")
 }
@@ -1716,6 +1717,7 @@ model ConsultingEngagement {
   deliverables    ConsultingDeliverable[]
   tenant          Tenant                  @relation(fields: [tenantId], references: [id])
   timeEntries     ConsultingTimeEntry[]
+  meetingRecords  MeetingRecord[]
 
   @@index([tenantId])
   @@index([status])
@@ -2091,6 +2093,7 @@ model ConsultingLead {
   proposals       ConsultingProposal[]
   signedDocuments SignedDocument[]
   events          ConsultingEvent[]
+  meetingRecords  MeetingRecord[]
 
   @@index([email])
   @@index([status])
@@ -2188,4 +2191,64 @@ model ConsultingEvent {
   @@index([type])
   @@index([createdAt])
   @@map("consulting_events")
+}
+
+model MeetingRecord {
+  id                  String    @id @default(cuid())
+  tenantId            String
+  tenant              Tenant    @relation(fields: [tenantId], references: [id])
+
+  // Meeting metadata
+  title               String
+  scheduledAt         DateTime?
+  startedAt           DateTime?
+  endedAt             DateTime?
+  durationMinutes     Int?
+  meetingUrl          String?       // Google Meet, Zoom, etc.
+  source              String        // 'upload', 'twilio', 'calendly', 'google_meet', 'zoom'
+  platform            String?       // 'google_meet', 'zoom', 'phone', 'in_person'
+
+  // Attendees stored as JSON array: [{name, email, role}]
+  attendees           Json?
+
+  // Recording
+  recordingUrl        String?       // S3 URL
+  recordingKey        String?       // S3 key for deletion
+  recordingFormat     String?       // 'mp4', 'webm', 'm4a', 'wav', 'mp3'
+  recordingSizeBytes  Int?
+
+  // Transcription
+  transcriptText      String?       // Full transcript
+  transcriptSpeakers  Json?         // Speaker-diarized segments: [{speaker, start, end, text}]
+  transcriptStatus    String        @default("none") // 'none', 'processing', 'completed', 'failed'
+  transcriptProvider  String?       // 'whisper', 'assemblyai'
+  transcriptError     String?
+
+  // AI Analysis
+  summaryText         String?       // Human-readable summary
+  summaryJson         Json?         // Structured: {keyDecisions, actionItems, followUps, concerns, nextSteps}
+  summaryStatus       String        @default("none") // 'none', 'processing', 'completed', 'failed'
+
+  // Distribution
+  summaryEmailedAt    DateTime?
+
+  // Optional relations (nullable — not every meeting is consulting-related)
+  engagementId        String?
+  engagement          ConsultingEngagement? @relation(fields: [engagementId], references: [id])
+  leadId              String?
+  lead                ConsultingLead? @relation(fields: [leadId], references: [id])
+  contactId           String?
+  calendarEventId     String?
+
+  // Metadata
+  createdById         String?       // User who uploaded/initiated
+  processedAt         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([tenantId])
+  @@index([engagementId])
+  @@index([leadId])
+  @@index([scheduledAt])
+  @@map("meeting_records")
 }

@@ -476,6 +476,97 @@ export class AiService {
     });
   }
 
+  /**
+   * Get meeting intelligence context for executives
+   * Used by Pam (EA), Jordan (CRO), and others for meeting-related queries
+   */
+  private async getMeetingIntelligenceContext(tenantId: string, executiveId: string): Promise<string> {
+    try {
+      const meetings = await this.prisma.meetingRecord.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        include: {
+          engagement: { select: { tenant: { select: { companyName: true } } } },
+          lead: { select: { name: true, company: true } },
+        },
+      });
+
+      if (meetings.length === 0) {
+        return '';
+      }
+
+      const processed = meetings.filter(m => m.summaryStatus === 'completed');
+      const pending = meetings.filter(m => m.transcriptStatus === 'processing' || m.summaryStatus === 'processing');
+
+      let context = `
+MEETING INTELLIGENCE:
+- Total Meetings: ${meetings.length}
+- Processed with AI Summary: ${processed.length}
+- Processing: ${pending.length}
+`;
+
+      // Add recent meetings with summaries for context
+      const recentWithSummary = processed.slice(0, 5);
+      if (recentWithSummary.length > 0) {
+        context += `
+RECENT MEETING SUMMARIES:
+${recentWithSummary.map(m => {
+  const summary = m.summaryJson as any;
+  const client = m.lead?.company || m.engagement?.tenant?.companyName || 'Unknown';
+  return `
+- "${m.title}" (${new Date(m.createdAt).toLocaleDateString()}) - ${client}
+  ${summary?.topicsSummary || 'Summary pending'}
+  ${summary?.keyDecisions?.length > 0 ? `Key Decisions: ${summary.keyDecisions.slice(0, 2).map((d: any) => d.decision).join('; ')}` : ''}
+  ${summary?.actionItems?.length > 0 ? `Action Items: ${summary.actionItems.length} items` : ''}
+`;
+}).join('')}`;
+      }
+
+      // Executive-specific context additions
+      if (executiveId === 'ea') {
+        // Pam (EA) - focus on follow-ups and action items
+        const allActionItems = processed.flatMap(m => {
+          const summary = m.summaryJson as any;
+          return (summary?.actionItems || []).map((a: any) => ({
+            ...a,
+            meetingTitle: m.title,
+            meetingDate: m.createdAt,
+          }));
+        });
+
+        if (allActionItems.length > 0) {
+          context += `
+PENDING ACTION ITEMS FROM MEETINGS:
+${allActionItems.slice(0, 8).map(a => `- ${a.item} (Owner: ${a.owner || 'Unassigned'}) - from "${a.meetingTitle}"`).join('\n')}
+`;
+        }
+      } else if (executiveId === 'cro') {
+        // Jordan (CRO) - focus on deal risks and client concerns
+        const clientConcerns = processed.flatMap(m => {
+          const summary = m.summaryJson as any;
+          return (summary?.clientConcerns || []).map((c: any) => ({
+            ...c,
+            meetingTitle: m.title,
+            client: m.lead?.company || m.engagement?.tenant?.companyName || 'Unknown',
+          }));
+        });
+
+        if (clientConcerns.length > 0) {
+          context += `
+CLIENT CONCERNS IDENTIFIED IN MEETINGS:
+${clientConcerns.slice(0, 5).map(c => `- [${c.severity || 'MEDIUM'}] ${c.concern} (${c.client}) - Response: ${c.response || 'Pending'}`).join('\n')}
+`;
+        }
+      }
+
+      return context;
+    } catch (error) {
+      console.error('Error fetching meeting intelligence:', error);
+      return '';
+    }
+  }
+
   async queryKnowledge(query: string, limit: number = 5) {
     // Search knowledge base for relevant articles
     const articles = await this.prisma.knowledgeArticle.findMany({
@@ -516,7 +607,7 @@ export class AiService {
       await this.enforceTokenCap(tenantId);
 
     // Get context data for the tenant
-    const [deals, contacts, activities] = await Promise.all([
+    const [deals, contacts, activities, meetingContext] = await Promise.all([
       this.prisma.deal.findMany({
         where: { tenantId },
         include: { contact: true },
@@ -533,6 +624,10 @@ export class AiService {
         orderBy: { createdAt: 'desc' },
         take: 10,
       }),
+      // Include meeting intelligence for Pam (EA) and Jordan (CRO)
+      (executiveId === 'ea' || executiveId === 'cro')
+        ? this.getMeetingIntelligenceContext(tenantId, executiveId)
+        : Promise.resolve(''),
     ]);
 
     // Build context about the business
@@ -545,7 +640,7 @@ CURRENT BUSINESS CONTEXT:
 
 DEAL SUMMARY:
 ${deals.slice(0, 5).map(d => `- ${d.dealName}: $${d.dealValue?.toLocaleString() || 0} (${d.stage}) - Contact: ${d.contact?.firstName} ${d.contact?.lastName}`).join('\n')}
-`;
+${meetingContext}`;
 
     
     // Query knowledge base for platform help

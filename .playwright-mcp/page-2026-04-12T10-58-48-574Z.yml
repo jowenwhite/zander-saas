@@ -1,0 +1,357 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - button "Expand sidebar" [ref=e4] [cursor=pointer]
+      - link "Z" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Z
+      - generic [ref=e9]:
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - link "Production" [ref=e13] [cursor=pointer]:
+              - /url: /production
+              - img [ref=e15]
+          - listitem [ref=e20]:
+            - link "Projects" [ref=e21] [cursor=pointer]:
+              - /url: /projects
+              - img [ref=e23]
+          - listitem [ref=e25]:
+            - link "People" [ref=e26] [cursor=pointer]:
+              - /url: /people
+              - img [ref=e28]
+          - listitem [ref=e33]:
+            - link "Products" [ref=e34] [cursor=pointer]:
+              - /url: /products
+              - img [ref=e36]
+        - list [ref=e41]:
+          - listitem [ref=e42]:
+            - link "Communication" [ref=e43] [cursor=pointer]:
+              - /url: /communication
+              - img [ref=e45]
+          - listitem [ref=e48]:
+            - link "Schedule" [ref=e49] [cursor=pointer]:
+              - /url: /schedule
+              - img [ref=e51]
+          - listitem [ref=e53]:
+            - link "Forms" [ref=e54] [cursor=pointer]:
+              - /url: /forms
+              - img [ref=e56]
+        - list [ref=e60]:
+          - listitem [ref=e61]:
+            - button "P" [ref=e62] [cursor=pointer]:
+              - generic [ref=e63]:
+                - generic [ref=e64]: P
+                - img [ref=e66]
+          - listitem [ref=e69]:
+            - button "J" [ref=e70] [cursor=pointer]:
+              - generic [ref=e71]:
+                - generic [ref=e72]: J
+                - img [ref=e74]
+          - listitem [ref=e77]:
+            - button "D" [ref=e78] [cursor=pointer]:
+              - generic [ref=e79]:
+                - generic [ref=e80]: D
+                - img [ref=e82]
+          - listitem [ref=e85]:
+            - button "B" [ref=e86] [cursor=pointer]:
+              - generic [ref=e87]:
+                - generic [ref=e88]: B
+                - img [ref=e90]
+          - listitem [ref=e93]:
+            - button "M" [ref=e94] [cursor=pointer]:
+              - generic [ref=e95]:
+                - generic [ref=e96]: M
+                - img [ref=e98]
+          - listitem [ref=e101]:
+            - button "T" [ref=e102] [cursor=pointer]:
+              - generic [ref=e103]:
+                - generic [ref=e104]: T
+                - img [ref=e106]
+          - listitem [ref=e109]:
+            - button "J" [ref=e110] [cursor=pointer]:
+              - generic [ref=e111]:
+                - generic [ref=e112]: J
+                - img [ref=e114]
+        - list [ref=e118]:
+          - listitem [ref=e119]:
+            - link "Treasury Admin" [ref=e120] [cursor=pointer]:
+              - /url: /admin/treasury
+              - img [ref=e122]
+          - listitem [ref=e124]:
+            - link "Support Admin" [ref=e125] [cursor=pointer]:
+              - /url: /admin/support-admin
+              - img [ref=e127]
+    - generic [ref=e129]:
+      - main [ref=e130]:
+        - generic [ref=e132]:
+          - heading "🛡️ Support Admin" [level=1] [ref=e133]
+          - paragraph [ref=e134]: Platform operations • Zander AI powered • SuperAdmin Only
+        - generic [ref=e135]:
+          - generic [ref=e136]:
+            - generic [ref=e138]: API Status
+            - generic [ref=e140]: ✓ Healthy
+          - generic [ref=e141]:
+            - generic [ref=e143]: Database
+            - generic [ref=e145]: ✓ Healthy
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - generic [ref=e148]: Active Users
+              - generic [ref=e149]: ↑ 12%
+            - generic [ref=e150]: "35"
+          - generic [ref=e151]:
+            - generic [ref=e152]:
+              - generic [ref=e153]: Open Tickets
+              - generic [ref=e154]: 0 new
+            - generic [ref=e155]: "0"
+        - generic [ref=e156]:
+          - button "📊 Overview" [ref=e157] [cursor=pointer]
+          - button "💓 Health" [ref=e158] [cursor=pointer]
+          - button "🔬 Diagnostics" [ref=e159] [cursor=pointer]
+          - button "🔴 Headwinds (0)" [ref=e160] [cursor=pointer]
+          - button "🏢 Tenants" [ref=e161] [cursor=pointer]
+          - button "👥 Users" [ref=e162] [cursor=pointer]
+          - button "🎫 Tickets (0)" [ref=e163] [cursor=pointer]
+          - button "📚 Knowledge" [ref=e164] [cursor=pointer]
+        - generic [ref=e858]:
+          - generic [ref=e859]:
+            - generic [ref=e860]:
+              - heading "User Engagement Dashboard" [level=2] [ref=e861]
+              - paragraph [ref=e862]: Monitor tenant health and take proactive action to reduce churn
+            - generic [ref=e863]:
+              - generic [ref=e864]:
+                - generic [ref=e865]: "10"
+                - generic [ref=e866]: tenants need attention
+              - button "Refresh" [ref=e867] [cursor=pointer]
+          - generic [ref=e868]:
+            - generic [ref=e869] [cursor=pointer]:
+              - generic [ref=e871]: "!"
+              - generic [ref=e872]: "0"
+              - heading "At-Risk Tenants" [level=3] [ref=e873]
+              - paragraph [ref=e874]: Declining engagement (14-30 days inactive)
+            - generic [ref=e875] [cursor=pointer]:
+              - generic [ref=e877]: "*"
+              - generic [ref=e878]: "0"
+              - heading "Power Users" [level=3] [ref=e879]
+              - paragraph [ref=e880]: High engagement, active within 7 days
+            - generic [ref=e881] [cursor=pointer]:
+              - generic [ref=e882]:
+                - generic [ref=e883]: <
+                - generic [ref=e884]: Action Needed
+              - generic [ref=e885]: "10"
+              - heading "Churning" [level=3] [ref=e886]
+              - paragraph [ref=e887]: Critical risk, 30+ days inactive
+          - generic [ref=e888]:
+            - generic [ref=e889] [cursor=pointer]:
+              - generic [ref=e890]:
+                - generic [ref=e891]: "!"
+                - heading "At-Risk Tenants" [level=3] [ref=e892]
+                - generic [ref=e893]: "0"
+              - button "Hide" [ref=e894]
+            - generic [ref=e895]:
+              - generic [ref=e896]: "!"
+              - generic [ref=e897]: No tenants in this segment
+          - generic [ref=e898]:
+            - generic [ref=e899] [cursor=pointer]:
+              - generic [ref=e900]:
+                - generic [ref=e901]: "*"
+                - heading "Power Users" [level=3] [ref=e902]
+                - generic [ref=e903]: "0"
+              - button "Hide" [ref=e904]
+            - generic [ref=e905]:
+              - generic [ref=e906]: "*"
+              - generic [ref=e907]: No tenants in this segment
+          - generic [ref=e908]:
+            - generic [ref=e909] [cursor=pointer]:
+              - generic [ref=e910]:
+                - generic [ref=e911]: <
+                - heading "Churning Tenants" [level=3] [ref=e912]
+                - generic [ref=e913]: "10"
+              - button "Hide" [ref=e914]
+            - table [ref=e916]:
+              - rowgroup [ref=e917]:
+                - row "Company Tier Engagement Days Inactive Reason Action" [ref=e918]:
+                  - columnheader "Company" [ref=e919]
+                  - columnheader "Tier" [ref=e920]
+                  - columnheader "Engagement" [ref=e921]
+                  - columnheader "Days Inactive" [ref=e922]
+                  - columnheader "Reason" [ref=e923]
+                  - columnheader "Action" [ref=e924]
+              - rowgroup [ref=e925]:
+                - 'row "64 West Capital Last active: -- ENTERPRISE OVERRIDE -- 999d 999 days inactive - likely churned Actions v" [ref=e926]':
+                  - 'cell "64 West Capital Last active: --" [ref=e927]':
+                    - generic [ref=e928]: 64 West Capital
+                    - generic [ref=e929]: "Last active: --"
+                  - cell "ENTERPRISE OVERRIDE" [ref=e930]:
+                    - generic [ref=e931]:
+                      - generic [ref=e932]: ENTERPRISE
+                      - generic "Tier Override Active" [ref=e933]: OVERRIDE
+                  - cell "--" [ref=e934]
+                  - cell "999d" [ref=e935]:
+                    - generic [ref=e936]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e937]
+                  - cell "Actions v" [ref=e938]:
+                    - button "Actions v" [ref=e940] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e941]: v
+                - 'row "[ARCHIVED] 64 West Consulting Last active: -- FREE -- 999d 999 days inactive - likely churned Actions v" [ref=e942]':
+                  - 'cell "[ARCHIVED] 64 West Consulting Last active: --" [ref=e943]':
+                    - generic [ref=e944]: "[ARCHIVED] 64 West Consulting"
+                    - generic [ref=e945]: "Last active: --"
+                  - cell "FREE" [ref=e946]:
+                    - generic [ref=e948]: FREE
+                  - cell "--" [ref=e949]
+                  - cell "999d" [ref=e950]:
+                    - generic [ref=e951]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e952]
+                  - cell "Actions v" [ref=e953]:
+                    - button "Actions v" [ref=e955] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e956]: v
+                - 'row "[ARCHIVED] 64 West Finance Last active: -- FREE -- 999d 999 days inactive - likely churned Actions v" [ref=e957]':
+                  - 'cell "[ARCHIVED] 64 West Finance Last active: --" [ref=e958]':
+                    - generic [ref=e959]: "[ARCHIVED] 64 West Finance"
+                    - generic [ref=e960]: "Last active: --"
+                  - cell "FREE" [ref=e961]:
+                    - generic [ref=e963]: FREE
+                  - cell "--" [ref=e964]
+                  - cell "999d" [ref=e965]:
+                    - generic [ref=e966]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e967]
+                  - cell "Actions v" [ref=e968]:
+                    - button "Actions v" [ref=e970] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e971]: v
+                - 'row "AVC Last active: -- FREE -- 999d 999 days inactive - likely churned Actions v" [ref=e972]':
+                  - 'cell "AVC Last active: --" [ref=e973]':
+                    - generic [ref=e974]: AVC
+                    - generic [ref=e975]: "Last active: --"
+                  - cell "FREE" [ref=e976]:
+                    - generic [ref=e978]: FREE
+                  - cell "--" [ref=e979]
+                  - cell "999d" [ref=e980]:
+                    - generic [ref=e981]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e982]
+                  - cell "Actions v" [ref=e983]:
+                    - button "Actions v" [ref=e985] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e986]: v
+                - 'row "HERBS Last active: -- FREE -- 999d 999 days inactive - likely churned Actions v" [ref=e987]':
+                  - 'cell "HERBS Last active: --" [ref=e988]':
+                    - generic [ref=e989]: HERBS
+                    - generic [ref=e990]: "Last active: --"
+                  - cell "FREE" [ref=e991]:
+                    - generic [ref=e993]: FREE
+                  - cell "--" [ref=e994]
+                  - cell "999d" [ref=e995]:
+                    - generic [ref=e996]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e997]
+                  - cell "Actions v" [ref=e998]:
+                    - button "Actions v" [ref=e1000] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e1001]: v
+                - 'row "Johnny 4 Last active: -- FREE -- 999d 999 days inactive - likely churned Actions v" [ref=e1002]':
+                  - 'cell "Johnny 4 Last active: --" [ref=e1003]':
+                    - generic [ref=e1004]: Johnny 4
+                    - generic [ref=e1005]: "Last active: --"
+                  - cell "FREE" [ref=e1006]:
+                    - generic [ref=e1008]: FREE
+                  - cell "--" [ref=e1009]
+                  - cell "999d" [ref=e1010]:
+                    - generic [ref=e1011]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e1012]
+                  - cell "Actions v" [ref=e1013]:
+                    - button "Actions v" [ref=e1015] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e1016]: v
+                - 'row "My Cabinet Factory Last active: -- ENTERPRISE OVERRIDE -- 999d 999 days inactive - likely churned Actions v" [ref=e1017]':
+                  - 'cell "My Cabinet Factory Last active: --" [ref=e1018]':
+                    - generic [ref=e1019]: My Cabinet Factory
+                    - generic [ref=e1020]: "Last active: --"
+                  - cell "ENTERPRISE OVERRIDE" [ref=e1021]:
+                    - generic [ref=e1022]:
+                      - generic [ref=e1023]: ENTERPRISE
+                      - generic "Tier Override Active" [ref=e1024]: OVERRIDE
+                  - cell "--" [ref=e1025]
+                  - cell "999d" [ref=e1026]:
+                    - generic [ref=e1027]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e1028]
+                  - cell "Actions v" [ref=e1029]:
+                    - button "Actions v" [ref=e1031] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e1032]: v
+                - 'row "SceeterOS Last active: -- FREE -- 999d 999 days inactive - likely churned Actions v" [ref=e1033]':
+                  - 'cell "SceeterOS Last active: --" [ref=e1034]':
+                    - generic [ref=e1035]: SceeterOS
+                    - generic [ref=e1036]: "Last active: --"
+                  - cell "FREE" [ref=e1037]:
+                    - generic [ref=e1039]: FREE
+                  - cell "--" [ref=e1040]
+                  - cell "999d" [ref=e1041]:
+                    - generic [ref=e1042]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e1043]
+                  - cell "Actions v" [ref=e1044]:
+                    - button "Actions v" [ref=e1046] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e1047]: v
+                - 'row "Summit Home Services Last active: -- ENTERPRISE OVERRIDE -- 999d 999 days inactive - likely churned Actions v" [ref=e1048]':
+                  - 'cell "Summit Home Services Last active: --" [ref=e1049]':
+                    - generic [ref=e1050]: Summit Home Services
+                    - generic [ref=e1051]: "Last active: --"
+                  - cell "ENTERPRISE OVERRIDE" [ref=e1052]:
+                    - generic [ref=e1053]:
+                      - generic [ref=e1054]: ENTERPRISE
+                      - generic "Tier Override Active" [ref=e1055]: OVERRIDE
+                  - cell "--" [ref=e1056]
+                  - cell "999d" [ref=e1057]:
+                    - generic [ref=e1058]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e1059]
+                  - cell "Actions v" [ref=e1060]:
+                    - button "Actions v" [ref=e1062] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e1063]: v
+                - 'row "Zander Inc Last active: -- ENTERPRISE OVERRIDE -- 999d 999 days inactive - likely churned Actions v" [ref=e1064]':
+                  - 'cell "Zander Inc Last active: --" [ref=e1065]':
+                    - generic [ref=e1066]: Zander Inc
+                    - generic [ref=e1067]: "Last active: --"
+                  - cell "ENTERPRISE OVERRIDE" [ref=e1068]:
+                    - generic [ref=e1069]:
+                      - generic [ref=e1070]: ENTERPRISE
+                      - generic "Tier Override Active" [ref=e1071]: OVERRIDE
+                  - cell "--" [ref=e1072]
+                  - cell "999d" [ref=e1073]:
+                    - generic [ref=e1074]: 999d
+                  - cell "999 days inactive - likely churned" [ref=e1075]
+                  - cell "Actions v" [ref=e1076]:
+                    - button "Actions v" [ref=e1078] [cursor=pointer]:
+                      - text: Actions
+                      - generic [ref=e1079]: v
+          - generic [ref=e1080]:
+            - generic [ref=e1081]:
+              - generic [ref=e1082]: Total Segments
+              - generic [ref=e1083]: "10"
+            - generic [ref=e1084]:
+              - generic [ref=e1085]: Healthy Rate
+              - generic [ref=e1086]: 0%
+            - generic [ref=e1087]:
+              - generic [ref=e1088]: At Risk Rate
+              - generic [ref=e1089]: 100%
+      - generic [ref=e174]:
+        - generic [ref=e175] [cursor=pointer]:
+          - generic [ref=e176]:
+            - generic [ref=e177]: 🤖
+            - generic [ref=e178]: ZanderYour Operations AI
+          - generic [ref=e179]:
+            - button "▼ Collapse" [ref=e1090]
+            - button "Hide" [ref=e181]
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e430]: "**Operational Status Check Results:** Getting 401 Unauthorized errors on both support endpoints: - `/support-tickets?limit=10` returning invalid/expired token error - `/headwinds` endpoint also returning 401 **Technical Assessment:** The support system API authentication is failing. This is likely an auth header mismatch or token expiration on these specific endpoints. The error is isolated to the support module - other platform systems should be operational. **Current Status:** - Cannot access ticket queue or active headwinds - Support system API needs auth refresh - No visibility into current operational issues via these channels I can retry these calls or check other platform systems (revenue, tenant health, build status) if you need immediate operational visibility through alternate channels."
+            - generic [ref=e1092]: How many tenants do we have?
+            - generic [ref=e1094]: "**Technical Status:** 401 Unauthorized from `/tenants` endpoint — same auth pattern as the support system. The authentication layer is failing across multiple modules. **Current Situation:** - Cannot retrieve tenant count or tenant data - This is the third endpoint returning 401 errors - Pattern indicates a platform-wide authentication issue, not isolated to support **Next Steps:** I can attempt other platform endpoints to map the scope of this auth issue, or if you need immediate tenant data, I can try the cross-platform summary which may use different auth paths. The authentication system needs attention before I can provide accurate tenant metrics."
+          - generic [ref=e184]:
+            - textbox "Ask Zander anything..." [ref=e185]
+            - button "Send" [disabled] [ref=e186] [cursor=pointer]
+            - generic [ref=e187]: Powered by Claude
+  - button "Your executive team is ready" [ref=e188] [cursor=pointer]:
+    - img [ref=e189]
+  - alert [ref=e192]

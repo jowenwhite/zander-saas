@@ -1,0 +1,35 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - img "Zander" [ref=e5]
+        - paragraph [ref=e6]: Your AI-Powered Executive Team
+      - generic [ref=e7]:
+        - blockquote [ref=e8]: "\"The true direction of commerce is not just the exchange of goods, but the expansion of human potential through strategic innovation.\""
+        - paragraph [ref=e9]: — Alexander Hamilton
+      - generic [ref=e10]: © 2026 Zander Systems LLC
+    - generic [ref=e12]:
+      - heading "Welcome Back" [level=2] [ref=e13]
+      - paragraph [ref=e14]: Sign in to access your Zander dashboard
+      - generic [ref=e36]: Invalid credentials
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: Email Address
+          - textbox "Enter your email" [ref=e18]: jonathan@zanderos.com
+        - generic [ref=e19]:
+          - generic [ref=e20]: Password
+          - textbox "Enter your password" [ref=e21]: zander123
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - checkbox "Remember me" [ref=e24]
+            - generic [ref=e25]: Remember me
+          - link "Forgot password?" [ref=e26] [cursor=pointer]:
+            - /url: /forgot-password
+        - button "Sign In" [ref=e27] [cursor=pointer]
+      - paragraph [ref=e29]:
+        - text: Don't have an account?
+        - link "Sign up" [ref=e30] [cursor=pointer]:
+          - /url: /signup
+  - button "Your executive team is ready" [ref=e31] [cursor=pointer]:
+    - img [ref=e32]
+  - alert [ref=e35]

@@ -1,0 +1,336 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - button "Expand sidebar" [ref=e4] [cursor=pointer]
+      - link "Z" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Z
+      - generic [ref=e9]:
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - link "Production" [ref=e13] [cursor=pointer]:
+              - /url: /production
+              - img [ref=e15]
+          - listitem [ref=e20]:
+            - link "Projects" [ref=e21] [cursor=pointer]:
+              - /url: /projects
+              - img [ref=e23]
+          - listitem [ref=e25]:
+            - link "People" [ref=e26] [cursor=pointer]:
+              - /url: /people
+              - img [ref=e28]
+          - listitem [ref=e33]:
+            - link "Products" [ref=e34] [cursor=pointer]:
+              - /url: /products
+              - img [ref=e36]
+        - list [ref=e41]:
+          - listitem [ref=e42]:
+            - link "Communication" [ref=e43] [cursor=pointer]:
+              - /url: /communication
+              - img [ref=e45]
+          - listitem [ref=e48]:
+            - link "Schedule" [ref=e49] [cursor=pointer]:
+              - /url: /schedule
+              - img [ref=e51]
+          - listitem [ref=e53]:
+            - link "Forms" [ref=e54] [cursor=pointer]:
+              - /url: /forms
+              - img [ref=e56]
+        - list [ref=e60]:
+          - listitem [ref=e61]:
+            - button "P" [ref=e62] [cursor=pointer]:
+              - generic [ref=e63]:
+                - generic [ref=e64]: P
+                - img [ref=e66]
+          - listitem [ref=e69]:
+            - button "J" [ref=e70] [cursor=pointer]:
+              - generic [ref=e71]:
+                - generic [ref=e72]: J
+                - img [ref=e74]
+          - listitem [ref=e77]:
+            - button "D" [ref=e78] [cursor=pointer]:
+              - generic [ref=e79]:
+                - generic [ref=e80]: D
+                - img [ref=e82]
+          - listitem [ref=e85]:
+            - button "B" [ref=e86] [cursor=pointer]:
+              - generic [ref=e87]:
+                - generic [ref=e88]: B
+                - img [ref=e90]
+          - listitem [ref=e93]:
+            - button "M" [ref=e94] [cursor=pointer]:
+              - generic [ref=e95]:
+                - generic [ref=e96]: M
+                - img [ref=e98]
+          - listitem [ref=e101]:
+            - button "T" [ref=e102] [cursor=pointer]:
+              - generic [ref=e103]:
+                - generic [ref=e104]: T
+                - img [ref=e106]
+          - listitem [ref=e109]:
+            - button "J" [ref=e110] [cursor=pointer]:
+              - generic [ref=e111]:
+                - generic [ref=e112]: J
+                - img [ref=e114]
+        - list [ref=e118]:
+          - listitem [ref=e119]:
+            - link "Treasury Admin" [ref=e120] [cursor=pointer]:
+              - /url: /admin/treasury
+              - img [ref=e122]
+          - listitem [ref=e124]:
+            - link "Support Admin" [ref=e125] [cursor=pointer]:
+              - /url: /admin/support-admin
+              - img [ref=e127]
+    - generic [ref=e129]:
+      - main [ref=e130]:
+        - generic [ref=e132]:
+          - heading "🛡️ Support Admin" [level=1] [ref=e133]
+          - paragraph [ref=e134]: Platform operations • Zander AI powered • SuperAdmin Only
+        - generic [ref=e135]:
+          - generic [ref=e136]:
+            - generic [ref=e138]: API Status
+            - generic [ref=e140]: ✓ Healthy
+          - generic [ref=e141]:
+            - generic [ref=e143]: Database
+            - generic [ref=e145]: ✓ Healthy
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - generic [ref=e148]: Active Users
+              - generic [ref=e149]: ↑ 12%
+            - generic [ref=e150]: "35"
+          - generic [ref=e151]:
+            - generic [ref=e152]:
+              - generic [ref=e153]: Open Tickets
+              - generic [ref=e154]: 0 new
+            - generic [ref=e155]: "0"
+        - generic [ref=e156]:
+          - button "📊 Overview" [ref=e157] [cursor=pointer]
+          - button "💓 Health" [ref=e158] [cursor=pointer]
+          - button "🔬 Diagnostics" [ref=e159] [cursor=pointer]
+          - button "🔴 Headwinds (0)" [ref=e160] [cursor=pointer]
+          - button "🏢 Tenants" [ref=e161] [cursor=pointer]
+          - button "👥 Users" [ref=e162] [cursor=pointer]
+          - button "🎫 Tickets (0)" [ref=e163] [cursor=pointer]
+          - button "📚 Knowledge" [ref=e164] [cursor=pointer]
+        - generic [ref=e578]:
+          - generic [ref=e579]:
+            - generic [ref=e580]:
+              - generic [ref=e581]:
+                - button "all" [ref=e582] [cursor=pointer]
+                - button "active" [ref=e583] [cursor=pointer]
+                - button "archived" [ref=e584] [cursor=pointer]
+              - generic [ref=e585]:
+                - textbox "Search tenants..." [ref=e586]
+                - generic [ref=e587]: "?"
+            - generic [ref=e588]:
+              - generic [ref=e589]: 10 tenants
+              - button "Refresh" [ref=e590] [cursor=pointer]
+          - table [ref=e593]:
+            - rowgroup [ref=e594]:
+              - row "Company Name > Tier Users Last Active Engagement Churn Risk Status Actions" [ref=e595]:
+                - columnheader [ref=e596]:
+                  - checkbox [ref=e597]
+                - columnheader "Company Name >" [ref=e598] [cursor=pointer]
+                - columnheader "Tier" [ref=e599] [cursor=pointer]
+                - columnheader "Users" [ref=e600] [cursor=pointer]
+                - columnheader "Last Active" [ref=e601] [cursor=pointer]
+                - columnheader "Engagement" [ref=e602] [cursor=pointer]
+                - columnheader "Churn Risk" [ref=e603] [cursor=pointer]
+                - columnheader "Status" [ref=e604]
+                - columnheader "Actions" [ref=e605]
+            - rowgroup [ref=e606]:
+              - row "[ARCHIVED] 64 West Consulting FREE 0 -- -- -- ACTIVE Actions <" [ref=e607]:
+                - cell [ref=e608]:
+                  - checkbox [ref=e609]
+                - cell "[ARCHIVED] 64 West Consulting" [ref=e610]:
+                  - generic [ref=e611]: "[ARCHIVED] 64 West Consulting"
+                - cell "FREE" [ref=e612]:
+                  - generic [ref=e614]: FREE
+                - cell "0" [ref=e615]
+                - cell "--" [ref=e616]
+                - cell "--" [ref=e617]
+                - cell "--" [ref=e618]
+                - cell "ACTIVE" [ref=e619]:
+                  - generic [ref=e620]: ACTIVE
+                - cell "Actions <" [ref=e622]:
+                  - button "Actions <" [ref=e624] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e625]: <
+              - row "[ARCHIVED] 64 West Finance FREE 0 -- -- -- ACTIVE Actions <" [ref=e626]:
+                - cell [ref=e627]:
+                  - checkbox [ref=e628]
+                - cell "[ARCHIVED] 64 West Finance" [ref=e629]:
+                  - generic [ref=e630]: "[ARCHIVED] 64 West Finance"
+                - cell "FREE" [ref=e631]:
+                  - generic [ref=e633]: FREE
+                - cell "0" [ref=e634]
+                - cell "--" [ref=e635]
+                - cell "--" [ref=e636]
+                - cell "--" [ref=e637]
+                - cell "ACTIVE" [ref=e638]:
+                  - generic [ref=e639]: ACTIVE
+                - cell "Actions <" [ref=e641]:
+                  - button "Actions <" [ref=e643] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e644]: <
+              - row "64 West Capital ENTERPRISE OVERRIDE 1 -- -- -- ACTIVE Actions <" [ref=e645]:
+                - cell [ref=e646]:
+                  - checkbox [ref=e647]
+                - cell "64 West Capital" [ref=e648]:
+                  - generic [ref=e649]: 64 West Capital
+                - cell "ENTERPRISE OVERRIDE" [ref=e650]:
+                  - generic [ref=e651]:
+                    - generic [ref=e652]: ENTERPRISE
+                    - generic "Tier Override Active" [ref=e653]: OVERRIDE
+                - cell "1" [ref=e654]
+                - cell "--" [ref=e655]
+                - cell "--" [ref=e656]
+                - cell "--" [ref=e657]
+                - cell "ACTIVE" [ref=e658]:
+                  - generic [ref=e659]: ACTIVE
+                - cell "Actions <" [ref=e661]:
+                  - button "Actions <" [ref=e663] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e664]: <
+              - row "AVC FREE 1 -- -- -- ACTIVE Actions <" [ref=e665]:
+                - cell [ref=e666]:
+                  - checkbox [ref=e667]
+                - cell "AVC" [ref=e668]:
+                  - generic [ref=e669]: AVC
+                - cell "FREE" [ref=e670]:
+                  - generic [ref=e672]: FREE
+                - cell "1" [ref=e673]
+                - cell "--" [ref=e674]
+                - cell "--" [ref=e675]
+                - cell "--" [ref=e676]
+                - cell "ACTIVE" [ref=e677]:
+                  - generic [ref=e678]: ACTIVE
+                - cell "Actions <" [ref=e680]:
+                  - button "Actions <" [ref=e682] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e683]: <
+              - row "HERBS FREE 1 -- -- -- ACTIVE Actions <" [ref=e684]:
+                - cell [ref=e685]:
+                  - checkbox [ref=e686]
+                - cell "HERBS" [ref=e687]:
+                  - generic [ref=e688]: HERBS
+                - cell "FREE" [ref=e689]:
+                  - generic [ref=e691]: FREE
+                - cell "1" [ref=e692]
+                - cell "--" [ref=e693]
+                - cell "--" [ref=e694]
+                - cell "--" [ref=e695]
+                - cell "ACTIVE" [ref=e696]:
+                  - generic [ref=e697]: ACTIVE
+                - cell "Actions <" [ref=e699]:
+                  - button "Actions <" [ref=e701] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e702]: <
+              - row "Johnny 4 FREE 1 -- -- -- ACTIVE Actions <" [ref=e703]:
+                - cell [ref=e704]:
+                  - checkbox [ref=e705]
+                - cell "Johnny 4" [ref=e706]:
+                  - generic [ref=e707]: Johnny 4
+                - cell "FREE" [ref=e708]:
+                  - generic [ref=e710]: FREE
+                - cell "1" [ref=e711]
+                - cell "--" [ref=e712]
+                - cell "--" [ref=e713]
+                - cell "--" [ref=e714]
+                - cell "ACTIVE" [ref=e715]:
+                  - generic [ref=e716]: ACTIVE
+                - cell "Actions <" [ref=e718]:
+                  - button "Actions <" [ref=e720] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e721]: <
+              - row "My Cabinet Factory ENTERPRISE OVERRIDE 1 -- -- -- ACTIVE Actions <" [ref=e722]:
+                - cell [ref=e723]:
+                  - checkbox [ref=e724]
+                - cell "My Cabinet Factory" [ref=e725]:
+                  - generic [ref=e726]: My Cabinet Factory
+                - cell "ENTERPRISE OVERRIDE" [ref=e727]:
+                  - generic [ref=e728]:
+                    - generic [ref=e729]: ENTERPRISE
+                    - generic "Tier Override Active" [ref=e730]: OVERRIDE
+                - cell "1" [ref=e731]
+                - cell "--" [ref=e732]
+                - cell "--" [ref=e733]
+                - cell "--" [ref=e734]
+                - cell "ACTIVE" [ref=e735]:
+                  - generic [ref=e736]: ACTIVE
+                - cell "Actions <" [ref=e738]:
+                  - button "Actions <" [ref=e740] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e741]: <
+              - row "SceeterOS FREE 1 -- -- -- ACTIVE Actions <" [ref=e742]:
+                - cell [ref=e743]:
+                  - checkbox [ref=e744]
+                - cell "SceeterOS" [ref=e745]:
+                  - generic [ref=e746]: SceeterOS
+                - cell "FREE" [ref=e747]:
+                  - generic [ref=e749]: FREE
+                - cell "1" [ref=e750]
+                - cell "--" [ref=e751]
+                - cell "--" [ref=e752]
+                - cell "--" [ref=e753]
+                - cell "ACTIVE" [ref=e754]:
+                  - generic [ref=e755]: ACTIVE
+                - cell "Actions <" [ref=e757]:
+                  - button "Actions <" [ref=e759] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e760]: <
+              - row "Summit Home Services ENTERPRISE OVERRIDE 4 -- -- -- ACTIVE Actions <" [ref=e761]:
+                - cell [ref=e762]:
+                  - checkbox [ref=e763]
+                - cell "Summit Home Services" [ref=e764]:
+                  - generic [ref=e765]: Summit Home Services
+                - cell "ENTERPRISE OVERRIDE" [ref=e766]:
+                  - generic [ref=e767]:
+                    - generic [ref=e768]: ENTERPRISE
+                    - generic "Tier Override Active" [ref=e769]: OVERRIDE
+                - cell "4" [ref=e770]
+                - cell "--" [ref=e771]
+                - cell "--" [ref=e772]
+                - cell "--" [ref=e773]
+                - cell "ACTIVE" [ref=e774]:
+                  - generic [ref=e775]: ACTIVE
+                - cell "Actions <" [ref=e777]:
+                  - button "Actions <" [ref=e779] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e780]: <
+              - row "Zander Inc ENTERPRISE OVERRIDE 2 -- -- -- ACTIVE Actions <" [ref=e811]:
+                - cell [ref=e782]:
+                  - checkbox [ref=e783]
+                - cell "Zander Inc" [ref=e784]:
+                  - generic [ref=e785]: Zander Inc
+                - cell "ENTERPRISE OVERRIDE" [ref=e786]:
+                  - generic [ref=e787]:
+                    - generic [ref=e788]: ENTERPRISE
+                    - generic "Tier Override Active" [ref=e789]: OVERRIDE
+                - cell "2" [ref=e790]
+                - cell "--" [ref=e791]
+                - cell "--" [ref=e792]
+                - cell "--" [ref=e793]
+                - cell "ACTIVE" [ref=e794]:
+                  - generic [ref=e795]: ACTIVE
+                - cell "Actions <" [ref=e812]:
+                  - button "Actions <" [ref=e813] [cursor=pointer]:
+                    - text: Actions
+                    - generic [ref=e800]: <
+      - generic [ref=e174]:
+        - generic [ref=e175] [cursor=pointer]:
+          - generic [ref=e176]:
+            - generic [ref=e177]: 🤖
+            - generic [ref=e178]: ZanderYour Operations AI
+          - generic [ref=e179]:
+            - button "▲ Expand" [ref=e180]
+            - button "Hide" [ref=e181]
+        - generic [ref=e182]:
+          - generic [ref=e430]: "**Operational Status Check Results:** Getting 401 Unauthorized errors on both support endpoints: - `/support-tickets?limit=10` returning invalid/expired token error - `/headwinds` endpoint also returning 401 **Technical Assessment:** The support system API authentication is failing. This is likely an auth header mismatch or token expiration on these specific endpoints. The error is isolated to the support module - other platform systems should be operational. **Current Status:** - Cannot access ticket queue or active headwinds - Support system API needs auth refresh - No visibility into current operational issues via these channels I can retry these calls or check other platform systems (revenue, tenant health, build status) if you need immediate operational visibility through alternate channels."
+          - generic [ref=e184]:
+            - textbox "Ask Zander anything..." [ref=e185]
+            - button "Send" [disabled] [ref=e186] [cursor=pointer]
+            - generic [ref=e187]: Powered by Claude
+  - button "Your executive team is ready" [ref=e188] [cursor=pointer]:
+    - img [ref=e189]
+  - alert [ref=e192]
