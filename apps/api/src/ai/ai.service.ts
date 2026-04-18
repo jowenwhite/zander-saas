@@ -1,11 +1,68 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { MeetingIntelligenceService } from '../meeting-intelligence/meeting-intelligence.service';
 import {
   TIER_TOKEN_CAPS,
   TIER_HIERARCHY,
   getTokenCapForTier,
   formatTokenCount,
 } from '../common/config/tier-config';
+
+// Tool definitions for meeting intelligence
+const MEETING_TOOLS = [
+  {
+    name: 'get_meeting_recordings',
+    description: 'List recent meeting recordings for this business with transcription and summary status',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'number', description: 'Number of meetings to return (default 5, max 20)' },
+        engagementId: { type: 'string', description: 'Filter by consulting engagement ID' },
+        dateFrom: { type: 'string', description: 'Filter meetings from this date (ISO format)' },
+        dateTo: { type: 'string', description: 'Filter meetings until this date (ISO format)' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'get_meeting_summary',
+    description: 'Get the full AI-generated summary for a specific meeting including action items, decisions, and follow-ups',
+    input_schema: {
+      type: 'object',
+      properties: {
+        meetingId: { type: 'string', description: 'The ID of the meeting to get summary for' },
+      },
+      required: ['meetingId'],
+    },
+  },
+  {
+    name: 'process_meeting_recording',
+    description: 'Submit a meeting recording URL for transcription and AI analysis. REQUIRES APPROVAL - this is an L3 DRAFT action.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        recordingUrl: { type: 'string', description: 'URL to the meeting recording file' },
+        title: { type: 'string', description: 'Title for the meeting' },
+        attendees: { type: 'string', description: 'Comma-separated list of attendee names' },
+        platform: { type: 'string', description: 'Meeting platform (zoom, google_meet, teams, etc)' },
+        engagementId: { type: 'string', description: 'Optional consulting engagement to link to' },
+      },
+      required: ['recordingUrl', 'title'],
+    },
+  },
+  {
+    name: 'share_meeting_summary',
+    description: 'Email a meeting summary to specified recipients. REQUIRES APPROVAL - this is an L3 DRAFT action that creates a ScheduledCommunication for Jonathan to review.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        meetingId: { type: 'string', description: 'The ID of the meeting' },
+        recipientEmails: { type: 'string', description: 'Comma-separated list of recipient email addresses' },
+      },
+      required: ['meetingId', 'recipientEmails'],
+    },
+  },
+];
 
 interface Executive {
   id: string;
@@ -226,7 +283,12 @@ When responding:
 
 @Injectable()
 export class AiService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(AiService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private meetingService: MeetingIntelligenceService,
+  ) {}
 
   /**
    * Get tenant's effective tier considering overrides and trials.
@@ -567,6 +629,158 @@ ${clientConcerns.slice(0, 5).map(c => `- [${c.severity || 'MEDIUM'}] ${c.concern
     }
   }
 
+  /**
+   * Execute a meeting tool and return the result
+   */
+  private async executeMeetingTool(
+    tenantId: string,
+    userId: string,
+    toolName: string,
+    toolInput: any,
+  ): Promise<{ success: boolean; result?: any; error?: string; needsApproval?: boolean }> {
+    try {
+      switch (toolName) {
+        case 'get_meeting_recordings': {
+          const { meetings, total } = await this.meetingService.findAll(tenantId, {
+            engagementId: toolInput.engagementId,
+            dateFrom: toolInput.dateFrom,
+            dateTo: toolInput.dateTo,
+            limit: Math.min(toolInput.limit || 5, 20),
+          });
+          return {
+            success: true,
+            result: {
+              meetings: meetings.map(m => ({
+                id: m.id,
+                title: m.title,
+                scheduledAt: m.scheduledAt,
+                durationMinutes: m.durationMinutes,
+                platform: m.platform,
+                transcriptStatus: m.transcriptStatus,
+                summaryStatus: m.summaryStatus,
+                engagement: m.engagement?.packageType,
+                lead: m.lead?.name,
+              })),
+              total,
+            },
+          };
+        }
+
+        case 'get_meeting_summary': {
+          const meeting = await this.meetingService.findOne(tenantId, toolInput.meetingId);
+          return {
+            success: true,
+            result: {
+              id: meeting.id,
+              title: meeting.title,
+              scheduledAt: meeting.scheduledAt,
+              summaryText: meeting.summaryText,
+              summaryJson: meeting.summaryJson,
+              attendees: meeting.attendees,
+              transcriptText: meeting.transcriptText?.substring(0, 2000) + (meeting.transcriptText?.length > 2000 ? '...' : ''),
+            },
+          };
+        }
+
+        case 'process_meeting_recording': {
+          // L3 DRAFT - creates a ScheduledCommunication for approval
+          const attendeesArray = toolInput.attendees
+            ? toolInput.attendees.split(',').map((a: string) => ({ name: a.trim() }))
+            : [];
+
+          // Create a pending action for Jonathan to approve
+          await this.prisma.scheduledCommunication.create({
+            data: {
+              tenantId,
+              type: 'meeting_processing',
+              subject: `Process Meeting: ${toolInput.title}`,
+              body: JSON.stringify({
+                action: 'process_meeting_recording',
+                recordingUrl: toolInput.recordingUrl,
+                title: toolInput.title,
+                attendees: attendeesArray,
+                platform: toolInput.platform || 'unknown',
+                engagementId: toolInput.engagementId,
+              }),
+              recipientEmail: 'jonathan@zanderos.com',
+              scheduledFor: new Date(),
+              status: 'pending',
+              needsApproval: true,
+              createdBy: userId,
+            },
+          });
+
+          return {
+            success: true,
+            result: {
+              status: 'pending_approval',
+              message: 'Meeting processing request submitted for Jonathan\'s approval. This is an L3 DRAFT action.',
+            },
+            needsApproval: true,
+          };
+        }
+
+        case 'share_meeting_summary': {
+          const meeting = await this.meetingService.findOne(tenantId, toolInput.meetingId);
+
+          if (!meeting.summaryText && !meeting.summaryJson) {
+            return {
+              success: false,
+              error: 'This meeting does not have a summary available yet.',
+            };
+          }
+
+          const recipients = toolInput.recipientEmails
+            .split(',')
+            .map((e: string) => e.trim())
+            .filter((e: string) => e.includes('@'));
+
+          // L3 DRAFT - create ScheduledCommunication for approval
+          await this.prisma.scheduledCommunication.create({
+            data: {
+              tenantId,
+              type: 'meeting_summary_share',
+              subject: `Share Meeting Summary: ${meeting.title}`,
+              body: JSON.stringify({
+                action: 'share_meeting_summary',
+                meetingId: meeting.id,
+                meetingTitle: meeting.title,
+                recipients: recipients.map((email: string) => ({ email, name: email.split('@')[0] })),
+              }),
+              recipientEmail: recipients[0],
+              scheduledFor: new Date(),
+              status: 'pending',
+              needsApproval: true,
+              createdBy: userId,
+            },
+          });
+
+          return {
+            success: true,
+            result: {
+              status: 'pending_approval',
+              message: `Summary share request for "${meeting.title}" submitted for Jonathan's approval. Recipients: ${recipients.join(', ')}. This is an L3 DRAFT action.`,
+              recipients,
+            },
+            needsApproval: true,
+          };
+        }
+
+        default:
+          return {
+            success: false,
+            error: `Unknown tool: ${toolName}`,
+          };
+      }
+    } catch (error) {
+      this.logger.error(`Tool execution error (${toolName}):`, error);
+      return {
+        success: false,
+        error: error.message || 'Tool execution failed',
+      };
+    }
+  }
+
   async queryKnowledge(query: string, limit: number = 5) {
     // Search knowledge base for relevant articles
     const articles = await this.prisma.knowledgeArticle.findMany({
@@ -669,7 +883,21 @@ ${knowledgeContext}
 
 Remember: You are ${executive.name}, the ${executive.fullTitle}. Stay in character and provide helpful, actionable advice based on your expertise. Reference the business context when relevant to personalize your advice.
 
-IMPORTANT: If the user asks about how to use Zander, platform features, or needs help with the software, refer to the PLATFORM KNOWLEDGE BASE section above. Provide accurate information based on the knowledge articles. If you don't have relevant knowledge articles, let the user know you'll escalate to support.`;
+IMPORTANT: If the user asks about how to use Zander, platform features, or needs help with the software, refer to the PLATFORM KNOWLEDGE BASE section above. Provide accurate information based on the knowledge articles. If you don't have relevant knowledge articles, let the user know you'll escalate to support.
+
+${(executiveId === 'ea' || executiveId === 'cro') ? `MEETING INTELLIGENCE TOOLS:
+You have access to meeting intelligence tools. Use them when:
+- User asks about recent meetings, meeting summaries, or action items
+- User wants to process a new recording
+- User wants to share a meeting summary
+
+Available tools:
+- get_meeting_recordings: List recent meetings with status
+- get_meeting_summary: Get full summary for a specific meeting
+- process_meeting_recording: Submit a recording for transcription (L3 DRAFT - requires approval)
+- share_meeting_summary: Email summary to recipients (L3 DRAFT - requires approval)
+
+When using L3 DRAFT tools, inform the user that the action requires Jonathan's approval before execution.` : ''}`;
 
     const messages = [
       ...conversationHistory.map((msg: any) => ({
@@ -687,64 +915,142 @@ IMPORTANT: If the user asks about how to use Zander, platform features, or needs
     }
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
+      // Determine if this executive has access to meeting tools
+      const hasMeetingTools = executiveId === 'ea' || executiveId === 'cro';
+
+      // Get user ID for tool execution (we need it for tracking)
+      const user = await this.prisma.user.findFirst({
+        where: { tenantId },
+        select: { id: true },
+      });
+      const userId = user?.id || 'system';
+
+      // Track total token usage across multiple API calls (for tool loops)
+      let totalInputTokens = 0;
+      let totalOutputTokens = 0;
+      let currentMessages = [...messages];
+      let finalTextContent = '';
+      let iterations = 0;
+      const maxIterations = 5; // Prevent infinite loops
+
+      // Tool use loop - continue until we get a final text response
+      while (iterations < maxIterations) {
+        iterations++;
+
+        const requestBody: any = {
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
           system: systemPrompt,
-          messages: messages,
-        }),
-      });
+          messages: currentMessages,
+        };
 
-      if (!response.ok) {
-        const error = await response.text();
-        console.error('Claude API error:', error);
-        return this.getMockResponse(executive, message, {
-          monthlyTokensUsed,
-          monthlyTokenLimit,
-          effectiveTier,
+        // Only include tools for executives that have them
+        if (hasMeetingTools) {
+          requestBody.tools = MEETING_TOOLS;
+        }
+
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify(requestBody),
         });
+
+        if (!response.ok) {
+          const error = await response.text();
+          this.logger.error('Claude API error:', error);
+          return this.getMockResponse(executive, message, {
+            monthlyTokensUsed,
+            monthlyTokenLimit,
+            effectiveTier,
+          });
+        }
+
+        const data = await response.json();
+
+        // Accumulate token usage
+        totalInputTokens += data.usage?.input_tokens || 0;
+        totalOutputTokens += data.usage?.output_tokens || 0;
+
+        // Check if we have tool_use blocks
+        const toolUseBlocks = data.content.filter((block: any) => block.type === 'tool_use');
+        const textBlocks = data.content.filter((block: any) => block.type === 'text');
+
+        // Collect any text from this response
+        if (textBlocks.length > 0) {
+          finalTextContent += textBlocks.map((b: any) => b.text).join('\n');
+        }
+
+        // If stop_reason is 'end_turn' and no tool_use, we're done
+        if (data.stop_reason === 'end_turn' && toolUseBlocks.length === 0) {
+          break;
+        }
+
+        // If there are tool_use blocks, execute them and continue
+        if (toolUseBlocks.length > 0) {
+          // Add assistant message with tool calls
+          currentMessages.push({
+            role: 'assistant',
+            content: data.content,
+          });
+
+          // Execute each tool and build tool_result message
+          const toolResults: any[] = [];
+          for (const toolBlock of toolUseBlocks) {
+            const result = await this.executeMeetingTool(
+              tenantId,
+              userId,
+              toolBlock.name,
+              toolBlock.input,
+            );
+
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: toolBlock.id,
+              content: JSON.stringify(result),
+            });
+          }
+
+          // Add tool results as user message
+          currentMessages.push({
+            role: 'user',
+            content: toolResults,
+          });
+        } else {
+          // No tool_use and no end_turn, still break to be safe
+          break;
+        }
       }
-
-      const data = await response.json();
-
-      // Extract token usage from Claude response
-      const inputTokens = data.usage?.input_tokens || 0;
-      const outputTokens = data.usage?.output_tokens || 0;
-      const tokensUsed = inputTokens + outputTokens;
 
       // Record usage
       const { monthlyTokensUsed: updatedMonthlyTokensUsed } = await this.recordTokenUsage(
         tenantId,
         executiveId,
-        inputTokens,
-        outputTokens,
+        totalInputTokens,
+        totalOutputTokens,
       );
 
       return {
-        content: data.content[0].text,
+        content: finalTextContent || 'I apologize, but I was unable to generate a response. Please try again.',
         executive: {
           id: executive.id,
           name: executive.name,
           role: executive.role,
         },
         usage: {
-          tokensUsed,
-          inputTokens,
-          outputTokens,
+          tokensUsed: totalInputTokens + totalOutputTokens,
+          inputTokens: totalInputTokens,
+          outputTokens: totalOutputTokens,
           monthlyTokensUsed: updatedMonthlyTokensUsed,
           monthlyTokenLimit,
           effectiveTier,
         },
       };
     } catch (error) {
-      console.error('Error calling Claude API:', error);
+      this.logger.error('Error calling Claude API:', error);
       return this.getMockResponse(executive, message, {
         monthlyTokensUsed,
         monthlyTokenLimit,

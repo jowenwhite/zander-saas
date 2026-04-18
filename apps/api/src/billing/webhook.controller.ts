@@ -495,10 +495,13 @@ export class WebhookController {
       return;
     }
 
+    const customerName = session.customer_details?.name || customerEmail.split('@')[0];
+
     // Get line items to determine the product
     const lineItems = await this.stripe.checkout.sessions.listLineItems(session.id);
     const priceId = lineItems.data[0]?.price?.id;
     const productName = lineItems.data[0]?.description || 'Digital Product';
+    const productInfo = priceId ? DIGITAL_STORE_PRICE_IDS[priceId] : null;
 
     this.logger.log(`Digital product purchased: ${productName} by ${customerEmail}`);
 
@@ -507,6 +510,113 @@ export class WebhookController {
 
     // Send admin notification
     await this.sendDigitalStoreAdminNotification(customerEmail, productName);
+
+    // D-6: Create ConsultingLead for store-to-consulting pipeline
+    try {
+      // Check if lead already exists for this email
+      const existingLead = await this.prisma.consultingLead.findFirst({
+        where: { email: customerEmail.toLowerCase() },
+      });
+
+      if (!existingLead) {
+        // Create new lead from digital store purchase
+        const lead = await this.prisma.consultingLead.create({
+          data: {
+            source: 'DIGITAL_STORE',
+            status: 'NEW',
+            name: customerName,
+            email: customerEmail.toLowerCase(),
+            notes: `Purchased: ${productName} (${productInfo?.type || 'unknown'}) on ${new Date().toLocaleDateString()}`,
+            estimatedValue: this.getEstimatedValueFromProduct(productInfo?.type),
+          },
+        });
+
+        this.logger.log(`D-6: Created ConsultingLead ${lead.id} from digital store purchase`);
+
+        // Create L3 DRAFT follow-up communication (nurture email)
+        const tenantId = process.env.ZANDER_TENANT_ID || 'zander-consulting';
+        const scheduledFor = new Date();
+        scheduledFor.setDate(scheduledFor.getDate() + 3); // Follow up in 3 days
+
+        await this.prisma.scheduledCommunication.create({
+          data: {
+            tenantId,
+            type: 'EMAIL',
+            subject: `How's ${productName} working for you?`,
+            body: this.generateStoreNurtureEmail(customerName, productName, productInfo?.type),
+            recipientEmail: customerEmail.toLowerCase(),
+            recipientName: customerName,
+            scheduledFor,
+            needsApproval: true, // L3 DRAFT - Jonathan must approve
+            status: 'DRAFT',
+            metadata: {
+              source: 'D-6_STORE_PIPELINE',
+              leadId: lead.id,
+              productType: productInfo?.type || 'unknown',
+              productName,
+            },
+          },
+        });
+
+        this.logger.log(`D-6: Created L3 DRAFT nurture email for lead ${lead.id}`);
+      } else {
+        // Update existing lead with new purchase info
+        await this.prisma.consultingLead.update({
+          where: { id: existingLead.id },
+          data: {
+            notes: `${existingLead.notes || ''}\n\nAdditional purchase: ${productName} on ${new Date().toLocaleDateString()}`,
+          },
+        });
+        this.logger.log(`D-6: Updated existing lead ${existingLead.id} with new purchase`);
+      }
+    } catch (error) {
+      this.logger.error(`D-6: Failed to create consulting lead from store purchase: ${error.message}`);
+      // Don't throw - purchase was successful, lead creation is secondary
+    }
+  }
+
+  private getEstimatedValueFromProduct(productType: string | undefined): number {
+    // Estimate consulting potential based on product purchased
+    const valueMap: Record<string, number> = {
+      'OPERATIONS_PLAYBOOK': 4500, // Foundation package potential
+      'STARTUP_FOUNDATIONS': 2500, // Compass package potential
+      'SALES_MARKETING': 4500, // Foundation package potential
+      'HIRING_TEAM': 2500, // Compass package potential
+      'FINANCIAL_CLARITY': 4500, // Foundation package potential
+      'INDUSTRY_STARTER': 2500, // Compass package potential
+    };
+    return valueMap[productType || ''] || 2500;
+  }
+
+  private generateStoreNurtureEmail(name: string, productName: string, productType: string | undefined): string {
+    const firstName = name.split(' ')[0];
+
+    // Customize recommendation based on product type
+    const recommendations: Record<string, string> = {
+      'OPERATIONS_PLAYBOOK': 'Foundation Package (20 hours) - Perfect for implementing operational systems',
+      'STARTUP_FOUNDATIONS': 'Compass Package (10 hours) - Ideal for early-stage strategy work',
+      'SALES_MARKETING': 'Foundation Package (20 hours) - Great for building sales infrastructure',
+      'HIRING_TEAM': 'Compass Package (10 hours) - Strategic hiring and team planning',
+      'FINANCIAL_CLARITY': 'Business Analysis (3 hours) - Deep dive into financial optimization',
+      'INDUSTRY_STARTER': 'Compass Package (10 hours) - Industry-specific strategy development',
+    };
+
+    const recommendation = recommendations[productType || ''] || 'Compass Package (10 hours)';
+
+    return `Hi ${firstName},
+
+I hope you're finding ${productName} valuable! I wanted to personally check in and see how you're doing with it.
+
+Many clients who start with our digital products find they want hands-on guidance implementing the concepts. If that resonates with you, I'd love to chat about how our consulting services could accelerate your progress.
+
+Based on what you purchased, I'd recommend our **${recommendation}** as a great next step.
+
+Would you be open to a quick 15-minute call to explore if consulting might be right for you?
+
+Best,
+Jonathan
+
+P.S. No pressure at all - I'm genuinely curious how the product is working for you!`;
   }
 
   // NOTE: sendConsultingWelcomeEmail removed - now using ConsultingEmailService.sendWelcomeEmail

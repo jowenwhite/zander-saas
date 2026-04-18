@@ -476,6 +476,7 @@ model ScheduledCommunication {
   createdBy      String?
   recipientEmail String?
   recipientName  String?
+  metadata       Json?     // D-6/D-7: Additional metadata for automation tracking
   contact        Contact?  @relation(fields: [contactId], references: [id])
   tenant         Tenant    @relation(fields: [tenantId], references: [id])
 
@@ -1980,6 +1981,8 @@ enum ConsultingStatus {
 enum DeliverableStatus {
   PENDING
   IN_PROGRESS
+  REVIEW           // D-4: Awaiting client approval
+  REVISION_REQUESTED // D-4: Client requested changes
   COMPLETED
   DELIVERED
 }
@@ -2009,6 +2012,7 @@ enum LeadSource {
   MANUAL // Manually created by Jonathan
   REFERRAL // Referral from existing client
   WEBSITE // General website contact
+  DIGITAL_STORE // D-6: From digital store purchase (upsell pipeline)
 }
 
 enum LeadStatus {
@@ -2045,6 +2049,7 @@ enum ConsultingEventType {
   MEETING_CANCELED // Calendly booking canceled
   MEETING_COMPLETED // Discovery/kickoff call done
   PROPOSAL_CREATED // Proposal drafted
+  PROPOSAL_DRAFTED // D-2: Alias for proposal generation
   PROPOSAL_SENT // Proposal emailed
   PROPOSAL_VIEWED // Proposal opened
   DOCUMENT_SIGNED // NDA/CSA/SOW signed
@@ -2052,6 +2057,9 @@ enum ConsultingEventType {
   ENGAGEMENT_STARTED // Engagement began
   STATUS_CHANGED // Lead/engagement status update
   NOTE_ADDED // Manual note
+  SURVEY_SCHEDULED // D-7: Satisfaction survey scheduled
+  SURVEY_RESPONSE // D-7: Satisfaction survey response received
+  FOLLOW_UP_NEEDED // D-7: Low satisfaction requires follow-up
 }
 
 model ConsultingLead {
@@ -2111,6 +2119,7 @@ model ConsultingProposal {
   totalAmount Float // Quoted price
   hourlyRate  Float? // If ad-hoc
   customTerms String? // Any custom terms
+  content     String? // D-2: Generated proposal markdown content
 
   // Status tracking
   status      ProposalStatus @default(DRAFT)
@@ -2121,6 +2130,7 @@ model ConsultingProposal {
 
   // Document
   documentUrl String? // PDF URL in S3
+  metadata    Json?   // D-2: Additional generation metadata
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2243,6 +2253,7 @@ model MeetingRecord {
   // Metadata
   createdById         String?       // User who uploaded/initiated
   processedAt         DateTime?
+  metadata            Json?         // C-2: Additional metadata from Calendly/etc
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 

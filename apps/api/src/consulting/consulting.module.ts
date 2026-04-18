@@ -7,6 +7,8 @@ import { ConsultingDocumentController } from './consulting-document.controller';
 import { ConsultingEventController } from './consulting-event.controller';
 import { ConsultingEmailController } from './consulting-email.controller';
 import { ConsultingEmailService } from './consulting-email.service';
+import { ConsultingBriefingService } from './consulting-briefing.service';
+import { ConsultingAutomationService } from './consulting-automation.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { EmailModule } from '../integrations/email/email.module';
 
@@ -20,7 +22,7 @@ import { EmailModule } from '../integrations/email/email.module';
     ConsultingEventController,
     ConsultingEmailController,
   ],
-  providers: [ConsultingService, ConsultingEmailService],
-  exports: [ConsultingService, ConsultingEmailService],
+  providers: [ConsultingService, ConsultingEmailService, ConsultingBriefingService, ConsultingAutomationService],
+  exports: [ConsultingService, ConsultingEmailService, ConsultingBriefingService, ConsultingAutomationService],
 })
 export class ConsultingModule {}

@@ -1,9 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { MeetingIntelligenceService } from '../../meeting-intelligence/meeting-intelligence.service';
+
+// Don (CMO) meeting tools - 3 tools (no process_meeting_recording, that's EA/CRO territory)
+const DON_MEETING_TOOLS = [
+  {
+    name: 'get_meeting_recordings',
+    description: 'List recent meeting recordings for this business with transcription and summary status. Useful for finding marketing-related discussions.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'number', description: 'Number of meetings to return (default 5, max 20)' },
+        engagementId: { type: 'string', description: 'Filter by consulting engagement ID' },
+        dateFrom: { type: 'string', description: 'Filter meetings from this date (ISO format)' },
+        dateTo: { type: 'string', description: 'Filter meetings until this date (ISO format)' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'get_meeting_summary',
+    description: 'Get the full AI-generated summary for a specific meeting including topics discussed, decisions made, and marketing-related insights.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        meetingId: { type: 'string', description: 'The ID of the meeting to get summary for' },
+      },
+      required: ['meetingId'],
+    },
+  },
+  {
+    name: 'share_meeting_summary',
+    description: 'Email a meeting summary to specified recipients. REQUIRES APPROVAL - this is an L3 DRAFT action that creates a ScheduledCommunication for Jonathan to review.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        meetingId: { type: 'string', description: 'The ID of the meeting' },
+        recipientEmails: { type: 'string', description: 'Comma-separated list of recipient email addresses' },
+      },
+      required: ['meetingId', 'recipientEmails'],
+    },
+  },
+];
 
 @Injectable()
 export class DonService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(DonService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private meetingService: MeetingIntelligenceService,
+  ) {}
 
   private getDonPersonality(): string {
     return `You are Don, the Chief Marketing Officer (CMO) AI assistant for Zander. You're a confident, suave marketing executive with classic advertising wisdom meets modern digital strategy. You speak with conviction, use compelling storytelling, and believe deeply in the power of emotional connection in marketing. Occasionally share timeless advertising philosophy.
@@ -336,6 +383,122 @@ ${clientFeedback.slice(0, 5).join('\n')}`;
     }
   }
 
+  /**
+   * Execute a meeting tool and return the result
+   * Don has access to 3 tools (no process_meeting_recording)
+   */
+  private async executeMeetingTool(
+    tenantId: string,
+    userId: string,
+    toolName: string,
+    toolInput: any,
+  ): Promise<{ success: boolean; result?: any; error?: string; needsApproval?: boolean }> {
+    try {
+      switch (toolName) {
+        case 'get_meeting_recordings': {
+          const { meetings, total } = await this.meetingService.findAll(tenantId, {
+            engagementId: toolInput.engagementId,
+            dateFrom: toolInput.dateFrom,
+            dateTo: toolInput.dateTo,
+            limit: Math.min(toolInput.limit || 5, 20),
+          });
+          return {
+            success: true,
+            result: {
+              meetings: meetings.map(m => ({
+                id: m.id,
+                title: m.title,
+                scheduledAt: m.scheduledAt,
+                durationMinutes: m.durationMinutes,
+                platform: m.platform,
+                transcriptStatus: m.transcriptStatus,
+                summaryStatus: m.summaryStatus,
+                engagement: m.engagement?.packageType,
+                lead: m.lead?.name,
+              })),
+              total,
+            },
+          };
+        }
+
+        case 'get_meeting_summary': {
+          const meeting = await this.meetingService.findOne(tenantId, toolInput.meetingId);
+          return {
+            success: true,
+            result: {
+              id: meeting.id,
+              title: meeting.title,
+              scheduledAt: meeting.scheduledAt,
+              summaryText: meeting.summaryText,
+              summaryJson: meeting.summaryJson,
+              attendees: meeting.attendees,
+              transcriptText: meeting.transcriptText?.substring(0, 2000) + (meeting.transcriptText?.length > 2000 ? '...' : ''),
+            },
+          };
+        }
+
+        case 'share_meeting_summary': {
+          const meeting = await this.meetingService.findOne(tenantId, toolInput.meetingId);
+
+          if (!meeting.summaryText && !meeting.summaryJson) {
+            return {
+              success: false,
+              error: 'This meeting does not have a summary available yet.',
+            };
+          }
+
+          const recipients = toolInput.recipientEmails
+            .split(',')
+            .map((e: string) => e.trim())
+            .filter((e: string) => e.includes('@'));
+
+          // L3 DRAFT - create ScheduledCommunication for approval
+          await this.prisma.scheduledCommunication.create({
+            data: {
+              tenantId,
+              type: 'meeting_summary_share',
+              subject: `Share Meeting Summary: ${meeting.title}`,
+              body: JSON.stringify({
+                action: 'share_meeting_summary',
+                meetingId: meeting.id,
+                meetingTitle: meeting.title,
+                recipients: recipients.map((email: string) => ({ email, name: email.split('@')[0] })),
+                requestedBy: 'Don (CMO)',
+              }),
+              recipientEmail: recipients[0],
+              scheduledFor: new Date(),
+              status: 'pending',
+              needsApproval: true,
+              createdBy: userId,
+            },
+          });
+
+          return {
+            success: true,
+            result: {
+              status: 'pending_approval',
+              message: `Summary share request for "${meeting.title}" submitted for Jonathan's approval. Recipients: ${recipients.join(', ')}. This is an L3 DRAFT action.`,
+              recipients,
+            },
+            needsApproval: true,
+          };
+        }
+
+        default:
+          return {
+            success: false,
+            error: `Unknown tool: ${toolName}`,
+          };
+      }
+    } catch (error) {
+      this.logger.error(`Tool execution error (${toolName}):`, error);
+      return {
+        success: false,
+        error: error.message || 'Tool execution failed',
+      };
+    }
+  }
+
   private async buildMarketingContext(tenantId: string): Promise<string> {
     const [
       campaigns,
@@ -386,13 +549,26 @@ ${meetingIntelligence}`;
       ? `\nPLATFORM HELP:\n${knowledgeArticles.map(a => `- ${a.title}: ${a.summary || a.content.substring(0, 200)}`).join('\n')}`
       : '';
 
-    // Build system prompt with personality + context
+    // Build system prompt with personality + context + tool info
     const systemPrompt = `${this.getDonPersonality()}
 
 ${marketingContext}
 ${knowledgeContext}
 
-Use this context to personalize your advice. Reference specific campaigns, workflows, or metrics when relevant.`;
+Use this context to personalize your advice. Reference specific campaigns, workflows, or metrics when relevant.
+
+MEETING INTELLIGENCE TOOLS:
+You have access to meeting intelligence tools. Use them when:
+- User asks about recent meetings, meeting summaries, or marketing discussions
+- User wants to review what was discussed in client meetings
+- User wants to share a meeting summary with stakeholders
+
+Available tools:
+- get_meeting_recordings: List recent meetings with status
+- get_meeting_summary: Get full summary for a specific meeting
+- share_meeting_summary: Email summary to recipients (L3 DRAFT - requires approval)
+
+When using L3 DRAFT tools, inform the user that the action requires Jonathan's approval before execution.`;
 
     // Build messages array for Claude
     const messages = [
@@ -406,46 +582,128 @@ Use this context to personalize your advice. Reference specific campaigns, workf
     // Call Claude API
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      console.error('ANTHROPIC_API_KEY not configured');
+      this.logger.error('ANTHROPIC_API_KEY not configured');
       return {
         content: 'AI assistant is not configured. Please contact support.',
         executive: { id: 'cmo', name: 'Don', role: 'Chief Marketing Officer' },
       };
     }
 
+    // Get user ID for tool execution
+    const user = await this.prisma.user.findFirst({
+      where: { tenantId },
+      select: { id: true },
+    });
+    const userId = user?.id || 'system';
+
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
+      // Track total token usage across multiple API calls (for tool loops)
+      let totalInputTokens = 0;
+      let totalOutputTokens = 0;
+      let currentMessages = [...messages];
+      let finalTextContent = '';
+      let iterations = 0;
+      const maxIterations = 5; // Prevent infinite loops
+
+      // Tool use loop - continue until we get a final text response
+      while (iterations < maxIterations) {
+        iterations++;
+
+        const requestBody: any = {
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
           system: systemPrompt,
-          messages: messages,
-        }),
-      });
+          messages: currentMessages,
+          tools: DON_MEETING_TOOLS,
+        };
 
-      if (!response.ok) {
-        const error = await response.text();
-        console.error('Claude API error:', error);
-        throw new Error('Claude API request failed');
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          this.logger.error('Claude API error:', error);
+          throw new Error('Claude API request failed');
+        }
+
+        const data = await response.json();
+
+        // Accumulate token usage
+        totalInputTokens += data.usage?.input_tokens || 0;
+        totalOutputTokens += data.usage?.output_tokens || 0;
+
+        // Check if we have tool_use blocks
+        const toolUseBlocks = data.content.filter((block: any) => block.type === 'tool_use');
+        const textBlocks = data.content.filter((block: any) => block.type === 'text');
+
+        // Collect any text from this response
+        if (textBlocks.length > 0) {
+          finalTextContent += textBlocks.map((b: any) => b.text).join('\n');
+        }
+
+        // If stop_reason is 'end_turn' and no tool_use, we're done
+        if (data.stop_reason === 'end_turn' && toolUseBlocks.length === 0) {
+          break;
+        }
+
+        // If there are tool_use blocks, execute them and continue
+        if (toolUseBlocks.length > 0) {
+          // Add assistant message with tool calls
+          currentMessages.push({
+            role: 'assistant',
+            content: data.content,
+          });
+
+          // Execute each tool and build tool_result message
+          const toolResults: any[] = [];
+          for (const toolBlock of toolUseBlocks) {
+            const result = await this.executeMeetingTool(
+              tenantId,
+              userId,
+              toolBlock.name,
+              toolBlock.input,
+            );
+
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: toolBlock.id,
+              content: JSON.stringify(result),
+            });
+          }
+
+          // Add tool results as user message
+          currentMessages.push({
+            role: 'user',
+            content: toolResults,
+          });
+        } else {
+          // No tool_use and no end_turn, still break to be safe
+          break;
+        }
       }
 
-      const data = await response.json();
       return {
-        content: data.content[0].text,
+        content: finalTextContent || 'I apologize, but I was unable to generate a response. Please try again.',
         executive: {
           id: 'cmo',
           name: 'Don',
           role: 'Chief Marketing Officer',
         },
+        usage: {
+          tokensUsed: totalInputTokens + totalOutputTokens,
+          inputTokens: totalInputTokens,
+          outputTokens: totalOutputTokens,
+        },
       };
     } catch (error) {
-      console.error('Error calling Claude API:', error);
+      this.logger.error('Error calling Claude API:', error);
       return {
         content: 'I encountered an issue processing your request. Please try again.',
         executive: { id: 'cmo', name: 'Don', role: 'Chief Marketing Officer' },

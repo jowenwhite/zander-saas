@@ -176,6 +176,24 @@ export class CalendlyWebhookController {
   }
 
   /**
+   * Detect meeting platform from Calendly location data
+   */
+  private detectPlatformFromLocation(locationType?: string, joinUrl?: string): string {
+    if (!locationType && !joinUrl) return 'unknown';
+
+    const type = locationType?.toLowerCase() || '';
+    const url = joinUrl?.toLowerCase() || '';
+
+    if (type.includes('zoom') || url.includes('zoom.us')) return 'zoom';
+    if (type.includes('google') || url.includes('meet.google')) return 'google_meet';
+    if (type.includes('teams') || url.includes('teams.microsoft')) return 'teams';
+    if (type.includes('webex') || url.includes('webex.com')) return 'webex';
+    if (type === 'custom' || type === 'phone') return type;
+
+    return 'other';
+  }
+
+  /**
    * Handle new call booking (invitee.created)
    * Creates or updates a ConsultingLead and logs the event
    */
@@ -258,6 +276,38 @@ export class CalendlyWebhookController {
       },
     });
 
+    // C-2: Create MeetingRecord stub for meeting intelligence
+    // This allows the recording to be linked when it becomes available
+    const durationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60));
+    const platform = this.detectPlatformFromLocation(event.location?.type, event.location?.join_url);
+
+    const meetingRecord = await this.prisma.meetingRecord.create({
+      data: {
+        tenant: { connect: { id: process.env.ZANDER_TENANT_ID || 'zander-consulting' } },
+        lead: { connect: { id: lead.id } },
+        title: `${eventName} - ${inviteeName}`,
+        scheduledAt: startTime,
+        durationMinutes,
+        source: 'calendly',
+        platform,
+        attendees: [
+          { name: inviteeName, email: inviteeEmail, role: 'client' },
+          { name: 'Jonathan White', email: 'jonathan@zanderos.com', role: 'host' },
+        ],
+        transcriptStatus: 'pending',
+        summaryStatus: 'pending',
+        metadata: {
+          calendlyEventUri,
+          meetingUrl: event.location?.join_url,
+          timezone,
+          questionsAndAnswers,
+          webhookSource: 'calendly_webhook',
+        },
+      },
+    });
+
+    this.logger.log(`Created MeetingRecord stub ${meetingRecord.id} for upcoming call`);
+
     // Send admin notification
     await this.sendCallBookedNotification({
       inviteeName,
@@ -325,6 +375,31 @@ export class CalendlyWebhookController {
           actorType: 'webhook',
         },
       });
+
+      // Update MeetingRecord if exists (mark as canceled)
+      const meetingRecord = await this.prisma.meetingRecord.findFirst({
+        where: {
+          leadId: lead.id,
+          scheduledAt: startTime,
+          transcriptStatus: 'pending',
+        },
+      });
+
+      if (meetingRecord) {
+        await this.prisma.meetingRecord.update({
+          where: { id: meetingRecord.id },
+          data: {
+            transcriptStatus: 'canceled',
+            summaryStatus: 'canceled',
+            metadata: {
+              ...(meetingRecord.metadata as object || {}),
+              canceledAt: new Date().toISOString(),
+              canceledVia: 'calendly_webhook',
+            },
+          },
+        });
+        this.logger.log(`Updated MeetingRecord ${meetingRecord.id} as canceled`);
+      }
 
       this.logger.log(`Updated lead ${lead.id} after Calendly cancellation`);
     }
