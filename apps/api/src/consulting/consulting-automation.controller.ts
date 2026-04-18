@@ -12,6 +12,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { ConsultingAutomationService } from './consulting-automation.service';
 import { ConsultingEmailService } from './consulting-email.service';
+import { EmailService } from '../integrations/email/email.service';
 import { Public } from '../auth/jwt-auth.decorator';
 import { randomUUID } from 'crypto';
 
@@ -28,7 +29,8 @@ export class ConsultingAutomationController {
   constructor(
     private prisma: PrismaService,
     private automationService: ConsultingAutomationService,
-    private emailService: ConsultingEmailService,
+    private consultingEmailService: ConsultingEmailService,
+    private emailService: EmailService,
   ) {}
 
   // ============================================
@@ -239,16 +241,16 @@ export class ConsultingAutomationController {
     });
 
     // Send direct notification to Jonathan (not draft - this is inbound client action)
-    await this.emailService.sendEmail(
-      'jonathan@zanderos.com',
-      `Deliverable Approved: ${deliverable.name}`,
-      `Client (${deliverable.tenant?.companyName}) approved the deliverable "${deliverable.name}".
+    await this.emailService.sendEmail({
+      to: 'jonathan@zanderos.com',
+      subject: `Deliverable Approved: ${deliverable.name}`,
+      text: `Client (${deliverable.tenant?.companyName}) approved the deliverable "${deliverable.name}".
 
 Package: ${deliverable.engagement?.packageType}
 Approved at: ${new Date().toLocaleString()}
 
 The deliverable has been marked as DELIVERED.`,
-    );
+    });
 
     this.logger.log(`Deliverable ${deliverable.id} approved by client`);
 
@@ -315,10 +317,10 @@ The deliverable has been marked as DELIVERED.`,
     });
 
     // Send direct notification to Jonathan (not draft - this is inbound client action)
-    await this.emailService.sendEmail(
-      'jonathan@zanderos.com',
-      `Revision Requested: ${deliverable.name}`,
-      `Client (${deliverable.tenant?.companyName}) requested revisions for "${deliverable.name}".
+    await this.emailService.sendEmail({
+      to: 'jonathan@zanderos.com',
+      subject: `Revision Requested: ${deliverable.name}`,
+      text: `Client (${deliverable.tenant?.companyName}) requested revisions for "${deliverable.name}".
 
 Package: ${deliverable.engagement?.packageType}
 Requested at: ${new Date().toLocaleString()}
@@ -327,7 +329,7 @@ REVISION NOTES:
 ${body.notes}
 
 Please address these notes and resubmit the deliverable.`,
-    );
+    });
 
     this.logger.log(`Revision requested for deliverable ${deliverable.id}`);
 
@@ -484,10 +486,10 @@ Please address these notes and resubmit the deliverable.`,
 
     // If low NPS, send direct alert to Jonathan (critical feedback)
     if (body.npsScore <= 5) {
-      await this.emailService.sendEmail(
-        'jonathan@zanderos.com',
-        `LOW NPS Alert: ${engagement.tenant?.companyName} - ${body.npsScore}/10`,
-        `ATTENTION: Low NPS score received!
+      await this.emailService.sendEmail({
+        to: 'jonathan@zanderos.com',
+        subject: `LOW NPS Alert: ${engagement.tenant?.companyName} - ${body.npsScore}/10`,
+        text: `ATTENTION: Low NPS score received!
 
 Client: ${engagement.tenant?.companyName}
 Package: ${engagement.packageType}
@@ -500,7 +502,7 @@ Improvements Requested:
 ${body.improvements || 'Not provided'}
 
 This requires follow-up within 24 hours.`,
-      );
+      });
     }
 
     this.logger.log(`Survey submitted for engagement ${engagement.id}: NPS ${body.npsScore}`);
