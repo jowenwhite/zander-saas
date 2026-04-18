@@ -42,6 +42,10 @@ interface Deliverable {
   status: string;
   deliveredAt?: string;
   documentUrl?: string;
+  approvalStatus?: string; // 'draft' | 'submitted' | 'approved' | 'revision_requested'
+  submittedAt?: string;
+  approvedAt?: string;
+  revisionNotes?: string;
 }
 
 interface TimeEntry {
@@ -117,6 +121,13 @@ const STATUS_COLORS: Record<string, string> = {
   'PENDING': '#8888A0',
   'IN_PROGRESS': '#00CFEB',
   'DELIVERED': '#22C55E',
+};
+
+const APPROVAL_STATUS_COLORS: Record<string, { bg: string; text: string; label: string }> = {
+  'draft': { bg: 'rgba(136, 136, 160, 0.15)', text: '#8888A0', label: 'Draft' },
+  'submitted': { bg: 'rgba(0, 207, 235, 0.15)', text: '#00CFEB', label: 'Awaiting Review' },
+  'approved': { bg: 'rgba(34, 197, 94, 0.15)', text: '#22C55E', label: 'Approved' },
+  'revision_requested': { bg: 'rgba(245, 158, 11, 0.15)', text: '#F59E0B', label: 'Revisions Requested' },
 };
 
 interface ConsultingPortalProps {
@@ -563,38 +574,76 @@ export default function ConsultingPortal({ authToken, tenantId }: ConsultingPort
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto' }}>
-                {deliverables.map((deliverable) => (
-                  <div
-                    key={deliverable.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '0.6rem 0.75rem',
-                      background: '#09090F',
-                      borderRadius: '6px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                      {deliverable.status === 'DELIVERED' ? (
-                        <CheckCircle2 size={16} style={{ color: '#22C55E' }} />
-                      ) : deliverable.status === 'IN_PROGRESS' ? (
-                        <Clock size={16} style={{ color: '#00CFEB' }} />
+                {deliverables.map((deliverable) => {
+                  const approvalStyle = deliverable.approvalStatus
+                    ? APPROVAL_STATUS_COLORS[deliverable.approvalStatus]
+                    : null;
+
+                  return (
+                    <div
+                      key={deliverable.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.6rem 0.75rem',
+                        background: '#09090F',
+                        borderRadius: '6px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: 1, minWidth: 0 }}>
+                        {deliverable.approvalStatus === 'approved' ? (
+                          <CheckCircle2 size={16} style={{ color: '#22C55E' }} />
+                        ) : deliverable.approvalStatus === 'submitted' ? (
+                          <Clock size={16} style={{ color: '#00CFEB' }} />
+                        ) : deliverable.approvalStatus === 'revision_requested' ? (
+                          <AlertCircle size={16} style={{ color: '#F59E0B' }} />
+                        ) : deliverable.status === 'DELIVERED' ? (
+                          <CheckCircle2 size={16} style={{ color: '#22C55E' }} />
+                        ) : deliverable.status === 'IN_PROGRESS' ? (
+                          <Clock size={16} style={{ color: '#00CFEB' }} />
+                        ) : (
+                          <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid #55556A' }} />
+                        )}
+                        <span style={{
+                          color: '#F0F0F5',
+                          fontSize: '0.85rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}>
+                          {deliverable.name}
+                        </span>
+                      </div>
+                      {approvalStyle && deliverable.approvalStatus !== 'draft' ? (
+                        <span style={{
+                          fontSize: '0.65rem',
+                          fontWeight: '600',
+                          padding: '0.2rem 0.5rem',
+                          borderRadius: '4px',
+                          background: approvalStyle.bg,
+                          color: approvalStyle.text,
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap',
+                          marginLeft: '0.5rem',
+                        }}>
+                          {approvalStyle.label}
+                        </span>
                       ) : (
-                        <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid #55556A' }} />
+                        <span style={{
+                          fontSize: '0.7rem',
+                          fontWeight: '600',
+                          color: STATUS_COLORS[deliverable.status] || '#8888A0',
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap',
+                          marginLeft: '0.5rem',
+                        }}>
+                          {deliverable.status.replace('_', ' ')}
+                        </span>
                       )}
-                      <span style={{ color: '#F0F0F5', fontSize: '0.85rem' }}>{deliverable.name}</span>
                     </div>
-                    <span style={{
-                      fontSize: '0.7rem',
-                      fontWeight: '600',
-                      color: STATUS_COLORS[deliverable.status] || '#8888A0',
-                      textTransform: 'uppercase',
-                    }}>
-                      {deliverable.status.replace('_', ' ')}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

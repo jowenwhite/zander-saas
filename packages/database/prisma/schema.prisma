@@ -1755,6 +1755,15 @@ model ConsultingDeliverable {
   status       DeliverableStatus    @default(PENDING)
   deliveredAt  DateTime?
   documentUrl  String?
+
+  // D-4: Approval workflow fields
+  approvalStatus        String?              // 'draft', 'submitted', 'approved', 'revision_requested'
+  submittedAt           DateTime?
+  approvedAt            DateTime?
+  revisionNotes         String?
+  revisionRequestedAt   DateTime?
+  reviewToken           String?    @unique  // UUID token for client review URL
+
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   engagement   ConsultingEngagement @relation(fields: [engagementId], references: [id])
@@ -1763,6 +1772,7 @@ model ConsultingDeliverable {
   @@index([tenantId])
   @@index([engagementId])
   @@index([status])
+  @@index([reviewToken])
   @@map("consulting_deliverables")
 }
 
@@ -2060,6 +2070,9 @@ enum ConsultingEventType {
   SURVEY_SCHEDULED // D-7: Satisfaction survey scheduled
   SURVEY_RESPONSE // D-7: Satisfaction survey response received
   FOLLOW_UP_NEEDED // D-7: Low satisfaction requires follow-up
+  DELIVERABLE_SUBMITTED // D-4: Deliverable submitted for review
+  DELIVERABLE_APPROVED // D-4: Client approved deliverable
+  DELIVERABLE_REVISION_REQUESTED // D-4: Client requested revisions
 }
 
 model ConsultingLead {

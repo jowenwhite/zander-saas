@@ -1,6 +1,7 @@
 import { Injectable, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MeetingIntelligenceService } from '../meeting-intelligence/meeting-intelligence.service';
+import { ConsultingBriefingService } from '../consulting/consulting-briefing.service';
 import {
   TIER_TOKEN_CAPS,
   TIER_HIERARCHY,
@@ -60,6 +61,61 @@ const MEETING_TOOLS = [
         recipientEmails: { type: 'string', description: 'Comma-separated list of recipient email addresses' },
       },
       required: ['meetingId', 'recipientEmails'],
+    },
+  },
+];
+
+// D-5: Zander Consulting Tools
+const CONSULTING_TOOLS = [
+  {
+    name: 'get_consulting_briefing',
+    description: 'Get the daily consulting briefing with pipeline status, meetings, contracts, and priority items for Jonathan',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
+  {
+    name: 'get_consulting_pipeline',
+    description: 'Get detailed consulting pipeline insights including current leads, trends, conversion rates, and recommendations',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
+  {
+    name: 'get_engagement_details',
+    description: 'Get details about a specific consulting engagement including hours used, deliverables, and time entries',
+    input_schema: {
+      type: 'object',
+      properties: {
+        engagementId: { type: 'string', description: 'The engagement ID to get details for' },
+        companyName: { type: 'string', description: 'Alternative: company name to find engagement for' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'check_engagement_renewals',
+    description: 'Check for engagements that are running low on hours or approaching expiration and may need renewal discussions',
+    input_schema: {
+      type: 'object',
+      properties: {
+        hoursThreshold: { type: 'number', description: 'Hours remaining threshold to flag (default: 10)' },
+        daysThreshold: { type: 'number', description: 'Days until expiration threshold to flag (default: 30)' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'get_priority_items',
+    description: 'Get current priority items needing attention: meetings today, pending contracts, new leads, cold leads, low hours engagements',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: [],
     },
   },
 ];
@@ -288,6 +344,7 @@ export class AiService {
   constructor(
     private prisma: PrismaService,
     private meetingService: MeetingIntelligenceService,
+    private consultingBriefingService: ConsultingBriefingService,
   ) {}
 
   /**
@@ -777,6 +834,139 @@ ${clientConcerns.slice(0, 5).map(c => `- [${c.severity || 'MEDIUM'}] ${c.concern
       return {
         success: false,
         error: error.message || 'Tool execution failed',
+      };
+    }
+  }
+
+  /**
+   * Execute a consulting tool and return the result (D-5: Zander Consulting Tools)
+   */
+  private async executeConsultingTool(
+    toolName: string,
+    toolInput: any,
+  ): Promise<{ success: boolean; result?: any; error?: string }> {
+    try {
+      switch (toolName) {
+        case 'get_consulting_briefing': {
+          const briefing = await this.consultingBriefingService.getDailyBriefing();
+          return { success: true, result: briefing };
+        }
+
+        case 'get_consulting_pipeline': {
+          const insights = await this.consultingBriefingService.getPipelineInsights();
+          return { success: true, result: insights };
+        }
+
+        case 'get_engagement_details': {
+          let engagement;
+          if (toolInput.engagementId) {
+            engagement = await this.prisma.consultingEngagement.findUnique({
+              where: { id: toolInput.engagementId },
+              include: {
+                tenant: { select: { companyName: true, email: true } },
+                deliverables: true,
+                timeEntries: { orderBy: { date: 'desc' }, take: 20 },
+              },
+            });
+          } else if (toolInput.companyName) {
+            engagement = await this.prisma.consultingEngagement.findFirst({
+              where: {
+                tenant: { companyName: { contains: toolInput.companyName, mode: 'insensitive' } },
+                status: 'ACTIVE',
+              },
+              include: {
+                tenant: { select: { companyName: true, email: true } },
+                deliverables: true,
+                timeEntries: { orderBy: { date: 'desc' }, take: 20 },
+              },
+            });
+          }
+
+          if (!engagement) {
+            return { success: false, error: 'Engagement not found' };
+          }
+
+          return {
+            success: true,
+            result: {
+              id: engagement.id,
+              company: engagement.tenant?.companyName,
+              email: engagement.tenant?.email,
+              package: engagement.packageType,
+              status: engagement.status,
+              startDate: engagement.startDate,
+              endDate: engagement.endDate,
+              hoursTotal: engagement.totalHours,
+              hoursUsed: engagement.hoursUsed,
+              hoursRemaining: engagement.totalHours - engagement.hoursUsed,
+              hoursProgress: Math.round((engagement.hoursUsed / engagement.totalHours) * 100),
+              deliverables: engagement.deliverables?.map(d => ({
+                name: d.name,
+                status: d.status,
+                approvalStatus: d.approvalStatus,
+              })),
+              recentTimeEntries: engagement.timeEntries?.slice(0, 10).map(t => ({
+                date: t.date,
+                hours: t.hours,
+                billable: t.billableHours,
+                description: t.description,
+              })),
+            },
+          };
+        }
+
+        case 'check_engagement_renewals': {
+          const hoursThreshold = toolInput.hoursThreshold || 10;
+          const daysThreshold = toolInput.daysThreshold || 30;
+          const thresholdDate = new Date();
+          thresholdDate.setDate(thresholdDate.getDate() + daysThreshold);
+
+          const engagements = await this.prisma.consultingEngagement.findMany({
+            where: { status: 'ACTIVE' },
+            include: { tenant: { select: { companyName: true, email: true } } },
+          });
+
+          const needsRenewal = engagements.filter(e => {
+            const hoursRemaining = e.totalHours - e.hoursUsed;
+            const isLowHours = hoursRemaining < hoursThreshold;
+            const isExpiringSoon = e.endDate && new Date(e.endDate) <= thresholdDate;
+            return isLowHours || isExpiringSoon;
+          });
+
+          return {
+            success: true,
+            result: {
+              total: needsRenewal.length,
+              engagements: needsRenewal.map(e => ({
+                id: e.id,
+                company: e.tenant?.companyName,
+                email: e.tenant?.email,
+                package: e.packageType,
+                hoursRemaining: e.totalHours - e.hoursUsed,
+                endDate: e.endDate,
+                daysUntilExpiration: e.endDate
+                  ? Math.ceil((new Date(e.endDate).getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+                  : null,
+                reason: (e.totalHours - e.hoursUsed) < hoursThreshold ? 'LOW_HOURS' :
+                        (e.endDate && new Date(e.endDate) <= thresholdDate) ? 'EXPIRING_SOON' : 'BOTH',
+              })),
+            },
+          };
+        }
+
+        case 'get_priority_items': {
+          const priorityItems = await this.consultingBriefingService.getPriorityItems();
+          return { success: true, result: priorityItems };
+        }
+
+        default:
+          return { success: false, error: `Unknown consulting tool: ${toolName}` };
+      }
+    } catch (error) {
+      this.logger.error(`Consulting tool execution error (${toolName}):`, error);
+      return {
+        success: false,
+        error: error.message || 'Consulting tool execution failed',
       };
     }
   }
@@ -1422,39 +1612,94 @@ COMMUNICATION STYLE:
     }
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 2048,
-          system: systemPrompt,
-          messages: messages,
-        }),
-      });
+      // D-5: Zander uses consulting tools for detailed queries
+      let currentMessages = [...messages];
+      let finalTextContent = '';
+      let iterations = 0;
+      const maxIterations = 5;
 
-      if (!response.ok) {
-        const error = await response.text();
-        console.error('Claude API error:', error);
-        return this.getZanderMockResponse(message, {
-        openTickets,
-        activeHeadwinds,
-        p1Headwinds,
-        consulting: {
-          pipelineLeads: activePipelineLeads.length,
-          pipelineValue,
-          activeEngagements: totalActiveEngagements,
-          pendingContracts: pendingContracts.length,
-          upcomingMeetings: upcomingMeetings.length,
-        },
-      });
+      // Tool use loop - continue until we get a final text response
+      while (iterations < maxIterations) {
+        iterations++;
+
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 2048,
+            system: systemPrompt,
+            messages: currentMessages,
+            tools: CONSULTING_TOOLS,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          console.error('Claude API error:', error);
+          return this.getZanderMockResponse(message, {
+            openTickets,
+            activeHeadwinds,
+            p1Headwinds,
+            consulting: {
+              pipelineLeads: activePipelineLeads.length,
+              pipelineValue,
+              activeEngagements: totalActiveEngagements,
+              pendingContracts: pendingContracts.length,
+              upcomingMeetings: upcomingMeetings.length,
+            },
+          });
+        }
+
+        const data = await response.json();
+
+        // Check for tool_use blocks
+        const toolUseBlocks = data.content.filter((block: any) => block.type === 'tool_use');
+        const textBlocks = data.content.filter((block: any) => block.type === 'text');
+
+        // Collect text from this response
+        if (textBlocks.length > 0) {
+          finalTextContent += textBlocks.map((b: any) => b.text).join('\n');
+        }
+
+        // If no tool_use, we're done
+        if (data.stop_reason === 'end_turn' && toolUseBlocks.length === 0) {
+          break;
+        }
+
+        // Execute tool calls
+        if (toolUseBlocks.length > 0) {
+          currentMessages.push({
+            role: 'assistant',
+            content: data.content,
+          });
+
+          const toolResults: any[] = [];
+          for (const toolBlock of toolUseBlocks) {
+            this.logger.log(`Zander executing consulting tool: ${toolBlock.name}`);
+            const result = await this.executeConsultingTool(toolBlock.name, toolBlock.input);
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: toolBlock.id,
+              content: JSON.stringify(result),
+            });
+          }
+
+          currentMessages.push({
+            role: 'user',
+            content: toolResults,
+          });
+        } else {
+          break;
+        }
       }
 
-      const data = await response.json();
+      // Use the accumulated text content
+      const responseContent = finalTextContent || 'I apologize, but I was unable to generate a response. Please try again.';
       
       // Generate suggested actions based on current state
       const actions: any[] = [];
@@ -1565,7 +1810,7 @@ COMMUNICATION STYLE:
       }
 
       return {
-        content: data.content[0].text,
+        content: responseContent,
         context: {
           // Platform stats
           openTickets,
