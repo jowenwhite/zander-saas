@@ -11,6 +11,7 @@ import { Briefcase, BarChart3, Settings, Palette, Users, Monitor, ClipboardList,
 import { useTier } from '../contexts/TierContext';
 import Scorecard, { PillarScores, ScorecardSnapshot } from '../components/Scorecard';
 import ScorecardComparison from '../components/ScorecardComparison';
+import ConsultingPortal from '../components/ConsultingPortal';
 
 // ============ TYPES ============
 
@@ -2359,41 +2360,14 @@ export default function HeadquartersPage() {
             )}
           </div>
 
-          {/* Consulting Scorecard - Only for CONSULTING tier users */}
+          {/* Consulting Client Portal - Only for CONSULTING tier users */}
           {isConsultingTier && (
             <div style={{ marginBottom: '1.5rem' }}>
-              {/* Consulting Welcome Banner */}
-              <div style={{
-                background: 'linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(0,204,238,0.1) 100%)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                marginBottom: '1.5rem',
-                border: '1px solid rgba(124,58,237,0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem'
-              }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #7C3AED 0%, #00CCEE 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <TrendingUp size={24} style={{ color: 'white' }} />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, color: '#F0F0F5', fontSize: '1.1rem', fontWeight: '700' }}>
-                    Consulting Package Active
-                  </h3>
-                  <p style={{ margin: '0.25rem 0 0', color: '#8888A0', fontSize: '0.9rem' }}>
-                    Your Operating Simply Scorecard tracks progress across the 10 pillars of business health
-                  </p>
-                </div>
-              </div>
+              {/* Consulting Portal Dashboard - Engagement Status, Documents, Deliverables, Time Log */}
+              <ConsultingPortal
+                authToken={authData.token || ''}
+                tenantId={authData.tenantId}
+              />
 
               {/* Scorecard Loading State */}
               {scorecardLoading && (
