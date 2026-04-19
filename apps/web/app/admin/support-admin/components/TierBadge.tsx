@@ -9,8 +9,9 @@ interface TierBadgeProps {
 const tierColors: Record<string, { bg: string; text: string; border: string }> = {
   FREE: { bg: '#2A2A38', text: '#8888A0', border: '#3A3A48' },
   STARTER: { bg: '#1a3a2a', text: '#28a745', border: '#28a745' },
-  GROWTH: { bg: '#1a2a4a', text: '#00CCEE', border: '#00CCEE' },
-  SCALE: { bg: '#2a1a4a', text: '#9333ea', border: '#9333ea' },
+  PRO: { bg: '#1a2a4a', text: '#00CCEE', border: '#00CCEE' },
+  BUSINESS: { bg: '#2a1a4a', text: '#9333ea', border: '#9333ea' },
+  CONSULTING: { bg: '#3a1a1a', text: '#BF0A30', border: '#BF0A30' },
   ENTERPRISE: { bg: '#3a2a1a', text: '#F0B323', border: '#F0B323' },
 };
 

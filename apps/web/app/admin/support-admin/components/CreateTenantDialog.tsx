@@ -16,7 +16,9 @@ interface CreateTenantDialogProps {
 const TIER_OPTIONS = [
   { value: '', label: 'FREE (Default)' },
   { value: 'STARTER', label: 'STARTER' },
-  { value: 'PROFESSIONAL', label: 'PROFESSIONAL' },
+  { value: 'PRO', label: 'PRO' },
+  { value: 'BUSINESS', label: 'BUSINESS' },
+  { value: 'CONSULTING', label: 'CONSULTING' },
   { value: 'ENTERPRISE', label: 'ENTERPRISE' },
 ];
 

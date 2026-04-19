@@ -13,13 +13,14 @@ interface TenantTierDialogProps {
   onCancel: () => void;
 }
 
-const TIERS = ['FREE', 'STARTER', 'GROWTH', 'SCALE', 'ENTERPRISE'];
+const TIERS = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'CONSULTING', 'ENTERPRISE'];
 
 const tierColors: Record<string, string> = {
   FREE: '#8888A0',
   STARTER: '#28a745',
-  GROWTH: '#00CCEE',
-  SCALE: '#9333ea',
+  PRO: '#00CCEE',
+  BUSINESS: '#9333ea',
+  CONSULTING: '#BF0A30',
   ENTERPRISE: '#F0B323',
 };
 
