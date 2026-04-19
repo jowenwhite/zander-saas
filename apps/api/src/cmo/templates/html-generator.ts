@@ -35,7 +35,7 @@ export function generateEmailHtml(template: EmailTemplateContent, subject: strin
     ...template.settings,
   };
 
-  const blocksHtml = template.blocks.map((block) => generateBlockHtml(block, settings)).join('\n');
+  const blocksHtml = (template.blocks || []).map((block) => generateBlockHtml(block, settings)).join('\n');
 
   return `<!DOCTYPE html>
 <html lang="en">

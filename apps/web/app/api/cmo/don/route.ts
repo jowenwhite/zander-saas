@@ -2238,12 +2238,15 @@ async function executeTool(
           return { success: false, error: `Failed to get contacts (${response.status}): ${responseText}` };
         }
         try {
-          const contacts = JSON.parse(responseText);
+          const result = JSON.parse(responseText);
+          // API returns { data: [...], pagination: {...} }
+          const contacts = result.data || result;
           return {
             success: true,
             result: {
-              count: contacts.length,
-              contacts: contacts.map((c: Record<string, unknown>) => ({
+              count: Array.isArray(contacts) ? contacts.length : 0,
+              total: result.pagination?.total || contacts.length,
+              contacts: (Array.isArray(contacts) ? contacts : []).map((c: Record<string, unknown>) => ({
                 id: c.id,
                 firstName: c.firstName,
                 lastName: c.lastName,
