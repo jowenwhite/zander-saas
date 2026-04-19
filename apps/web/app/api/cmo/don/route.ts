@@ -1590,10 +1590,12 @@ async function executeTool(
         console.log(`[Don Tool] POST ${url}`);
 
         // Map Don's tool fields to API fields
+        // API expects body as an object, not a string
+        const bodyContent = toolInput.body as string;
         const templateData = {
           name: toolInput.name as string,
           subject: (toolInput.subject as string) || null,
-          body: (toolInput.body as string) || null,
+          body: bodyContent ? { html: bodyContent, text: bodyContent.replace(/<[^>]*>/g, '') } : null,
           category: (toolInput.category as string) || null,
           status: 'draft',
         };
@@ -2545,9 +2547,15 @@ async function executeTool(
       }
 
       case 'update_email_template': {
-        const { templateId, ...updateData } = toolInput as { templateId: string; [key: string]: unknown };
+        const { templateId, body: bodyContent, ...restData } = toolInput as { templateId: string; body?: string; [key: string]: unknown };
         const url = `${CMO_API_URL}/cmo/templates/${templateId}`;
         console.log(`[Don Tool] PUT ${url}`);
+
+        // API expects body as an object, not a string
+        const updateData = {
+          ...restData,
+          ...(bodyContent ? { body: { html: bodyContent, text: bodyContent.replace(/<[^>]*>/g, '') } } : {}),
+        };
 
         const response = await fetch(url, {
           method: 'PUT',
@@ -2569,9 +2577,21 @@ async function executeTool(
 
       // ========== CALENDAR EVENT MANAGEMENT ==========
       case 'update_calendar_event': {
-        const { eventId, ...updateData } = toolInput as { eventId: string; [key: string]: unknown };
+        const { eventId, startDate, endDate, ...restData } = toolInput as {
+          eventId: string;
+          startDate?: string;
+          endDate?: string;
+          [key: string]: unknown
+        };
         const url = `${CMO_API_URL}/cmo/calendar/events/${eventId}`;
         console.log(`[Don Tool] PATCH ${url}`);
+
+        // API expects startTime/endTime, not startDate/endDate
+        const updateData = {
+          ...restData,
+          ...(startDate ? { startTime: startDate } : {}),
+          ...(endDate ? { endTime: endDate } : {}),
+        };
 
         const response = await fetch(url, {
           method: 'PATCH',
