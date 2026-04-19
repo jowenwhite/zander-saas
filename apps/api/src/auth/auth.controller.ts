@@ -60,4 +60,15 @@ export class AuthController {
     return this.authService.resetPassword(body.token, body.password);
   }
 
+  /**
+   * Test endpoint to send beta welcome email
+   * POST /auth/test-welcome-email
+   * Body: { email: string, firstName?: string }
+   */
+  @Public()
+  @Post('test-welcome-email')
+  async testWelcomeEmail(@Body() body: { email: string; firstName?: string }) {
+    return this.authService.testSendBetaWelcomeEmail(body.email, body.firstName);
+  }
+
 }

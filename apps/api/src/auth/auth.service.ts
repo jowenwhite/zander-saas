@@ -1,14 +1,24 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { EmailService } from '../integrations/email/email.service';
+import {
+  generateBetaWelcomeEmail,
+  BETA_WELCOME_SUBJECT,
+  BETA_WELCOME_FROM,
+  BETA_WELCOME_REPLY_TO,
+} from '../email/templates/beta-welcome';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private prisma: PrismaService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private emailService: EmailService,
   ) {}
 
   // Default pipeline stages for new tenants
@@ -101,7 +111,67 @@ export class AuthService {
       }
     });
 
+    // Send beta welcome email (non-blocking)
+    this.sendBetaWelcomeEmail(user.email, user.firstName).catch((error) => {
+      this.logger.error(`Failed to send beta welcome email to ${user.email}: ${error.message}`);
+    });
+
     return user;
+  }
+
+  /**
+   * Send beta welcome email to new user
+   * Called after successful registration
+   */
+  private async sendBetaWelcomeEmail(email: string, firstName: string): Promise<void> {
+    try {
+      const html = generateBetaWelcomeEmail(firstName);
+
+      const result = await this.emailService.sendEmail({
+        to: email,
+        subject: BETA_WELCOME_SUBJECT,
+        html,
+        from: BETA_WELCOME_FROM,
+        replyTo: BETA_WELCOME_REPLY_TO,
+      });
+
+      if (result.success) {
+        this.logger.log(`Beta welcome email sent to ${email}`);
+      } else {
+        this.logger.warn(`Beta welcome email failed for ${email}: ${result.error}`);
+      }
+    } catch (error) {
+      this.logger.error(`Error sending beta welcome email: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test endpoint to send beta welcome email
+   * Used for testing email template before deployment
+   */
+  async testSendBetaWelcomeEmail(email: string, firstName?: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const html = generateBetaWelcomeEmail(firstName);
+
+      const result = await this.emailService.sendEmail({
+        to: email,
+        subject: BETA_WELCOME_SUBJECT,
+        html,
+        from: BETA_WELCOME_FROM,
+        replyTo: BETA_WELCOME_REPLY_TO,
+      });
+
+      if (result.success) {
+        this.logger.log(`Test beta welcome email sent to ${email}`);
+        return { success: true, message: `Beta welcome email sent to ${email}` };
+      } else {
+        return { success: false, message: result.error || 'Failed to send email' };
+      }
+    } catch (error) {
+      this.logger.error(`Error sending test beta welcome email: ${error.message}`);
+      return { success: false, message: error.message };
+    }
   }
 
   async login(loginData: { email: string; password: string; twoFactorCode?: string }) {
