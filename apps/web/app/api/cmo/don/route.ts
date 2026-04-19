@@ -40,6 +40,7 @@ Available Tools:
 - get_analytics_summary: Get marketing performance metrics
 - get_brand_settings: View current brand settings
 - get_monthly_themes: View monthly themes for the calendar
+- get_calendar_events: View calendar events for a date range
 - get_parking_lot_ideas: View saved marketing ideas
 - get_contacts: List marketing contacts/leads
 - get_products: List products and services
@@ -560,6 +561,29 @@ const TOOLS = [
         year: {
           type: 'number',
           description: 'Year to get themes for (defaults to current year)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_calendar_events',
+    description: 'Get calendar events for the marketing calendar. Use this to see scheduled activities, campaigns, deadlines, and other marketing events.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        startDate: {
+          type: 'string',
+          description: 'Start date for the range (YYYY-MM-DD). Defaults to beginning of current month.'
+        },
+        endDate: {
+          type: 'string',
+          description: 'End date for the range (YYYY-MM-DD). Defaults to end of current month.'
+        },
+        type: {
+          type: 'string',
+          enum: ['email', 'social', 'blog', 'campaign', 'webinar', 'other'],
+          description: 'Filter by event type'
         }
       },
       required: []
@@ -1740,6 +1764,44 @@ async function executeTool(
           };
         } catch {
           return { success: false, error: 'Failed to parse monthly themes data' };
+        }
+      }
+
+      case 'get_calendar_events': {
+        const params = new URLSearchParams();
+        if (toolInput.startDate) params.append('startDate', toolInput.startDate as string);
+        if (toolInput.endDate) params.append('endDate', toolInput.endDate as string);
+        if (toolInput.type) params.append('type', toolInput.type as string);
+
+        const url = `${CMO_API_URL}/cmo/calendar/events${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get calendar events (${response.status}): ${responseText}` };
+        }
+        try {
+          const events = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: events.length,
+              events: events.map((e: Record<string, unknown>) => ({
+                id: e.id,
+                title: e.title,
+                description: e.description,
+                startDate: e.startDate,
+                endDate: e.endDate,
+                eventType: e.eventType,
+                status: e.status,
+                allDay: e.allDay,
+                color: e.color
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse calendar events data' };
         }
       }
 
