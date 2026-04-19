@@ -24,6 +24,18 @@ Available Tools:
 - create_email_template: Create email templates for campaigns
 - create_workflow: Create marketing automation workflows
 - create_funnel: Create marketing funnels
+- update_funnel: Update funnel details and manage funnel stages (add/remove/reorder stages)
+- get_funnel: Get details of a specific funnel including its stages
+- update_workflow: Update marketing automation workflows
+- activate_workflow: Activate a workflow to start processing
+- pause_workflow: Pause an active workflow
+- update_persona: Update customer persona details
+- get_email_templates: List email templates
+- update_email_template: Update an existing email template
+- update_calendar_event: Update a marketing calendar event
+- get_segments: List audience segments
+- create_segment: Create audience segments for targeting
+- get_recommendations: Get AI-powered marketing recommendations
 - update_brand_settings: Update brand voice, colors, fonts, logos, or guidelines
 - create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
 - create_campaign: Create a new marketing campaign with goals and triggers
@@ -376,6 +388,252 @@ const TOOLS = [
         }
       },
       required: ['name']
+    }
+  },
+  {
+    name: 'update_funnel',
+    description: 'Update a marketing funnel including its stages. Use this to modify funnel details, add stages, remove stages, or reorder stages. This is the primary tool for managing funnel stages.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        funnelId: {
+          type: 'string',
+          description: 'ID of the funnel to update'
+        },
+        name: {
+          type: 'string',
+          description: 'New name for the funnel'
+        },
+        description: {
+          type: 'string',
+          description: 'New description'
+        },
+        status: {
+          type: 'string',
+          enum: ['draft', 'active', 'paused', 'archived'],
+          description: 'Funnel status'
+        },
+        conversionGoal: {
+          type: 'string',
+          description: 'The conversion goal'
+        },
+        stages: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: { type: 'string', description: 'Stage name' },
+              stageType: { type: 'string', enum: ['awareness', 'interest', 'consideration', 'intent', 'evaluation', 'purchase', 'retention', 'advocacy'], description: 'Type of stage' },
+              stageOrder: { type: 'number', description: 'Order of the stage (0-based)' },
+              config: { type: 'object', description: 'Stage configuration' }
+            },
+            required: ['name', 'stageType', 'stageOrder']
+          },
+          description: 'Array of funnel stages. Provide the complete stages array - existing stages not included will be removed.'
+        }
+      },
+      required: ['funnelId']
+    }
+  },
+  {
+    name: 'get_funnel',
+    description: 'Get details of a specific funnel by ID, including all its stages.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        funnelId: {
+          type: 'string',
+          description: 'ID of the funnel to retrieve'
+        }
+      },
+      required: ['funnelId']
+    }
+  },
+  {
+    name: 'update_workflow',
+    description: 'Update a marketing automation workflow including its configuration.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        workflowId: {
+          type: 'string',
+          description: 'ID of the workflow to update'
+        },
+        name: {
+          type: 'string',
+          description: 'New name for the workflow'
+        },
+        description: {
+          type: 'string',
+          description: 'New description'
+        },
+        triggerType: {
+          type: 'string',
+          enum: ['manual', 'schedule', 'form_submission', 'tag_added', 'tag_removed', 'segment_entry', 'segment_exit', 'deal_stage_change', 'contact_created'],
+          description: 'Trigger type'
+        },
+        triggerConfig: {
+          type: 'object',
+          description: 'Configuration for the trigger'
+        }
+      },
+      required: ['workflowId']
+    }
+  },
+  {
+    name: 'activate_workflow',
+    description: 'Activate a workflow to start processing triggers.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        workflowId: {
+          type: 'string',
+          description: 'ID of the workflow to activate'
+        }
+      },
+      required: ['workflowId']
+    }
+  },
+  {
+    name: 'pause_workflow',
+    description: 'Pause an active workflow to stop processing new triggers.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        workflowId: {
+          type: 'string',
+          description: 'ID of the workflow to pause'
+        }
+      },
+      required: ['workflowId']
+    }
+  },
+  {
+    name: 'update_persona',
+    description: 'Update an existing customer persona.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        personaId: {
+          type: 'string',
+          description: 'ID of the persona to update'
+        },
+        name: { type: 'string', description: 'Persona name' },
+        tagline: { type: 'string', description: 'Brief tagline' },
+        painPoints: { type: 'array', items: { type: 'string' }, description: 'Pain points' },
+        goals: { type: 'array', items: { type: 'string' }, description: 'Goals' },
+        preferredChannels: { type: 'array', items: { type: 'string' }, description: 'Preferred channels' },
+        demographics: { type: 'object', description: 'Demographics' },
+        psychographics: { type: 'object', description: 'Psychographics' },
+        behaviors: { type: 'object', description: 'Behaviors' },
+        brandAffinities: { type: 'array', items: { type: 'string' }, description: 'Brand affinities' }
+      },
+      required: ['personaId']
+    }
+  },
+  {
+    name: 'get_email_templates',
+    description: 'List email templates with optional category filter.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        category: {
+          type: 'string',
+          enum: ['general', 'onboarding', 'marketing', 'sales', 'events', 'transactional'],
+          description: 'Filter by template category'
+        },
+        status: {
+          type: 'string',
+          enum: ['draft', 'active', 'archived'],
+          description: 'Filter by template status'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'update_email_template',
+    description: 'Update an existing email template.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        templateId: {
+          type: 'string',
+          description: 'ID of the template to update'
+        },
+        name: { type: 'string', description: 'Template name' },
+        subject: { type: 'string', description: 'Email subject line' },
+        body: { type: 'string', description: 'Email body content (can include HTML)' },
+        category: { type: 'string', enum: ['general', 'onboarding', 'marketing', 'sales', 'events', 'transactional'] }
+      },
+      required: ['templateId']
+    }
+  },
+  {
+    name: 'update_calendar_event',
+    description: 'Update an existing marketing calendar event.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        eventId: {
+          type: 'string',
+          description: 'ID of the calendar event to update'
+        },
+        title: { type: 'string', description: 'Event title' },
+        description: { type: 'string', description: 'Event description' },
+        startDate: { type: 'string', description: 'Start date (ISO format)' },
+        endDate: { type: 'string', description: 'End date (ISO format)' },
+        eventType: { type: 'string', enum: ['email', 'social', 'blog', 'campaign', 'webinar', 'other'] },
+        status: { type: 'string', enum: ['draft', 'scheduled', 'published', 'cancelled'] },
+        allDay: { type: 'boolean' },
+        color: { type: 'string', description: 'Color hex code' }
+      },
+      required: ['eventId']
+    }
+  },
+  {
+    name: 'get_segments',
+    description: 'List audience segments for targeting campaigns.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'create_segment',
+    description: 'Create a new audience segment based on filter criteria.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Segment name'
+        },
+        description: {
+          type: 'string',
+          description: 'Segment description'
+        },
+        segmentType: {
+          type: 'string',
+          enum: ['static', 'dynamic'],
+          description: 'static = manually added members, dynamic = auto-updated based on criteria'
+        },
+        filterCriteria: {
+          type: 'object',
+          description: 'Filter criteria for dynamic segments (e.g., { "lifecycleStage": "lead", "leadScore": { "gte": 50 } })'
+        }
+      },
+      required: ['name']
+    }
+  },
+  {
+    name: 'get_recommendations',
+    description: 'Get AI-powered marketing recommendations and insights.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
     }
   },
   {
@@ -2109,6 +2367,314 @@ async function executeTool(
           return { success: true, result };
         } catch {
           return { success: true, result: { message: 'Product created' } };
+        }
+      }
+
+      // ========== FUNNEL MANAGEMENT ==========
+      case 'update_funnel': {
+        const { funnelId, ...updateData } = toolInput as { funnelId: string; [key: string]: unknown };
+        const url = `${CMO_API_URL}/cmo/funnels/${funnelId}`;
+        console.log(`[Don Tool] PATCH ${url}`);
+
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update funnel (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result: { ...result, message: 'Funnel updated successfully' } };
+        } catch {
+          return { success: true, result: { message: 'Funnel updated' } };
+        }
+      }
+
+      case 'get_funnel': {
+        const funnelId = toolInput.funnelId as string;
+        const url = `${CMO_API_URL}/cmo/funnels/${funnelId}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get funnel (${response.status}): ${responseText}` };
+        }
+        try {
+          const funnel = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              id: funnel.id,
+              name: funnel.name,
+              description: funnel.description,
+              status: funnel.status,
+              conversionGoal: funnel.conversionGoal,
+              stages: funnel.stages || [],
+              createdAt: funnel.createdAt
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse funnel data' };
+        }
+      }
+
+      // ========== WORKFLOW MANAGEMENT ==========
+      case 'update_workflow': {
+        const { workflowId, ...updateData } = toolInput as { workflowId: string; [key: string]: unknown };
+        const url = `${CMO_API_URL}/cmo/workflows/${workflowId}`;
+        console.log(`[Don Tool] PATCH ${url}`);
+
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update workflow (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Workflow updated' } };
+        }
+      }
+
+      case 'activate_workflow': {
+        const workflowId = toolInput.workflowId as string;
+        const url = `${CMO_API_URL}/cmo/workflows/${workflowId}/activate`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const response = await fetch(url, { method: 'POST', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to activate workflow (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result: { ...result, message: 'Workflow activated' } };
+        } catch {
+          return { success: true, result: { message: 'Workflow activated' } };
+        }
+      }
+
+      case 'pause_workflow': {
+        const workflowId = toolInput.workflowId as string;
+        const url = `${CMO_API_URL}/cmo/workflows/${workflowId}/pause`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const response = await fetch(url, { method: 'POST', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to pause workflow (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result: { ...result, message: 'Workflow paused' } };
+        } catch {
+          return { success: true, result: { message: 'Workflow paused' } };
+        }
+      }
+
+      // ========== PERSONA MANAGEMENT ==========
+      case 'update_persona': {
+        const { personaId, ...updateData } = toolInput as { personaId: string; [key: string]: unknown };
+        const url = `${CMO_API_URL}/cmo/personas/${personaId}`;
+        console.log(`[Don Tool] PATCH ${url}`);
+
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update persona (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Persona updated' } };
+        }
+      }
+
+      // ========== TEMPLATE MANAGEMENT ==========
+      case 'get_email_templates': {
+        const params = new URLSearchParams();
+        if (toolInput.category) params.append('category', toolInput.category as string);
+        if (toolInput.status) params.append('status', toolInput.status as string);
+
+        const url = `${CMO_API_URL}/cmo/templates${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get email templates (${response.status}): ${responseText}` };
+        }
+        try {
+          const templates = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: templates.length,
+              templates: templates.map((t: Record<string, unknown>) => ({
+                id: t.id,
+                name: t.name,
+                subject: t.subject,
+                category: t.category,
+                status: t.status,
+                createdAt: t.createdAt
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse templates data' };
+        }
+      }
+
+      case 'update_email_template': {
+        const { templateId, ...updateData } = toolInput as { templateId: string; [key: string]: unknown };
+        const url = `${CMO_API_URL}/cmo/templates/${templateId}`;
+        console.log(`[Don Tool] PUT ${url}`);
+
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update email template (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Email template updated' } };
+        }
+      }
+
+      // ========== CALENDAR EVENT MANAGEMENT ==========
+      case 'update_calendar_event': {
+        const { eventId, ...updateData } = toolInput as { eventId: string; [key: string]: unknown };
+        const url = `${CMO_API_URL}/cmo/calendar/events/${eventId}`;
+        console.log(`[Don Tool] PATCH ${url}`);
+
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update calendar event (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Calendar event updated' } };
+        }
+      }
+
+      // ========== SEGMENTS ==========
+      case 'get_segments': {
+        const url = `${CMO_API_URL}/cmo/segments`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get segments (${response.status}): ${responseText}` };
+        }
+        try {
+          const segments = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: segments.length,
+              segments: segments.map((s: Record<string, unknown>) => ({
+                id: s.id,
+                name: s.name,
+                description: s.description,
+                segmentType: s.segmentType,
+                memberCount: s.memberCount,
+                createdAt: s.createdAt
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse segments data' };
+        }
+      }
+
+      case 'create_segment': {
+        const url = `${CMO_API_URL}/cmo/segments`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const segmentData = {
+          name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          segmentType: (toolInput.segmentType as string) || 'static',
+          filterCriteria: toolInput.filterCriteria || null,
+        };
+
+        console.log(`[Don Tool] Segment data:`, JSON.stringify(segmentData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(segmentData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create segment (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Segment created' } };
+        }
+      }
+
+      // ========== INSIGHTS ==========
+      case 'get_recommendations': {
+        const url = `${CMO_API_URL}/cmo/insights/recommendations`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          // Return helpful message if recommendations not available
+          return {
+            success: true,
+            result: {
+              recommendations: [],
+              message: 'AI recommendations are being generated. Check back soon or add more marketing data to improve insights.'
+            }
+          };
+        }
+        try {
+          const recommendations = JSON.parse(responseText);
+          return { success: true, result: recommendations };
+        } catch {
+          return { success: false, error: 'Failed to parse recommendations data' };
         }
       }
 
