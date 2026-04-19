@@ -49,7 +49,7 @@ const containerStyle: CSSProperties = {
 const textStyle: CSSProperties = {
   fontSize: '1rem',
   lineHeight: '1.6',
-  color: '#F0F0F5',
+  color: '#333333', // Dark text for email preview (white background)
 };
 
 const placeholderStyle: CSSProperties = {

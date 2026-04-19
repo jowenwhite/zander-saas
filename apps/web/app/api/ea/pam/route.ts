@@ -3,8 +3,38 @@ import { NextRequest, NextResponse } from 'next/server';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const EA_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-// Build Pam's system prompt with current date
-function buildPamSystemPrompt(): string {
+// Tenant context for executive awareness
+interface TenantContext {
+  name: string;
+  industry?: string | null;
+}
+
+// Fetch tenant info from API
+async function fetchTenantContext(authToken: string): Promise<TenantContext | null> {
+  try {
+    const response = await fetch(`${EA_API_URL}/tenants/me`, {
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.error(`[Pam] Failed to fetch tenant: ${response.status}`);
+      return null;
+    }
+    const tenant = await response.json();
+    return {
+      name: tenant.companyName || 'Unknown Company',
+      industry: tenant.industry || null,
+    };
+  } catch (error) {
+    console.error('[Pam] Error fetching tenant context:', error);
+    return null;
+  }
+}
+
+// Build Pam's system prompt with current date and tenant context
+function buildPamSystemPrompt(tenant?: TenantContext | null): string {
   const now = new Date();
   const dateString = now.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -18,6 +48,9 @@ function buildPamSystemPrompt(): string {
 
 **CURRENT DATE CONTEXT:**
 Today is ${dateString} (${isoDate}). Use this as your reference for ALL date-related operations including calendar events, meetings, tasks, and scheduling. When users say "tomorrow", "next week", "this month", etc., calculate relative to today's date.
+
+**TENANT CONTEXT — CRITICAL:**
+You are operating within ${tenant?.name || 'this company'}${tenant?.industry ? ` (${tenant.industry})` : ''}. All your work, communications, tasks, and meetings are for THIS company — ${tenant?.name || 'your employer'}. Do NOT confuse the tenant's business with contact or external company names. You work for ${tenant?.name || 'the tenant'}, and everything you do is on their behalf.
 
 **Your Capabilities — You Can EXECUTE:**
 You have tools to manage schedules, communications, tasks, and help users navigate the platform.
@@ -1907,6 +1940,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
+    // Fetch tenant context for executive awareness
+    const tenantContext = await fetchTenantContext(authToken);
+
     // Get API key from environment
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
@@ -1934,7 +1970,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: buildPamSystemPrompt(),
+        system: buildPamSystemPrompt(tenantContext),
         tools: TOOLS,
         messages,
       }),
@@ -1995,7 +2031,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: buildPamSystemPrompt(),
+          system: buildPamSystemPrompt(tenantContext),
           messages: [
             ...messages,
             {

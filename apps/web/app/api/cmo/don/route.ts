@@ -3,8 +3,38 @@ import { NextRequest, NextResponse } from 'next/server';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const CMO_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-// Build Don's system prompt with current date
-function buildDonSystemPrompt(): string {
+// Tenant context for executive awareness
+interface TenantContext {
+  name: string;
+  industry?: string | null;
+}
+
+// Fetch tenant info from API
+async function fetchTenantContext(authToken: string): Promise<TenantContext | null> {
+  try {
+    const response = await fetch(`${CMO_API_URL}/tenants/me`, {
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.error(`[Don] Failed to fetch tenant: ${response.status}`);
+      return null;
+    }
+    const tenant = await response.json();
+    return {
+      name: tenant.companyName || 'Unknown Company',
+      industry: tenant.industry || null,
+    };
+  } catch (error) {
+    console.error('[Don] Error fetching tenant context:', error);
+    return null;
+  }
+}
+
+// Build Don's system prompt with current date and tenant context
+function buildDonSystemPrompt(tenant?: TenantContext | null): string {
   const now = new Date();
   const dateString = now.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -18,6 +48,9 @@ function buildDonSystemPrompt(): string {
 
 **CURRENT DATE CONTEXT:**
 Today is ${dateString} (${isoDate}). Use this as your reference for ALL date-related operations including calendar events, campaigns, and scheduling. When users say "tomorrow", "next week", "this month", etc., calculate relative to today's date.
+
+**TENANT CONTEXT — CRITICAL:**
+You are operating within ${tenant?.name || 'this company'}${tenant?.industry ? ` (${tenant.industry})` : ''}. All your work, campaigns, content, and marketing assets are for THIS company — ${tenant?.name || 'your employer'}. Do NOT confuse the tenant's business with contact or lead company names. When creating personas, funnels, or campaigns, you are marketing FOR ${tenant?.name || 'the tenant'}, not for companies mentioned in contact records.
 
 You are Don, the AI Chief Marketing Officer for Zander. You combine classic advertising wisdom with modern digital strategy.
 
@@ -2196,7 +2229,7 @@ async function executeTool(
         const limit = (toolInput.limit as number) || 50;
         params.append('limit', String(limit));
 
-        const url = `${CMO_API_URL}/cmo/people${params.toString() ? '?' + params.toString() : ''}`;
+        const url = `${CMO_API_URL}/contacts${params.toString() ? '?' + params.toString() : ''}`;
         console.log(`[Don Tool] GET ${url}`);
         const response = await fetch(url, { method: 'GET', headers });
         const responseText = await response.text();
@@ -2231,7 +2264,7 @@ async function executeTool(
         if (toolInput.type) params.append('type', toolInput.type as string);
         if (toolInput.status) params.append('status', toolInput.status as string);
 
-        const url = `${CMO_API_URL}/cmo/products${params.toString() ? '?' + params.toString() : ''}`;
+        const url = `${CMO_API_URL}/products${params.toString() ? '?' + params.toString() : ''}`;
         console.log(`[Don Tool] GET ${url}`);
         const response = await fetch(url, { method: 'GET', headers });
         const responseText = await response.text();
@@ -3457,6 +3490,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
+    // Fetch tenant context for executive awareness
+    const tenantContext = await fetchTenantContext(authToken);
+
     // Get API key from environment
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
@@ -3484,7 +3520,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: buildDonSystemPrompt(),
+        system: buildDonSystemPrompt(tenantContext),
         tools: TOOLS,
         messages,
       }),
@@ -3554,7 +3590,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: buildDonSystemPrompt(),
+          system: buildDonSystemPrompt(tenantContext),
           messages: [
             ...messages,
             {

@@ -30,8 +30,8 @@ export class EmailService {
       this.logger.warn('RESEND_API_KEY not configured - emails will not be sent');
     }
     if (apiKey) { this.resend = new Resend(apiKey); }
-    // Default from address - update this to your verified domain
-    this.defaultFrom = 'Zander <noreply@mcfapp.com>';
+    // Default from address - Zander platform emails
+    this.defaultFrom = 'Zander <noreply@zanderos.com>';
   }
 
   async sendEmail(dto: SendEmailDto): Promise<EmailResult> {

@@ -20,17 +20,35 @@ export class S3Service {
   private bucketName: string;
   private region: string;
 
+  private credentialsConfigured: boolean;
+
+  /**
+   * Check if S3 credentials are configured
+   */
+  isConfigured(): boolean {
+    return this.credentialsConfigured;
+  }
+
   constructor(private configService: ConfigService) {
     this.region = this.configService.get<string>('AWS_REGION') || 'us-east-1';
     this.bucketName = this.configService.get<string>('S3_BUCKET_NAME') || 'zander-assets';
 
+    const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID') || '';
+    const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '';
+
+    this.credentialsConfigured = !!(accessKeyId && secretAccessKey);
+
     this.s3Client = new S3Client({
       region: this.region,
       credentials: {
-        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID') || '',
-        secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '',
+        accessKeyId,
+        secretAccessKey,
       },
     });
+
+    if (!this.credentialsConfigured) {
+      this.logger.warn('AWS S3 credentials not configured - file uploads will fail');
+    }
   }
 
   /**
@@ -48,6 +66,13 @@ export class S3Service {
     filename: string,
     mimeType: string,
   ): Promise<UploadResult> {
+    // Check if credentials are configured
+    if (!this.credentialsConfigured) {
+      throw new Error(
+        'S3 storage not configured: AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables are required',
+      );
+    }
+
     // Sanitize filename
     const sanitizedFilename = this.sanitizeFilename(filename);
     const timestamp = Date.now();

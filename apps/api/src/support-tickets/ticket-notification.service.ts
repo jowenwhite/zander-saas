@@ -29,6 +29,7 @@ interface TicketNotificationData {
 export class TicketNotificationService {
   private readonly logger = new Logger(TicketNotificationService.name);
   private readonly appUrl = 'https://app.zanderos.com';
+  private readonly supportFromAddress = 'Zander Support <support@zanderos.com>';
 
   constructor(private emailService: EmailService) {}
 
@@ -53,6 +54,7 @@ export class TicketNotificationService {
         to: user.email,
         subject: `[${ticketNumber}] Ticket Created: ${subject}`,
         html,
+        from: this.supportFromAddress,
       });
 
       if (result.success) {
@@ -98,6 +100,7 @@ export class TicketNotificationService {
         to: user.email,
         subject: `[${ticketNumber}] Ticket Updated: ${subject}`,
         html,
+        from: this.supportFromAddress,
       });
 
       if (result.success) {
@@ -130,6 +133,7 @@ export class TicketNotificationService {
         to: user.email,
         subject: `[${ticketNumber}] Ticket Resolved: ${subject}`,
         html,
+        from: this.supportFromAddress,
       });
 
       if (result.success) {

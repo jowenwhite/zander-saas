@@ -59,11 +59,19 @@ export class AssetsController {
       }
     }
 
-    return this.assetsService.uploadAsset(req.tenantId, file, {
-      folder: folder || 'Images',
-      description,
-      tags: parsedTags,
-    });
+    try {
+      return await this.assetsService.uploadAsset(req.tenantId, file, {
+        folder: folder || 'Images',
+        description,
+        tags: parsedTags,
+      });
+    } catch (error) {
+      // Log the actual error for debugging
+      console.error('[AssetsController] Upload failed:', error);
+      throw new BadRequestException(
+        `Upload failed: ${error.message || 'Unknown error'}`,
+      );
+    }
   }
 
   // Storage Info

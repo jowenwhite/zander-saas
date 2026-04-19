@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { EmailService } from '../../integrations/email/email.service';
 import { generateEmailHtml } from './html-generator';
 import { prebuiltTemplates, PrebuiltTemplate } from './prebuilt-templates';
 
 @Injectable()
 export class TemplatesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+  ) {}
 
   // List all templates for tenant
   async findAll(
@@ -185,17 +189,30 @@ export class TemplatesService {
     };
   }
 
-  // Send test email (placeholder - integrate with EmailService)
+  // Send test email via Resend
   async sendTestEmail(id: string, tenantId: string, email: string) {
     const { html, subject } = await this.exportHtml(id, tenantId);
 
-    // TODO: Integrate with EmailService to actually send
-    // For now, return the HTML for preview
+    // Send the actual email via Resend
+    const result = await this.emailService.sendEmail({
+      to: email,
+      subject: subject || 'Test Email',
+      html,
+    });
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.error || 'Failed to send test email',
+        subject,
+      };
+    }
+
     return {
       success: true,
-      message: `Test email would be sent to ${email}`,
+      message: `Test email sent to ${email}`,
+      messageId: result.messageId,
       subject,
-      html,
     };
   }
 }

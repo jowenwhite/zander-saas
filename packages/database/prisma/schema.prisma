@@ -1156,6 +1156,7 @@ model ContentAsset {
   tags         String[] @default([])
   metadata     Json     @default("{}")
   isArchived   Boolean  @default(false)
+  fileData     String?  // Base64-encoded file data for DB storage fallback
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   tenant       Tenant   @relation(fields: [tenantId], references: [id])

@@ -11,7 +11,7 @@ export class AssetsService {
     private storageService: StorageService,
   ) {}
 
-  // Upload asset to S3 and create database record
+  // Upload asset to S3 (or database fallback) and create database record
   async uploadAsset(
     tenantId: string,
     file: Express.Multer.File,
@@ -33,8 +33,37 @@ export class AssetsService {
       throw new BadRequestException(canUpload.message);
     }
 
-    // Upload to S3
     const folder = metadata.folder || 'Images';
+
+    // Check if S3 is configured - if not, use database storage
+    if (!this.s3Service.isConfigured()) {
+      // Database fallback: store file as base64
+      const base64Data = file.buffer.toString('base64');
+      // Create a data URL that can be used directly in img src
+      const dataUrl = `data:${file.mimetype};base64,${base64Data}`;
+
+      const asset = await this.prisma.contentAsset.create({
+        data: {
+          tenantId,
+          name: file.originalname,
+          assetType: validation.assetType,
+          description: metadata.description,
+          url: dataUrl, // Use data URL for immediate use
+          fileData: base64Data, // Store raw base64 for retrieval
+          mimeType: file.mimetype,
+          fileSize: file.size,
+          folder,
+          tags: metadata.tags || [],
+          metadata: {
+            storageType: 'database',
+          },
+        },
+      });
+
+      return asset;
+    }
+
+    // Upload to S3
     const uploadResult = await this.s3Service.uploadFile(
       tenantId,
       folder,
@@ -58,6 +87,7 @@ export class AssetsService {
         metadata: {
           s3Key: uploadResult.key,
           s3Bucket: uploadResult.bucket,
+          storageType: 's3',
         },
       },
     });

@@ -3,8 +3,38 @@ import { NextRequest, NextResponse } from 'next/server';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const CRO_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-// Build Jordan's system prompt with current date
-function buildJordanSystemPrompt(): string {
+// Tenant context for executive awareness
+interface TenantContext {
+  name: string;
+  industry?: string | null;
+}
+
+// Fetch tenant info from API
+async function fetchTenantContext(authToken: string): Promise<TenantContext | null> {
+  try {
+    const response = await fetch(`${CRO_API_URL}/tenants/me`, {
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.error(`[Jordan] Failed to fetch tenant: ${response.status}`);
+      return null;
+    }
+    const tenant = await response.json();
+    return {
+      name: tenant.companyName || 'Unknown Company',
+      industry: tenant.industry || null,
+    };
+  } catch (error) {
+    console.error('[Jordan] Error fetching tenant context:', error);
+    return null;
+  }
+}
+
+// Build Jordan's system prompt with current date and tenant context
+function buildJordanSystemPrompt(tenant?: TenantContext | null): string {
   const now = new Date();
   const dateString = now.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -18,6 +48,9 @@ function buildJordanSystemPrompt(): string {
 
 **CURRENT DATE CONTEXT:**
 Today is ${dateString} (${isoDate}). Use this as your reference for ALL date-related operations including follow-ups, expected close dates, activities, and scheduling. When users say "tomorrow", "next week", "this month", etc., calculate relative to today's date.
+
+**TENANT CONTEXT — CRITICAL:**
+You are operating within ${tenant?.name || 'this company'}${tenant?.industry ? ` (${tenant.industry})` : ''}. All your work, deals, campaigns, and communications are for THIS company — ${tenant?.name || 'your employer'}. Do NOT confuse the tenant's business with contact or lead company names. When a contact works at "Acme Corp", that's the PROSPECT's company, not yours. You work for ${tenant?.name || 'the tenant'}.
 
 **Your Personality:**
 - Enthusiastic, encouraging, and action-oriented
@@ -1573,6 +1606,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
+    // Fetch tenant context for executive awareness
+    const tenantContext = await fetchTenantContext(authToken);
+
     // Get API key from environment
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
@@ -1600,7 +1636,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: buildJordanSystemPrompt(),
+        system: buildJordanSystemPrompt(tenantContext),
         tools: TOOLS,
         messages,
       }),
@@ -1662,7 +1698,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: buildJordanSystemPrompt(),
+          system: buildJordanSystemPrompt(tenantContext),
           messages: [
             ...messages,
             {
