@@ -3,7 +3,10 @@ import {
   IsString,
   IsOptional,
   IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+import { FunnelStageDto } from './funnel-stage.dto';
 
 export class UpdateFunnelDto {
   @IsString()
@@ -23,6 +26,8 @@ export class UpdateFunnelDto {
   conversionGoal?: string;
 
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FunnelStageDto)
   @IsOptional()
-  stages?: any[];  // Complex nested objects, validated at runtime
+  stages?: FunnelStageDto[];
 }
