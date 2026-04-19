@@ -46,7 +46,8 @@ export function generateBetaWelcomeEmail(firstName?: string): string {
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
           <tr>
             <td style="padding-bottom: 30px; border-bottom: 1px solid ${COLORS.borderColor};">
-              <img src="${ZANDER_LOGO_URL}" alt="Zander" style="height: 40px; width: auto;">
+              <img src="${ZANDER_LOGO_URL}" alt="Zander" style="height: 80px; width: auto;">
+              <p style="margin: 8px 0 0 0; font-size: 14px; color: #FFFFFF; text-transform: uppercase; letter-spacing: 2px; font-family: Arial, sans-serif;">Operating Simply</p>
             </td>
           </tr>
         </table>
@@ -172,7 +173,7 @@ export function generateBetaWelcomeEmail(firstName?: string): string {
                 <tr>
                   <!-- Logo Column -->
                   <td style="padding-right: 20px; vertical-align: top;">
-                    <img src="${ZANDER_LOGO_URL}" alt="Zander" style="height: 50px; width: auto;" />
+                    <img src="${ZANDER_LOGO_URL}" alt="Zander" style="height: 56px; width: auto;" />
                   </td>
                   <!-- Divider -->
                   <td style="border-left: 2px solid ${COLORS.cyan}; padding-left: 20px; vertical-align: top;">
