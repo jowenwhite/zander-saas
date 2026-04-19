@@ -27,15 +27,26 @@ export interface EmailBlock {
 }
 
 export function generateEmailHtml(template: EmailTemplateContent, subject: string): string {
+  // Defensive: ensure template is a valid object
+  if (!template || typeof template !== 'object') {
+    console.error('[html-generator] Invalid template object:', typeof template, template);
+    template = { version: '1.0', settings: {}, blocks: [] };
+  }
+
   const settings = {
     backgroundColor: '#f4f4f4',
     contentWidth: 600,
     fontFamily: 'Arial, sans-serif',
     defaultTextColor: '#333333',
-    ...template.settings,
+    ...(template.settings || {}),
   };
 
-  const blocksHtml = (template.blocks || []).map((block) => generateBlockHtml(block, settings)).join('\n');
+  // CRITICAL: Use Array.isArray to handle cases where blocks is truthy but not an array
+  if (!Array.isArray(template.blocks)) {
+    console.error('[html-generator] template.blocks is not an array:', typeof template.blocks, template.blocks);
+  }
+  const blocks = Array.isArray(template.blocks) ? template.blocks : [];
+  const blocksHtml = blocks.map((block) => generateBlockHtml(block, settings)).join('\n');
 
   return `<!DOCTYPE html>
 <html lang="en">

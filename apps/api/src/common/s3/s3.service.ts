@@ -16,38 +16,44 @@ export interface UploadResult {
 @Injectable()
 export class S3Service {
   private readonly logger = new Logger(S3Service.name);
-  private s3Client: S3Client;
+  private s3Client: S3Client | null = null;
   private bucketName: string;
   private region: string;
 
-  private credentialsConfigured: boolean;
+  private s3Configured: boolean;
 
   /**
-   * Check if S3 credentials are configured
+   * Check if S3 is explicitly configured via environment variable.
+   * Does NOT rely on SDK credential chain - only explicit S3_BUCKET_NAME config.
    */
   isConfigured(): boolean {
-    return this.credentialsConfigured;
+    return this.s3Configured;
   }
 
   constructor(private configService: ConfigService) {
     this.region = this.configService.get<string>('AWS_REGION') || 'us-east-1';
-    this.bucketName = this.configService.get<string>('S3_BUCKET_NAME') || 'zander-assets';
 
-    const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID') || '';
-    const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '';
+    // CRITICAL: Only consider S3 configured if S3_BUCKET_NAME is EXPLICITLY set
+    // Do NOT rely on SDK credential chain or IAM task roles
+    const explicitBucket = this.configService.get<string>('S3_BUCKET_NAME');
+    this.s3Configured = !!explicitBucket;
+    this.bucketName = explicitBucket || 'zander-assets';
 
-    this.credentialsConfigured = !!(accessKeyId && secretAccessKey);
+    if (this.s3Configured) {
+      // Only initialize S3 client if explicitly configured
+      const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID') || '';
+      const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '';
 
-    this.s3Client = new S3Client({
-      region: this.region,
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-    });
+      this.s3Client = new S3Client({
+        region: this.region,
+        credentials: accessKeyId && secretAccessKey
+          ? { accessKeyId, secretAccessKey }
+          : undefined, // Let SDK use default credential chain if no explicit creds
+      });
 
-    if (!this.credentialsConfigured) {
-      this.logger.warn('AWS S3 credentials not configured - file uploads will fail');
+      this.logger.log(`S3 configured with bucket: ${this.bucketName}`);
+    } else {
+      this.logger.warn('S3_BUCKET_NAME not set - S3 uploads disabled, using database storage fallback');
     }
   }
 
@@ -66,10 +72,10 @@ export class S3Service {
     filename: string,
     mimeType: string,
   ): Promise<UploadResult> {
-    // Check if credentials are configured
-    if (!this.credentialsConfigured) {
+    // Check if S3 is explicitly configured
+    if (!this.s3Configured || !this.s3Client) {
       throw new Error(
-        'S3 storage not configured: AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables are required',
+        'S3 storage not configured: S3_BUCKET_NAME environment variable is required',
       );
     }
 
@@ -109,6 +115,11 @@ export class S3Service {
    * @param key - S3 object key
    */
   async deleteFile(key: string): Promise<void> {
+    if (!this.s3Client) {
+      this.logger.warn('S3 not configured - cannot delete file');
+      return;
+    }
+
     const command = new DeleteObjectCommand({
       Bucket: this.bucketName,
       Key: key,
@@ -128,6 +139,10 @@ export class S3Service {
    * @param key - S3 object key
    */
   async fileExists(key: string): Promise<boolean> {
+    if (!this.s3Client) {
+      return false;
+    }
+
     try {
       const command = new HeadObjectCommand({
         Bucket: this.bucketName,
