@@ -86,3 +86,28 @@ npx prisma db push
 5. [ ] Verify health check: `curl https://api.zanderos.com/health`
 6. [ ] Test critical flows in app
 7. [ ] Update SESSION_LOG.md with deployment notes
+
+## DEBUGGING PRODUCTION ERRORS — MANDATORY PROTOCOL
+
+For ANY API error (500, 404, or unexpected behavior in production), you MUST check CloudWatch logs BEFORE attempting any fix. Never guess at the cause. Never write fix code without the actual stack trace.
+
+### How to pull logs:
+```bash
+aws logs get-log-events --log-group-name /ecs/zander-api --log-stream-name $(aws logs describe-log-streams --log-group-name /ecs/zander-api --order-by LastEventTime --descending --limit 1 --query "logStreams[0].logStreamName" --output text --region us-east-1) --limit 50 --region us-east-1 --query "events[*].message" --output text
+```
+
+### Protocol:
+1. Reproduce the error (or get the timestamp from the user)
+2. Pull CloudWatch logs for that time window
+3. Find the exact stack trace and error message
+4. REPORT the error to the user before writing any fix
+5. Write the fix based on the ACTUAL error, not assumptions
+6. Verify the fix addresses the specific error from the logs
+
+### What NOT to do:
+- Do not guess at fixes based on code reading alone
+- Do not assume TypeScript compilation = working code
+- Do not claim a fix works without testing against the actual error
+- Do not make multiple speculative fixes hoping one sticks
+
+This protocol would have saved hours of wasted work on April 19, 2026. Enforce it every time.
