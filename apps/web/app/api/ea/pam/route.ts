@@ -3,8 +3,21 @@ import { NextRequest, NextResponse } from 'next/server';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const EA_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-// Pam's system prompt
-const PAM_SYSTEM_PROMPT = `You are Pam, Executive Assistant at Zander. You are warm, organized, and genuinely caring — the kind of person who remembers everyone's preferences and makes sure nothing falls through the cracks. You have a calm, steady presence and a humble sense of humor that comes through naturally without ever trying too hard. You are competent without being intimidating. You are the connective tissue of this business — you hold the calendar, manage the inbox, keep the tasks moving, and make sure every person on the team knows what they need to know when they need to know it. You do not seek credit. You just quietly make sure everything works. When something is unclear, you ask the simplest possible clarifying question rather than guessing. You are never robotic. You are never sycophantic. You are Pam.
+// Build Pam's system prompt with current date
+function buildPamSystemPrompt(): string {
+  const now = new Date();
+  const dateString = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const isoDate = now.toISOString().split('T')[0];
+
+  return `You are Pam, Executive Assistant at Zander. You are warm, organized, and genuinely caring — the kind of person who remembers everyone's preferences and makes sure nothing falls through the cracks. You have a calm, steady presence and a humble sense of humor that comes through naturally without ever trying too hard. You are competent without being intimidating. You are the connective tissue of this business — you hold the calendar, manage the inbox, keep the tasks moving, and make sure every person on the team knows what they need to know when they need to know it. You do not seek credit. You just quietly make sure everything works. When something is unclear, you ask the simplest possible clarifying question rather than guessing. You are never robotic. You are never sycophantic. You are Pam.
+
+**CURRENT DATE CONTEXT:**
+Today is ${dateString} (${isoDate}). Use this as your reference for ALL date-related operations including calendar events, meetings, tasks, and scheduling. When users say "tomorrow", "next week", "this month", etc., calculate relative to today's date.
 
 **Your Capabilities — You Can EXECUTE:**
 You have tools to manage schedules, communications, tasks, and help users navigate the platform.
@@ -23,6 +36,7 @@ Available Tools:
 - mark_communication_read: Mark communications as read
 - flag_communication_priority: Set priority flag on communications
 - compose_email: Compose a new email to a contact (lands in Scheduled → Pending for approval)
+- compose_sms: Compose an SMS message to a contact (lands in Scheduled → Pending for approval, requires Twilio)
 - draft_email_reply: Draft a reply to an existing communication (lands in Scheduled → Pending for approval)
 - draft_daily_briefing: Draft a daily briefing email (lands in Scheduled → Pending for approval)
 - draft_meeting_agenda: Draft a meeting agenda (lands in Scheduled → Pending for approval)
@@ -73,10 +87,11 @@ CATEGORY 2 — Ad-hoc compose/draft requests from chat:
 - "Draft a reply to...", "Compose an email to...", "Send a message to..."
 - MUST land in Scheduled → Pending for human review
 - NEVER auto-send these communications
-- When you call draft_email_reply, compose_email, or similar tools, the result goes to Scheduled → Pending
+- When you call draft_email_reply, compose_email, compose_sms, or similar tools, the result goes to Scheduled → Pending
 - Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
 Remember: You're the organizational backbone. Everything flows through you, and you make it look effortless.`;
+}
 
 // Tool definitions
 const TOOLS = [
@@ -353,6 +368,36 @@ const TOOLS = [
         }
       },
       required: ['subject', 'body']
+    }
+  },
+  {
+    name: 'compose_sms',
+    description: 'Compose an SMS message to a contact. Creates a draft in Scheduled → Pending for human approval. Never auto-sends. Requires Twilio integration to be connected.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'Contact ID to send the SMS to'
+        },
+        recipientPhone: {
+          type: 'string',
+          description: 'Phone number to send to (E.164 format preferred, e.g., +15551234567). Used if contactId not provided.'
+        },
+        body: {
+          type: 'string',
+          description: 'SMS message content (required, max 1600 characters)'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Optional deal ID to link the SMS to'
+        },
+        context: {
+          type: 'string',
+          description: 'Context or reason for sending this SMS (helps with approval review)'
+        }
+      },
+      required: ['body']
     }
   },
   {
@@ -1215,6 +1260,83 @@ async function executeTool(
         };
       }
 
+      case 'compose_sms': {
+        const { contactId, recipientPhone, body, dealId, context } = toolInput as {
+          contactId?: string;
+          recipientPhone?: string;
+          body: string;
+          dealId?: string;
+          context?: string;
+        };
+
+        if (!contactId && !recipientPhone) {
+          return {
+            success: false,
+            result: {
+              message: 'Please provide either a contactId or recipientPhone.',
+              note: 'I need to know who to send this SMS to.'
+            }
+          };
+        }
+
+        // Validate body length
+        if (body.length > 1600) {
+          return {
+            success: false,
+            result: {
+              message: 'SMS body exceeds maximum length of 1600 characters.',
+              currentLength: body.length,
+              note: 'Please shorten the message.'
+            }
+          };
+        }
+
+        // Create scheduled communication with needsApproval=true for SMS
+        const scheduledUrl = `${EA_API_URL}/scheduled-communications`;
+        console.log(`[Pam Tool] POST ${scheduledUrl} (compose_sms, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            contactId: contactId || null,
+            recipientPhone: recipientPhone || null,
+            dealId,
+            type: 'sms',
+            subject: context || 'SMS Message',
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'pam-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: false,
+            result: {
+              message: 'Failed to create SMS draft',
+              error: `${scheduleRes.status}: ${errorText}`,
+              note: 'SMS could not be queued for approval'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "SMS draft created — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to: contactId ? 'contact' : recipientPhone,
+            preview: body.substring(0, 160) + (body.length > 160 ? '...' : ''),
+            characterCount: body.length,
+            note: 'Review and approve in Scheduled → Pending before sending. Requires Twilio integration.'
+          }
+        };
+      }
+
       case 'draft_email_reply': {
         const { communicationId, tone = 'warm', keyPoints } = toolInput as {
           communicationId: string;
@@ -1812,7 +1934,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: PAM_SYSTEM_PROMPT,
+        system: buildPamSystemPrompt(),
         tools: TOOLS,
         messages,
       }),
@@ -1873,7 +1995,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: PAM_SYSTEM_PROMPT,
+          system: buildPamSystemPrompt(),
           messages: [
             ...messages,
             {

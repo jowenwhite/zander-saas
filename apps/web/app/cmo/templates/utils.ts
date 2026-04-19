@@ -296,32 +296,65 @@ export function generateBlockId(): string {
 }
 
 export function parseTemplateBody(body: string | null): EmailTemplateContent {
+  const defaultContent: EmailTemplateContent = {
+    version: '1.0',
+    settings: {
+      backgroundColor: '#f4f4f4',
+      contentWidth: 600,
+      fontFamily: 'Arial, sans-serif',
+      defaultTextColor: '#333333',
+    },
+    blocks: [],
+  };
+
   if (!body) {
-    return {
-      version: '1.0',
-      settings: {
-        backgroundColor: '#f4f4f4',
-        contentWidth: 600,
-        fontFamily: 'Arial, sans-serif',
-        defaultTextColor: '#333333',
-      },
-      blocks: [],
-    };
+    return defaultContent;
   }
 
   try {
-    return JSON.parse(body);
+    const parsed = JSON.parse(body);
+
+    // Validate that parsed object has required EmailTemplateContent structure
+    // Handle legacy format: { html: string, text: string } from Don's old tool
+    if (!parsed || typeof parsed !== 'object') {
+      return defaultContent;
+    }
+
+    // If blocks array exists and is valid, use the parsed content
+    if (Array.isArray(parsed.blocks)) {
+      return {
+        version: parsed.version || '1.0',
+        settings: parsed.settings || defaultContent.settings,
+        blocks: parsed.blocks,
+      };
+    }
+
+    // Legacy format: { html: string, text?: string } - convert to blocks format
+    if (typeof parsed.html === 'string') {
+      return {
+        version: '1.0',
+        settings: defaultContent.settings,
+        blocks: [
+          {
+            id: generateBlockId(),
+            type: 'text',
+            settings: {
+              backgroundColor: '#ffffff',
+              padding: { top: 20, right: 40, bottom: 20, left: 40 },
+              alignment: 'left',
+            },
+            content: {
+              html: parsed.html,
+            },
+          },
+        ],
+      };
+    }
+
+    // Unknown format - return default
+    return defaultContent;
   } catch {
-    return {
-      version: '1.0',
-      settings: {
-        backgroundColor: '#f4f4f4',
-        contentWidth: 600,
-        fontFamily: 'Arial, sans-serif',
-        defaultTextColor: '#333333',
-      },
-      blocks: [],
-    };
+    return defaultContent;
   }
 }
 

@@ -14,6 +14,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TierGuard } from '../../common/guards/tier.guard';
 import { RequireTier } from '../../common/decorators/require-tier.decorator';
@@ -29,8 +30,10 @@ export class AssetsController {
 
   // File Upload
   // MEDIUM-2: File upload size limit (10MB max)
+  // FIX: Explicit memoryStorage ensures file.buffer is populated for S3 upload
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
+    storage: memoryStorage(),
     limits: {
       fileSize: 10 * 1024 * 1024, // 10MB max file size
     },

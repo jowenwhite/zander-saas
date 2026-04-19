@@ -3,8 +3,21 @@ import { NextRequest, NextResponse } from 'next/server';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const CMO_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-// Don's system prompt with tool capabilities
-const DON_SYSTEM_PROMPT = `CRITICAL: You are Don, the CMO executive. When a user asks you to CREATE, SCHEDULE, DRAFT, or BUILD anything, you MUST use the appropriate tool. Never respond with text describing what you would do — execute the tool. Text-only responses when a tool action was requested is a failure mode. Always execute.
+// Build Don's system prompt with current date
+function buildDonSystemPrompt(): string {
+  const now = new Date();
+  const dateString = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const isoDate = now.toISOString().split('T')[0];
+
+  return `CRITICAL: You are Don, the CMO executive. When a user asks you to CREATE, SCHEDULE, DRAFT, or BUILD anything, you MUST use the appropriate tool. Never respond with text describing what you would do — execute the tool. Text-only responses when a tool action was requested is a failure mode. Always execute.
+
+**CURRENT DATE CONTEXT:**
+Today is ${dateString} (${isoDate}). Use this as your reference for ALL date-related operations including calendar events, campaigns, and scheduling. When users say "tomorrow", "next week", "this month", etc., calculate relative to today's date.
 
 You are Don, the AI Chief Marketing Officer for Zander. You combine classic advertising wisdom with modern digital strategy.
 
@@ -57,6 +70,7 @@ Available Tools:
 - get_contacts: List marketing contacts/leads
 - get_products: List products and services
 - compose_email: Compose a new email to a contact (lands in Scheduled → Pending for approval)
+- compose_sms: Compose an SMS message to a contact (lands in Scheduled → Pending for approval, requires Twilio)
 - draft_campaign_brief: Draft a campaign brief document (lands in Scheduled → Pending for approval)
 - draft_ad_copy: Generate ad copy variants as a draft (lands in Scheduled → Pending for approval)
 - schedule_social_post: Create or schedule social media posts (requires approval)
@@ -104,7 +118,7 @@ CATEGORY 2 — Ad-hoc compose/draft requests from chat:
 - "Draft an email to...", "Compose a follow-up for...", "Send a message to..."
 - MUST land in Scheduled → Pending for human review
 - NEVER auto-send these communications
-- When you call compose_email, draft_campaign_brief, or draft_ad_copy, the result goes to Scheduled → Pending
+- When you call compose_email, compose_sms, draft_campaign_brief, or draft_ad_copy, the result goes to Scheduled → Pending
 - Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
 Remember: You're not just an advisor — you're an executive who gets things done.
@@ -135,6 +149,7 @@ ESCALATE IMMEDIATELY:
 - Anything involving customer data or privacy
 
 When in doubt, draft and escalate. Never guess on tone for negative interactions.`;
+}
 
 // Tool definitions following Anthropic's schema
 const TOOLS = [
@@ -370,7 +385,7 @@ const TOOLS = [
   },
   {
     name: 'create_funnel',
-    description: 'Create a marketing funnel. Use this when the user asks to create a sales funnel, lead funnel, or conversion path.',
+    description: 'Create a marketing funnel with stages. Use this when the user asks to create a sales funnel, lead funnel, or conversion path. Include stages array to create a complete funnel in one call.',
     input_schema: {
       type: 'object',
       properties: {
@@ -385,6 +400,20 @@ const TOOLS = [
         conversionGoal: {
           type: 'string',
           description: 'The goal of this funnel (e.g., "Free trial signup", "Demo request", "Purchase")'
+        },
+        stages: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: { type: 'string', description: 'Stage name (e.g., "Awareness", "Interest", "Decision")' },
+              stageType: { type: 'string', enum: ['awareness', 'interest', 'consideration', 'intent', 'evaluation', 'purchase', 'retention', 'advocacy'], description: 'Type of stage' },
+              stageOrder: { type: 'number', description: 'Order of the stage (0-based)' },
+              config: { type: 'object', description: 'Optional stage configuration' }
+            },
+            required: ['name', 'stageType', 'stageOrder']
+          },
+          description: 'Array of funnel stages to create with the funnel. If not provided, funnel is created without stages.'
         }
       },
       required: ['name']
@@ -1039,7 +1068,7 @@ const TOOLS = [
   },
   {
     name: 'create_campaign',
-    description: 'Create a new marketing campaign. Use this when launching a new marketing initiative.',
+    description: 'Create a new marketing campaign. Use this when launching a new marketing initiative. Supports multiple channels for multi-channel campaigns.',
     input_schema: {
       type: 'object',
       properties: {
@@ -1056,10 +1085,13 @@ const TOOLS = [
           enum: ['single', 'multi', 'drip', 'event'],
           description: 'Campaign type (default: multi)'
         },
-        channel: {
-          type: 'string',
-          enum: ['email', 'social', 'paid', 'content', 'events', 'other'],
-          description: 'Primary marketing channel'
+        channels: {
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: ['email', 'social', 'paid', 'content', 'events', 'sms', 'phone', 'other']
+          },
+          description: 'Marketing channels for this campaign (e.g., ["email", "social"] for multi-channel). At least one channel required.'
         },
         budget: {
           type: 'number',
@@ -1091,7 +1123,7 @@ const TOOLS = [
           description: 'Configuration for the trigger (e.g., form ID, tag name)'
         }
       },
-      required: ['name', 'channel']
+      required: ['name', 'channels']
     }
   },
   {
@@ -1154,6 +1186,36 @@ const TOOLS = [
         }
       },
       required: ['subject', 'body']
+    }
+  },
+  {
+    name: 'compose_sms',
+    description: 'Compose an SMS message to a contact. Creates a draft in Scheduled → Pending for human approval. Never auto-sends. Requires Twilio integration to be connected.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'Contact ID to send the SMS to'
+        },
+        recipientPhone: {
+          type: 'string',
+          description: 'Phone number to send to (E.164 format preferred, e.g., +15551234567). Used if contactId not provided.'
+        },
+        body: {
+          type: 'string',
+          description: 'SMS message content (required, max 1600 characters)'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Optional deal ID to link the SMS to'
+        },
+        context: {
+          type: 'string',
+          description: 'Context or reason for sending this SMS (helps with approval review)'
+        }
+      },
+      required: ['body']
     }
   },
   {
@@ -1590,12 +1652,38 @@ async function executeTool(
         console.log(`[Don Tool] POST ${url}`);
 
         // Map Don's tool fields to API fields
-        // API expects body as an object, not a string
+        // Body must be EmailTemplateContent format: { version, settings, blocks }
         const bodyContent = toolInput.body as string;
+
+        // Create proper EmailTemplateContent structure with a text block
+        const emailTemplateBody = bodyContent ? {
+          version: '1.0',
+          settings: {
+            backgroundColor: '#f4f4f4',
+            contentWidth: 600,
+            fontFamily: 'Arial, sans-serif',
+            defaultTextColor: '#333333',
+          },
+          blocks: [
+            {
+              id: `block_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              type: 'text',
+              settings: {
+                backgroundColor: '#ffffff',
+                padding: { top: 20, right: 40, bottom: 20, left: 40 },
+                alignment: 'left',
+              },
+              content: {
+                html: bodyContent,
+              },
+            },
+          ],
+        } : null;
+
         const templateData = {
           name: toolInput.name as string,
           subject: (toolInput.subject as string) || null,
-          body: bodyContent ? { html: bodyContent, text: bodyContent.replace(/<[^>]*>/g, '') } : null,
+          body: emailTemplateBody,
           category: (toolInput.category as string) || null,
           status: 'draft',
         };
@@ -1660,12 +1748,19 @@ async function executeTool(
         const url = `${CMO_API_URL}/cmo/funnels`;
         console.log(`[Don Tool] POST ${url}`);
 
-        // Build funnel data with correct field names
+        // Build funnel data with correct field names - pass through stages if provided
+        const inputStages = toolInput.stages as Array<{
+          name: string;
+          stageType: string;
+          stageOrder: number;
+          config?: Record<string, unknown>;
+        }> | undefined;
+
         const funnelData = {
           name: toolInput.name as string,
           description: (toolInput.description as string) || null,
           conversionGoal: (toolInput.conversionGoal as string) || null,
-          stages: [], // Empty stages - user will add stages in funnel builder
+          stages: inputStages || [], // Pass through stages if provided, otherwise empty
         };
 
         console.log(`[Don Tool] Funnel data:`, JSON.stringify(funnelData, null, 2));
@@ -2173,21 +2268,22 @@ async function executeTool(
         const url = `${CMO_API_URL}/campaigns`;
         console.log(`[Don Tool] POST ${url}`);
 
-        // Map channel to channels array format
-        const channelMap: Record<string, string[]> = {
-          email: ['email'],
-          social: ['social'],
-          paid: ['paid'],
-          content: ['content'],
-          events: ['events'],
-          other: ['other']
-        };
+        // Handle channels - accept array directly, fall back to single channel for backwards compatibility
+        let channels: string[] = [];
+        if (Array.isArray(toolInput.channels)) {
+          channels = toolInput.channels as string[];
+        } else if (typeof toolInput.channel === 'string') {
+          // Backwards compatibility: convert single channel to array
+          channels = [toolInput.channel];
+        } else {
+          channels = ['other'];
+        }
 
         const campaignData = {
           name: toolInput.name as string,
           description: (toolInput.description as string) || null,
           type: (toolInput.type as string) || 'multi',
-          channels: channelMap[(toolInput.channel as string) || 'other'] || ['other'],
+          channels,
           budget: (toolInput.budget as number) || null,
           startDate: (toolInput.startDate as string) || null,
           endDate: (toolInput.endDate as string) || null,
@@ -2789,6 +2885,83 @@ async function executeTool(
         };
       }
 
+      case 'compose_sms': {
+        const { contactId, recipientPhone, body, dealId, context } = toolInput as {
+          contactId?: string;
+          recipientPhone?: string;
+          body: string;
+          dealId?: string;
+          context?: string;
+        };
+
+        if (!contactId && !recipientPhone) {
+          return {
+            success: false,
+            result: {
+              message: 'Please provide either a contactId or recipientPhone.',
+              note: 'I need to know who to send this SMS to.'
+            }
+          };
+        }
+
+        // Validate body length
+        if (body.length > 1600) {
+          return {
+            success: false,
+            result: {
+              message: 'SMS body exceeds maximum length of 1600 characters.',
+              currentLength: body.length,
+              note: 'Please shorten the message.'
+            }
+          };
+        }
+
+        // Create scheduled communication with needsApproval=true for SMS
+        const scheduledUrl = `${CMO_API_URL}/scheduled-communications`;
+        console.log(`[Don Tool] POST ${scheduledUrl} (compose_sms, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            contactId: contactId || null,
+            recipientPhone: recipientPhone || null,
+            dealId,
+            type: 'sms',
+            subject: context || 'SMS Message',  // Use context as subject for reference
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'don-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: false,
+            result: {
+              message: 'Failed to create SMS draft',
+              error: `${scheduleRes.status}: ${errorText}`,
+              note: 'SMS could not be queued for approval'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "SMS draft created — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to: contactId ? 'contact' : recipientPhone,
+            preview: body.substring(0, 160) + (body.length > 160 ? '...' : ''),
+            characterCount: body.length,
+            note: 'Review and approve in Scheduled → Pending before sending. Requires Twilio integration.'
+          }
+        };
+      }
+
       case 'draft_campaign_brief': {
         const { campaignName, objective, targetPersonaId, channel, budget } = toolInput as {
           campaignName: string;
@@ -3311,7 +3484,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: DON_SYSTEM_PROMPT,
+        system: buildDonSystemPrompt(),
         tools: TOOLS,
         messages,
       }),
@@ -3381,7 +3554,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: DON_SYSTEM_PROMPT,
+          system: buildDonSystemPrompt(),
           messages: [
             ...messages,
             {

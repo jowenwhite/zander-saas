@@ -3,8 +3,21 @@ import { NextRequest, NextResponse } from 'next/server';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const CRO_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-// Jordan's system prompt with tool capabilities
-const JORDAN_SYSTEM_PROMPT = `You are Jordan, the AI Chief Revenue Officer for Zander. You're an enthusiastic, warm sales coach who helps close deals and build client relationships.
+// Build Jordan's system prompt with current date
+function buildJordanSystemPrompt(): string {
+  const now = new Date();
+  const dateString = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const isoDate = now.toISOString().split('T')[0];
+
+  return `You are Jordan, the AI Chief Revenue Officer for Zander. You're an enthusiastic, warm sales coach who helps close deals and build client relationships.
+
+**CURRENT DATE CONTEXT:**
+Today is ${dateString} (${isoDate}). Use this as your reference for ALL date-related operations including follow-ups, expected close dates, activities, and scheduling. When users say "tomorrow", "next week", "this month", etc., calculate relative to today's date.
 
 **Your Personality:**
 - Enthusiastic, encouraging, and action-oriented
@@ -25,6 +38,7 @@ Available Tools:
 - create_activity: Log a sales activity (call, meeting, email, note)
 - schedule_followup: Schedule a future follow-up activity
 - compose_email: Compose a new email to a contact (lands in Scheduled → Pending for approval)
+- compose_sms: Compose an SMS message to a contact (lands in Scheduled → Pending for approval, requires Twilio)
 - draft_email: Create an email draft for user review (lands in Scheduled → Pending for approval)
 - create_support_ticket: Submit a support ticket for bugs, feature requests, or questions
 - get_pipeline_summary: Get pipeline overview with deal counts and values by stage
@@ -80,10 +94,11 @@ CATEGORY 2 — Ad-hoc compose/draft requests from chat:
 - "Draft an email to...", "Compose a follow-up for...", "Send a message to..."
 - MUST land in Scheduled → Pending for human review
 - NEVER auto-send these communications
-- When you call compose_email, draft_email, or draft_follow_up_email, the result goes to Scheduled → Pending
+- When you call compose_email, compose_sms, draft_email, or draft_follow_up_email, the result goes to Scheduled → Pending
 - Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
 Remember: You're not just a sales advisor — you're a revenue-driving executive who gets things done.`;
+}
 
 // Tool definitions following Anthropic's schema
 const TOOLS = [
@@ -345,6 +360,36 @@ const TOOLS = [
         }
       },
       required: ['subject', 'body']
+    }
+  },
+  {
+    name: 'compose_sms',
+    description: 'Compose an SMS message to a contact. Creates a draft in Scheduled → Pending for human approval. Never auto-sends. Requires Twilio integration to be connected.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'Contact ID to send the SMS to'
+        },
+        recipientPhone: {
+          type: 'string',
+          description: 'Phone number to send to (E.164 format preferred, e.g., +15551234567). Used if contactId not provided.'
+        },
+        body: {
+          type: 'string',
+          description: 'SMS message content (required, max 1600 characters)'
+        },
+        dealId: {
+          type: 'string',
+          description: 'Optional deal ID to link the SMS to'
+        },
+        context: {
+          type: 'string',
+          description: 'Context or reason for sending this SMS (helps with approval review)'
+        }
+      },
+      required: ['body']
     }
   },
   {
@@ -914,6 +959,83 @@ async function executeTool(
         };
       }
 
+      case 'compose_sms': {
+        const { contactId, recipientPhone, body, dealId, context } = toolInput as {
+          contactId?: string;
+          recipientPhone?: string;
+          body: string;
+          dealId?: string;
+          context?: string;
+        };
+
+        if (!contactId && !recipientPhone) {
+          return {
+            success: false,
+            result: {
+              message: 'Please provide either a contactId or recipientPhone.',
+              note: 'I need to know who to send this SMS to.'
+            }
+          };
+        }
+
+        // Validate body length
+        if (body.length > 1600) {
+          return {
+            success: false,
+            result: {
+              message: 'SMS body exceeds maximum length of 1600 characters.',
+              currentLength: body.length,
+              note: 'Please shorten the message.'
+            }
+          };
+        }
+
+        // Create scheduled communication with needsApproval=true for SMS
+        const scheduledUrl = `${CRO_API_URL}/scheduled-communications`;
+        console.log(`[Jordan Tool] POST ${scheduledUrl} (compose_sms, needs approval)`);
+        const scheduleRes = await fetch(scheduledUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            contactId: contactId || null,
+            recipientPhone: recipientPhone || null,
+            dealId,
+            type: 'sms',
+            subject: context || 'SMS Message',
+            body,
+            scheduledFor: new Date().toISOString(),
+            needsApproval: true,
+            createdBy: 'jordan-ai'
+          })
+        });
+
+        if (!scheduleRes.ok) {
+          const errorText = await scheduleRes.text();
+          return {
+            success: false,
+            result: {
+              message: 'Failed to create SMS draft',
+              error: `${scheduleRes.status}: ${errorText}`,
+              note: 'SMS could not be queued for approval'
+            }
+          };
+        }
+
+        const scheduled = await scheduleRes.json();
+        return {
+          success: true,
+          result: {
+            message: "SMS draft created — it's in your Scheduled queue pending approval",
+            scheduledId: scheduled.id,
+            status: 'pending',
+            to: contactId ? 'contact' : recipientPhone,
+            preview: body.substring(0, 160) + (body.length > 160 ? '...' : ''),
+            characterCount: body.length,
+            note: 'Review and approve in Scheduled → Pending before sending. Requires Twilio integration.'
+          }
+        };
+      }
+
       case 'draft_email': {
         const { to, subject, body, contactId, dealId } = toolInput as {
           to: string;
@@ -1478,7 +1600,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: JORDAN_SYSTEM_PROMPT,
+        system: buildJordanSystemPrompt(),
         tools: TOOLS,
         messages,
       }),
@@ -1540,7 +1662,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: JORDAN_SYSTEM_PROMPT,
+          system: buildJordanSystemPrompt(),
           messages: [
             ...messages,
             {
