@@ -4,6 +4,34 @@ Use this file to record session handoffs and major changes.
 
 ---
 
+## 2026-04-19 — Email Template Fix: Gmail/Outlook Width Compatibility
+
+**What Shipped:**
+
+1. **Base Layout Template System**
+   - Created `apps/api/src/email/templates/base-layout.ts`
+   - Uses HTML `width="600"` attribute instead of CSS max-width (Gmail/Outlook strip CSS max-width on divs)
+   - MSO conditionals for Outlook compatibility
+   - Reusable helpers: `wrapInBaseLayout()`, `createSectionHeader()`, `createParagraph()`, `createHeadline()`
+   - Consistent branding: dark background #0D1117, cyan accents #00D4FF
+
+2. **Refactored Beta Welcome Email**
+   - `apps/api/src/email/templates/beta-welcome.ts` now uses base layout
+   - Body content only — no inline layout HTML
+   - Preheader text support for email previews
+
+**Technical Details:**
+- HTML table with `width="600"` attribute is reliable across all email clients
+- 40px side padding = 520px content area
+- MSO conditional comments for Outlook rendering
+
+**Deployment:**
+- Commit: 120fc92
+- ECS: zander-api:64 (v71 image)
+- Test email sent to jonathan@zanderos.com
+
+---
+
 ## 2026-04-18 — Phase 5B Consulting Lead Pipeline (Deployment Verified)
 
 **What Shipped:**
