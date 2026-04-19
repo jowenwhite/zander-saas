@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailService } from '../integrations/email/email.service';
 import { TicketStatus } from '@prisma/client';
+import {
+  wrapInBaseLayout,
+  createSectionHeader,
+  EMAIL_COLORS,
+} from '../email/templates/base-layout';
 
 interface TicketNotificationData {
   ticketNumber: string;
@@ -182,69 +187,63 @@ export class TicketNotificationService {
     category: string;
     ticketUrl: string;
   }): string {
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="background: linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-      <h1 style="color: #F0B323; margin: 0; font-size: 24px;">⚡ Zander Support</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 14px;">Your ticket has been created</p>
-    </div>
+    const bodyContent = `
+      <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 16px; line-height: 1.7; margin: 0 0 20px;">
+        Hi ${data.firstName},
+      </p>
 
-    <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-      <p style="color: #333; font-size: 16px; margin: 0 0 20px;">Hi ${data.firstName},</p>
-
-      <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 0 0 20px;">
+      <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 16px; line-height: 1.7; margin: 0 0 20px;">
         Thank you for reaching out. We've received your support ticket and our team will review it shortly.
       </p>
 
-      <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px; width: 120px;">Ticket #:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px; font-weight: 600;">${data.ticketNumber}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px;">Subject:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px; font-weight: 600;">${data.subject}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px;">Priority:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px;">${data.priority}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px;">Category:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px;">${data.category}</td>
-          </tr>
-        </table>
-      </div>
+      ${createSectionHeader('Ticket Details')}
 
-      <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-        <p style="color: #666; font-size: 12px; text-transform: uppercase; margin: 0 0 8px; letter-spacing: 0.5px;">Description</p>
-        <p style="color: #333; font-size: 14px; line-height: 1.6; margin: 0; white-space: pre-wrap;">${data.description.slice(0, 500)}${data.description.length > 500 ? '...' : ''}</p>
-      </div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(255,255,255,0.03); border: 1px solid ${EMAIL_COLORS.borderColor}; border-radius: 8px; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; width: 100px; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">Ticket #</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.cyan}; font-size: 14px; font-weight: 600; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">${data.ticketNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">Subject</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.white}; font-size: 14px; font-weight: 600; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">${data.subject}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">Priority</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.lightGray}; font-size: 14px; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">${data.priority}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px;">Category</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.lightGray}; font-size: 14px;">${data.category}</td>
+        </tr>
+      </table>
 
-      <div style="text-align: center; margin: 25px 0;">
-        <a href="${data.ticketUrl}" style="display: inline-block; background: linear-gradient(135deg, #BF0A30 0%, #A00A28 100%); color: white; text-decoration: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; font-size: 14px;">View Ticket</a>
-      </div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(255,255,255,0.02); border: 1px solid ${EMAIL_COLORS.borderColor}; border-radius: 8px; margin: 20px 0;">
+        <tr>
+          <td style="padding: 16px;">
+            <p style="color: ${EMAIL_COLORS.mutedGray}; font-size: 12px; text-transform: uppercase; margin: 0 0 8px; letter-spacing: 0.5px;">Description</p>
+            <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 14px; line-height: 1.6; margin: 0; white-space: pre-wrap;">${data.description.slice(0, 500)}${data.description.length > 500 ? '...' : ''}</p>
+          </td>
+        </tr>
+      </table>
 
-      <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 0;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 25px 0;">
+        <tr>
+          <td>
+            <a href="${data.ticketUrl}" style="display: inline-block; background: ${EMAIL_COLORS.cyan}; color: ${EMAIL_COLORS.background}; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 14px;">View Ticket</a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; line-height: 1.6; margin: 0;">
         We'll notify you when there's an update to your ticket.
       </p>
-    </div>
+    `;
 
-    <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-      <p style="margin: 0;">Zander - Operating Simply</p>
-      <p style="margin: 5px 0 0;">Powered by Zander Systems LLC</p>
-    </div>
-  </div>
-</body>
-</html>`;
+    return wrapInBaseLayout(bodyContent, {
+      showHeader: true,
+      showSignature: true,
+      preheaderText: `Ticket ${data.ticketNumber} created: ${data.subject}`,
+    });
   }
 
   private generateTicketUpdatedEmail(data: {
@@ -255,68 +254,76 @@ export class TicketNotificationService {
     newStatus: string;
     ticketUrl: string;
   }): string {
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="background: linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-      <h1 style="color: #F0B323; margin: 0; font-size: 24px;">⚡ Zander Support</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 14px;">Your ticket has been updated</p>
-    </div>
+    const bodyContent = `
+      <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 16px; line-height: 1.7; margin: 0 0 20px;">
+        Hi ${data.firstName},
+      </p>
 
-    <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-      <p style="color: #333; font-size: 16px; margin: 0 0 20px;">Hi ${data.firstName},</p>
-
-      <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 0 0 20px;">
+      <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 16px; line-height: 1.7; margin: 0 0 20px;">
         There's been an update to your support ticket.
       </p>
 
-      <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px; width: 120px;">Ticket #:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px; font-weight: 600;">${data.ticketNumber}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px;">Subject:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px; font-weight: 600;">${data.subject}</td>
-          </tr>
-        </table>
-      </div>
+      ${createSectionHeader('Ticket Details')}
 
-      <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 25px 0; text-align: center;">
-        <div style="display: inline-block; background: #f1f3f5; padding: 10px 20px; border-radius: 6px;">
-          <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 4px;">Previous Status</p>
-          <p style="color: #333; font-size: 14px; font-weight: 600; margin: 0;">${data.previousStatus}</p>
-        </div>
-        <span style="color: #999; font-size: 20px;">→</span>
-        <div style="display: inline-block; background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(39, 174, 96, 0.05) 100%); padding: 10px 20px; border-radius: 6px; border: 1px solid rgba(39, 174, 96, 0.2);">
-          <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 4px;">New Status</p>
-          <p style="color: #27ae60; font-size: 14px; font-weight: 600; margin: 0;">${data.newStatus}</p>
-        </div>
-      </div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(255,255,255,0.03); border: 1px solid ${EMAIL_COLORS.borderColor}; border-radius: 8px; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; width: 100px; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">Ticket #</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.cyan}; font-size: 14px; font-weight: 600; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">${data.ticketNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px;">Subject</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.white}; font-size: 14px; font-weight: 600;">${data.subject}</td>
+        </tr>
+      </table>
 
-      <div style="text-align: center; margin: 25px 0;">
-        <a href="${data.ticketUrl}" style="display: inline-block; background: linear-gradient(135deg, #BF0A30 0%, #A00A28 100%); color: white; text-decoration: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; font-size: 14px;">View Ticket</a>
-      </div>
+      ${createSectionHeader('Status Change')}
 
-      <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 0;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 20px 0;">
+        <tr>
+          <td width="45%" style="vertical-align: top;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(255,255,255,0.03); border: 1px solid ${EMAIL_COLORS.borderColor}; border-radius: 8px;">
+              <tr>
+                <td style="padding: 16px; text-align: center;">
+                  <p style="color: ${EMAIL_COLORS.mutedGray}; font-size: 11px; text-transform: uppercase; margin: 0 0 8px; letter-spacing: 0.5px;">Previous</p>
+                  <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 14px; font-weight: 600; margin: 0;">${data.previousStatus}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td width="10%" style="text-align: center; vertical-align: middle;">
+            <span style="color: ${EMAIL_COLORS.cyan}; font-size: 20px;">→</span>
+          </td>
+          <td width="45%" style="vertical-align: top;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(0, 212, 255, 0.1); border: 1px solid ${EMAIL_COLORS.cyan}; border-radius: 8px;">
+              <tr>
+                <td style="padding: 16px; text-align: center;">
+                  <p style="color: ${EMAIL_COLORS.mutedGray}; font-size: 11px; text-transform: uppercase; margin: 0 0 8px; letter-spacing: 0.5px;">New</p>
+                  <p style="color: ${EMAIL_COLORS.cyan}; font-size: 14px; font-weight: 600; margin: 0;">${data.newStatus}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 25px 0;">
+        <tr>
+          <td>
+            <a href="${data.ticketUrl}" style="display: inline-block; background: ${EMAIL_COLORS.cyan}; color: ${EMAIL_COLORS.background}; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 14px;">View Ticket</a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; line-height: 1.6; margin: 0;">
         We'll continue to keep you updated on any changes.
       </p>
-    </div>
+    `;
 
-    <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-      <p style="margin: 0;">Zander - Operating Simply</p>
-      <p style="margin: 5px 0 0;">Powered by Zander Systems LLC</p>
-    </div>
-  </div>
-</body>
-</html>`;
+    return wrapInBaseLayout(bodyContent, {
+      showHeader: true,
+      showSignature: true,
+      preheaderText: `Ticket ${data.ticketNumber} status changed to ${data.newStatus}`,
+    });
   }
 
   private generateTicketResolvedEmail(data: {
@@ -327,68 +334,74 @@ export class TicketNotificationService {
     status: string;
     ticketUrl: string;
   }): string {
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">✅ Ticket Resolved</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 14px;">${data.ticketNumber}</p>
-    </div>
+    // Green accent for resolved status
+    const successGreen = '#10B981';
 
-    <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-      <p style="color: #333; font-size: 16px; margin: 0 0 20px;">Hi ${data.firstName},</p>
+    const bodyContent = `
+      <p style="color: ${EMAIL_COLORS.white}; font-size: 32px; font-weight: 700; margin: 0 0 20px; letter-spacing: -1px;">
+        Ticket Resolved
+      </p>
 
-      <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 0 0 20px;">
+      <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 16px; line-height: 1.7; margin: 0 0 20px;">
+        Hi ${data.firstName},
+      </p>
+
+      <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 16px; line-height: 1.7; margin: 0 0 20px;">
         Great news! Your support ticket has been resolved.
       </p>
 
-      <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px; width: 120px;">Ticket #:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px; font-weight: 600;">${data.ticketNumber}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px;">Subject:</td>
-            <td style="padding: 8px 0; color: #0C2340; font-size: 14px; font-weight: 600;">${data.subject}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #666; font-size: 14px;">Status:</td>
-            <td style="padding: 8px 0;">
-              <span style="display: inline-block; background: #27ae60; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">${data.status}</span>
-            </td>
-          </tr>
-        </table>
-      </div>
+      ${createSectionHeader('Ticket Details')}
 
-      <div style="background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(39, 174, 96, 0.05) 100%); border: 1px solid rgba(39, 174, 96, 0.2); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-        <p style="color: #27ae60; font-size: 12px; text-transform: uppercase; margin: 0 0 8px; letter-spacing: 0.5px; font-weight: 600;">Resolution</p>
-        <p style="color: #333; font-size: 14px; line-height: 1.6; margin: 0; white-space: pre-wrap;">${data.resolution}</p>
-      </div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(255,255,255,0.03); border: 1px solid ${EMAIL_COLORS.borderColor}; border-radius: 8px; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; width: 100px; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">Ticket #</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.cyan}; font-size: 14px; font-weight: 600; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">${data.ticketNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">Subject</td>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.white}; font-size: 14px; font-weight: 600; border-bottom: 1px solid ${EMAIL_COLORS.borderColor};">${data.subject}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 16px; color: ${EMAIL_COLORS.mutedGray}; font-size: 14px;">Status</td>
+          <td style="padding: 8px 16px;">
+            <span style="display: inline-block; background: ${successGreen}; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">${data.status}</span>
+          </td>
+        </tr>
+      </table>
 
-      <div style="text-align: center; margin: 25px 0;">
-        <a href="${data.ticketUrl}" style="display: inline-block; background: linear-gradient(135deg, #0C2340 0%, #1a3a5c 100%); color: white; text-decoration: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; font-size: 14px;">View Ticket Details</a>
-      </div>
+      ${createSectionHeader('Resolution')}
 
-      <div style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-top: 20px; text-align: center;">
-        <p style="color: #666; font-size: 13px; margin: 0;">
-          Need more help? Reply to this email or <a href="${data.ticketUrl}" style="color: #BF0A30; text-decoration: none; font-weight: 600;">open a new ticket</a>.
-        </p>
-      </div>
-    </div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; margin: 20px 0;">
+        <tr>
+          <td style="padding: 20px;">
+            <p style="color: ${EMAIL_COLORS.lightGray}; font-size: 14px; line-height: 1.7; margin: 0; white-space: pre-wrap;">${data.resolution}</p>
+          </td>
+        </tr>
+      </table>
 
-    <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-      <p style="margin: 0;">Zander - Operating Simply</p>
-      <p style="margin: 5px 0 0;">Powered by Zander Systems LLC</p>
-    </div>
-  </div>
-</body>
-</html>`;
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 25px 0;">
+        <tr>
+          <td>
+            <a href="${data.ticketUrl}" style="display: inline-block; background: ${EMAIL_COLORS.cyan}; color: ${EMAIL_COLORS.background}; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 14px;">View Ticket Details</a>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: rgba(255,255,255,0.03); border: 1px solid ${EMAIL_COLORS.borderColor}; border-radius: 8px; margin: 25px 0 0;">
+        <tr>
+          <td style="padding: 16px; text-align: center;">
+            <p style="color: ${EMAIL_COLORS.mutedGray}; font-size: 13px; margin: 0;">
+              Need more help? Reply to this email or <a href="${data.ticketUrl}" style="color: ${EMAIL_COLORS.cyan}; text-decoration: none; font-weight: 600;">open a new ticket</a>.
+            </p>
+          </td>
+        </tr>
+      </table>
+    `;
+
+    return wrapInBaseLayout(bodyContent, {
+      showHeader: true,
+      showSignature: true,
+      preheaderText: `Great news! Ticket ${data.ticketNumber} has been resolved.`,
+    });
   }
 }

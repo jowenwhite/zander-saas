@@ -131,37 +131,76 @@ export function wrapEmailContent(bodyContent: string, options: { theme?: 'dark' 
   const bgColor = theme === 'dark' ? '#080A0F' : '#FFFFFF';
   const bgGradient = theme === 'dark' ? 'linear-gradient(180deg, #080A0F 0%, #0E1117 100%)' : '#FFFFFF';
 
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: ${bgColor};">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto;">
+  // Uses HTML width="600" attribute instead of CSS max-width for Gmail/Outlook compatibility
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Zander</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style type="text/css">
+    body, table, td, p, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: ${bgColor}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <!-- Outer wrapper table for centering -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: ${bgColor};">
+    <tr>
+      <td align="center" style="padding: 20px 10px;">
+
+        <!--[if mso]>
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" align="center">
         <tr>
-          <td style="padding: 40px 30px; background: ${bgGradient};">
-            <!-- Header with Logo -->
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-              <tr>
-                <td style="padding-bottom: 30px; border-bottom: 1px solid rgba(0, 207, 235, 0.2);">
-                  <img src="${ZANDER_LOGO_URL}" alt="Zander" style="height: 36px; width: auto;">
-                </td>
-              </tr>
-            </table>
+        <td>
+        <![endif]-->
 
-            <!-- Email Body Content -->
-            ${bodyContent}
+        <!-- Main content table - fixed 600px width -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" align="center" style="width: 600px; max-width: 600px; background: ${bgGradient};">
+          <tr>
+            <td style="padding: 40px 30px;">
+              <!-- Header with Logo -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="padding-bottom: 30px; border-bottom: 1px solid rgba(0, 207, 235, 0.2);">
+                    <img src="${ZANDER_LOGO_URL}" alt="Zander" width="120" height="36" style="display: block; height: 36px; width: auto; border: 0;">
+                  </td>
+                </tr>
+              </table>
 
-            <!-- Email Signature -->
-            ${signature}
-          </td>
+              <!-- Email Body Content -->
+              ${bodyContent}
+
+              <!-- Email Signature -->
+              ${signature}
+            </td>
+          </tr>
+        </table>
+
+        <!--[if mso]>
+        </td>
         </tr>
-      </table>
-    </body>
-    </html>
-  `;
+        </table>
+        <![endif]-->
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 }
 
 /**
