@@ -25,6 +25,27 @@
 - **ORM:** Prisma
 - **Migration:** `prisma db push` only (never `migrate dev` in production)
 
+## LOCAL TESTING MANDATE — MANDATORY
+
+NO code change ships to ECS without local verification first. This rule is permanent and non-negotiable.
+
+### Before ANY Docker build or deployment:
+1. Clean and rebuild: `rm -rf apps/api/dist && cd apps/api && npx tsc`
+2. Start local API: `cd apps/api && npm run start:dev`
+3. Start local web: `cd apps/web && npm run dev`
+4. Open browser at localhost and test EVERY fix against the local server
+5. Verify the fix works visually and functionally
+6. Only THEN proceed to Docker build and deploy
+
+### Why this exists:
+The April 19-20, 2026 weekend burned 5+ Docker build/ECR push/ECS deploy cycles (hours of time, real AWS costs) deploying code that was never tested locally. Compiled JS did not include source changes. Every deployment "succeeded" (health check passed, TypeScript compiled) but the actual bugs remained because the fixes never made it into the running code.
+
+### The rule:
+- TypeScript compiling does NOT mean the fix works
+- Docker --no-cache does NOT guarantee fresh compiled output
+- Health check passing does NOT mean your fix is deployed
+- The ONLY proof is: run it locally, see it work in the browser
+
 ## Deployment Commands
 
 ### API Deployment
