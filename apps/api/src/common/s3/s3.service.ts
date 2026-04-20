@@ -33,27 +33,32 @@ export class S3Service {
   constructor(private configService: ConfigService) {
     this.region = this.configService.get<string>('AWS_REGION') || 'us-east-1';
 
-    // CRITICAL: Only consider S3 configured if S3_BUCKET_NAME is EXPLICITLY set
+    // CRITICAL: Require ALL THREE env vars before considering S3 configured
     // Do NOT rely on SDK credential chain or IAM task roles
     const explicitBucket = this.configService.get<string>('S3_BUCKET_NAME');
-    this.s3Configured = !!explicitBucket;
+    const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID');
+    const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY');
+
+    this.s3Configured = !!(explicitBucket && accessKeyId && secretAccessKey);
     this.bucketName = explicitBucket || 'zander-assets';
 
     if (this.s3Configured) {
-      // Only initialize S3 client if explicitly configured
-      const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID') || '';
-      const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '';
-
+      // Only initialize S3 client if ALL credentials explicitly configured
       this.s3Client = new S3Client({
         region: this.region,
-        credentials: accessKeyId && secretAccessKey
-          ? { accessKeyId, secretAccessKey }
-          : undefined, // Let SDK use default credential chain if no explicit creds
+        credentials: {
+          accessKeyId: accessKeyId!,
+          secretAccessKey: secretAccessKey!,
+        },
       });
 
       this.logger.log(`S3 configured with bucket: ${this.bucketName}`);
     } else {
-      this.logger.warn('S3_BUCKET_NAME not set - S3 uploads disabled, using database storage fallback');
+      const missing: string[] = [];
+      if (!explicitBucket) missing.push('S3_BUCKET_NAME');
+      if (!accessKeyId) missing.push('AWS_ACCESS_KEY_ID');
+      if (!secretAccessKey) missing.push('AWS_SECRET_ACCESS_KEY');
+      this.logger.warn(`S3 disabled - missing env vars: ${missing.join(', ')}. Using database storage fallback.`);
     }
   }
 
