@@ -49,18 +49,38 @@ The April 19-20, 2026 weekend burned 5+ Docker build/ECR push/ECS deploy cycles 
 ## Deployment Commands
 
 ### API Deployment
+
+**CRITICAL:** `aws ecs update-service --force-new-deployment` does NOT update the image if the task definition is pinned to a specific image tag. You MUST register a new task definition revision pointing to the new image, then update the service to use the new task definition.
+
 ```bash
-# Build with no cache (ALWAYS use --no-cache)
+# 1. Build with no cache (ALWAYS use --no-cache)
 docker build --no-cache -f Dockerfile.api -t zander-api:vXX .
 
-# Tag for ECR
+# 2. Tag for ECR (both version and latest)
 docker tag zander-api:vXX 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:vXX
+docker tag zander-api:vXX 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:latest
 
-# Push to ECR
+# 3. ECR login + push both
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 288720721534.dkr.ecr.us-east-1.amazonaws.com
 docker push 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:vXX
+docker push 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:latest
 
-# Update ECS service (force new deployment)
-aws ecs update-service --cluster zander-cluster --service zander-api-service --force-new-deployment
+# 4. Register NEW task definition revision with the new image
+aws ecs describe-task-definition --task-definition zander-api --region us-east-1 --query "taskDefinition" > /tmp/task-def.json
+cat /tmp/task-def.json | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | .containerDefinitions[0].image = "288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:vXX"' > /tmp/new-task-def.json
+aws ecs register-task-definition --cli-input-json file:///tmp/new-task-def.json --region us-east-1
+
+# 5. Update service with NEW task definition (note the new revision number from step 4)
+aws ecs update-service --cluster zander-cluster --service zander-api-service --task-definition zander-api:NEW_REVISION --force-new-deployment --region us-east-1
+
+# 6. Wait for stability
+aws ecs wait services-stable --cluster zander-cluster --services zander-api-service --region us-east-1
+
+# 7. Health check
+curl https://api.zanderos.com/health
+
+# 8. Pull CloudWatch logs to verify new code is running
+aws logs get-log-events --log-group-name /ecs/zander-api --log-stream-name $(aws logs describe-log-streams --log-group-name /ecs/zander-api --order-by LastEventTime --descending --limit 1 --query "logStreams[0].logStreamName" --output text --region us-east-1) --limit 30 --region us-east-1 --query "events[*].message" --output text
 ```
 
 ### Web Deployment
