@@ -5,6 +5,7 @@ import { ThemeProvider } from './components/ThemeProvider'
 import { PostHogProvider } from './components/PostHogProvider'
 import { PEPProvider, PersistentExecutivePanel } from './components/pep'
 import { TierProvider } from './contexts/TierContext'
+import { GoogleAnalytics } from './components/GoogleAnalytics'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark">
       <body className={`${inter.variable} ${sora.variable} font-sans`}>
+        <GoogleAnalytics />
         <PostHogProvider>
           <ThemeProvider>
             <TierProvider>
