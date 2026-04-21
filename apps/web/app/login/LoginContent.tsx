@@ -25,7 +25,8 @@ export default function LoginContent() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://api.zanderos.com/auth/login', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,0 +1,44 @@
+- generic [active] [ref=e2]:
+  - generic [ref=e7] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e8]:
+      - img [ref=e9]
+    - generic [ref=e12]:
+      - button "Open issues overlay" [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: "0"
+          - generic [ref=e16]: "1"
+        - generic [ref=e17]: Issue
+      - button "Collapse issues badge" [ref=e18]:
+        - img [ref=e19]
+  - alert [ref=e1]
+  - generic [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - img "Zander" [ref=e24]
+        - paragraph [ref=e25]: Your AI-Powered Executive Team
+      - generic [ref=e26]:
+        - blockquote [ref=e27]: "\"The true direction of commerce is not just the exchange of goods, but the expansion of human potential through strategic innovation.\""
+        - paragraph [ref=e28]: — Alexander Hamilton
+      - generic [ref=e29]: © 2026 Zander Systems LLC
+    - generic [ref=e31]:
+      - heading "Welcome Back" [level=2] [ref=e32]
+      - paragraph [ref=e33]: Sign in to access your Zander dashboard
+      - generic [ref=e50]: Unable to connect to server. Please try again.
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]: Email Address
+          - textbox "Enter your email" [ref=e37]: jonathan@zanderos.com
+        - generic [ref=e38]:
+          - generic [ref=e39]: Password
+          - textbox "Enter your password" [ref=e40]: test123!
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - checkbox "Remember me" [ref=e43]
+            - generic [ref=e44]: Remember me
+          - link "Forgot password?" [ref=e45] [cursor=pointer]:
+            - /url: /forgot-password
+        - button "Sign In" [ref=e46] [cursor=pointer]
+      - paragraph [ref=e48]:
+        - text: Don't have an account?
+        - link "Sign up" [ref=e49] [cursor=pointer]:
+          - /url: /signup

@@ -101,6 +101,7 @@ model Tenant {
   userTenantAccess        UserTenantAccess[]
   users                   User[]
   meetingRecords          MeetingRecord[]
+  integrationConnections  IntegrationConnection[]
 
   @@map("tenants")
 }
@@ -2276,4 +2277,24 @@ model MeetingRecord {
   @@index([leadId])
   @@index([scheduledAt])
   @@map("meeting_records")
+}
+
+model IntegrationConnection {
+  id            String    @id @default(cuid())
+  tenantId      String
+  provider      String    // 'google-analytics', 'meta', 'linkedin', 'twitter', 'canva'
+  accessToken   String?
+  refreshToken  String?
+  expiresAt     DateTime?
+  metadata      Json?     // { propertyId, measurementId, propertyName, accountId }
+  status        String    @default("active") // 'active', 'disconnected', 'expired', 'error'
+  connectedAt   DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, provider])
+  @@index([tenantId])
+  @@index([provider])
+  @@index([status])
+  @@map("integration_connections")
 }

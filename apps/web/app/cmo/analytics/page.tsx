@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, CSSProperties } from 'react';
+import { useState, useEffect, CSSProperties, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CMOLayout, Card, LoadingSpinner } from '../components';
 
@@ -117,7 +117,7 @@ interface AnalyticsData {
   };
 }
 
-export default function CMOAnalyticsPage() {
+function CMOAnalyticsContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -1726,3 +1726,18 @@ const trafficKpiStyle: CSSProperties = {
   padding: '1rem',
   textAlign: 'center',
 };
+
+// Wrapper component with Suspense boundary for useSearchParams
+export default function CMOAnalyticsPage() {
+  return (
+    <Suspense fallback={
+      <CMOLayout>
+        <div style={loadingContainerStyle}>
+          <LoadingSpinner />
+        </div>
+      </CMOLayout>
+    }>
+      <CMOAnalyticsContent />
+    </Suspense>
+  );
+}
