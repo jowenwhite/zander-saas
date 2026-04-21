@@ -1,6 +1,64 @@
 'use client';
 import { useState, useEffect, CSSProperties } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CMOLayout, Card, LoadingSpinner } from '../components';
+
+// GA4 Interfaces
+interface GAStatus {
+  connected: boolean;
+  propertyId?: string;
+  propertyName?: string;
+  connectedAt?: string;
+}
+
+interface GAProperty {
+  propertyId: string;
+  displayName: string;
+  accountId: string;
+}
+
+interface GAWebTrafficData {
+  activeUsers: { today: number; period: number };
+  sessions: number;
+  pageViews: number;
+  newVsReturning: { new: number; returning: number };
+  topPages: Array<{ path: string; views: number; avgTimeOnPage: number }>;
+  trafficSources: Array<{ source: string; medium: string; sessions: number }>;
+}
+
+// Meta Interfaces
+interface MetaStatus {
+  connected: boolean;
+  pageId?: string;
+  pageName?: string;
+  instagramConnected?: boolean;
+  instagramUsername?: string;
+  connectedAt?: string;
+  expiresAt?: string;
+}
+
+interface MetaPage {
+  pageId: string;
+  pageName: string;
+  pageAccessToken: string;
+  instagramAccountId?: string;
+  instagramUsername?: string;
+}
+
+interface MetaEngagementData {
+  pageLikes: number;
+  pageFollowers: number;
+  postReach: { period7d: number; period30d: number };
+  engagementRate: number;
+  topPosts: Array<{
+    id: string;
+    message: string;
+    createdTime: string;
+    reach: number;
+    engagement: number;
+    type: 'facebook' | 'instagram';
+  }>;
+}
 
 interface CampaignMetrics {
   id: string;
@@ -60,13 +118,207 @@ interface AnalyticsData {
 }
 
 export default function CMOAnalyticsPage() {
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d'>('30d');
 
+  // Google Analytics state
+  const [gaStatus, setGaStatus] = useState<GAStatus>({ connected: false });
+  const [gaProperties, setGaProperties] = useState<GAProperty[]>([]);
+  const [gaWebTraffic, setGaWebTraffic] = useState<GAWebTrafficData | null>(null);
+  const [gaLoading, setGaLoading] = useState(false);
+  const [showPropertySelector, setShowPropertySelector] = useState(false);
+  const [gaMessage, setGaMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Meta state
+  const [metaStatus, setMetaStatus] = useState<MetaStatus>({ connected: false });
+  const [metaPages, setMetaPages] = useState<MetaPage[]>([]);
+  const [metaEngagement, setMetaEngagement] = useState<MetaEngagementData | null>(null);
+  const [metaLoading, setMetaLoading] = useState(false);
+  const [showPageSelector, setShowPageSelector] = useState(false);
+  const [metaMessage, setMetaMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Check GA and Meta status on mount and handle OAuth callbacks
+  useEffect(() => {
+    checkGAStatus();
+    checkMetaStatus();
+
+    // Handle GA OAuth callback params
+    const gaParam = searchParams.get('ga');
+    const gaError = searchParams.get('ga_error');
+
+    if (gaParam === 'connected') {
+      setGaMessage({ type: 'success', text: 'Google Analytics connected successfully!' });
+      window.history.replaceState({}, '', '/cmo/analytics');
+    } else if (gaParam === 'select_property') {
+      setShowPropertySelector(true);
+      fetchGAProperties();
+      window.history.replaceState({}, '', '/cmo/analytics');
+    } else if (gaError) {
+      setGaMessage({ type: 'error', text: `Connection failed: ${gaError}` });
+      window.history.replaceState({}, '', '/cmo/analytics');
+    }
+
+    // Handle Meta OAuth callback params
+    const metaParam = searchParams.get('meta');
+    const metaError = searchParams.get('meta_error');
+
+    if (metaParam === 'connected') {
+      setMetaMessage({ type: 'success', text: 'Meta Suite connected successfully!' });
+      window.history.replaceState({}, '', '/cmo/analytics');
+    } else if (metaParam === 'select_page') {
+      setShowPageSelector(true);
+      fetchMetaPages();
+      window.history.replaceState({}, '', '/cmo/analytics');
+    } else if (metaError) {
+      setMetaMessage({ type: 'error', text: `Connection failed: ${metaError}` });
+      window.history.replaceState({}, '', '/cmo/analytics');
+    }
+  }, [searchParams]);
+
+  // Fetch GA web traffic when connected and date range changes
+  useEffect(() => {
+    if (gaStatus.connected && gaStatus.propertyId) {
+      fetchGAWebTraffic();
+    }
+  }, [gaStatus.connected, gaStatus.propertyId, dateRange]);
+
+  // Fetch Meta engagement when connected and date range changes
+  useEffect(() => {
+    if (metaStatus.connected && metaStatus.pageId) {
+      fetchMetaEngagement();
+    }
+  }, [metaStatus.connected, metaStatus.pageId, dateRange]);
+
   useEffect(() => {
     fetchAnalytics();
   }, [dateRange]);
+
+  const checkGAStatus = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/google-analytics/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const status = await response.json();
+        setGaStatus(status);
+      }
+    } catch (error) {
+      console.error('Failed to check GA status:', error);
+    }
+  };
+
+  const fetchGAProperties = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/google-analytics/properties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setGaProperties(data.properties || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch GA properties:', error);
+    }
+  };
+
+  const fetchGAWebTraffic = async () => {
+    try {
+      setGaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/google-analytics/data?range=${dateRange}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const trafficData = await response.json();
+        setGaWebTraffic(trafficData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch GA web traffic:', error);
+    } finally {
+      setGaLoading(false);
+    }
+  };
+
+  const handleGAConnect = async () => {
+    try {
+      setGaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/google-analytics/connect`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const { authUrl } = await response.json();
+        window.location.href = authUrl;
+      }
+    } catch (error) {
+      console.error('Failed to initiate GA connect:', error);
+      setGaMessage({ type: 'error', text: 'Failed to connect. Please try again.' });
+    } finally {
+      setGaLoading(false);
+    }
+  };
+
+  const handleGADisconnect = async () => {
+    if (!confirm('Disconnect Google Analytics? Web traffic data will no longer be displayed.')) return;
+    try {
+      setGaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      await fetch(`${apiUrl}/integrations/google-analytics/disconnect`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setGaStatus({ connected: false });
+      setGaWebTraffic(null);
+      setGaMessage({ type: 'success', text: 'Google Analytics disconnected' });
+    } catch (error) {
+      console.error('Failed to disconnect GA:', error);
+    } finally {
+      setGaLoading(false);
+    }
+  };
+
+  const handleSelectProperty = async (property: GAProperty) => {
+    try {
+      setGaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/google-analytics/select-property`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          propertyId: property.propertyId,
+          propertyName: property.displayName,
+          accountId: property.accountId,
+        }),
+      });
+      if (response.ok) {
+        setGaStatus({
+          connected: true,
+          propertyId: property.propertyId,
+          propertyName: property.displayName,
+        });
+        setShowPropertySelector(false);
+        setGaMessage({ type: 'success', text: `Connected to ${property.displayName}` });
+      }
+    } catch (error) {
+      console.error('Failed to select property:', error);
+    } finally {
+      setGaLoading(false);
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
@@ -90,6 +342,136 @@ export default function CMOAnalyticsPage() {
       setData(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Meta handler functions
+  const checkMetaStatus = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/meta/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const status = await response.json();
+        setMetaStatus(status);
+      }
+    } catch (error) {
+      console.error('Failed to check Meta status:', error);
+    }
+  };
+
+  const fetchMetaPages = async () => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/meta/pages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMetaPages(data.pages || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Meta pages:', error);
+    }
+  };
+
+  const fetchMetaEngagement = async () => {
+    try {
+      setMetaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/meta/data?range=${dateRange}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const engagementData = await response.json();
+        setMetaEngagement(engagementData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Meta engagement:', error);
+    } finally {
+      setMetaLoading(false);
+    }
+  };
+
+  const handleMetaConnect = async () => {
+    try {
+      setMetaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/meta/connect`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const { authUrl } = await response.json();
+        window.location.href = authUrl;
+      }
+    } catch (error) {
+      console.error('Failed to initiate Meta connect:', error);
+      setMetaMessage({ type: 'error', text: 'Failed to connect. Please try again.' });
+    } finally {
+      setMetaLoading(false);
+    }
+  };
+
+  const handleMetaDisconnect = async () => {
+    if (!confirm('Disconnect Meta Suite? Social engagement data will no longer be displayed.')) return;
+    try {
+      setMetaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      await fetch(`${apiUrl}/integrations/meta/disconnect`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMetaStatus({ connected: false });
+      setMetaEngagement(null);
+      setMetaMessage({ type: 'success', text: 'Meta Suite disconnected' });
+    } catch (error) {
+      console.error('Failed to disconnect Meta:', error);
+    } finally {
+      setMetaLoading(false);
+    }
+  };
+
+  const handleSelectPage = async (page: MetaPage) => {
+    try {
+      setMetaLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+      const response = await fetch(`${apiUrl}/integrations/meta/select-page`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pageId: page.pageId,
+          pageName: page.pageName,
+          pageAccessToken: page.pageAccessToken,
+          instagramAccountId: page.instagramAccountId,
+          instagramUsername: page.instagramUsername,
+        }),
+      });
+      if (response.ok) {
+        setMetaStatus({
+          connected: true,
+          pageId: page.pageId,
+          pageName: page.pageName,
+          instagramConnected: !!page.instagramAccountId,
+          instagramUsername: page.instagramUsername,
+        });
+        setShowPageSelector(false);
+        setMetaMessage({ type: 'success', text: `Connected to ${page.pageName}` });
+      }
+    } catch (error) {
+      console.error('Failed to select page:', error);
+    } finally {
+      setMetaLoading(false);
     }
   };
 
@@ -148,6 +530,284 @@ export default function CMOAnalyticsPage() {
         </div>
       </div>
 
+      {/* GA Message Toast */}
+      {gaMessage && (
+        <div
+          style={{
+            padding: '0.75rem 1rem',
+            marginBottom: '1rem',
+            borderRadius: '8px',
+            background: gaMessage.type === 'success' ? 'rgba(39, 174, 96, 0.15)' : 'rgba(231, 76, 60, 0.15)',
+            border: `1px solid ${gaMessage.type === 'success' ? '#27AE60' : '#E74C3C'}`,
+            color: gaMessage.type === 'success' ? '#27AE60' : '#E74C3C',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>{gaMessage.text}</span>
+          <button
+            onClick={() => setGaMessage(null)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0.25rem' }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Meta Message Toast */}
+      {metaMessage && (
+        <div
+          style={{
+            padding: '0.75rem 1rem',
+            marginBottom: '1rem',
+            borderRadius: '8px',
+            background: metaMessage.type === 'success' ? 'rgba(39, 174, 96, 0.15)' : 'rgba(231, 76, 60, 0.15)',
+            border: `1px solid ${metaMessage.type === 'success' ? '#27AE60' : '#E74C3C'}`,
+            color: metaMessage.type === 'success' ? '#27AE60' : '#E74C3C',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>{metaMessage.text}</span>
+          <button
+            onClick={() => setMetaMessage(null)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0.25rem' }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Marketing Integrations Section */}
+      <div style={{ marginBottom: '1.5rem' }}>
+      <Card>
+        <div style={cardHeaderStyle}>
+          <h3 style={cardTitleStyle}>Marketing Integrations</h3>
+        </div>
+        <div style={{ padding: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+          {/* Google Analytics */}
+          <div style={integrationCardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ ...integrationIconStyle, background: 'rgba(245, 124, 0, 0.1)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#F57C00">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Google Analytics</div>
+                <div style={{ fontSize: '0.75rem', color: gaStatus.connected ? '#27AE60' : '#8888A0' }}>
+                  {gaStatus.connected ? gaStatus.propertyName || 'Connected' : 'Not connected'}
+                </div>
+              </div>
+            </div>
+            {gaStatus.connected ? (
+              <button
+                onClick={handleGADisconnect}
+                disabled={gaLoading}
+                style={{
+                  ...integrationButtonStyle,
+                  background: 'transparent',
+                  border: '1px solid #E74C3C',
+                  color: '#E74C3C',
+                }}
+              >
+                {gaLoading ? 'Disconnecting...' : 'Disconnect'}
+              </button>
+            ) : (
+              <button
+                onClick={handleGAConnect}
+                disabled={gaLoading}
+                style={integrationButtonStyle}
+              >
+                {gaLoading ? 'Connecting...' : 'Connect'}
+              </button>
+            )}
+          </div>
+
+          {/* Email (Resend) - Always connected */}
+          <div style={integrationCardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ ...integrationIconStyle, background: 'rgba(52, 152, 219, 0.1)' }}>
+                <span style={{ fontSize: '1.25rem' }}>📧</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Email (Resend)</div>
+                <div style={{ fontSize: '0.75rem', color: '#27AE60' }}>Platform connected</div>
+              </div>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#8888A0', textAlign: 'center' }}>
+              Managed by platform
+            </div>
+          </div>
+
+          {/* Meta Suite */}
+          <div style={integrationCardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ ...integrationIconStyle, background: 'rgba(24, 119, 242, 0.1)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F2">
+                  <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Meta Suite</div>
+                <div style={{ fontSize: '0.75rem', color: metaStatus.connected ? '#27AE60' : '#8888A0' }}>
+                  {metaStatus.connected
+                    ? metaStatus.instagramConnected
+                      ? `${metaStatus.pageName} + IG`
+                      : metaStatus.pageName || 'Connected'
+                    : 'Not connected'}
+                </div>
+              </div>
+            </div>
+            {metaStatus.connected ? (
+              <button
+                onClick={handleMetaDisconnect}
+                disabled={metaLoading}
+                style={{
+                  ...integrationButtonStyle,
+                  background: 'transparent',
+                  border: '1px solid #E74C3C',
+                  color: '#E74C3C',
+                }}
+              >
+                {metaLoading ? 'Disconnecting...' : 'Disconnect'}
+              </button>
+            ) : (
+              <button
+                onClick={handleMetaConnect}
+                disabled={metaLoading}
+                style={{ ...integrationButtonStyle, background: '#1877F2' }}
+              >
+                {metaLoading ? 'Connecting...' : 'Connect'}
+              </button>
+            )}
+          </div>
+
+          {/* LinkedIn - Coming Soon */}
+          <div style={{ ...integrationCardStyle, opacity: 0.6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ ...integrationIconStyle, background: 'rgba(136, 136, 160, 0.1)' }}>
+                <span style={{ fontSize: '1.25rem' }}>💼</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>LinkedIn</div>
+                <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Coming soon</div>
+              </div>
+            </div>
+            <div style={{ ...comingSoonBadgeStyle }}>Coming Soon</div>
+          </div>
+
+          {/* Twitter/X - Coming Soon */}
+          <div style={{ ...integrationCardStyle, opacity: 0.6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ ...integrationIconStyle, background: 'rgba(136, 136, 160, 0.1)' }}>
+                <span style={{ fontSize: '1.25rem' }}>𝕏</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Twitter / X</div>
+                <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Coming soon</div>
+              </div>
+            </div>
+            <div style={{ ...comingSoonBadgeStyle }}>Coming Soon</div>
+          </div>
+
+          {/* Canva - Coming Soon */}
+          <div style={{ ...integrationCardStyle, opacity: 0.6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ ...integrationIconStyle, background: 'rgba(136, 136, 160, 0.1)' }}>
+                <span style={{ fontSize: '1.25rem' }}>🎨</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#F0F0F5', fontSize: '0.9rem' }}>Canva</div>
+                <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Coming soon</div>
+              </div>
+            </div>
+            <div style={{ ...comingSoonBadgeStyle }}>Coming Soon</div>
+          </div>
+        </div>
+      </Card>
+      </div>
+
+      {/* Property Selector Modal */}
+      {showPropertySelector && gaProperties.length > 0 && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h3 style={{ margin: '0 0 1rem', color: '#F0F0F5' }}>Select a GA4 Property</h3>
+            <p style={{ margin: '0 0 1rem', color: '#8888A0', fontSize: '0.875rem' }}>
+              Multiple properties found. Please select which one to use:
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {gaProperties.map((prop) => (
+                <button
+                  key={prop.propertyId}
+                  onClick={() => handleSelectProperty(prop)}
+                  style={{
+                    padding: '1rem',
+                    background: '#1C1C26',
+                    border: '1px solid #2A2A38',
+                    borderRadius: '8px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    color: '#F0F0F5',
+                  }}
+                >
+                  <div style={{ fontWeight: '600' }}>{prop.displayName}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>ID: {prop.propertyId}</div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowPropertySelector(false)}
+              style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: 'transparent', border: '1px solid #2A2A38', borderRadius: '6px', color: '#8888A0', cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Page Selector Modal (Meta) */}
+      {showPageSelector && metaPages.length > 0 && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h3 style={{ margin: '0 0 1rem', color: '#F0F0F5' }}>Select a Facebook Page</h3>
+            <p style={{ margin: '0 0 1rem', color: '#8888A0', fontSize: '0.875rem' }}>
+              Multiple pages found. Please select which one to use:
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {metaPages.map((page) => (
+                <button
+                  key={page.pageId}
+                  onClick={() => handleSelectPage(page)}
+                  style={{
+                    padding: '1rem',
+                    background: '#1C1C26',
+                    border: '1px solid #2A2A38',
+                    borderRadius: '8px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    color: '#F0F0F5',
+                  }}
+                >
+                  <div style={{ fontWeight: '600' }}>{page.pageName}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
+                    {page.instagramUsername ? `+ Instagram: @${page.instagramUsername}` : 'No Instagram connected'}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowPageSelector(false)}
+              style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: 'transparent', border: '1px solid #2A2A38', borderRadius: '6px', color: '#8888A0', cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Overview KPIs */}
       <div style={kpiGridStyle}>
         <KPICard
@@ -179,6 +839,336 @@ export default function CMOAnalyticsPage() {
           color="#9B59B6"
         />
       </div>
+
+      {/* Web Traffic Section - only shown when GA is connected */}
+      {gaStatus.connected && (
+        <div style={{ marginBottom: '1.5rem' }}>
+        <Card>
+          <div style={cardHeaderStyle}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={cardTitleStyle}>Web Traffic</h3>
+              {gaStatus.propertyName && (
+                <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
+                  {gaStatus.propertyName}
+                </span>
+              )}
+            </div>
+          </div>
+          {gaLoading && !gaWebTraffic ? (
+            <div style={{ padding: '3rem', textAlign: 'center' }}>
+              <LoadingSpinner />
+              <p style={{ color: '#8888A0', marginTop: '1rem' }}>Loading web traffic data...</p>
+            </div>
+          ) : gaWebTraffic ? (
+            <div style={{ padding: '1rem' }}>
+              {/* Traffic KPIs */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={trafficKpiStyle}>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Active Users Today</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
+                    {formatNumber(gaWebTraffic.activeUsers.today)}
+                  </div>
+                </div>
+                <div style={trafficKpiStyle}>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Total Sessions</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
+                    {formatNumber(gaWebTraffic.sessions)}
+                  </div>
+                </div>
+                <div style={trafficKpiStyle}>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>Page Views</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#F0F0F5' }}>
+                    {formatNumber(gaWebTraffic.pageViews)}
+                  </div>
+                </div>
+                <div style={trafficKpiStyle}>
+                  <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>New vs Returning</div>
+                  <div style={{ fontSize: '1rem', fontWeight: '600', color: '#F0F0F5' }}>
+                    <span style={{ color: '#27AE60' }}>{formatNumber(gaWebTraffic.newVsReturning.new)}</span>
+                    <span style={{ color: '#8888A0' }}> / </span>
+                    <span style={{ color: '#3498DB' }}>{formatNumber(gaWebTraffic.newVsReturning.returning)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                {/* Top Pages */}
+                <div>
+                  <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
+                    Top Pages
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {gaWebTraffic.topPages.slice(0, 5).map((page, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '0.5rem 0.75rem',
+                          background: '#1C1C26',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <span style={{ fontSize: '0.875rem', color: '#F0F0F5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                          {page.path}
+                        </span>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#F57C00' }}>
+                          {formatNumber(page.views)}
+                        </span>
+                      </div>
+                    ))}
+                    {gaWebTraffic.topPages.length === 0 && (
+                      <div style={{ color: '#8888A0', fontSize: '0.875rem', padding: '1rem', textAlign: 'center' }}>
+                        No page data available
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Traffic Sources */}
+                <div>
+                  <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
+                    Traffic Sources
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {gaWebTraffic.trafficSources.slice(0, 5).map((source, idx) => {
+                      const maxSessions = Math.max(...gaWebTraffic.trafficSources.map((s) => s.sessions), 1);
+                      const percentage = (source.sessions / maxSessions) * 100;
+                      return (
+                        <div key={idx} style={{ padding: '0.5rem 0' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                            <span style={{ fontSize: '0.875rem', color: '#F0F0F5' }}>
+                              {source.source} / {source.medium}
+                            </span>
+                            <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#3498DB' }}>
+                              {formatNumber(source.sessions)}
+                            </span>
+                          </div>
+                          <div style={{ height: '6px', background: '#2A2A38', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                width: `${percentage}%`,
+                                background: 'linear-gradient(90deg, #3498DB, #27AE60)',
+                                borderRadius: '3px',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {gaWebTraffic.trafficSources.length === 0 && (
+                      <div style={{ color: '#8888A0', fontSize: '0.875rem', padding: '1rem', textAlign: 'center' }}>
+                        No traffic source data available
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
+              <p>Unable to load web traffic data. Please try again.</p>
+            </div>
+          )}
+        </Card>
+        </div>
+      )}
+
+      {/* Social Engagement Section - Meta Suite */}
+      {metaStatus.connected && (
+        <div style={{ marginTop: '2rem' }}>
+        <Card>
+          <div style={cardHeaderStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>📱</span>
+              <div>
+                <h3 style={{ ...cardTitleStyle, margin: 0 }}>Social Engagement</h3>
+                <p style={{ color: '#8888A0', fontSize: '0.75rem', margin: '0.25rem 0 0' }}>
+                  {metaStatus.pageName}
+                  {metaStatus.instagramConnected && ` • @${metaStatus.instagramUsername}`}
+                </p>
+              </div>
+            </div>
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value as '7d' | '30d' | '90d')}
+              style={{
+                background: '#2A2A3E',
+                border: '1px solid #3A3A4E',
+                borderRadius: '6px',
+                color: '#F0F0F5',
+                padding: '0.5rem 1rem',
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+            </select>
+          </div>
+
+          {metaLoading ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#8888A0' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+              <p>Loading social engagement data...</p>
+            </div>
+          ) : metaEngagement ? (
+            <div>
+              {/* Engagement KPIs */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '1rem',
+                padding: '1.5rem',
+                borderBottom: '1px solid #3A3A4E'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Page Likes</div>
+                  <div style={{ color: '#F0F0F5', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {metaEngagement.pageLikes.toLocaleString()}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Followers</div>
+                  <div style={{ color: '#F0F0F5', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {metaEngagement.pageFollowers.toLocaleString()}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Post Reach (7d)</div>
+                  <div style={{ color: '#F0F0F5', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {metaEngagement.postReach.period7d.toLocaleString()}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Post Reach (30d)</div>
+                  <div style={{ color: '#F0F0F5', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {metaEngagement.postReach.period30d.toLocaleString()}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Engagement Rate</div>
+                  <div style={{ color: '#27AE60', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {metaEngagement.engagementRate.toFixed(2)}%
+                  </div>
+                </div>
+              </div>
+
+              {/* Top Posts */}
+              <div style={{ padding: '1.5rem' }}>
+                <h4 style={{ color: '#F0F0F5', fontSize: '1rem', margin: '0 0 1rem', fontWeight: '600' }}>
+                  Top Recent Posts
+                </h4>
+                {metaEngagement.topPosts.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {metaEngagement.topPosts.slice(0, 5).map((post) => (
+                      <div
+                        key={post.id}
+                        style={{
+                          background: '#2A2A3E',
+                          borderRadius: '8px',
+                          padding: '1rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          gap: '1rem',
+                        }}
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                            <span style={{
+                              fontSize: '0.75rem',
+                              padding: '0.125rem 0.5rem',
+                              borderRadius: '4px',
+                              background: post.type === 'instagram' ? '#E1306C' : '#1877F2',
+                              color: 'white'
+                            }}>
+                              {post.type === 'instagram' ? 'IG' : 'FB'}
+                            </span>
+                            <span style={{ color: '#8888A0', fontSize: '0.75rem' }}>
+                              {new Date(post.createdTime).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <p style={{
+                            color: '#F0F0F5',
+                            fontSize: '0.875rem',
+                            margin: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {post.message || '(No caption)'}
+                          </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1.5rem', flexShrink: 0 }}>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ color: '#8888A0', fontSize: '0.625rem', textTransform: 'uppercase' }}>Reach</div>
+                            <div style={{ color: '#3498DB', fontSize: '1rem', fontWeight: '600' }}>
+                              {post.reach.toLocaleString()}
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ color: '#8888A0', fontSize: '0.625rem', textTransform: 'uppercase' }}>Engagement</div>
+                            <div style={{ color: '#27AE60', fontSize: '1rem', fontWeight: '600' }}>
+                              {post.engagement.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ color: '#8888A0', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>
+                    No posts found in this time period
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#8888A0' }}>
+              <p>Unable to load social engagement data. Please try again.</p>
+            </div>
+          )}
+        </Card>
+        </div>
+      )}
+
+      {/* Social Engagement Empty State - when Meta not connected */}
+      {!metaStatus.connected && gaStatus.connected && (
+        <div style={{ marginTop: '2rem' }}>
+        <Card>
+          <div style={{ padding: '3rem', textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
+            <h3 style={{ color: '#F0F0F5', margin: '0 0 0.5rem', fontSize: '1.25rem' }}>
+              Social Engagement
+            </h3>
+            <p style={{ color: '#8888A0', margin: '0 0 1.5rem', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+              Connect Meta Suite to see your Facebook &amp; Instagram engagement metrics, including page likes, followers, post reach, and top performing content.
+            </p>
+            <button
+              onClick={handleMetaConnect}
+              disabled={metaLoading}
+              style={{
+                background: 'linear-gradient(135deg, #1877F2, #E1306C)',
+                color: 'white',
+                border: 'none',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                cursor: metaLoading ? 'not-allowed' : 'pointer',
+                opacity: metaLoading ? 0.7 : 1,
+              }}
+            >
+              {metaLoading ? 'Connecting...' : 'Connect Meta Suite'}
+            </button>
+          </div>
+        </Card>
+        </div>
+      )}
 
       {/* Getting Started Guide - shown when no data */}
       {!hasAnyData && (
@@ -668,4 +1658,71 @@ const secondaryButtonStyle: CSSProperties = {
   textDecoration: 'none',
   fontWeight: '600',
   fontSize: '0.875rem',
+};
+
+// Integration Card Styles
+const integrationCardStyle: CSSProperties = {
+  background: '#1C1C26',
+  borderRadius: '8px',
+  border: '1px solid #2A2A38',
+  padding: '1rem',
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+const integrationIconStyle: CSSProperties = {
+  width: '40px',
+  height: '40px',
+  borderRadius: '8px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const integrationButtonStyle: CSSProperties = {
+  padding: '0.5rem 1rem',
+  background: '#F57C00',
+  color: 'white',
+  border: 'none',
+  borderRadius: '6px',
+  fontWeight: '600',
+  fontSize: '0.8rem',
+  cursor: 'pointer',
+  width: '100%',
+};
+
+const comingSoonBadgeStyle: CSSProperties = {
+  padding: '0.5rem 1rem',
+  background: 'rgba(136, 136, 160, 0.1)',
+  color: '#8888A0',
+  borderRadius: '6px',
+  fontSize: '0.75rem',
+  fontWeight: '600',
+  textAlign: 'center',
+};
+
+const modalOverlayStyle: CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  background: 'rgba(0, 0, 0, 0.7)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+};
+
+const modalContentStyle: CSSProperties = {
+  background: '#09090F',
+  borderRadius: '12px',
+  border: '1px solid #2A2A38',
+  padding: '1.5rem',
+  maxWidth: '400px',
+  width: '90%',
+};
+
+const trafficKpiStyle: CSSProperties = {
+  background: '#1C1C26',
+  borderRadius: '8px',
+  padding: '1rem',
+  textAlign: 'center',
 };

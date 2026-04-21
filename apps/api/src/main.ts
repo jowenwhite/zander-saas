@@ -43,10 +43,13 @@ async function bootstrap() {
   const URLENCODED_LIMIT = '1mb';
   const RAW_LIMIT = '5mb';  // Larger for webhooks that may include file data
 
+  // Webhook routes that need raw body for signature verification
+  const webhookRoutes = ['/webhooks/stripe', '/email/webhook'];
+
   // Custom body parser that preserves raw body for webhooks
   app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (req.originalUrl === '/webhooks/stripe') {
-      // For Stripe webhooks, capture raw body with size limit
+    if (webhookRoutes.includes(req.originalUrl)) {
+      // For webhooks, capture raw body with size limit for signature verification
       let rawBody = '';
       let bodySize = 0;
       const maxSize = 5 * 1024 * 1024; // 5MB limit for webhooks
@@ -78,7 +81,7 @@ async function bootstrap() {
 
   // URL-encoded body parser for non-webhook routes with size limit
   app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (req.originalUrl !== '/webhooks/stripe') {
+    if (!webhookRoutes.includes(req.originalUrl)) {
       express.urlencoded({ limit: URLENCODED_LIMIT, extended: true })(req, res, next);
     } else {
       next();

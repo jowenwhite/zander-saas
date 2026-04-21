@@ -1,5 +1,34 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
+import { PrismaClient } from '@prisma/client';
+import * as crypto from 'crypto';
+
+const prisma = new PrismaClient();
+
+// Resend webhook event types
+export type ResendEventType =
+  | 'email.sent'
+  | 'email.delivered'
+  | 'email.delivery_delayed'
+  | 'email.complained'
+  | 'email.bounced'
+  | 'email.opened'
+  | 'email.clicked';
+
+export interface ResendWebhookPayload {
+  type: ResendEventType;
+  created_at: string;
+  data: {
+    email_id: string;
+    from: string;
+    to: string[];
+    subject: string;
+    created_at: string;
+    // Additional fields for specific events
+    click?: { link: string; timestamp: string };
+    bounce?: { message: string };
+  };
+}
 
 export interface SendEmailDto {
   to: string | string[];
@@ -113,5 +142,153 @@ export class EmailService {
         </div>
       `,
     });
+  }
+
+  /**
+   * Verify Resend webhook signature using svix headers
+   * Resend uses Svix for webhook delivery
+   */
+  verifyWebhookSignature(
+    payload: string,
+    headers: {
+      'svix-id': string;
+      'svix-timestamp': string;
+      'svix-signature': string;
+    }
+  ): boolean {
+    const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      this.logger.warn('RESEND_WEBHOOK_SECRET not configured - skipping signature verification');
+      // In development, allow unverified webhooks
+      return process.env.NODE_ENV !== 'production';
+    }
+
+    try {
+      const signedContent = `${headers['svix-id']}.${headers['svix-timestamp']}.${payload}`;
+
+      // Extract the secret (remove "whsec_" prefix if present)
+      const secretBytes = Buffer.from(
+        webhookSecret.startsWith('whsec_')
+          ? webhookSecret.slice(6)
+          : webhookSecret,
+        'base64'
+      );
+
+      const expectedSignature = crypto
+        .createHmac('sha256', secretBytes)
+        .update(signedContent)
+        .digest('base64');
+
+      // svix-signature format: "v1,<signature>" (can have multiple)
+      const signatures = headers['svix-signature'].split(' ');
+
+      for (const sig of signatures) {
+        const [version, signature] = sig.split(',');
+        if (version === 'v1' && signature === expectedSignature) {
+          return true;
+        }
+      }
+
+      // Check timestamp to prevent replay attacks (5 minute tolerance)
+      const timestamp = parseInt(headers['svix-timestamp']);
+      const now = Math.floor(Date.now() / 1000);
+      if (Math.abs(now - timestamp) > 300) {
+        this.logger.warn('Webhook timestamp too old - possible replay attack');
+        return false;
+      }
+
+      this.logger.warn('Webhook signature verification failed');
+      return false;
+    } catch (err) {
+      this.logger.error(`Webhook signature verification error: ${err.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * Process Resend webhook events
+   */
+  async processWebhookEvent(event: ResendWebhookPayload): Promise<{ processed: boolean; message: string }> {
+    const { type, data } = event;
+    const emailId = data.email_id;
+
+    this.logger.log(`Processing webhook event: ${type} for email: ${emailId}`);
+
+    try {
+      // Find the email message by Resend messageId
+      const emailMessage = await prisma.emailMessage.findFirst({
+        where: { messageId: emailId }
+      });
+
+      if (!emailMessage) {
+        this.logger.log(`Email message not found for messageId: ${emailId} - may be from external sender`);
+        return { processed: true, message: 'Email not tracked in system' };
+      }
+
+      switch (type) {
+        case 'email.sent':
+          await prisma.emailMessage.update({
+            where: { id: emailMessage.id },
+            data: { status: 'sent' }
+          });
+          break;
+
+        case 'email.delivered':
+          await prisma.emailMessage.update({
+            where: { id: emailMessage.id },
+            data: { status: 'delivered' }
+          });
+          break;
+
+        case 'email.delivery_delayed':
+          await prisma.emailMessage.update({
+            where: { id: emailMessage.id },
+            data: { status: 'delayed' }
+          });
+          break;
+
+        case 'email.opened':
+          await prisma.emailMessage.update({
+            where: { id: emailMessage.id },
+            data: {
+              status: 'opened',
+              openedAt: new Date()
+            }
+          });
+          break;
+
+        case 'email.clicked':
+          // Track click event - status remains 'opened' but we log the click
+          this.logger.log(`Email clicked: ${emailId}, link: ${data.click?.link}`);
+          // Could add a separate EmailClick table for detailed tracking
+          break;
+
+        case 'email.bounced':
+          await prisma.emailMessage.update({
+            where: { id: emailMessage.id },
+            data: { status: 'bounced' }
+          });
+          this.logger.warn(`Email bounced: ${emailId}, reason: ${data.bounce?.message}`);
+          break;
+
+        case 'email.complained':
+          await prisma.emailMessage.update({
+            where: { id: emailMessage.id },
+            data: { status: 'complained' }
+          });
+          this.logger.warn(`Email complaint received for: ${emailId}`);
+          // Consider adding contact to suppression list
+          break;
+
+        default:
+          this.logger.log(`Unhandled webhook event type: ${type}`);
+      }
+
+      return { processed: true, message: `Event ${type} processed successfully` };
+    } catch (err) {
+      this.logger.error(`Error processing webhook event: ${err.message}`);
+      return { processed: false, message: err.message };
+    }
   }
 }
