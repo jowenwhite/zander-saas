@@ -52,7 +52,7 @@ export class MetaController {
     @Query('error_description') errorDescription: string,
     @Res() res: Response,
   ): Promise<void> {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3002';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://app.zanderos.com';
 
     // Handle OAuth errors
     if (error) {
