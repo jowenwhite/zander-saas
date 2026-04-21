@@ -108,7 +108,7 @@ export class EmailService {
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
           <p style="color: #666; font-size: 12px;">
             Sent from Zander - Operating Simply<br>
-            Powered by 64 West Holdings
+            Powered by Zander Systems LLC
           </p>
         </div>
       `,
