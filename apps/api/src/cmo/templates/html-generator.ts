@@ -3,15 +3,19 @@
  * Converts block-based template JSON to responsive email HTML
  */
 
+// Block-based template format (new visual editor)
 export interface EmailTemplateContent {
-  version: string;
-  settings: {
+  version?: string;
+  settings?: {
     backgroundColor?: string;
     contentWidth?: number;
     fontFamily?: string;
     defaultTextColor?: string;
   };
-  blocks: EmailBlock[];
+  blocks?: EmailBlock[];
+  // Legacy format: simple html/text fields (older templates)
+  html?: string;
+  text?: string;
 }
 
 export interface EmailBlock {
@@ -45,12 +49,29 @@ export function generateEmailHtml(template: EmailTemplateContent, subject: strin
   // Force dark text color for email - override any light colors from template
   settings.defaultTextColor = '#333333';
 
-  // CRITICAL: Use Array.isArray to handle cases where blocks is truthy but not an array
-  if (!Array.isArray(template.blocks)) {
-    console.error('[html-generator] template.blocks is not an array:', typeof template.blocks, template.blocks);
+  // Determine content based on template format
+  let blocksHtml: string;
+
+  if (Array.isArray(template.blocks) && template.blocks.length > 0) {
+    // FORMAT 1: Block-based template (visual editor) - use block rendering
+    console.log('[html-generator] Using block-based format, blocks:', template.blocks.length);
+    blocksHtml = template.blocks.map((block) => generateBlockHtml(block, settings)).join('\n');
+  } else if (template.html && typeof template.html === 'string') {
+    // FORMAT 2: Legacy {html, text} format - wrap HTML content directly
+    console.log('[html-generator] Using legacy html/text format, html length:', template.html.length);
+    // Sanitize colors and wrap in a standard content row
+    const sanitizedHtml = sanitizeTextColorsForEmail(template.html);
+    blocksHtml = `          <tr>
+            <td class="content" style="padding: 30px 40px; background-color: #ffffff; color: ${settings.defaultTextColor}; font-size: 16px; line-height: 1.6;">
+              ${sanitizedHtml}
+            </td>
+          </tr>`;
+  } else {
+    // FORMAT 3: Neither blocks nor html - empty template, log warning
+    console.warn('[html-generator] Template has no blocks array and no html field - generating empty email');
+    console.warn('[html-generator] Template keys:', Object.keys(template));
+    blocksHtml = '';
   }
-  const blocks = Array.isArray(template.blocks) ? template.blocks : [];
-  const blocksHtml = blocks.map((block) => generateBlockHtml(block, settings)).join('\n');
 
   return `<!DOCTYPE html>
 <html lang="en">
