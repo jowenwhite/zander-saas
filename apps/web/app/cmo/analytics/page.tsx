@@ -7,13 +7,11 @@ interface CampaignMetrics {
   name: string;
   status: string;
   businessUnit: string | null;
-  sent: number;
-  opened: number;
-  clicked: number;
-  converted: number;
-  openRate: number;
-  clickRate: number;
-  conversionRate: number;
+  enrollments: number;
+  sent: number | null;
+  openRate: number | null;
+  clickRate: number | null;
+  conversionRate: number | null;
 }
 
 interface FunnelMetrics {
@@ -35,11 +33,13 @@ interface AnalyticsData {
   overview: {
     totalCampaigns: number;
     activeCampaigns: number;
-    totalLeads: number;
-    leadsThisMonth: number;
+    totalContacts: number;
+    contactsThisMonth: number;
     emailsSent: number;
-    avgOpenRate: number;
-    avgClickRate: number;
+    emailsOpened: number;
+    avgOpenRate: number | null;
+    avgClickRate: number | null;
+    totalSocialPosts: number;
     totalConversions: number;
   };
   campaigns: CampaignMetrics[];
@@ -50,6 +50,13 @@ interface AnalyticsData {
     opened: number;
     clicked: number;
   }[];
+  hasData: {
+    campaigns: boolean;
+    contacts: boolean;
+    emails: boolean;
+    funnels: boolean;
+    socialPosts: boolean;
+  };
 }
 
 export default function CMOAnalyticsPage() {
@@ -67,88 +74,20 @@ export default function CMOAnalyticsPage() {
       const token = localStorage.getItem('zander_token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-      // Fetch campaigns
-      const campaignsRes = await fetch(`${apiUrl}/campaigns`, {
+      const response = await fetch(`${apiUrl}/cmo/analytics/overview?dateRange=${dateRange}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const campaigns = campaignsRes.ok ? await campaignsRes.json() : [];
 
-      // Fetch funnels
-      const funnelsRes = await fetch(`${apiUrl}/cmo/funnels`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const funnels = funnelsRes.ok ? await funnelsRes.json() : [];
-
-      // Calculate metrics from available data
-      const activeCampaigns = campaigns.filter((c: any) => c.status === 'active');
-
-      // Mock email performance data (would come from real email service in production)
-      const emailPerformance = [
-        { period: 'Week 1', sent: 1250, opened: 312, clicked: 89 },
-        { period: 'Week 2', sent: 1480, opened: 399, clicked: 112 },
-        { period: 'Week 3', sent: 1320, opened: 356, clicked: 98 },
-        { period: 'Week 4', sent: 1560, opened: 437, clicked: 134 },
-      ];
-
-      const totalSent = emailPerformance.reduce((sum, p) => sum + p.sent, 0);
-      const totalOpened = emailPerformance.reduce((sum, p) => sum + p.opened, 0);
-      const totalClicked = emailPerformance.reduce((sum, p) => sum + p.clicked, 0);
-
-      // Build campaign metrics
-      const campaignMetrics: CampaignMetrics[] = campaigns.slice(0, 6).map((c: any, i: number) => ({
-        id: c.id,
-        name: c.name,
-        status: c.status,
-        businessUnit: c.businessUnit,
-        sent: Math.floor(Math.random() * 2000) + 500,
-        opened: 0,
-        clicked: 0,
-        converted: 0,
-        openRate: Math.random() * 30 + 15,
-        clickRate: Math.random() * 10 + 2,
-        conversionRate: Math.random() * 5 + 1,
-      })).map((c: CampaignMetrics) => ({
-        ...c,
-        opened: Math.floor(c.sent * (c.openRate / 100)),
-        clicked: Math.floor(c.sent * (c.clickRate / 100)),
-        converted: Math.floor(c.sent * (c.conversionRate / 100)),
-      }));
-
-      // Build funnel metrics
-      const funnelMetrics: FunnelMetrics[] = funnels.map((f: any) => ({
-        id: f.id,
-        name: f.name,
-        status: f.status,
-        totalVisits: f.totalVisits || Math.floor(Math.random() * 5000) + 1000,
-        totalConversions: f.totalConversions || Math.floor(Math.random() * 200) + 50,
-        conversionRate: f.totalVisits > 0
-          ? ((f.totalConversions || 0) / f.totalVisits) * 100
-          : Math.random() * 10 + 2,
-        stages: (f.stages || []).map((s: any, i: number, arr: any[]) => ({
-          name: s.name,
-          entryCount: s.entryCount || Math.floor(Math.random() * 1000) + 200,
-          exitCount: s.exitCount || Math.floor(Math.random() * 300) + 50,
-          dropoffRate: i < arr.length - 1 ? Math.random() * 30 + 10 : 0,
-        })),
-      }));
-
-      setData({
-        overview: {
-          totalCampaigns: campaigns.length,
-          activeCampaigns: activeCampaigns.length,
-          totalLeads: Math.floor(Math.random() * 5000) + 2000,
-          leadsThisMonth: Math.floor(Math.random() * 500) + 100,
-          emailsSent: totalSent,
-          avgOpenRate: totalSent > 0 ? (totalOpened / totalSent) * 100 : 0,
-          avgClickRate: totalSent > 0 ? (totalClicked / totalSent) * 100 : 0,
-          totalConversions: funnelMetrics.reduce((sum, f) => sum + f.totalConversions, 0),
-        },
-        campaigns: campaignMetrics,
-        funnels: funnelMetrics,
-        emailPerformance,
-      });
+      if (response.ok) {
+        const analyticsData = await response.json();
+        setData(analyticsData);
+      } else {
+        console.error('Failed to fetch analytics:', response.status);
+        setData(null);
+      }
     } catch (error) {
       console.error('Error fetching analytics:', error);
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -175,6 +114,8 @@ export default function CMOAnalyticsPage() {
       </CMOLayout>
     );
   }
+
+  const hasAnyData = data.hasData.campaigns || data.hasData.contacts || data.hasData.emails || data.hasData.funnels;
 
   return (
     <CMOLayout>
@@ -218,26 +159,52 @@ export default function CMOAnalyticsPage() {
         />
         <KPICard
           label="Emails Sent"
-          value={formatNumber(data.overview.emailsSent)}
-          subValue={`${data.overview.avgOpenRate.toFixed(1)}% open rate`}
+          value={data.overview.emailsSent}
+          subValue={data.overview.avgOpenRate !== null ? `${data.overview.avgOpenRate.toFixed(1)}% open rate` : 'No tracking data yet'}
           icon="📧"
           color="#3498DB"
         />
         <KPICard
-          label="Total Leads"
-          value={formatNumber(data.overview.totalLeads)}
-          subValue={`+${data.overview.leadsThisMonth} this month`}
+          label="Total Contacts"
+          value={data.overview.totalContacts}
+          subValue={`+${data.overview.contactsThisMonth} this month`}
           icon="👥"
           color="#27AE60"
         />
         <KPICard
           label="Conversions"
-          value={formatNumber(data.overview.totalConversions)}
-          subValue={`${data.overview.avgClickRate.toFixed(1)}% click rate`}
+          value={data.overview.totalConversions}
+          subValue={data.overview.avgClickRate !== null ? `${data.overview.avgClickRate.toFixed(1)}% click rate` : 'Funnel conversions'}
           icon="🎯"
           color="#9B59B6"
         />
       </div>
+
+      {/* Getting Started Guide - shown when no data */}
+      {!hasAnyData && (
+        <Card>
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📈</div>
+            <h2 style={{ color: '#F0F0F5', margin: '0 0 0.5rem', fontSize: '1.25rem' }}>
+              Welcome to Marketing Analytics
+            </h2>
+            <p style={{ color: '#8888A0', margin: '0 0 1.5rem', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' }}>
+              Start building your marketing engine to see real analytics here. Create campaigns, add contacts, and send emails to track your performance.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <a href="/cmo/campaigns" style={ctaButtonStyle}>
+                Create Campaign
+              </a>
+              <a href="/crm/contacts" style={secondaryButtonStyle}>
+                Add Contacts
+              </a>
+              <a href="/cmo/funnels" style={secondaryButtonStyle}>
+                Build Funnel
+              </a>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Main Content Grid */}
       <div style={contentGridStyle}>
@@ -246,51 +213,60 @@ export default function CMOAnalyticsPage() {
           <div style={cardHeaderStyle}>
             <h3 style={cardTitleStyle}>Campaign Performance</h3>
           </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Campaign</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>Sent</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>Open Rate</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>Click Rate</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>Conversions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.campaigns.map((campaign) => (
-                  <tr key={campaign.id}>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: '600', color: '#F0F0F5' }}>
-                          {campaign.name}
-                        </span>
-                        {campaign.businessUnit && (
-                          <span style={businessUnitBadgeStyle}>
-                            {campaign.businessUnit}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: 'right' }}>{formatNumber(campaign.sent)}</td>
-                    <td style={{ ...tdStyle, textAlign: 'right' }}>
-                      <span style={{ color: campaign.openRate > 25 ? '#27AE60' : 'inherit' }}>
-                        {campaign.openRate.toFixed(1)}%
-                      </span>
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: 'right' }}>
-                      <span style={{ color: campaign.clickRate > 5 ? '#27AE60' : 'inherit' }}>
-                        {campaign.clickRate.toFixed(1)}%
-                      </span>
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: 'right', fontWeight: '600' }}>
-                      {campaign.converted}
-                    </td>
+          {data.campaigns.length === 0 ? (
+            <EmptyState
+              icon="📊"
+              title="No campaigns yet"
+              description="Create your first campaign to start tracking performance metrics."
+              actionLabel="Create Campaign"
+              actionHref="/cmo/campaigns"
+            />
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Campaign</th>
+                    <th style={{ ...thStyle, textAlign: 'right' }}>Enrollments</th>
+                    <th style={{ ...thStyle, textAlign: 'right' }}>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {data.campaigns.map((campaign) => (
+                    <tr key={campaign.id}>
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span style={{ fontWeight: '600', color: '#F0F0F5' }}>
+                            {campaign.name}
+                          </span>
+                          {campaign.businessUnit && (
+                            <span style={businessUnitBadgeStyle}>
+                              {campaign.businessUnit}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td style={{ ...tdStyle, textAlign: 'right' }}>
+                        {campaign.enrollments}
+                      </td>
+                      <td style={{ ...tdStyle, textAlign: 'right' }}>
+                        <span style={{
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          background: campaign.status === 'active' ? 'rgba(39, 174, 96, 0.15)' : 'rgba(136, 136, 160, 0.15)',
+                          color: campaign.status === 'active' ? '#27AE60' : '#8888A0',
+                        }}>
+                          {campaign.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Card>
 
         {/* Email Performance Chart */}
@@ -298,66 +274,80 @@ export default function CMOAnalyticsPage() {
           <div style={cardHeaderStyle}>
             <h3 style={cardTitleStyle}>Email Performance</h3>
           </div>
-          <div style={{ padding: '1rem' }}>
-            {data.emailPerformance.map((week, i) => (
-              <div key={i} style={{ marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
-                    {week.period}
-                  </span>
-                  <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
-                    {week.sent} sent
-                  </span>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', height: '24px' }}>
-                  <div
-                    style={{
-                      flex: week.opened,
-                      background: '#3498DB',
-                      borderRadius: '4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      fontWeight: '600',
-                    }}
-                    title={`Opened: ${week.opened}`}
-                  >
-                    {week.opened > 100 && `${((week.opened / week.sent) * 100).toFixed(0)}%`}
+          {data.emailPerformance.length === 0 ? (
+            <EmptyState
+              icon="📧"
+              title="No email data yet"
+              description="Send emails through campaigns to see performance metrics here."
+              actionLabel="Go to Campaigns"
+              actionHref="/cmo/campaigns"
+            />
+          ) : (
+            <div style={{ padding: '1rem' }}>
+              {data.emailPerformance.map((week, i) => (
+                <div key={i} style={{ marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
+                      {week.period}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
+                      {week.sent} sent
+                    </span>
                   </div>
-                  <div
-                    style={{
-                      flex: week.clicked,
-                      background: '#27AE60',
-                      borderRadius: '4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      fontWeight: '600',
-                    }}
-                    title={`Clicked: ${week.clicked}`}
-                  >
-                    {week.clicked > 50 && `${((week.clicked / week.sent) * 100).toFixed(0)}%`}
+                  <div style={{ display: 'flex', gap: '0.5rem', height: '24px' }}>
+                    <div
+                      style={{
+                        flex: week.opened || 1,
+                        background: '#3498DB',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '0.7rem',
+                        fontWeight: '600',
+                      }}
+                      title={`Opened: ${week.opened}`}
+                    >
+                      {week.opened > 100 && `${((week.opened / week.sent) * 100).toFixed(0)}%`}
+                    </div>
+                    {week.clicked > 0 && (
+                      <div
+                        style={{
+                          flex: week.clicked,
+                          background: '#27AE60',
+                          borderRadius: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontSize: '0.7rem',
+                          fontWeight: '600',
+                        }}
+                        title={`Clicked: ${week.clicked}`}
+                      >
+                        {week.clicked > 50 && `${((week.clicked / week.sent) * 100).toFixed(0)}%`}
+                      </div>
+                    )}
+                    <div
+                      style={{
+                        flex: Math.max(week.sent - week.opened, 1),
+                        background: 'var(--zander-border-gray)',
+                        borderRadius: '4px',
+                      }}
+                      title={`Not opened: ${week.sent - week.opened}`}
+                    />
                   </div>
-                  <div
-                    style={{
-                      flex: week.sent - week.opened,
-                      background: 'var(--zander-border-gray)',
-                      borderRadius: '4px',
-                    }}
-                    title={`Not opened: ${week.sent - week.opened}`}
-                  />
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '0.25rem' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#3498DB' }}>Opened: {week.opened}</span>
+                    {week.clicked > 0 && (
+                      <span style={{ fontSize: '0.7rem', color: '#27AE60' }}>Clicked: {week.clicked}</span>
+                    )}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.25rem' }}>
-                  <span style={{ fontSize: '0.7rem', color: '#3498DB' }}>Opened: {week.opened}</span>
-                  <span style={{ fontSize: '0.7rem', color: '#27AE60' }}>Clicked: {week.clicked}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 
@@ -369,9 +359,13 @@ export default function CMOAnalyticsPage() {
           </div>
           <div style={{ padding: '1rem' }}>
             {data.funnels.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#8888A0' }}>
-                No funnels found. Create a funnel to track conversions.
-              </div>
+              <EmptyState
+                icon="🎯"
+                title="No funnels created"
+                description="Create marketing funnels to track visitor journeys and conversions."
+                actionLabel="Create Funnel"
+                actionHref="/cmo/funnels"
+              />
             ) : (
               <div style={{ display: 'grid', gap: '1.5rem' }}>
                 {data.funnels.map((funnel) => (
@@ -386,7 +380,7 @@ export default function CMOAnalyticsPage() {
                         </span>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#27AE60' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: funnel.conversionRate > 0 ? '#27AE60' : '#8888A0' }}>
                           {funnel.conversionRate.toFixed(1)}%
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>
@@ -396,44 +390,50 @@ export default function CMOAnalyticsPage() {
                     </div>
 
                     {/* Funnel Visualization */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      {funnel.stages.map((stage, i) => (
-                        <div key={i} style={{ flex: 1, position: 'relative' }}>
-                          <div
-                            style={{
-                              background: `hsl(${200 - i * 30}, 70%, ${50 + i * 5}%)`,
-                              padding: '0.75rem 0.5rem',
-                              borderRadius: '4px',
-                              textAlign: 'center',
-                              clipPath: i < funnel.stages.length - 1
-                                ? 'polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%)'
-                                : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-                              marginRight: i < funnel.stages.length - 1 ? '-8px' : 0,
-                            }}
-                          >
-                            <div style={{ fontSize: '0.65rem', color: 'white', opacity: 0.9, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {stage.name}
+                    {funnel.stages.length > 0 ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        {funnel.stages.map((stage, i) => (
+                          <div key={i} style={{ flex: 1, position: 'relative' }}>
+                            <div
+                              style={{
+                                background: `hsl(${200 - i * 30}, 70%, ${50 + i * 5}%)`,
+                                padding: '0.75rem 0.5rem',
+                                borderRadius: '4px',
+                                textAlign: 'center',
+                                clipPath: i < funnel.stages.length - 1
+                                  ? 'polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%)'
+                                  : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+                                marginRight: i < funnel.stages.length - 1 ? '-8px' : 0,
+                              }}
+                            >
+                              <div style={{ fontSize: '0.65rem', color: 'white', opacity: 0.9, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {stage.name}
+                              </div>
+                              <div style={{ fontSize: '0.875rem', fontWeight: '700', color: 'white' }}>
+                                {formatNumber(stage.entryCount)}
+                              </div>
                             </div>
-                            <div style={{ fontSize: '0.875rem', fontWeight: '700', color: 'white' }}>
-                              {formatNumber(stage.entryCount)}
-                            </div>
+                            {i < funnel.stages.length - 1 && stage.dropoffRate > 0 && (
+                              <div style={{
+                                position: 'absolute',
+                                bottom: '-18px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                fontSize: '0.6rem',
+                                color: '#E74C3C',
+                                whiteSpace: 'nowrap',
+                              }}>
+                                -{stage.dropoffRate.toFixed(0)}%
+                              </div>
+                            )}
                           </div>
-                          {i < funnel.stages.length - 1 && stage.dropoffRate > 0 && (
-                            <div style={{
-                              position: 'absolute',
-                              bottom: '-18px',
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              fontSize: '0.6rem',
-                              color: '#E74C3C',
-                              whiteSpace: 'nowrap',
-                            }}>
-                              -{stage.dropoffRate.toFixed(0)}%
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '1rem', color: '#8888A0', fontSize: '0.875rem' }}>
+                        No stages configured. Edit this funnel to add stages.
+                      </div>
+                    )}
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #2A2A38' }}>
                       <div>
@@ -444,7 +444,7 @@ export default function CMOAnalyticsPage() {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>Conversions</span>
-                        <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#27AE60' }}>
+                        <div style={{ fontSize: '1.125rem', fontWeight: '600', color: funnel.totalConversions > 0 ? '#27AE60' : '#8888A0' }}>
                           {formatNumber(funnel.totalConversions)}
                         </div>
                       </div>
@@ -457,6 +457,49 @@ export default function CMOAnalyticsPage() {
         </Card>
       </div>
     </CMOLayout>
+  );
+}
+
+// Empty State Component
+function EmptyState({ icon, title, description, actionLabel, actionHref }: {
+  icon: string;
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionHref: string;
+}) {
+  return (
+    <div style={{
+      padding: '2rem',
+      textAlign: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '0.5rem'
+    }}>
+      <div style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>{icon}</div>
+      <h4 style={{ margin: 0, color: '#F0F0F5', fontSize: '1rem', fontWeight: '600' }}>
+        {title}
+      </h4>
+      <p style={{ margin: 0, color: '#8888A0', fontSize: '0.875rem', maxWidth: '280px' }}>
+        {description}
+      </p>
+      <a
+        href={actionHref}
+        style={{
+          marginTop: '0.5rem',
+          padding: '0.5rem 1rem',
+          background: 'rgba(245, 124, 0, 0.15)',
+          color: '#F57C00',
+          borderRadius: '6px',
+          textDecoration: 'none',
+          fontSize: '0.875rem',
+          fontWeight: '600',
+        }}
+      >
+        {actionLabel}
+      </a>
+    </div>
   );
 }
 
@@ -476,7 +519,7 @@ function KPICard({ label, value, subValue, icon, color }: {
             {label}
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F0F0F5' }}>
-            {value}
+            {typeof value === 'number' ? formatNumber(value) : value}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#8888A0', marginTop: '0.25rem' }}>
             {subValue}
@@ -604,4 +647,25 @@ const funnelCardStyle: CSSProperties = {
   background: '#1C1C26',
   borderRadius: '8px',
   padding: '1.25rem',
+};
+
+const ctaButtonStyle: CSSProperties = {
+  padding: '0.75rem 1.5rem',
+  background: '#F57C00',
+  color: 'white',
+  borderRadius: '8px',
+  textDecoration: 'none',
+  fontWeight: '600',
+  fontSize: '0.875rem',
+};
+
+const secondaryButtonStyle: CSSProperties = {
+  padding: '0.75rem 1.5rem',
+  background: 'transparent',
+  color: '#F0F0F5',
+  border: '2px solid #2A2A38',
+  borderRadius: '8px',
+  textDecoration: 'none',
+  fontWeight: '600',
+  fontSize: '0.875rem',
 };
