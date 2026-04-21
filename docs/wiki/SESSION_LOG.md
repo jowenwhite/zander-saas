@@ -4,6 +4,43 @@ Use this file to record session handoffs and major changes.
 
 ---
 
+## 2026-04-21 — CMO Email Template Blank Email Fix
+
+**Problem:**
+CMO "Send Test Email" feature was sending blank emails. Email arrived (from noreply@zanderos.com) but body was completely empty — no visible content.
+
+**Root Cause:**
+Production templates stored body in legacy `{html, text}` format:
+```json
+{"html": "Hi {{first_name}}...", "text": "Hi..."}
+```
+
+But `generateEmailHtml()` expected block-based format:
+```json
+{"version": "1.0", "settings": {...}, "blocks": [...]}
+```
+
+When `template.blocks` was undefined, it fell back to empty array → blank email wrapper generated with zero content.
+
+**Fix:**
+Updated `apps/api/src/cmo/templates/html-generator.ts` to detect and handle both formats:
+1. Block-based (visual editor): render blocks as before
+2. Legacy {html,text}: wrap html content directly in standard email container
+3. Empty: log warning, return empty email
+
+**Testing:**
+1. Local test script confirmed fix generates correct HTML
+2. Local email sent via Resend to jowenwhite4@gmail.com — arrived with visible content
+3. Production deployment verified via CloudWatch logs
+
+**Deployment:**
+- Commit: 2d2032f
+- Docker: v81
+- ECS Task Definition: zander-api:67
+- CloudWatch confirmed: `[html-generator] Using legacy html/text format, html length: 1123`
+
+---
+
 ## 2026-04-19 — Email Template Fix: Gmail/Outlook Width Compatibility
 
 **What Shipped:**
