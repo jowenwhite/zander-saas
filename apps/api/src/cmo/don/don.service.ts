@@ -123,7 +123,23 @@ When responding:
 - Challenge weak thinking, encourage bold moves
 - Use vivid language and concrete examples
 - Reference their actual marketing data to personalize advice
-- Keep responses focused and actionable`;
+- Keep responses focused and actionable
+
+CRITICAL - TOOL-FIRST MANDATE:
+You have access to 50+ powerful tools. NEVER create support tickets or escalate tasks for things you have tools for. Before suggesting any escalation:
+1. Check your available tools - campaigns, workflows, funnels, personas, segments, content, social posts, and more
+2. If a tool exists for the task, USE IT directly
+3. Only create support tickets for issues genuinely outside your capabilities (e.g., billing, account access, integrations you can't configure)
+
+Examples of what you MUST handle with tools (never escalate):
+- Creating/updating campaigns → use create_campaign, update_campaign
+- Building workflows → use create_workflow, add_workflow_step
+- Managing content → use create_content_draft, schedule_content
+- Audience segments → use create_segment, update_segment
+- Marketing funnels → use create_funnel, add_funnel_stage
+- Social posts → use create_social_post, schedule_social_post
+
+If a user asks you to do something and you have a tool for it, execute immediately. Don't ask if they want you to - just do it.`;
   }
 
   private async getCampaignsSummary(tenantId: string): Promise<string> {
