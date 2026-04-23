@@ -115,6 +115,9 @@ Available Tools:
 - create_design_asset: Create a design asset (routes to Canva or Adobe)
 - get_brand_assets: View tenant's design assets
 - generate_social_graphic: Create a graphic for a social post
+- get_marketing_budget: View current budget settings and allocations
+- update_marketing_budget: Update annual budget and category allocations
+- suggest_budget_allocation: Get AI-powered budget allocation recommendations
 
 **How to Use Tools:**
 1. When asked to create something, use the appropriate tool immediately
@@ -1522,8 +1525,150 @@ const TOOLS = [
       },
       required: ['platform', 'content']
     }
+  },
+  // ========== BUDGET MANAGEMENT TOOLS ==========
+  {
+    name: 'get_marketing_budget',
+    description: 'Get the current marketing budget settings including annual budget, fiscal year, and category allocations. Use this when the user asks about their marketing budget, spending, or allocations.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        fiscalYear: {
+          type: 'string',
+          description: 'Fiscal year to query (e.g., "FY2025"). Defaults to current year if not specified.'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'update_marketing_budget',
+    description: 'Update marketing budget settings including annual budget target and category allocations. Use this when the user wants to set or change their marketing budget.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        annualBudget: {
+          type: 'number',
+          description: 'Total annual marketing budget in dollars'
+        },
+        fiscalYear: {
+          type: 'string',
+          description: 'Fiscal year for the budget (e.g., "FY2025")'
+        },
+        allocations: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              category: { type: 'string', description: 'Budget category name' },
+              planned: { type: 'number', description: 'Planned amount in dollars' },
+              actual: { type: 'number', description: 'Actual spent amount in dollars (optional)' }
+            },
+            required: ['category', 'planned']
+          },
+          description: 'Budget allocations by category'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'suggest_budget_allocation',
+    description: 'Get AI-powered budget allocation recommendations based on business goals and industry benchmarks. Use this when the user asks for help with budget planning or allocation.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        annualBudget: {
+          type: 'number',
+          description: 'Total annual marketing budget to allocate (in dollars)'
+        },
+        businessGoals: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Business goals to optimize budget allocation for (e.g., "Increase brand awareness", "Generate leads", "Launch new product")'
+        },
+        industry: {
+          type: 'string',
+          description: 'Industry for benchmark comparison (e.g., "B2B SaaS", "E-commerce", "Professional Services")'
+        },
+        companyStage: {
+          type: 'string',
+          enum: ['startup', 'growth', 'established', 'enterprise'],
+          description: 'Company growth stage affects allocation strategy'
+        }
+      },
+      required: ['annualBudget']
+    }
   }
 ];
+
+/**
+ * Sanitize response text to remove any raw XML/function call tags
+ * that Claude might accidentally output in its text response.
+ * This prevents internal tool orchestration markup from leaking to the user.
+ */
+function sanitizeResponse(text: string): string {
+  if (!text) return text;
+
+  // Patterns for raw XML/tool markup that should never reach the client
+  const patterns = [
+    // Function call tags
+    /<\/?function_call[^>]*>/gi,
+    /<function_calls>[\s\S]*?<\/function_calls>/gi,
+    // Tool use tags (Anthropic format)
+    /<\/?tool_use[^>]*>/gi,
+    /<\/?tool_result[^>]*>/gi,
+    /<tool_use>[\s\S]*?<\/tool_use>/gi,
+    /<tool_result>[\s\S]*?<\/tool_result>/gi,
+    // Anthropic XML namespace tags
+    /<\/?antml:[^>]*>/gi,
+    /<[^>]+>[\s\S]*?<\/antml:[^>]+>/gi,
+    // Invoke/parameter tags (MCP format)
+    /<\/?invoke[^>]*>/gi,
+    /<\/?parameter[^>]*>/gi,
+    /<invoke[^>]*>[\s\S]*?<\/invoke>/gi,
+    // Generic thinking/scratchpad tags
+    /<\/?thinking[^>]*>/gi,
+    /<thinking>[\s\S]*?<\/thinking>/gi,
+    /<\/?scratchpad[^>]*>/gi,
+    /<scratchpad>[\s\S]*?<\/scratchpad>/gi,
+  ];
+
+  let sanitized = text;
+  for (const pattern of patterns) {
+    sanitized = sanitized.replace(pattern, '');
+  }
+
+  // Clean up excessive whitespace that might result from removals
+  sanitized = sanitized.replace(/\n{3,}/g, '\n\n').trim();
+
+  return sanitized;
+}
+
+/**
+ * Get rationale for budget category allocation based on context
+ */
+function getCategoryRationale(category: string, stage?: string, goals?: string[]): string {
+  const rationales: Record<string, string> = {
+    'Strategy and Plan': 'Foundation for all marketing activities. Critical for alignment.',
+    'Branding and Messaging': stage === 'startup' ? 'Essential for establishing market presence and differentiation.' : 'Maintains brand consistency and market positioning.',
+    'Content Marketing': 'Drives organic traffic, establishes thought leadership, and supports lead nurturing.',
+    'Digital Marketing': 'Core channel for reach and engagement. Includes SEO, PPC, and display.',
+    'Social Media Marketing': 'Community building and brand awareness. Cost-effective reach.',
+    'Advertising and Media Buying': stage === 'startup' ? 'Lower priority initially - focus on organic channels first.' : 'Accelerates reach and drives immediate traffic.',
+    'Lead Generation and Nurturing': 'Direct pipeline contribution. Critical for revenue growth.',
+    'Sales Enablement': 'Empowers sales team with tools and content for higher close rates.',
+    'Analytics and Reporting': 'Enables data-driven decisions and optimization.',
+    'Event Marketing': stage === 'startup' ? 'Start small with virtual events.' : 'Builds relationships and generates high-quality leads.',
+    'Public Relations': 'Builds credibility and extends reach through earned media.',
+    'Marketing Automation': 'Scales personalization and improves efficiency.',
+    'Partnerships and Affiliates': 'Extends reach through strategic alliances.',
+    'Product Marketing': 'Bridges product and market. Key for launches and positioning.',
+    'Customer Experience and Retention': 'Reduces churn and increases lifetime value.',
+  };
+
+  return rationales[category] || 'Standard marketing investment for this category.';
+}
 
 // Execute a tool by calling the CMO API
 async function executeTool(
@@ -3459,6 +3604,270 @@ ${variants.join('\n---')}
         };
       }
 
+      // ============================================
+      // BUDGET MANAGEMENT TOOLS
+      // ============================================
+
+      case 'get_marketing_budget': {
+        const { fiscalYear } = toolInput as { fiscalYear?: string };
+        const currentYear = new Date().getFullYear();
+        const year = fiscalYear || `FY${currentYear}`;
+
+        // Fetch marketing plan which contains budget info
+        const url = `${CMO_API_URL}/cmo/marketing-plan`;
+        console.log(`[Don Tool] GET ${url} for budget info`);
+
+        try {
+          const response = await fetch(url, { method: 'GET', headers });
+
+          if (!response.ok) {
+            // No marketing plan exists yet
+            return {
+              success: true,
+              result: {
+                message: 'No marketing budget has been configured yet',
+                fiscalYear: year,
+                annualBudget: null,
+                allocations: [],
+                tip: 'Use update_marketing_budget to set up your budget, or suggest_budget_allocation for recommendations',
+                categories: [
+                  'Strategy and Plan',
+                  'Branding and Messaging',
+                  'Content Marketing',
+                  'Digital Marketing',
+                  'Social Media Marketing',
+                  'Advertising and Media Buying',
+                  'Lead Generation and Nurturing',
+                  'Sales Enablement',
+                  'Analytics and Reporting',
+                  'Event Marketing',
+                  'Public Relations',
+                  'Marketing Automation',
+                  'Partnerships and Affiliates',
+                  'Product Marketing',
+                  'Customer Experience and Retention',
+                ]
+              }
+            };
+          }
+
+          const plan = await response.json();
+
+          // Parse budget from marketing plan
+          let budgetData: { annualBudget?: number; allocations?: any[] } = {};
+          if (plan.budget) {
+            try {
+              // Budget might be JSON string or plain string
+              if (typeof plan.budget === 'string' && plan.budget.startsWith('{')) {
+                budgetData = JSON.parse(plan.budget);
+              } else if (typeof plan.budget === 'object') {
+                budgetData = plan.budget;
+              }
+            } catch {
+              // Budget is a simple string (e.g., "$100,000")
+              const numMatch = plan.budget.replace(/[^0-9]/g, '');
+              budgetData = { annualBudget: numMatch ? parseInt(numMatch) : undefined };
+            }
+          }
+
+          return {
+            success: true,
+            result: {
+              message: 'Marketing budget retrieved',
+              fiscalYear: year,
+              annualBudget: budgetData.annualBudget || null,
+              allocations: budgetData.allocations || [],
+              planStatus: plan.status,
+              categories: [
+                'Strategy and Plan',
+                'Branding and Messaging',
+                'Content Marketing',
+                'Digital Marketing',
+                'Social Media Marketing',
+                'Advertising and Media Buying',
+                'Lead Generation and Nurturing',
+                'Sales Enablement',
+                'Analytics and Reporting',
+                'Event Marketing',
+                'Public Relations',
+                'Marketing Automation',
+                'Partnerships and Affiliates',
+                'Product Marketing',
+                'Customer Experience and Retention',
+              ]
+            }
+          };
+        } catch (error) {
+          console.error('[Don Tool] Error fetching budget:', error);
+          return {
+            success: false,
+            error: 'Failed to retrieve marketing budget'
+          };
+        }
+      }
+
+      case 'update_marketing_budget': {
+        const { annualBudget, fiscalYear, allocations } = toolInput as {
+          annualBudget?: number;
+          fiscalYear?: string;
+          allocations?: Array<{ category: string; planned: number; actual?: number }>;
+        };
+
+        const currentYear = new Date().getFullYear();
+        const year = fiscalYear || `FY${currentYear}`;
+
+        // Store budget as JSON in the marketing plan's budget field
+        const budgetData = {
+          annualBudget: annualBudget || 0,
+          fiscalYear: year,
+          allocations: allocations || [],
+          lastUpdated: new Date().toISOString()
+        };
+
+        const url = `${CMO_API_URL}/cmo/marketing-plan`;
+        console.log(`[Don Tool] POST ${url} for budget update`);
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              budget: JSON.stringify(budgetData)
+            })
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[Don Tool] Failed to update budget: ${response.status} ${errorText}`);
+            return {
+              success: false,
+              error: `Failed to save budget: ${errorText}`
+            };
+          }
+
+          const totalAllocated = (allocations || []).reduce((sum, a) => sum + (a.planned || 0), 0);
+          const remaining = (annualBudget || 0) - totalAllocated;
+
+          return {
+            success: true,
+            result: {
+              message: 'Marketing budget updated successfully',
+              fiscalYear: year,
+              annualBudget: annualBudget || 0,
+              totalAllocated,
+              remaining,
+              allocationCount: (allocations || []).length,
+              tip: remaining > 0
+                ? `You have $${remaining.toLocaleString()} unallocated. Consider using suggest_budget_allocation for recommendations.`
+                : remaining < 0
+                ? `Warning: Budget is over-allocated by $${Math.abs(remaining).toLocaleString()}`
+                : 'Budget is fully allocated'
+            }
+          };
+        } catch (error) {
+          console.error('[Don Tool] Error updating budget:', error);
+          return {
+            success: false,
+            error: 'Failed to update marketing budget'
+          };
+        }
+      }
+
+      case 'suggest_budget_allocation': {
+        const { annualBudget, businessGoals, industry, companyStage } = toolInput as {
+          annualBudget: number;
+          businessGoals?: string[];
+          industry?: string;
+          companyStage?: string;
+        };
+
+        // Default allocation percentages based on common benchmarks
+        // Adjusted based on business goals and company stage
+        const defaultAllocations: Record<string, number> = {
+          'Strategy and Plan': 3,
+          'Branding and Messaging': 5,
+          'Content Marketing': 15,
+          'Digital Marketing': 20,
+          'Social Media Marketing': 10,
+          'Advertising and Media Buying': 15,
+          'Lead Generation and Nurturing': 10,
+          'Sales Enablement': 5,
+          'Analytics and Reporting': 3,
+          'Event Marketing': 5,
+          'Public Relations': 4,
+          'Marketing Automation': 2,
+          'Partnerships and Affiliates': 2,
+          'Product Marketing': 0,
+          'Customer Experience and Retention': 1,
+        };
+
+        // Adjust based on company stage
+        if (companyStage === 'startup') {
+          defaultAllocations['Branding and Messaging'] = 10;
+          defaultAllocations['Content Marketing'] = 20;
+          defaultAllocations['Digital Marketing'] = 25;
+          defaultAllocations['Advertising and Media Buying'] = 5;
+          defaultAllocations['Event Marketing'] = 2;
+        } else if (companyStage === 'growth') {
+          defaultAllocations['Lead Generation and Nurturing'] = 15;
+          defaultAllocations['Marketing Automation'] = 5;
+          defaultAllocations['Sales Enablement'] = 8;
+        } else if (companyStage === 'enterprise') {
+          defaultAllocations['Customer Experience and Retention'] = 8;
+          defaultAllocations['Analytics and Reporting'] = 5;
+          defaultAllocations['Product Marketing'] = 5;
+        }
+
+        // Adjust based on goals
+        const goals = businessGoals || [];
+        if (goals.some(g => g.toLowerCase().includes('brand') || g.toLowerCase().includes('awareness'))) {
+          defaultAllocations['Branding and Messaging'] += 5;
+          defaultAllocations['Advertising and Media Buying'] += 5;
+          defaultAllocations['Lead Generation and Nurturing'] -= 5;
+        }
+        if (goals.some(g => g.toLowerCase().includes('lead') || g.toLowerCase().includes('pipeline'))) {
+          defaultAllocations['Lead Generation and Nurturing'] += 5;
+          defaultAllocations['Content Marketing'] += 5;
+          defaultAllocations['Branding and Messaging'] -= 5;
+        }
+        if (goals.some(g => g.toLowerCase().includes('retention') || g.toLowerCase().includes('loyalty'))) {
+          defaultAllocations['Customer Experience and Retention'] += 5;
+          defaultAllocations['Marketing Automation'] += 3;
+          defaultAllocations['Advertising and Media Buying'] -= 5;
+        }
+
+        // Normalize to 100%
+        const total = Object.values(defaultAllocations).reduce((a, b) => a + b, 0);
+        const normalizedAllocations = Object.entries(defaultAllocations).map(([category, percent]) => {
+          const normalizedPercent = Math.round((percent / total) * 100);
+          const amount = Math.round((normalizedPercent / 100) * annualBudget);
+          return {
+            category,
+            percentOfBudget: normalizedPercent,
+            recommendedAmount: amount,
+            rationale: getCategoryRationale(category, companyStage, goals)
+          };
+        }).filter(a => a.percentOfBudget > 0);
+
+        return {
+          success: true,
+          result: {
+            message: 'Budget allocation recommendations generated',
+            annualBudget,
+            fiscalYear: `FY${new Date().getFullYear()}`,
+            companyStage: companyStage || 'growth',
+            industry: industry || 'General',
+            businessGoals: goals.length > 0 ? goals : ['General marketing'],
+            recommendations: normalizedAllocations,
+            summary: {
+              topPriorities: normalizedAllocations.slice(0, 3).map(a => `${a.category}: $${a.recommendedAmount.toLocaleString()} (${a.percentOfBudget}%)`),
+              totalCategories: normalizedAllocations.length,
+            },
+            tip: 'Use update_marketing_budget to apply these recommendations to your budget.'
+          }
+        };
+      }
+
       default:
         return { success: false, error: `Unknown tool: ${toolName}` };
     }
@@ -3620,8 +4029,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Return the response with tool results
+    // Sanitize content to remove any raw XML/tool tags that might have leaked through
     return NextResponse.json({
-      content: textContent,
+      content: sanitizeResponse(textContent),
       toolsExecuted: toolResults.map((tr) => ({
         tool: tr.tool,
         success: tr.success,

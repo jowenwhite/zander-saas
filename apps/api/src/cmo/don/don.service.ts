@@ -43,6 +43,49 @@ const DON_MEETING_TOOLS = [
   },
 ];
 
+/**
+ * Sanitize response text to remove any raw XML/function call tags
+ * that Claude might accidentally output in its text response.
+ * This prevents internal tool orchestration markup from leaking to the user.
+ */
+function sanitizeResponse(text: string): string {
+  if (!text) return text;
+
+  // Patterns for raw XML/tool markup that should never reach the client
+  const patterns = [
+    // Function call tags
+    /<\/?function_call[^>]*>/gi,
+    /<function_calls>[\s\S]*?<\/function_calls>/gi,
+    // Tool use tags (Anthropic format)
+    /<\/?tool_use[^>]*>/gi,
+    /<\/?tool_result[^>]*>/gi,
+    /<tool_use>[\s\S]*?<\/tool_use>/gi,
+    /<tool_result>[\s\S]*?<\/tool_result>/gi,
+    // Anthropic XML namespace tags
+    /<\/?antml:[^>]*>/gi,
+    /<[^>]+>[\s\S]*?<\/antml:[^>]+>/gi,
+    // Invoke/parameter tags (MCP format)
+    /<\/?invoke[^>]*>/gi,
+    /<\/?parameter[^>]*>/gi,
+    /<invoke[^>]*>[\s\S]*?<\/invoke>/gi,
+    // Generic thinking/scratchpad tags
+    /<\/?thinking[^>]*>/gi,
+    /<thinking>[\s\S]*?<\/thinking>/gi,
+    /<\/?scratchpad[^>]*>/gi,
+    /<scratchpad>[\s\S]*?<\/scratchpad>/gi,
+  ];
+
+  let sanitized = text;
+  for (const pattern of patterns) {
+    sanitized = sanitized.replace(pattern, '');
+  }
+
+  // Clean up excessive whitespace that might result from removals
+  sanitized = sanitized.replace(/\n{3,}/g, '\n\n').trim();
+
+  return sanitized;
+}
+
 @Injectable()
 export class DonService {
   private readonly logger = new Logger(DonService.name);
@@ -689,8 +732,9 @@ When using L3 DRAFT tools, inform the user that the action requires Jonathan's a
         }
       }
 
+      // Sanitize content to remove any raw XML/tool tags that might have leaked through
       return {
-        content: finalTextContent || 'I apologize, but I was unable to generate a response. Please try again.',
+        content: sanitizeResponse(finalTextContent) || 'I apologize, but I was unable to generate a response. Please try again.',
         executive: {
           id: 'cmo',
           name: 'Don',
