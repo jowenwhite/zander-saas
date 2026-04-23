@@ -48,6 +48,16 @@ export class FunnelsService {
       }[];
     },
   ) {
+    // Log incoming data for debugging
+    console.log('[FunnelsService.create] Input data:', JSON.stringify({
+      name: data.name,
+      description: data.description,
+      conversionGoal: data.conversionGoal,
+      stagesProvided: !!data.stages,
+      stagesCount: data.stages?.length || 0,
+      stages: data.stages,
+    }, null, 2));
+
     const funnel = await this.prisma.funnel.create({
       data: {
         tenantId,
@@ -58,7 +68,11 @@ export class FunnelsService {
       },
     });
 
-    if (data.stages && data.stages.length > 0) {
+    console.log('[FunnelsService.create] Funnel created:', funnel.id);
+
+    // Create stages if provided - matching update_funnel pattern
+    if (data.stages && Array.isArray(data.stages) && data.stages.length > 0) {
+      console.log(`[FunnelsService.create] Creating ${data.stages.length} stages`);
       await this.prisma.funnelStage.createMany({
         data: data.stages.map((stage) => ({
           funnelId: funnel.id,
@@ -68,6 +82,9 @@ export class FunnelsService {
           config: stage.config || {},
         })),
       });
+      console.log('[FunnelsService.create] Stages created successfully');
+    } else {
+      console.log('[FunnelsService.create] No stages to create');
     }
 
     return this.findOne(funnel.id, tenantId);

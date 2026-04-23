@@ -1926,22 +1926,41 @@ async function executeTool(
         const url = `${CMO_API_URL}/cmo/funnels`;
         console.log(`[Don Tool] POST ${url}`);
 
-        // Build funnel data with correct field names - pass through stages if provided
-        const inputStages = toolInput.stages as Array<{
+        // Pass through stages directly like update_funnel does - let backend validate
+        // Validate and normalize stages if provided
+        const rawStages = toolInput.stages;
+        let stages: Array<{
           name: string;
           stageType: string;
           stageOrder: number;
           config?: Record<string, unknown>;
         }> | undefined;
 
-        const funnelData = {
+        if (Array.isArray(rawStages) && rawStages.length > 0) {
+          // Normalize stages - ensure required fields exist
+          stages = rawStages.map((stage: Record<string, unknown>, index: number) => ({
+            name: String(stage.name || `Stage ${index + 1}`),
+            stageType: String(stage.stageType || 'awareness'),
+            stageOrder: typeof stage.stageOrder === 'number' ? stage.stageOrder : index,
+            config: (stage.config && typeof stage.config === 'object') ? stage.config as Record<string, unknown> : undefined,
+          }));
+          console.log(`[Don Tool] Normalized ${stages.length} stages for funnel creation`);
+        }
+
+        // Build request body - only include stages if they exist
+        const funnelData: Record<string, unknown> = {
           name: toolInput.name as string,
-          description: (toolInput.description as string) || null,
-          conversionGoal: (toolInput.conversionGoal as string) || null,
-          stages: inputStages || [], // Pass through stages if provided, otherwise empty
+          description: (toolInput.description as string) || undefined,
+          conversionGoal: (toolInput.conversionGoal as string) || undefined,
         };
 
+        // Only add stages to request if we have valid stages
+        if (stages && stages.length > 0) {
+          funnelData.stages = stages;
+        }
+
         console.log(`[Don Tool] Funnel data:`, JSON.stringify(funnelData, null, 2));
+        console.log(`[Don Tool] Stages included: ${stages ? stages.length : 0}`);
 
         const response = await fetch(url, {
           method: 'POST',
@@ -1956,7 +1975,8 @@ async function executeTool(
         }
         try {
           const result = JSON.parse(responseText);
-          console.log(`[Don Tool] Funnel created successfully:`, result);
+          const stageCount = (result.stages || []).length;
+          console.log(`[Don Tool] Funnel created with ${stageCount} stages:`, result);
           return { success: true, result };
         } catch {
           return { success: true, result: { message: 'Funnel created' } };

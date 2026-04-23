@@ -44,6 +44,14 @@ export class FunnelsController {
     @Request() req,
     @Body() createData: CreateFunnelDto,
   ) {
+    // Log what we received after DTO validation/transformation
+    console.log('[FunnelsController.create] Received DTO:', JSON.stringify({
+      name: createData.name,
+      description: createData.description,
+      conversionGoal: createData.conversionGoal,
+      stagesProvided: !!createData.stages,
+      stagesCount: createData.stages?.length || 0,
+    }));
     return this.funnelsService.create(req.tenantId, createData);
   }
 
