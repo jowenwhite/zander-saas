@@ -79,6 +79,8 @@ const genericStageTypeMap: Record<string, Partial<StageTypeInfo>> = {
   decision: { label: 'Decision', icon: '🤔', color: '#F39C12' },
   action: { label: 'Action', icon: '✅', color: '#27AE60' },
   consideration: { label: 'Consideration', icon: '⚖️', color: '#E67E22' },
+  evaluation: { label: 'Evaluation', icon: '🔍', color: '#8E44AD' },
+  trial: { label: 'Trial', icon: '🧪', color: '#16A085' },
   conversion: { label: 'Conversion', icon: '🎯', color: '#2ECC71' },
   retention: { label: 'Retention', icon: '🔄', color: '#1ABC9C' },
   advocacy: { label: 'Advocacy', icon: '📢', color: '#E74C3C' },
