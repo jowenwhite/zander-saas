@@ -153,18 +153,18 @@ async function buildExecutiveAssistantContext(authHeaders: Record<string, string
 
   if (calendarEvents?.length) {
     const upcoming = calendarEvents.slice(0, 10);
-    sections.push(`UPCOMING EVENTS (${calendarEvents.length} total, showing 10):\n${upcoming.map((e: { title?: string; subject?: string; startDate?: string; date?: string }) => `- ${e.title || e.subject || 'No title'} [${e.startDate || e.date || 'No date'}]`).join('\n')}`);
+    sections.push(`UPCOMING EVENTS (${calendarEvents.length} total, showing 10):\n${upcoming.map((e: { title?: string; startTime?: string }) => `- ${e.title || 'No title'} [${e.startTime ? new Date(e.startTime).toLocaleDateString() : 'No date'}]`).join('\n')}`);
   }
 
   if (tasks?.length) {
-    const pending = tasks.filter((t: { status?: string }) => t.status !== 'completed');
-    const completed = tasks.filter((t: { status?: string }) => t.status === 'completed');
-    sections.push(`TASKS (${pending.length} pending, ${completed.length} completed):\n${pending.slice(0, 10).map((t: { title?: string; priority?: string; status?: string; dueDate?: string }) => `- ${t.title || 'No title'} [${t.priority || 'normal'}, ${t.status || 'pending'}]${t.dueDate ? ` due ${t.dueDate}` : ''}`).join('\n')}`);
+    const pending = tasks.filter((t: { status?: string }) => t.status !== 'completed' && t.status !== 'COMPLETED');
+    const completed = tasks.filter((t: { status?: string }) => t.status === 'completed' || t.status === 'COMPLETED');
+    sections.push(`TASKS (${pending.length} pending, ${completed.length} completed):\n${pending.slice(0, 10).map((t: { title?: string; priority?: string; status?: string; dueDate?: string }) => `- ${t.title || 'No title'} [${t.priority || 'normal'}, ${t.status || 'pending'}]${t.dueDate ? ` due ${new Date(t.dueDate).toLocaleDateString()}` : ''}`).join('\n')}`);
   }
 
   if (emails?.length) {
-    const unread = emails.filter((e: { read?: boolean }) => !e.read);
-    sections.push(`EMAILS (${unread.length} unread of ${emails.length} recent):\n${emails.slice(0, 5).map((e: { subject?: string; from?: string; senderName?: string }) => `- ${e.subject || 'No subject'} [from: ${e.senderName || e.from || 'unknown'}]`).join('\n')}`);
+    const unread = emails.filter((e: { isRead?: boolean }) => !e.isRead);
+    sections.push(`EMAILS (${unread.length} unread of ${emails.length} recent):\n${emails.slice(0, 5).map((e: { subject?: string; fromAddress?: string }) => `- ${e.subject || 'No subject'} [from: ${e.fromAddress || 'unknown'}]`).join('\n')}`);
   }
 
   if (hqDashboard) {

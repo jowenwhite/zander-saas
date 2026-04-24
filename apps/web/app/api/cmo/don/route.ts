@@ -213,7 +213,7 @@ async function buildMarketingDataContext(authHeaders: Record<string, string>): P
     fetchJSON(`${CMO_API_URL}/cmo/funnels`),
     fetchJSON(`${CMO_API_URL}/cmo/segments`),
     fetchJSON(`${CMO_API_URL}/cmo/assets/brand`),    // brand is under /cmo/assets
-    fetchJSON(`${CMO_API_URL}/cmo/calendar`),
+    fetchJSON(`${CMO_API_URL}/cmo/calendar/schedule`),
     fetchJSON(`${CMO_API_URL}/cmo/marketing-plan`),
     fetchJSON(`${CMO_API_URL}/cmo/templates`),       // templates controller (not email-templates)
     fetchJSON(`${CMO_API_URL}/cmo/workflows`),

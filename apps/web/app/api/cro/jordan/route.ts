@@ -175,7 +175,7 @@ async function buildSalesDataContext(authHeaders: Record<string, string>): Promi
   }
 
   if (activities?.length) {
-    sections.push(`RECENT ACTIVITIES (${activities.length}):\n${activities.slice(0, 10).map((a: { type?: string; subject?: string; title?: string; createdAt?: string }) => `- ${a.type || 'Activity'}: ${a.subject || a.title || 'No subject'} [${a.createdAt ? new Date(a.createdAt).toLocaleDateString() : ''}]`).join('\n')}`);
+    sections.push(`RECENT ACTIVITIES (${activities.length}):\n${activities.slice(0, 10).map((a: { type?: string; subject?: string; date?: string }) => `- ${a.type || 'Activity'}: ${a.subject || 'No subject'} [${a.date ? new Date(a.date).toLocaleDateString() : ''}]`).join('\n')}`);
   }
 
   if (pipelineStages?.length) {

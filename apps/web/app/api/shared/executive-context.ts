@@ -68,8 +68,8 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
   // Schedule summary (for Don and Jordan to see what Pam is managing)
   if (calendar?.length) {
     const upcoming = calendar.slice(0, 5);
-    const eventsText = upcoming.map((e: { title?: string; subject?: string; startDate?: string; date?: string }) =>
-      `${e.title || e.subject || 'Event'} [${e.startDate || e.date || 'TBD'}]`
+    const eventsText = upcoming.map((e: { title?: string; startTime?: string }) =>
+      `${e.title || 'Event'} [${e.startTime ? new Date(e.startTime).toLocaleDateString() : 'TBD'}]`
     ).join(', ');
     sections.push(`SCHEDULE (Pam): ${calendar.length} upcoming events. Next: ${eventsText}`);
   }
