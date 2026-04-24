@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { buildCrossExecutiveContext } from '../../shared/executive-context';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const CRO_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
@@ -1660,13 +1661,17 @@ export async function POST(request: NextRequest) {
     const tenantContext = await fetchTenantContext(authToken);
 
     // Fetch sales data context so Jordan knows about existing CRM assets
-    const salesDataContext = await buildSalesDataContext({
+    const authHeaders = {
       'Authorization': `Bearer ${authToken}`,
       'Content-Type': 'application/json',
-    });
+    };
+    const salesDataContext = await buildSalesDataContext(authHeaders);
 
-    // Build complete system prompt with tenant and sales context
-    const systemPrompt = buildJordanSystemPrompt(tenantContext) + salesDataContext;
+    // Fetch cross-executive context so Jordan knows what Don and Pam are working on
+    const crossContext = await buildCrossExecutiveContext(authHeaders);
+
+    // Build complete system prompt with tenant, sales, and team context
+    const systemPrompt = buildJordanSystemPrompt(tenantContext) + salesDataContext + crossContext;
 
     // Get API key from environment
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
