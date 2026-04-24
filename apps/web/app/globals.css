@@ -528,3 +528,19 @@ hr, [class*="divider"], [class*="Divider"] {
   --zander-text-secondary: #8888A0;
   --zander-text-muted: #55556A;
 }
+
+/* PEP Panel Animations */
+@keyframes pep-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 204, 238, 0); }
+  50% { box-shadow: 0 0 0 8px rgba(0, 204, 238, 0.15); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}

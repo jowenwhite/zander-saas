@@ -364,12 +364,6 @@ export default function PersistentExecutivePanel() {
         }}
       >
         <Bot size={32} />
-        <style jsx>{`
-          @keyframes pep-pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 204, 238, 0); }
-            50% { box-shadow: 0 0 0 8px rgba(0, 204, 238, 0.15); }
-          }
-        `}</style>
       </button>
     );
   }
@@ -614,12 +608,6 @@ export default function PersistentExecutivePanel() {
               <p style={{ color: '#8888A0', margin: 0, fontSize: '0.9rem' }}>
                 Loading conversation history...
               </p>
-              <style jsx>{`
-                @keyframes spin {
-                  from { transform: rotate(0deg); }
-                  to { transform: rotate(360deg); }
-                }
-              `}</style>
             </div>
           ) : messages.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
@@ -808,13 +796,6 @@ export default function PersistentExecutivePanel() {
             </button>
           </div>
         </div>
-
-        <style jsx>{`
-          @keyframes pulse {
-            0%, 100% { opacity: 0.4; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1); }
-          }
-        `}</style>
       </aside>
     </>
   );
