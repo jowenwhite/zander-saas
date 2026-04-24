@@ -16,7 +16,7 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
   };
 
   // Use verified endpoint paths matching actual API controllers
-  const [campaignsRes, dealsRes, calendar, tasksRes, hqDashboard, marketingPlan, productsRes, conversationTopics] = await Promise.all([
+  const [campaignsRes, dealsRes, calendar, tasksRes, hqDashboard, marketingPlan, productsRes, conversationTopics, designAssetsRes] = await Promise.all([
     fetchJSON(`${API_URL}/campaigns`),                // campaigns controller - returns array directly
     fetchJSON(`${API_URL}/deals`),                    // Jordan's domain - returns { data: [], pagination: {} }
     fetchJSON(`${API_URL}/calendar-events/upcoming`), // Pam's domain - returns array directly
@@ -25,6 +25,7 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
     fetchJSON(`${API_URL}/cmo/marketing-plan`),       // Don's domain
     fetchJSON(`${API_URL}/products`),                 // Shared - what the company sells
     fetchJSON(`${API_URL}/conversations/topics`),    // Recent conversation topics for cross-exec awareness
+    fetchJSON(`${API_URL}/design-assets?limit=5`),   // Design assets for marketing context
   ]);
 
   // Normalize responses - some endpoints return { data: [] }, others return [] directly
@@ -50,6 +51,12 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
     if (typeof planSummary === 'string' && planSummary.length > 0) {
       sections.push(`MARKETING PLAN: ${planSummary.substring(0, 150)}${planSummary.length > 150 ? '...' : ''}`);
     }
+  }
+
+  // Design assets summary (for all executives to know what creative assets exist)
+  const designAssets = designAssetsRes?.assets || (Array.isArray(designAssetsRes) ? designAssetsRes : []);
+  if (designAssets?.length > 0) {
+    sections.push(`DESIGN ASSETS: ${designAssets.length} available for marketing content`);
   }
 
   // Sales summary (for Don and Pam to see what Jordan is doing)

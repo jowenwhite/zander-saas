@@ -67,7 +67,8 @@ export class IntegrationsController {
         description: 'Import designs and graphics for your marketing',
         icon: 'canva',
         category: 'design',
-        comingSoon: true,
+        connectPath: '/integrations/canva/connect',
+        disconnectPath: '/integrations/canva/disconnect',
       },
       {
         provider: 'resend',

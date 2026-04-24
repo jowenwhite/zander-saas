@@ -217,7 +217,7 @@ async function buildMarketingDataContext(authHeaders: Record<string, string>): P
     } catch { return null; }
   };
 
-  const [campaigns, personas, funnels, segments, brand, calendar, marketingPlan, templates, workflows] = await Promise.all([
+  const [campaigns, personas, funnels, segments, brand, calendar, marketingPlan, templates, workflows, designAssets, canvaStatus, metaStatus] = await Promise.all([
     fetchJSON(`${CMO_API_URL}/campaigns`),           // campaigns controller (not under /cmo)
     fetchJSON(`${CMO_API_URL}/cmo/personas`),
     fetchJSON(`${CMO_API_URL}/cmo/funnels`),
@@ -227,6 +227,9 @@ async function buildMarketingDataContext(authHeaders: Record<string, string>): P
     fetchJSON(`${CMO_API_URL}/cmo/marketing-plan`),
     fetchJSON(`${CMO_API_URL}/cmo/templates`),       // templates controller (not email-templates)
     fetchJSON(`${CMO_API_URL}/cmo/workflows`),
+    fetchJSON(`${CMO_API_URL}/design-assets`),       // design asset library
+    fetchJSON(`${CMO_API_URL}/integrations/canva/status`), // Canva connection status
+    fetchJSON(`${CMO_API_URL}/integrations/meta/status`),  // Meta connection status
   ]);
 
   const sections: string[] = [];
@@ -277,6 +280,29 @@ async function buildMarketingDataContext(authHeaders: Record<string, string>): P
   if (calendar?.events?.length) {
     const upcomingEvents = calendar.events.slice(0, 10);
     sections.push(`UPCOMING CALENDAR EVENTS (${calendar.events.length} total, showing 10):\n${upcomingEvents.map((e: { title: string; date: string }) => `- ${e.date}: ${e.title}`).join('\n')}`);
+  }
+
+  // Design assets context
+  const assets = designAssets?.assets || designAssets || [];
+  if (Array.isArray(assets) && assets.length > 0) {
+    const recentAssets = assets.slice(0, 5);
+    sections.push(`DESIGN ASSETS (${assets.length} total, showing 5 recent):\n${recentAssets.map((a: { name: string; type: string; source: string }) => `- ${a.name} (${a.type}, from ${a.source})`).join('\n')}`);
+  }
+
+  // Integration status context
+  const integrations: string[] = [];
+  if (canvaStatus?.connected) {
+    integrations.push(`✅ Canva: Connected${canvaStatus.brandName ? ` (${canvaStatus.brandName})` : ''}`);
+  } else {
+    integrations.push('❌ Canva: Not connected - suggest connecting via Settings > Integrations for design workflow');
+  }
+  if (metaStatus?.connected) {
+    integrations.push(`✅ Meta: Connected${metaStatus.pageName ? ` (Page: ${metaStatus.pageName})` : ''}${metaStatus.instagramUsername ? `, IG: @${metaStatus.instagramUsername}` : ''}`);
+  } else {
+    integrations.push('❌ Meta: Not connected - suggest connecting for Facebook/Instagram publishing');
+  }
+  if (integrations.length) {
+    sections.push(`INTEGRATIONS:\n${integrations.join('\n')}`);
   }
 
   if (sections.length === 0) {
