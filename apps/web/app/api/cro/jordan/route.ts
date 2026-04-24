@@ -788,6 +788,153 @@ const TOOLS = [
       },
       required: ['to', 'body']
     }
+  },
+  // ========== SHARED MODULE TOOLS ==========
+  {
+    name: 'create_product',
+    description: 'Create a new product or service in the catalog.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Product name'
+        },
+        description: {
+          type: 'string',
+          description: 'Product description'
+        },
+        sku: {
+          type: 'string',
+          description: 'SKU/product code'
+        },
+        category: {
+          type: 'string',
+          description: 'Product category'
+        },
+        type: {
+          type: 'string',
+          enum: ['PHYSICAL', 'SERVICE', 'SUBSCRIPTION', 'DIGITAL', 'ACCESS', 'BUNDLE'],
+          description: 'Product type'
+        },
+        status: {
+          type: 'string',
+          enum: ['ACTIVE', 'DRAFT', 'DISCONTINUED'],
+          description: 'Product status (default: ACTIVE)'
+        },
+        basePrice: {
+          type: 'number',
+          description: 'Base price in dollars'
+        },
+        unit: {
+          type: 'string',
+          enum: ['each', 'linear_ft', 'sq_ft', 'hour', 'day', 'week', 'month', 'year', 'project'],
+          description: 'Unit of measurement'
+        }
+      },
+      required: ['name', 'type']
+    }
+  },
+  {
+    name: 'get_products',
+    description: 'Get products and services from the catalog.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['PHYSICAL', 'SERVICE', 'SUBSCRIPTION', 'DIGITAL', 'ACCESS', 'BUNDLE'],
+          description: 'Filter by product type'
+        },
+        status: {
+          type: 'string',
+          enum: ['ACTIVE', 'DRAFT', 'DISCONTINUED'],
+          description: 'Filter by status'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'create_calendar_event',
+    description: 'Create an event on the calendar. Use this when the user asks to schedule, plan, or add an activity, deadline, or meeting.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'Title of the calendar event'
+        },
+        description: {
+          type: 'string',
+          description: 'Description of the event'
+        },
+        startDate: {
+          type: 'string',
+          description: 'Start date in ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)'
+        },
+        endDate: {
+          type: 'string',
+          description: 'End date in ISO format (optional, defaults to same day)'
+        },
+        eventType: {
+          type: 'string',
+          enum: ['email', 'social', 'blog', 'campaign', 'webinar', 'other'],
+          description: 'Type of event'
+        },
+        allDay: {
+          type: 'boolean',
+          description: 'Whether this is an all-day event'
+        },
+        color: {
+          type: 'string',
+          description: 'Color for the event (hex code)'
+        }
+      },
+      required: ['title', 'startDate']
+    }
+  },
+  {
+    name: 'get_calendar_events',
+    description: 'Get calendar events. Use this to see scheduled activities, campaigns, deadlines, and other events.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        startDate: {
+          type: 'string',
+          description: 'Start date for the range (YYYY-MM-DD). Defaults to beginning of current month.'
+        },
+        endDate: {
+          type: 'string',
+          description: 'End date for the range (YYYY-MM-DD). Defaults to end of current month.'
+        },
+        type: {
+          type: 'string',
+          enum: ['email', 'social', 'blog', 'campaign', 'webinar', 'other'],
+          description: 'Filter by event type'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'get_communication_inbox',
+    description: 'View inbox with communications. Can filter by status.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['all', 'unread', 'draft', 'sent'],
+          description: 'Filter by status (default: unread)'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of messages to return (default 20)'
+        }
+      },
+      required: []
+    }
   }
 ];
 
@@ -1634,6 +1781,210 @@ async function executeTool(
             bodyPreview: body.length > 50 ? body.substring(0, 50) + '...' : body,
             linkedContact: contactId,
             linkedDeal: dealId
+          }
+        };
+      }
+
+      // ========== SHARED MODULE TOOLS ==========
+      case 'create_product': {
+        const url = `${CRO_API_URL}/products`;
+        console.log(`[Jordan Tool] POST ${url}`);
+
+        const productData = {
+          name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          sku: (toolInput.sku as string) || null,
+          category: (toolInput.category as string) || null,
+          type: toolInput.type as string,
+          status: (toolInput.status as string) || 'ACTIVE',
+          basePrice: (toolInput.basePrice as number) || null,
+          unit: (toolInput.unit as string) || 'each',
+        };
+
+        console.log(`[Jordan Tool] Product data:`, JSON.stringify(productData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(productData),
+        });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create product (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Product created' } };
+        }
+      }
+
+      case 'get_products': {
+        const params = new URLSearchParams();
+        if (toolInput.type) params.append('type', toolInput.type as string);
+        if (toolInput.status) params.append('status', toolInput.status as string);
+
+        const url = `${CRO_API_URL}/products${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Jordan Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get products (${response.status}): ${responseText}` };
+        }
+        try {
+          const parsed = JSON.parse(responseText);
+          const products = Array.isArray(parsed) ? parsed : (parsed.data || []);
+          return {
+            success: true,
+            result: {
+              count: products.length,
+              products: products.map((p: Record<string, unknown>) => ({
+                id: p.id,
+                name: p.name,
+                description: p.description,
+                sku: p.sku,
+                category: p.category,
+                type: p.type,
+                status: p.status,
+                basePrice: p.basePrice,
+                unit: p.unit
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse products data' };
+        }
+      }
+
+      case 'create_calendar_event': {
+        const url = `${CRO_API_URL}/cmo/calendar/events`;
+        console.log(`[Jordan Tool] POST ${url}`);
+
+        const eventData = {
+          title: toolInput.title as string,
+          description: (toolInput.description as string) || null,
+          startTime: toolInput.startDate as string,
+          endTime: (toolInput.endDate as string) || (toolInput.startDate as string),
+          eventType: (toolInput.eventType as string) || 'other',
+          color: (toolInput.color as string) || null,
+          allDay: (toolInput.allDay as boolean) || false,
+        };
+
+        console.log(`[Jordan Tool] Calendar event data:`, JSON.stringify(eventData, null, 2));
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(eventData),
+        });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create calendar event (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Calendar event created' } };
+        }
+      }
+
+      case 'get_calendar_events': {
+        const params = new URLSearchParams();
+        if (toolInput.startDate) params.append('startDate', toolInput.startDate as string);
+        if (toolInput.endDate) params.append('endDate', toolInput.endDate as string);
+        if (toolInput.type) params.append('type', toolInput.type as string);
+
+        const url = `${CRO_API_URL}/cmo/calendar/events${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Jordan Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Jordan Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get calendar events (${response.status}): ${responseText}` };
+        }
+        try {
+          const events = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: events.length,
+              events: events.map((e: Record<string, unknown>) => ({
+                id: e.id,
+                title: e.title,
+                description: e.description,
+                startDate: e.startDate,
+                endDate: e.endDate,
+                eventType: e.eventType,
+                status: e.status,
+                allDay: e.allDay,
+                color: e.color
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse calendar events data' };
+        }
+      }
+
+      case 'get_communication_inbox': {
+        const status = (toolInput.status as string) || 'unread';
+        const limit = (toolInput.limit as number) || 20;
+
+        const params = new URLSearchParams();
+        params.append('tenantId', tenantId);
+        if (status === 'unread') params.append('isRead', 'false');
+        if (status === 'draft') params.append('status', 'draft');
+        if (status === 'sent') params.append('direction', 'outbound');
+        params.append('limit', String(limit));
+
+        const url = `${CRO_API_URL}/email-messages?${params.toString()}`;
+        const response = await fetch(url, { headers });
+
+        if (!response.ok) {
+          return {
+            success: true,
+            result: {
+              messages: [],
+              count: 0,
+              lastSynced: null,
+              message: 'Inbox query requires /email-messages endpoint',
+              note: 'Use Communications module directly for full inbox access'
+            }
+          };
+        }
+
+        const messages = await response.json();
+
+        let lastSynced: string | null = null;
+        if (messages.length > 0) {
+          const timestamps = messages
+            .map((m: Record<string, unknown>) => m.createdAt as string)
+            .filter(Boolean)
+            .sort()
+            .reverse();
+          lastSynced = timestamps[0] || null;
+        }
+
+        return {
+          success: true,
+          result: {
+            count: messages.length,
+            status: status,
+            lastSynced,
+            messages: messages.slice(0, limit).map((m: Record<string, unknown>) => ({
+              id: m.id,
+              subject: m.subject,
+              fromAddress: m.fromAddress,
+              toAddress: m.toAddress,
+              snippet: (m.body as string)?.substring(0, 100) || '',
+              isRead: m.isRead,
+              createdAt: m.createdAt
+            }))
           }
         };
       }

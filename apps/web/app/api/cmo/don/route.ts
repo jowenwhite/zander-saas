@@ -1707,6 +1707,47 @@ const TOOLS = [
       },
       required: ['annualBudget']
     }
+  },
+  // ========== SHARED MODULE TOOLS ==========
+  {
+    name: 'update_contact',
+    description: 'Update an existing contact with new information.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        contactId: {
+          type: 'string',
+          description: 'ID of the contact to update'
+        },
+        firstName: { type: 'string' },
+        lastName: { type: 'string' },
+        email: { type: 'string' },
+        phone: { type: 'string' },
+        company: { type: 'string' },
+        title: { type: 'string' },
+        notes: { type: 'string' }
+      },
+      required: ['contactId']
+    }
+  },
+  {
+    name: 'get_communication_inbox',
+    description: 'View inbox with communications. Can filter by status.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['all', 'unread', 'draft', 'sent'],
+          description: 'Filter by status (default: unread)'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of messages to return (default 20)'
+        }
+      },
+      required: []
+    }
   }
 ];
 
@@ -4121,6 +4162,87 @@ ${variants.join('\n---')}
               totalCategories: normalizedAllocations.length,
             },
             tip: 'Use update_marketing_budget to apply these recommendations to your budget.'
+          }
+        };
+      }
+
+      // ========== SHARED MODULE TOOLS ==========
+      case 'update_contact': {
+        const { contactId, ...updateData } = toolInput as { contactId: string; [key: string]: unknown };
+        const url = `${CMO_API_URL}/contacts/${contactId}`;
+        console.log(`[Don Tool] PATCH ${url}`);
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updateData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to update contact (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Contact updated' } };
+        }
+      }
+
+      case 'get_communication_inbox': {
+        const status = (toolInput.status as string) || 'unread';
+        const limit = (toolInput.limit as number) || 20;
+
+        const params = new URLSearchParams();
+        params.append('tenantId', tenantId);
+        if (status === 'unread') params.append('isRead', 'false');
+        if (status === 'draft') params.append('status', 'draft');
+        if (status === 'sent') params.append('direction', 'outbound');
+        params.append('limit', String(limit));
+
+        const url = `${CMO_API_URL}/email-messages?${params.toString()}`;
+        const response = await fetch(url, { headers });
+
+        if (!response.ok) {
+          return {
+            success: true,
+            result: {
+              messages: [],
+              count: 0,
+              lastSynced: null,
+              message: 'Inbox query requires /email-messages endpoint',
+              note: 'Use Communications module directly for full inbox access'
+            }
+          };
+        }
+
+        const messages = await response.json();
+
+        let lastSynced: string | null = null;
+        if (messages.length > 0) {
+          const timestamps = messages
+            .map((m: Record<string, unknown>) => m.createdAt as string)
+            .filter(Boolean)
+            .sort()
+            .reverse();
+          lastSynced = timestamps[0] || null;
+        }
+
+        return {
+          success: true,
+          result: {
+            count: messages.length,
+            status: status,
+            lastSynced,
+            messages: messages.slice(0, limit).map((m: Record<string, unknown>) => ({
+              id: m.id,
+              subject: m.subject,
+              fromAddress: m.fromAddress,
+              toAddress: m.toAddress,
+              snippet: (m.body as string)?.substring(0, 100) || '',
+              isRead: m.isRead,
+              createdAt: m.createdAt
+            }))
           }
         };
       }
