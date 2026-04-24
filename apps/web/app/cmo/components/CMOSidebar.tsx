@@ -1,7 +1,7 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import TenantSwitcher from '../../components/TenantSwitcher';
-import { LayoutDashboard, FileText, FolderKanban, Users, Package, Mail, Calendar, CalendarDays, ClipboardList, Bot, Zap, Target, BarChart3, UserCircle, DollarSign, Palette, FileCode, LucideIcon } from 'lucide-react';
+import { LayoutDashboard, FileText, FolderKanban, Users, Package, Mail, Calendar, CalendarDays, ClipboardList, Bot, Zap, Target, BarChart3, UserCircle, DollarSign, Palette, FileCode, CheckSquare, LucideIcon } from 'lucide-react';
 
 interface CMOSidebarProps {
   collapsed?: boolean;
@@ -31,6 +31,7 @@ export default function CMOSidebar({ collapsed = false }: CMOSidebarProps) {
 
   const processItems: NavItem[] = [
     { icon: Mail, label: 'Communication', href: '/cmo/communication' },
+    { icon: CheckSquare, label: 'Approval Queue', href: '/cmo/queue' },
     { icon: Calendar, label: 'Schedule', href: '/cmo/schedule' },
     { icon: CalendarDays, label: 'Marketing Calendar', href: '/cmo/calendar' },
     { icon: ClipboardList, label: 'Forms', href: '/cmo/forms' },
