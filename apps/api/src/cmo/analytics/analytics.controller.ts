@@ -25,4 +25,15 @@ export class AnalyticsController {
   async getTopContent(@Request() req) {
     return this.analyticsService.getTopContent(req.tenantId);
   }
+
+  @Get('email')
+  async getEmailAnalytics(
+    @Request() req,
+    @Query('dateRange') dateRange?: '7d' | '30d' | '90d',
+  ) {
+    return this.analyticsService.getEmailAnalytics(
+      req.tenantId,
+      dateRange || '30d',
+    );
+  }
 }

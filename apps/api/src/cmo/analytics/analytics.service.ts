@@ -191,6 +191,232 @@ export class AnalyticsService {
     return d;
   }
 
+  /**
+   * Get detailed email performance analytics
+   */
+  async getEmailAnalytics(tenantId: string, dateRange: '7d' | '30d' | '90d' = '30d') {
+    const now = new Date();
+    const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
+    const days = daysMap[dateRange];
+    const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+    // Get all email counts by status
+    const [
+      totalSent,
+      deliveredCount,
+      openedCount,
+      bouncedCount,
+      complainedCount,
+      delayedCount,
+      dailyTrend,
+      topEmails,
+    ] = await Promise.all([
+      // Total sent
+      this.prisma.emailMessage.count({
+        where: { tenantId, sentAt: { gte: startDate }, direction: 'outbound' },
+      }),
+
+      // Delivered (status = delivered or opened means delivered)
+      this.prisma.emailMessage.count({
+        where: {
+          tenantId,
+          sentAt: { gte: startDate },
+          direction: 'outbound',
+          status: { in: ['delivered', 'opened'] },
+        },
+      }),
+
+      // Opened
+      this.prisma.emailMessage.count({
+        where: {
+          tenantId,
+          sentAt: { gte: startDate },
+          direction: 'outbound',
+          openedAt: { not: null },
+        },
+      }),
+
+      // Bounced
+      this.prisma.emailMessage.count({
+        where: {
+          tenantId,
+          sentAt: { gte: startDate },
+          direction: 'outbound',
+          status: 'bounced',
+        },
+      }),
+
+      // Complained (spam)
+      this.prisma.emailMessage.count({
+        where: {
+          tenantId,
+          sentAt: { gte: startDate },
+          direction: 'outbound',
+          status: 'complained',
+        },
+      }),
+
+      // Delayed
+      this.prisma.emailMessage.count({
+        where: {
+          tenantId,
+          sentAt: { gte: startDate },
+          direction: 'outbound',
+          status: 'delayed',
+        },
+      }),
+
+      // Daily trend
+      this.getEmailDailyTrend(tenantId, startDate),
+
+      // Top performing emails by subject (open rate)
+      this.getTopPerformingEmails(tenantId, startDate),
+    ]);
+
+    // Calculate rates
+    const deliveryRate = totalSent > 0 ? (deliveredCount / totalSent) * 100 : 0;
+    const openRate = deliveredCount > 0 ? (openedCount / deliveredCount) * 100 : 0;
+    const bounceRate = totalSent > 0 ? (bouncedCount / totalSent) * 100 : 0;
+    const complaintRate = totalSent > 0 ? (complainedCount / totalSent) * 100 : 0;
+
+    return {
+      summary: {
+        totalSent,
+        delivered: deliveredCount,
+        opened: openedCount,
+        bounced: bouncedCount,
+        complained: complainedCount,
+        delayed: delayedCount,
+        deliveryRate: Math.round(deliveryRate * 10) / 10,
+        openRate: Math.round(openRate * 10) / 10,
+        bounceRate: Math.round(bounceRate * 10) / 10,
+        complaintRate: Math.round(complaintRate * 100) / 100, // More precision for complaints
+      },
+      trend: dailyTrend,
+      topEmails,
+      dateRange,
+      hasData: totalSent > 0,
+    };
+  }
+
+  /**
+   * Get email stats grouped by day for trend chart
+   */
+  private async getEmailDailyTrend(tenantId: string, startDate: Date) {
+    const emails = await this.prisma.emailMessage.findMany({
+      where: {
+        tenantId,
+        sentAt: { gte: startDate },
+        direction: 'outbound',
+      },
+      select: {
+        sentAt: true,
+        status: true,
+        openedAt: true,
+      },
+      orderBy: { sentAt: 'asc' },
+    });
+
+    if (emails.length === 0) {
+      return [];
+    }
+
+    // Group by day
+    const dayMap = new Map<string, { sent: number; delivered: number; opened: number; bounced: number }>();
+
+    emails.forEach((email) => {
+      const dayKey = email.sentAt.toISOString().split('T')[0];
+
+      if (!dayMap.has(dayKey)) {
+        dayMap.set(dayKey, { sent: 0, delivered: 0, opened: 0, bounced: 0 });
+      }
+
+      const day = dayMap.get(dayKey)!;
+      day.sent++;
+      if (email.status === 'delivered' || email.status === 'opened' || email.openedAt) {
+        day.delivered++;
+      }
+      if (email.openedAt) {
+        day.opened++;
+      }
+      if (email.status === 'bounced') {
+        day.bounced++;
+      }
+    });
+
+    // Convert to array
+    return Array.from(dayMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, data]) => ({
+        date,
+        ...data,
+        openRate: data.delivered > 0 ? Math.round((data.opened / data.delivered) * 1000) / 10 : 0,
+      }));
+  }
+
+  /**
+   * Get top performing emails by open rate
+   */
+  private async getTopPerformingEmails(tenantId: string, startDate: Date) {
+    // Group emails by subject
+    const emails = await this.prisma.emailMessage.groupBy({
+      by: ['subject'],
+      where: {
+        tenantId,
+        sentAt: { gte: startDate },
+        direction: 'outbound',
+      },
+      _count: { id: true },
+    });
+
+    if (emails.length === 0) {
+      return [];
+    }
+
+    // Get open counts per subject
+    const results = await Promise.all(
+      emails.map(async (email) => {
+        const [delivered, opened] = await Promise.all([
+          this.prisma.emailMessage.count({
+            where: {
+              tenantId,
+              sentAt: { gte: startDate },
+              direction: 'outbound',
+              subject: email.subject,
+              status: { in: ['delivered', 'opened'] },
+            },
+          }),
+          this.prisma.emailMessage.count({
+            where: {
+              tenantId,
+              sentAt: { gte: startDate },
+              direction: 'outbound',
+              subject: email.subject,
+              openedAt: { not: null },
+            },
+          }),
+        ]);
+
+        return {
+          subject: email.subject,
+          sent: email._count.id,
+          delivered,
+          opened,
+          openRate: delivered > 0 ? Math.round((opened / delivered) * 1000) / 10 : 0,
+        };
+      })
+    );
+
+    // Sort by open rate then by sent count
+    return results
+      .filter((r) => r.sent >= 3) // Only show subjects with at least 3 sends
+      .sort((a, b) => {
+        if (b.openRate !== a.openRate) return b.openRate - a.openRate;
+        return b.sent - a.sent;
+      })
+      .slice(0, 10);
+  }
+
   async getTopContent(tenantId: string) {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
