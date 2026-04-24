@@ -16,14 +16,19 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
   };
 
   // Use verified endpoint paths matching actual API controllers
-  const [campaigns, deals, calendar, tasks, hqDashboard, marketingPlan] = await Promise.all([
-    fetchJSON(`${API_URL}/campaigns`),                // campaigns controller (not under /cmo)
-    fetchJSON(`${API_URL}/deals`),                    // Jordan's domain
-    fetchJSON(`${API_URL}/calendar-events/upcoming`), // Pam's domain
-    fetchJSON(`${API_URL}/tasks`),                    // Pam's domain
+  const [campaignsRes, dealsRes, calendar, tasksRes, hqDashboard, marketingPlan] = await Promise.all([
+    fetchJSON(`${API_URL}/campaigns`),                // campaigns controller - returns array directly
+    fetchJSON(`${API_URL}/deals`),                    // Jordan's domain - returns { data: [], pagination: {} }
+    fetchJSON(`${API_URL}/calendar-events/upcoming`), // Pam's domain - returns array directly
+    fetchJSON(`${API_URL}/tasks`),                    // Pam's domain - returns { data: [], pagination: {} }
     fetchJSON(`${API_URL}/hq/dashboard`),             // Shared HQ
     fetchJSON(`${API_URL}/cmo/marketing-plan`),       // Don's domain
   ]);
+
+  // Normalize responses - some endpoints return { data: [] }, others return [] directly
+  const campaigns = Array.isArray(campaignsRes) ? campaignsRes : campaignsRes?.data || [];
+  const deals = Array.isArray(dealsRes) ? dealsRes : dealsRes?.data || [];
+  const tasks = Array.isArray(tasksRes) ? tasksRes : tasksRes?.data || [];
 
   const sections: string[] = [];
   sections.push('=== TEAM AWARENESS (What your fellow executives are working on) ===');
