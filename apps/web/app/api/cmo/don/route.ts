@@ -1748,6 +1748,42 @@ const TOOLS = [
       },
       required: []
     }
+  },
+  {
+    name: 'get_forms',
+    description: 'Get forms for the tenant. Use this to see intake forms, questionnaires, and other forms.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'create_form',
+    description: 'Create a new form for collecting information from contacts or clients.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Form name'
+        },
+        description: {
+          type: 'string',
+          description: 'Form description'
+        },
+        type: {
+          type: 'string',
+          enum: ['INTAKE', 'SURVEY', 'FEEDBACK', 'REGISTRATION', 'OTHER'],
+          description: 'Form type'
+        },
+        fields: {
+          type: 'array',
+          description: 'Array of form field definitions'
+        }
+      },
+      required: ['name', 'type']
+    }
   }
 ];
 
@@ -4245,6 +4281,65 @@ ${variants.join('\n---')}
             }))
           }
         };
+      }
+
+      case 'get_forms': {
+        const url = `${CMO_API_URL}/forms`;
+        console.log(`[Don Tool] GET ${url}`);
+        const response = await fetch(url, { method: 'GET', headers });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to get forms (${response.status}): ${responseText}` };
+        }
+        try {
+          const forms = JSON.parse(responseText);
+          return {
+            success: true,
+            result: {
+              count: forms.length,
+              forms: forms.map((f: Record<string, unknown>) => ({
+                id: f.id,
+                name: f.name,
+                description: f.description,
+                type: f.type,
+                status: f.status,
+                createdAt: f.createdAt
+              }))
+            }
+          };
+        } catch {
+          return { success: false, error: 'Failed to parse forms data' };
+        }
+      }
+
+      case 'create_form': {
+        const url = `${CMO_API_URL}/forms`;
+        console.log(`[Don Tool] POST ${url}`);
+
+        const formData = {
+          name: toolInput.name as string,
+          description: (toolInput.description as string) || null,
+          type: toolInput.type as string,
+          fields: toolInput.fields || [],
+        };
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(formData),
+        });
+        const responseText = await response.text();
+        console.log(`[Don Tool] Response status: ${response.status}, body: ${responseText}`);
+        if (!response.ok) {
+          return { success: false, error: `Failed to create form (${response.status}): ${responseText}` };
+        }
+        try {
+          const result = JSON.parse(responseText);
+          return { success: true, result };
+        } catch {
+          return { success: true, result: { message: 'Form created' } };
+        }
       }
 
       default:
