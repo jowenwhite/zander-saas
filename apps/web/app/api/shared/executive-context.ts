@@ -16,19 +16,21 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
   };
 
   // Use verified endpoint paths matching actual API controllers
-  const [campaignsRes, dealsRes, calendar, tasksRes, hqDashboard, marketingPlan] = await Promise.all([
+  const [campaignsRes, dealsRes, calendar, tasksRes, hqDashboard, marketingPlan, productsRes] = await Promise.all([
     fetchJSON(`${API_URL}/campaigns`),                // campaigns controller - returns array directly
     fetchJSON(`${API_URL}/deals`),                    // Jordan's domain - returns { data: [], pagination: {} }
     fetchJSON(`${API_URL}/calendar-events/upcoming`), // Pam's domain - returns array directly
     fetchJSON(`${API_URL}/tasks`),                    // Pam's domain - returns { data: [], pagination: {} }
     fetchJSON(`${API_URL}/hq/dashboard`),             // Shared HQ
     fetchJSON(`${API_URL}/cmo/marketing-plan`),       // Don's domain
+    fetchJSON(`${API_URL}/products`),                 // Shared - what the company sells
   ]);
 
   // Normalize responses - some endpoints return { data: [] }, others return [] directly
   const campaigns = Array.isArray(campaignsRes) ? campaignsRes : campaignsRes?.data || [];
   const deals = Array.isArray(dealsRes) ? dealsRes : dealsRes?.data || [];
   const tasks = Array.isArray(tasksRes) ? tasksRes : tasksRes?.data || [];
+  const products = Array.isArray(productsRes) ? productsRes : productsRes?.data || [];
 
   const sections: string[] = [];
   sections.push('=== TEAM AWARENESS (What your fellow executives are working on) ===');
@@ -95,6 +97,17 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
     if (parts.length) {
       sections.push(`HQ: ${parts.join(', ')}`);
     }
+  }
+
+  // Products & Services (ALL executives need to know what the company sells)
+  if (products?.length) {
+    const activeProducts = products.filter((p: { status?: string }) =>
+      p.status === 'ACTIVE' || p.status === 'active' || !p.status
+    );
+    const productsList = activeProducts.slice(0, 10).map((p: { name: string; basePrice?: number; status?: string }) =>
+      `${p.name}${p.basePrice ? ` [$${p.basePrice.toLocaleString()}]` : ''}`
+    ).join(', ');
+    sections.push(`PRODUCTS & SERVICES (${activeProducts.length}): ${productsList || 'None listed'}`);
   }
 
   sections.push('=== Use this team context to give coordinated advice. Reference what other executives are working on when relevant. ===');

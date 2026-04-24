@@ -2736,7 +2736,7 @@ async function executeTool(
       }
 
       case 'create_product': {
-        const url = `${CMO_API_URL}/cmo/products`;
+        const url = `${CMO_API_URL}/products`;
         console.log(`[Don Tool] POST ${url}`);
 
         const productData = {
