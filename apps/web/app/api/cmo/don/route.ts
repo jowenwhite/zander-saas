@@ -106,7 +106,8 @@ Available Tools:
 - compose_sms: Compose an SMS message to a contact (lands in Scheduled → Pending for approval, requires Twilio)
 - draft_campaign_brief: Draft a campaign brief document (lands in Scheduled → Pending for approval)
 - draft_ad_copy: Generate ad copy variants as a draft (lands in Scheduled → Pending for approval)
-- schedule_social_post: Create or schedule social media posts (requires approval)
+- schedule_social_post: Create or schedule social media posts (goes to Approval Queue)
+- list_social_queue: View posts awaiting approval in the Approval Queue
 - draft_social_reply: Draft a reply to social media comments/mentions/DMs
 - get_social_analytics: Get social media engagement metrics
 - connect_social_account: Get instructions for connecting social platforms
@@ -158,6 +159,14 @@ CATEGORY 2 — Ad-hoc compose/draft requests from chat:
 - Always tell the user: "I've drafted that — it's in your Scheduled queue pending approval"
 
 Remember: You're not just an advisor — you're an executive who gets things done.
+
+**SOCIAL MEDIA CONTENT WORKFLOW:**
+When you create social media content using schedule_social_post:
+1. The post is created as a draft in the Approval Queue
+2. Tell the user: "I've drafted that post — it's in your Approval Queue for review"
+3. The user can review, edit, approve, or reject posts at CMO > Approval Queue
+4. Use list_social_queue to check what's pending approval
+5. Nothing publishes until the user explicitly approves it
 
 **SOCIAL MEDIA AGENT RULES:**
 You manage social media accounts for the tenant. Your behavior depends on the interaction type:
@@ -1440,6 +1449,15 @@ const TOOLS = [
           description: 'Maximum number to return (default 20)'
         }
       },
+      required: []
+    }
+  },
+  {
+    name: 'list_social_queue',
+    description: 'Get all social posts pending approval. Shows drafts and pending_approval posts awaiting user review.',
+    input_schema: {
+      type: 'object',
+      properties: {},
       required: []
     }
   },
@@ -3361,34 +3379,59 @@ ${variants.join('\n---')}
           campaignId?: string;
         };
 
-        // Create the social post record
-        const postData = {
-          tenantId,
-          platform,
-          content,
-          mediaUrls: mediaUrls || [],
-          scheduledFor: scheduledFor ? new Date(scheduledFor).toISOString() : null,
-          campaignId: campaignId || null,
-          status: scheduledFor ? 'scheduled' : 'pending_approval',
-        };
-
-        // For now, store in database via direct Prisma call
-        // In future, this will route through the social service
+        // Call the actual API to create the social post
         const url = `${CMO_API_URL}/cmo/social/posts`;
-        console.log(`[Don Tool] POST ${url} (stub - social integration not yet wired)`);
+        console.log(`[Don Tool] POST ${url}`);
 
-        // Return success with note about pending integration
-        return {
-          success: true,
-          result: {
-            message: `Social post drafted for ${platform}`,
-            platform,
-            status: postData.status,
-            scheduledFor: scheduledFor || 'Pending approval',
-            note: 'Social media integration is scaffolded but not yet connected to live platforms. Post saved to database for review.',
-            preview: content.substring(0, 100) + (content.length > 100 ? '...' : '')
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              platform,
+              content,
+              mediaUrls: mediaUrls || [],
+              scheduledFor: scheduledFor || null,
+              campaignId: campaignId || null,
+              status: scheduledFor ? 'scheduled' : 'pending_approval',
+            }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[Don Tool] POST ${url} failed: ${response.status} - ${errorText}`);
+            return {
+              success: false,
+              error: `Failed to create social post: ${response.status}`,
+            };
           }
-        };
+
+          const post = await response.json();
+
+          return {
+            success: true,
+            result: {
+              message: `Social post created for ${platform}`,
+              post: {
+                id: post.id,
+                platform: post.socialAccount?.platform || platform,
+                status: post.status,
+                scheduledFor: post.scheduledFor || 'Pending approval in queue',
+                preview: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+              },
+              nextSteps: "The post has been added to your Approval Queue. Go to CMO > Approval Queue to review and approve it before publishing."
+            }
+          };
+        } catch (error) {
+          console.error(`[Don Tool] schedule_social_post error:`, error);
+          return {
+            success: false,
+            error: `Failed to create social post: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          };
+        }
       }
 
       case 'draft_social_reply': {
@@ -3501,15 +3544,114 @@ ${variants.join('\n---')}
           limit?: number;
         };
 
-        return {
-          success: true,
-          result: {
-            message: 'Social posts retrieved',
-            filters: { status: status || 'all', limit: limit || 20 },
-            posts: [],
-            note: 'Social media integrations are scaffolded but not yet connected. Posts created via schedule_social_post will appear here once the integration is live.'
+        // Call the actual API to get social posts
+        const params = new URLSearchParams();
+        if (status) params.append('status', status);
+        if (limit) params.append('limit', limit.toString());
+
+        const url = `${CMO_API_URL}/cmo/social/posts${params.toString() ? '?' + params.toString() : ''}`;
+        console.log(`[Don Tool] GET ${url}`);
+
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            console.error(`[Don Tool] GET ${url} failed: ${response.status}`);
+            return {
+              success: false,
+              error: `Failed to fetch social posts: ${response.status}`,
+            };
           }
-        };
+
+          const data = await response.json();
+          const posts = data.posts || [];
+
+          return {
+            success: true,
+            result: {
+              message: `Found ${posts.length} social post(s)`,
+              filters: { status: status || 'all', limit: limit || 20 },
+              total: data.total || posts.length,
+              posts: posts.map((p: any) => ({
+                id: p.id,
+                platform: p.socialAccount?.platform,
+                status: p.status,
+                content: p.content.substring(0, 100) + (p.content.length > 100 ? '...' : ''),
+                scheduledFor: p.scheduledFor,
+                createdAt: p.createdAt,
+                hasMedia: p.mediaUrls?.length > 0,
+              })),
+            }
+          };
+        } catch (error) {
+          console.error(`[Don Tool] get_social_posts error:`, error);
+          return {
+            success: false,
+            error: `Failed to fetch social posts: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          };
+        }
+      }
+
+      case 'list_social_queue': {
+        // Call the actual API to get the approval queue
+        const url = `${CMO_API_URL}/cmo/social/posts/queue`;
+        console.log(`[Don Tool] GET ${url}`);
+
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            console.error(`[Don Tool] GET ${url} failed: ${response.status}`);
+            return {
+              success: false,
+              error: `Failed to fetch approval queue: ${response.status}`,
+            };
+          }
+
+          const data = await response.json();
+          const posts = data.posts || [];
+
+          return {
+            success: true,
+            result: {
+              message: posts.length === 0
+                ? 'Your approval queue is empty. All posts have been reviewed.'
+                : `Found ${posts.length} post(s) awaiting approval`,
+              pendingCount: data.pendingCount || 0,
+              draftCount: data.draftCount || 0,
+              total: data.total || posts.length,
+              posts: posts.map((p: any) => ({
+                id: p.id,
+                platform: p.socialAccount?.platform,
+                status: p.status,
+                content: p.content.substring(0, 100) + (p.content.length > 100 ? '...' : ''),
+                scheduledFor: p.scheduledFor,
+                createdAt: p.createdAt,
+              })),
+              action: posts.length > 0
+                ? 'Go to CMO > Approval Queue to review and approve these posts.'
+                : null,
+            }
+          };
+        } catch (error) {
+          console.error(`[Don Tool] list_social_queue error:`, error);
+          return {
+            success: false,
+            error: `Failed to fetch approval queue: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          };
+        }
       }
 
       // ============================================
