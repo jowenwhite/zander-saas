@@ -53,13 +53,13 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
 
   // Sales summary (for Don and Pam to see what Jordan is doing)
   if (deals?.length) {
-    const totalValue = deals.reduce((sum: number, d: { value?: number }) => sum + (d.value || 0), 0);
+    const totalValue = deals.reduce((sum: number, d: { dealValue?: number }) => sum + (d.dealValue || 0), 0);
     const recentWins = deals.filter((d: { stage?: string }) =>
       d.stage === 'Won' || d.stage === 'Closed Won' || d.stage === 'CLOSED_WON'
     ).slice(0, 3);
     const winsText = recentWins.length
-      ? '. Recent wins: ' + recentWins.map((d: { name: string; value?: number }) =>
-          `${d.name} ($${(d.value || 0).toLocaleString()})`
+      ? '. Recent wins: ' + recentWins.map((d: { dealName: string; dealValue?: number }) =>
+          `${d.dealName} ($${(d.dealValue || 0).toLocaleString()})`
         ).join(', ')
       : '';
     sections.push(`SALES (Jordan): ${deals.length} deals in pipeline, total value $${totalValue.toLocaleString()}${winsText}`);

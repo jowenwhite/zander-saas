@@ -144,17 +144,22 @@ async function buildSalesDataContext(authHeaders: Record<string, string>): Promi
     } catch { return null; }
   };
 
-  const [contacts, deals, activities, pipelineStages] = await Promise.all([
+  const [contactsRes, dealsRes, activitiesRes, pipelineStages] = await Promise.all([
     fetchJSON(`${CRO_API_URL}/contacts`),
     fetchJSON(`${CRO_API_URL}/deals`),
     fetchJSON(`${CRO_API_URL}/activities`),
     fetchJSON(`${CRO_API_URL}/pipeline-stages`),
   ]);
 
+  // Normalize responses - endpoints return { data: [], pagination: {} }
+  const contacts = Array.isArray(contactsRes) ? contactsRes : contactsRes?.data || [];
+  const deals = Array.isArray(dealsRes) ? dealsRes : dealsRes?.data || [];
+  const activities = Array.isArray(activitiesRes) ? activitiesRes : activitiesRes?.data || [];
+
   const sections: string[] = [];
 
   if (deals?.length) {
-    const totalValue = deals.reduce((sum: number, d: { value?: number }) => sum + (d.value || 0), 0);
+    const totalValue = deals.reduce((sum: number, d: { dealValue?: number }) => sum + (d.dealValue || 0), 0);
     const byStage = deals.reduce((acc: Record<string, number>, d: { stage?: string }) => {
       const stage = d.stage || 'Unknown';
       acc[stage] = (acc[stage] || 0) + 1;
@@ -162,7 +167,7 @@ async function buildSalesDataContext(authHeaders: Record<string, string>): Promi
     }, {});
     sections.push(`DEALS (${deals.length}, total value $${totalValue.toLocaleString()}):\nBy stage: ${Object.entries(byStage).map(([stage, count]) => `${stage}: ${count}`).join(', ')}`);
     const recentDeals = deals.slice(0, 8);
-    sections.push(`RECENT DEALS:\n${recentDeals.map((d: { name: string; value?: number; stage?: string }) => `- ${d.name} [$${(d.value || 0).toLocaleString()}, ${d.stage || 'Unknown'}]`).join('\n')}`);
+    sections.push(`RECENT DEALS:\n${recentDeals.map((d: { dealName: string; dealValue?: number; stage?: string }) => `- ${d.dealName} [$${(d.dealValue || 0).toLocaleString()}, ${d.stage || 'Unknown'}]`).join('\n')}`);
   }
 
   if (contacts?.length) {

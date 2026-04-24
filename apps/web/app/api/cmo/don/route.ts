@@ -2542,7 +2542,9 @@ async function executeTool(
           return { success: false, error: `Failed to get products (${response.status}): ${responseText}` };
         }
         try {
-          const products = JSON.parse(responseText);
+          const parsed = JSON.parse(responseText);
+          // API returns { data: products } - unwrap it
+          const products = Array.isArray(parsed) ? parsed : (parsed.data || []);
           return {
             success: true,
             result: {

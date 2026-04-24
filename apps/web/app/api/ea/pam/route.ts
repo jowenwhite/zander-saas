@@ -137,12 +137,17 @@ async function buildExecutiveAssistantContext(authHeaders: Record<string, string
     } catch { return null; }
   };
 
-  const [calendarEvents, tasks, emails, hqDashboard] = await Promise.all([
+  const [calendarEventsRes, tasksRes, emailsRes, hqDashboard] = await Promise.all([
     fetchJSON(`${EA_API_URL}/calendar-events/upcoming`),
     fetchJSON(`${EA_API_URL}/tasks`),
     fetchJSON(`${EA_API_URL}/email-messages`),
     fetchJSON(`${EA_API_URL}/hq/dashboard`),
   ]);
+
+  // Normalize responses - some endpoints return { data: [] }, others return [] directly
+  const calendarEvents = Array.isArray(calendarEventsRes) ? calendarEventsRes : calendarEventsRes?.data || [];
+  const tasks = Array.isArray(tasksRes) ? tasksRes : tasksRes?.data || [];
+  const emails = Array.isArray(emailsRes) ? emailsRes : emailsRes?.data || [];
 
   const sections: string[] = [];
 
