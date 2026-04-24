@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { MetaService } from '../../integrations/meta/meta.service';
 
 // ============================================
 // PLATFORM ADAPTER INTERFACES
@@ -11,6 +12,7 @@ export interface SocialPostPayload {
   mediaUrls?: string[];
   scheduledFor?: Date;
   metadata?: Record<string, unknown>;
+  tenantId?: string; // Added for Meta adapters to access tenant context
 }
 
 export interface SocialReplyPayload {
@@ -36,49 +38,105 @@ export interface PlatformAdapter {
 }
 
 // ============================================
-// PLACEHOLDER PLATFORM ADAPTERS
-// Each returns "Integration not yet configured"
+// PLATFORM ADAPTERS
+// Facebook and Instagram use Meta Graph API via MetaService
 // ============================================
 
 class FacebookAdapter implements PlatformAdapter {
-  async connect(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Facebook integration not yet configured. OAuth app required via Meta Business Suite.' };
+  constructor(private metaService: MetaService) {}
+
+  async connect(tenantId: string, authCode: string): Promise<{ success: boolean; accountId?: string; error?: string }> {
+    // OAuth flow is handled by MetaService OAuth endpoints
+    // This adapter is for publishing after connection is established
+    return { success: false, error: 'Use Settings > Integrations to connect Facebook via Meta OAuth flow.' };
   }
+
   async disconnect(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Facebook integration not yet configured.' };
+    // Disconnection is handled via MetaService disconnect endpoint
+    return { success: false, error: 'Use Settings > Integrations to disconnect Facebook.' };
   }
-  async publishPost(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Facebook integration not yet configured.' };
+
+  async publishPost(accountId: string, payload: SocialPostPayload): Promise<{ success: boolean; platformPostId?: string; error?: string }> {
+    if (!payload.tenantId) {
+      return { success: false, error: 'Tenant ID required for Facebook publishing.' };
+    }
+
+    // Check if Meta is connected for this tenant
+    const isConnected = await this.metaService.isConnected(payload.tenantId);
+    if (!isConnected) {
+      return { success: false, error: 'Facebook not connected. Connect via Settings > Integrations.' };
+    }
+
+    // Publish via Meta Graph API
+    return this.metaService.publishToFacebook(
+      payload.tenantId,
+      payload.content,
+      payload.mediaUrls,
+    );
   }
+
   async getEngagements(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Facebook integration not yet configured.' };
+    // TODO: Implement via Meta Graph API /page/feed with fields=comments,likes
+    return { success: false, error: 'Facebook engagement fetching not yet implemented.' };
   }
+
   async replyToEngagement(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Facebook integration not yet configured.' };
+    // TODO: Implement via Meta Graph API POST /comment_id/replies
+    return { success: false, error: 'Facebook reply not yet implemented.' };
   }
+
   async getAnalytics(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Facebook integration not yet configured.' };
+    // TODO: Implement via Meta Graph API /page/insights
+    return { success: false, error: 'Facebook analytics not yet implemented.' };
   }
 }
 
 class InstagramAdapter implements PlatformAdapter {
-  async connect(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Instagram integration not yet configured. Requires Instagram Graph API via Meta Business Suite.' };
+  constructor(private metaService: MetaService) {}
+
+  async connect(tenantId: string, authCode: string): Promise<{ success: boolean; accountId?: string; error?: string }> {
+    // OAuth flow is handled by MetaService OAuth endpoints (same as Facebook)
+    return { success: false, error: 'Use Settings > Integrations to connect Instagram via Meta OAuth flow.' };
   }
+
   async disconnect(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Instagram integration not yet configured.' };
+    // Disconnection is handled via MetaService disconnect endpoint
+    return { success: false, error: 'Use Settings > Integrations to disconnect Instagram.' };
   }
-  async publishPost(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Instagram integration not yet configured.' };
+
+  async publishPost(accountId: string, payload: SocialPostPayload): Promise<{ success: boolean; platformPostId?: string; error?: string }> {
+    if (!payload.tenantId) {
+      return { success: false, error: 'Tenant ID required for Instagram publishing.' };
+    }
+
+    // Check if Meta is connected for this tenant
+    const isConnected = await this.metaService.isConnected(payload.tenantId);
+    if (!isConnected) {
+      return { success: false, error: 'Instagram not connected. Connect via Settings > Integrations.' };
+    }
+
+    // Publish via Meta Graph API (two-step: create media container, then publish)
+    // Note: Instagram requires an image - MetaService will return error if no media
+    return this.metaService.publishToInstagram(
+      payload.tenantId,
+      payload.content,
+      payload.mediaUrls,
+    );
   }
+
   async getEngagements(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Instagram integration not yet configured.' };
+    // TODO: Implement via Meta Graph API /ig-media/comments
+    return { success: false, error: 'Instagram engagement fetching not yet implemented.' };
   }
+
   async replyToEngagement(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Instagram integration not yet configured.' };
+    // TODO: Implement via Meta Graph API POST /ig-comment/replies
+    return { success: false, error: 'Instagram reply not yet implemented.' };
   }
+
   async getAnalytics(): Promise<{ success: boolean; error?: string }> {
-    return { success: false, error: 'Instagram integration not yet configured.' };
+    // TODO: Implement via Meta Graph API /ig-user/insights
+    return { success: false, error: 'Instagram analytics not yet implemented.' };
   }
 }
 
@@ -187,10 +245,14 @@ export class SocialMediaService {
   private readonly logger = new Logger(SocialMediaService.name);
   private adapters: Map<string, PlatformAdapter> = new Map();
 
-  constructor(private prisma: PrismaService) {
+  constructor(
+    private prisma: PrismaService,
+    private metaService: MetaService,
+  ) {
     // Initialize all platform adapters
-    this.adapters.set('facebook', new FacebookAdapter());
-    this.adapters.set('instagram', new InstagramAdapter());
+    // Facebook and Instagram use MetaService for Graph API calls
+    this.adapters.set('facebook', new FacebookAdapter(this.metaService));
+    this.adapters.set('instagram', new InstagramAdapter(this.metaService));
     this.adapters.set('linkedin', new LinkedInAdapter());
     this.adapters.set('tiktok', new TikTokAdapter());
     this.adapters.set('youtube', new YouTubeAdapter());
@@ -313,6 +375,7 @@ export class SocialMediaService {
     const result = await adapter.publishPost(post.socialAccount.accountId, {
       content: post.content,
       mediaUrls: post.mediaUrls,
+      tenantId: post.tenantId, // Pass tenantId for Meta adapters to access IntegrationConnection
     });
 
     if (!result.success) {

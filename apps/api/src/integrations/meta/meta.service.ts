@@ -501,6 +501,162 @@ export class MetaService {
   }
 
   /**
+   * Publish a post to Facebook Page via Graph API
+   * Called by the social publishing adapter after approval
+   */
+  async publishToFacebook(
+    tenantId: string,
+    content: string,
+    mediaUrls?: string[],
+  ): Promise<{ success: boolean; platformPostId?: string; error?: string }> {
+    try {
+      const connection = await this.getConnection(tenantId);
+      const metadata = connection.metadata as any;
+
+      if (!metadata?.pageId || !metadata?.pageAccessToken) {
+        return {
+          success: false,
+          error: 'Facebook not connected. Connect via Settings > Integrations.',
+        };
+      }
+
+      const pageAccessToken = metadata.pageAccessToken;
+      const pageId = metadata.pageId;
+
+      // Build the post payload
+      const postData: Record<string, string> = {
+        message: content,
+        access_token: pageAccessToken,
+      };
+
+      // If there's a media URL, add it (Facebook supports link posts)
+      if (mediaUrls && mediaUrls.length > 0) {
+        postData.link = mediaUrls[0]; // Facebook Page feed only supports one link
+      }
+
+      // POST to Graph API
+      const response = await fetch(`${this.GRAPH_API_BASE}/${pageId}/feed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        this.logger.error(`Facebook publish failed: ${data.error.message}`);
+        return { success: false, error: data.error.message };
+      }
+
+      this.logger.log(`Published to Facebook: ${data.id}`);
+      return { success: true, platformPostId: data.id };
+    } catch (error) {
+      this.logger.error(`Facebook publish error: ${error.message}`);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Publish a post to Instagram via Graph API
+   * Two-step process: create media container, then publish
+   * Instagram REQUIRES an image - text-only posts are not supported
+   */
+  async publishToInstagram(
+    tenantId: string,
+    content: string,
+    mediaUrls?: string[],
+  ): Promise<{ success: boolean; platformPostId?: string; error?: string }> {
+    try {
+      const connection = await this.getConnection(tenantId);
+      const metadata = connection.metadata as any;
+
+      if (!metadata?.instagramAccountId || !metadata?.pageAccessToken) {
+        return {
+          success: false,
+          error: 'Instagram not connected. Connect via Settings > Integrations.',
+        };
+      }
+
+      // Instagram requires an image
+      if (!mediaUrls || mediaUrls.length === 0) {
+        return {
+          success: false,
+          error: 'Instagram requires an image. Attach a design asset or image URL.',
+        };
+      }
+
+      const pageAccessToken = metadata.pageAccessToken;
+      const igUserId = metadata.instagramAccountId;
+      const imageUrl = mediaUrls[0];
+
+      // Step 1: Create media container
+      const createMediaResponse = await fetch(
+        `${this.GRAPH_API_BASE}/${igUserId}/media`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_url: imageUrl,
+            caption: content,
+            access_token: pageAccessToken,
+          }),
+        },
+      );
+
+      const createMediaData = await createMediaResponse.json();
+
+      if (createMediaData.error) {
+        this.logger.error(`Instagram media creation failed: ${createMediaData.error.message}`);
+        return { success: false, error: createMediaData.error.message };
+      }
+
+      const creationId = createMediaData.id;
+
+      // Step 2: Publish the media container
+      const publishResponse = await fetch(
+        `${this.GRAPH_API_BASE}/${igUserId}/media_publish`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creation_id: creationId,
+            access_token: pageAccessToken,
+          }),
+        },
+      );
+
+      const publishData = await publishResponse.json();
+
+      if (publishData.error) {
+        this.logger.error(`Instagram publish failed: ${publishData.error.message}`);
+        return { success: false, error: publishData.error.message };
+      }
+
+      this.logger.log(`Published to Instagram: ${publishData.id}`);
+      return { success: true, platformPostId: publishData.id };
+    } catch (error) {
+      this.logger.error(`Instagram publish error: ${error.message}`);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Check if Meta (Facebook/Instagram) is connected for a tenant
+   */
+  async isConnected(tenantId: string): Promise<boolean> {
+    try {
+      const connection = await this.prisma.integrationConnection.findUnique({
+        where: {
+          tenantId_provider: { tenantId, provider: 'meta' },
+        },
+      });
+      return !!connection && connection.status === 'active';
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Disconnect Meta integration
    */
   async disconnect(tenantId: string): Promise<void> {
