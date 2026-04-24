@@ -1,6 +1,6 @@
 'use client';
 import { CalendarDay, CalendarEvent } from '../types';
-import { getDayNames, getEventColor, getEventIcon } from '../utils';
+import { getDayNames, getEventColor, getEventIcon, getPlatformColor, getStatusDotColor, platformIcons } from '../utils';
 
 interface CalendarGridProps {
   days: CalendarDay[];
@@ -117,35 +117,62 @@ export default function CalendarGrid({
 
               {/* Events */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                {visibleEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEventClick(event);
-                    }}
-                    style={{
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      fontSize: '0.7rem',
-                      fontWeight: '500',
-                      background: getEventColor(event.type),
-                      color: 'white',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      borderLeft: event.status === 'draft' ? '2px dashed rgba(255,255,255,0.5)' : 'none',
-                    }}
-                    title={event.title}
-                  >
-                    <span style={{ fontSize: '0.65rem' }}>{getEventIcon(event.type)}</span>
-                    {event.title}
-                  </div>
-                ))}
+                {visibleEvents.map((event) => {
+                  // Use platform color for social posts, otherwise use type color
+                  const bgColor = event.isSocialPost && event.platform
+                    ? getPlatformColor(event.platform)
+                    : getEventColor(event.type);
+                  const statusColor = getStatusDotColor(event.status);
+
+                  return (
+                    <div
+                      key={event.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEventClick(event);
+                      }}
+                      style={{
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontSize: '0.7rem',
+                        fontWeight: '500',
+                        background: bgColor,
+                        color: 'white',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        borderLeft: event.status === 'draft' || event.status === 'pending_approval'
+                          ? '2px dashed rgba(255,255,255,0.5)'
+                          : 'none',
+                        position: 'relative',
+                      }}
+                      title={event.title}
+                    >
+                      {/* Status dot */}
+                      <span
+                        style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: statusColor,
+                          flexShrink: 0,
+                          boxShadow: '0 0 2px rgba(0,0,0,0.3)',
+                        }}
+                      />
+                      {/* Icon - platform icon for social posts, type icon otherwise */}
+                      <span style={{ fontSize: '0.65rem' }}>
+                        {event.isSocialPost && event.platform
+                          ? platformIcons[event.platform]
+                          : getEventIcon(event.type)}
+                      </span>
+                      {event.title}
+                    </div>
+                  );
+                })}
                 {hiddenCount > 0 && (
                   <div
                     style={{

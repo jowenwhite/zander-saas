@@ -1,4 +1,4 @@
-import { CalendarDay, CalendarEvent, CalendarEventType } from './types';
+import { CalendarDay, CalendarEvent, CalendarEventType, SocialPlatform, CalendarEventStatus } from './types';
 
 // Event type colors
 export const eventTypeColors: Record<CalendarEventType, string> = {
@@ -19,6 +19,58 @@ export const eventTypeIcons: Record<CalendarEventType, string> = {
   webinar: '🎥',
   other: '📌',
 };
+
+// Social platform colors
+export const platformColors: Record<SocialPlatform, string> = {
+  facebook: '#1877F2',
+  instagram: '#E4405F',
+  linkedin: '#0A66C2',
+  twitter: '#1DA1F2',
+  tiktok: '#000000',
+  youtube: '#FF0000',
+};
+
+// Social platform icons (emoji style)
+export const platformIcons: Record<SocialPlatform, string> = {
+  facebook: 'f',
+  instagram: '',
+  linkedin: 'in',
+  twitter: '',
+  tiktok: '',
+  youtube: '',
+};
+
+// Platform labels
+export const platformLabels: Record<SocialPlatform, string> = {
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  linkedin: 'LinkedIn',
+  twitter: 'Twitter/X',
+  tiktok: 'TikTok',
+  youtube: 'YouTube',
+};
+
+// Status dot colors
+export const statusDotColors: Record<CalendarEventStatus, string> = {
+  draft: '#6c757d',           // gray
+  pending_approval: '#F57C00', // orange
+  scheduled: '#00CCEE',        // cyan
+  approved: '#28a745',         // green
+  published: '#28a745',        // green
+  failed: '#dc3545',           // red
+  cancelled: '#6c757d',        // gray
+};
+
+// Get platform color for an event
+export function getPlatformColor(platform?: SocialPlatform): string {
+  if (!platform) return eventTypeColors.social;
+  return platformColors[platform] || eventTypeColors.social;
+}
+
+// Get status dot color
+export function getStatusDotColor(status: CalendarEventStatus): string {
+  return statusDotColors[status] || statusDotColors.draft;
+}
 
 // Get color for event type
 export function getEventColor(type: CalendarEventType): string {

@@ -14,7 +14,22 @@ export type CalendarEventStatus =
   | 'draft'
   | 'scheduled'
   | 'published'
-  | 'cancelled';
+  | 'cancelled'
+  | 'pending_approval'
+  | 'approved'
+  | 'failed';
+
+// Social Platform Types
+export type SocialPlatform =
+  | 'facebook'
+  | 'instagram'
+  | 'linkedin'
+  | 'twitter'
+  | 'tiktok'
+  | 'youtube';
+
+// Platform filter type
+export type PlatformFilter = 'all' | SocialPlatform | 'email';
 
 // Calendar Event
 export type CalendarEvent = {
@@ -27,6 +42,11 @@ export type CalendarEvent = {
   endDate?: string;
   allDay: boolean;
   color?: string;
+  // Social post specific fields
+  platform?: SocialPlatform;
+  isSocialPost?: boolean;
+  mediaUrls?: string[];
+  socialAccountName?: string;
 };
 
 // Monthly Theme

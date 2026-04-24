@@ -19,6 +19,8 @@ import {
   EventFormData,
   ThemeFormData,
   ParkingLotFormData,
+  PlatformFilter,
+  SocialPlatform,
 } from './types';
 import {
   getMonthDays,
@@ -41,8 +43,12 @@ export default function CMOCalendarPage() {
 
   // Data state
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [socialPosts, setSocialPosts] = useState<CalendarEvent[]>([]);
   const [theme, setTheme] = useState<MonthlyTheme | null>(null);
   const [ideas, setIdeas] = useState<ParkingLotIdea[]>([]);
+
+  // Filter state
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('all');
 
   // Modal state
   const [showEventModal, setShowEventModal] = useState(false);
@@ -63,12 +69,15 @@ export default function CMOCalendarPage() {
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
 
-      const [eventsRes, themeRes, ideasRes] = await Promise.all([
+      const [eventsRes, themeRes, ideasRes, socialRes] = await Promise.all([
         fetch(`${apiUrl}/cmo/calendar/events?startDate=${startDate}&endDate=${endDate}`, { headers }).catch(
           () => null
         ),
         fetch(`${apiUrl}/cmo/calendar/themes/${year}/${month}`, { headers }).catch(() => null),
         fetch(`${apiUrl}/cmo/calendar/ideas`, { headers }).catch(() => null),
+        fetch(`${apiUrl}/cmo/social/posts?startDate=${startDate}&endDate=${endDate}`, { headers }).catch(
+          () => null
+        ),
       ]);
 
       if (eventsRes?.ok) {
@@ -92,6 +101,31 @@ export default function CMOCalendarPage() {
       if (ideasRes?.ok) {
         const data = await ideasRes.json();
         setIdeas(data || []);
+      }
+
+      // Process social posts into calendar events
+      if (socialRes?.ok) {
+        try {
+          const data = await socialRes.json();
+          const posts = data.posts || [];
+          const socialEvents: CalendarEvent[] = posts.map((post: any) => ({
+            id: post.id,
+            title: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : ''),
+            description: post.content,
+            type: 'social' as const,
+            status: post.status,
+            startDate: post.scheduledFor || post.createdAt,
+            allDay: false,
+            platform: post.socialAccount?.platform as SocialPlatform,
+            isSocialPost: true,
+            mediaUrls: post.mediaUrls,
+            socialAccountName: post.socialAccount?.accountName,
+          }));
+          setSocialPosts(socialEvents);
+        } catch (socialError) {
+          console.warn('Error parsing social posts:', socialError);
+          setSocialPosts([]);
+        }
       }
     } catch (error) {
       console.error('Error fetching calendar data:', error);
@@ -288,10 +322,23 @@ export default function CMOCalendarPage() {
     setShowEventModal(true);
   };
 
-  // Compute calendar days
-  const monthDays = getMonthDays(currentDate.getFullYear(), currentDate.getMonth(), events);
-  const weekDays = getWeekDays(currentDate, events);
-  const dayEvents = events.filter((e) => e.startDate.startsWith(formatDateForAPI(currentDate)));
+  // Merge and filter events
+  const allEvents = [...events, ...socialPosts];
+  const filteredEvents = allEvents.filter((event) => {
+    if (platformFilter === 'all') return true;
+    if (platformFilter === 'email') return event.type === 'email';
+    // For social platform filters
+    if (event.isSocialPost && event.platform) {
+      return event.platform === platformFilter;
+    }
+    // Show non-social events only when 'all' is selected (already handled above)
+    return false;
+  });
+
+  // Compute calendar days with filtered events
+  const monthDays = getMonthDays(currentDate.getFullYear(), currentDate.getMonth(), filteredEvents);
+  const weekDays = getWeekDays(currentDate, filteredEvents);
+  const dayEvents = filteredEvents.filter((e) => e.startDate.startsWith(formatDateForAPI(currentDate)));
 
   if (loading) {
     return (
@@ -345,6 +392,45 @@ export default function CMOCalendarPage() {
           setShowEventModal(true);
         }}
       />
+
+      {/* Platform Filter Toggles */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '0.5rem',
+          marginBottom: '1rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        {([
+          { value: 'all', label: 'All', color: '#00CCEE' },
+          { value: 'facebook', label: 'Facebook', color: '#1877F2' },
+          { value: 'instagram', label: 'Instagram', color: '#E4405F' },
+          { value: 'linkedin', label: 'LinkedIn', color: '#0A66C2' },
+          { value: 'twitter', label: 'Twitter/X', color: '#1DA1F2' },
+          { value: 'email', label: 'Email', color: '#3498DB' },
+        ] as { value: PlatformFilter; label: string; color: string }[]).map(
+          ({ value, label, color }) => (
+            <button
+              key={value}
+              onClick={() => setPlatformFilter(value)}
+              style={{
+                padding: '0.4rem 0.75rem',
+                borderRadius: '20px',
+                border: platformFilter === value ? `2px solid ${color}` : '2px solid #2A2A38',
+                background: platformFilter === value ? `${color}20` : 'transparent',
+                color: platformFilter === value ? color : '#8888A0',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {label}
+            </button>
+          )
+        )}
+      </div>
 
       {/* Monthly Theme Banner */}
       <MonthlyThemeBanner
