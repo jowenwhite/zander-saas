@@ -7,7 +7,7 @@ import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
 import Sidebar from '../components/Sidebar';
 import { logout } from '../utils/auth';
-import { User, Building2, Users, BarChart3, Link2, Lock, ScrollText, CreditCard, Database, Mail, Inbox, Send, Cloud, MessageSquare, FileText, Calendar, Clock, FolderOpen, Package, Rocket, BookOpen, CalendarClock, AlertTriangle, Trash2, Check, Phone, Contact, Apple } from 'lucide-react';
+import { User, Building2, Users, BarChart3, Link2, Lock, ScrollText, CreditCard, Database, Mail, Inbox, Send, Cloud, MessageSquare, FileText, Calendar, Clock, FolderOpen, Package, Rocket, BookOpen, CalendarClock, AlertTriangle, Trash2, Check, Phone, Contact, Apple, Share2, Briefcase, Palette, Twitter } from 'lucide-react';
 
 // Helper functions for month conversion
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -54,6 +54,11 @@ const getIntegrationIcon = (iconKey: string, size: number = 24): React.ReactNode
     twilio: <Phone size={size} />,
     google_contacts: <Contact size={size} />,
     apple_contacts: <Apple size={size} />,
+    google_analytics: <BarChart3 size={size} />,
+    meta: <Share2 size={size} />,
+    linkedin: <Briefcase size={size} />,
+    twitter: <Twitter size={size} />,
+    canva: <Palette size={size} />,
   };
   return icons[iconKey] || <Cloud size={size} />;
 };
@@ -441,6 +446,13 @@ function SettingsContent() {
       { id: 'gdrive', name: 'Google Drive', description: 'Store and access files', status: 'available', connected: gmailConnected },
       { id: 'dropbox', name: 'Dropbox', description: 'Connect Dropbox storage', status: 'soon', connected: false },
       { id: 'onedrive', name: 'OneDrive', description: 'Microsoft cloud storage', status: 'soon', connected: false },
+    ],
+    marketing: [
+      { id: 'google_analytics', name: 'Google Analytics', description: 'Website traffic and conversion tracking', status: 'available', connected: false },
+      { id: 'meta', name: 'Meta (Facebook & Instagram)', description: 'Social media publishing and analytics', status: 'soon', connected: false },
+      { id: 'linkedin', name: 'LinkedIn', description: 'Professional network publishing', status: 'soon', connected: false },
+      { id: 'twitter', name: 'Twitter / X', description: 'Social media publishing', status: 'soon', connected: false },
+      { id: 'canva', name: 'Canva', description: 'Design asset creation', status: 'soon', connected: false },
     ],
   };
 
@@ -1509,7 +1521,7 @@ function SettingsContent() {
       {Object.entries(integrations).map(([category, items]) => (
         <div key={category} style={{ marginBottom: '2rem' }}>
           <h3 style={{ margin: '0 0 1rem 0', color: '#F0F0F5', fontSize: '1.1rem', textTransform: 'capitalize' }}>
-            {category === 'phone' ? 'Phone & SMS' : category === 'crm' ? 'CRM & Sales' : category === 'email' ? 'Email & Communication' : category === 'calendar' ? 'Calendar & Scheduling' : category === 'storage' ? 'Cloud Storage' : category}
+            {category === 'phone' ? 'Phone & SMS' : category === 'crm' ? 'CRM & Sales' : category === 'email' ? 'Email & Communication' : category === 'calendar' ? 'Calendar & Scheduling' : category === 'storage' ? 'Cloud Storage' : category === 'marketing' ? 'Marketing Platforms' : category}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
             {items.map((integration) => (

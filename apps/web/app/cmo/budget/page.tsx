@@ -1,6 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import CMOLayout from '../components/CMOLayout';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
 interface BudgetLineItem {
   id: string;
@@ -34,7 +36,7 @@ const formatCurrency = (value: number) => {
 };
 
 export default function CMOBudgetPage() {
-  const [annualBudget, setAnnualBudget] = useState<number>(100000);
+  const [annualBudget, setAnnualBudget] = useState<number>(0);
   const [fiscalYear, setFiscalYear] = useState<string>('FY2025');
   const [lineItems, setLineItems] = useState<BudgetLineItem[]>(
     BUDGET_CATEGORIES.map((cat, idx) => ({
@@ -49,7 +51,137 @@ export default function CMOBudgetPage() {
   const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const [businessGoals, setBusinessGoals] = useState<string>('');
   const [editingBudget, setEditingBudget] = useState(false);
-  const [tempBudget, setTempBudget] = useState<string>('100000');
+  const [tempBudget, setTempBudget] = useState<string>('0');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const initialLoadRef = useRef(true);
+
+  // Fetch budget from API on mount
+  useEffect(() => {
+    const fetchBudget = async () => {
+      const token = localStorage.getItem('zander_token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/cmo/marketing-plan`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const plan = await res.json();
+
+          if (plan.budget) {
+            try {
+              const budgetData = typeof plan.budget === 'string'
+                ? JSON.parse(plan.budget)
+                : plan.budget;
+
+              if (budgetData.annualBudget !== undefined) {
+                setAnnualBudget(budgetData.annualBudget);
+                setTempBudget(budgetData.annualBudget.toString());
+              }
+              if (budgetData.fiscalYear) {
+                setFiscalYear(budgetData.fiscalYear);
+              }
+              if (budgetData.allocations && Array.isArray(budgetData.allocations)) {
+                setLineItems(items =>
+                  items.map(item => {
+                    const allocation = budgetData.allocations.find(
+                      (a: any) => a.category === item.category
+                    );
+                    return allocation
+                      ? { ...item, planned: allocation.amount || allocation.planned || 0 }
+                      : item;
+                  })
+                );
+              }
+              if (budgetData.lastUpdated) {
+                setLastSaved(budgetData.lastUpdated);
+              }
+            } catch (parseError) {
+              console.error('Failed to parse budget data:', parseError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch budget:', error);
+      } finally {
+        setLoading(false);
+        // Mark initial load complete after a short delay to prevent immediate save
+        setTimeout(() => {
+          initialLoadRef.current = false;
+        }, 500);
+      }
+    };
+
+    fetchBudget();
+  }, []);
+
+  // Save budget to API (debounced)
+  const saveBudget = useCallback(async (budget: number, year: string, items: BudgetLineItem[]) => {
+    const token = localStorage.getItem('zander_token');
+    if (!token) return;
+
+    setSaving(true);
+    try {
+      const budgetData = {
+        annualBudget: budget,
+        fiscalYear: year,
+        allocations: items.map(item => ({
+          category: item.category,
+          amount: item.planned,
+          percentage: budget > 0 ? ((item.planned / budget) * 100) : 0,
+        })),
+        lastUpdated: new Date().toISOString(),
+      };
+
+      const res = await fetch(`${API_URL}/cmo/marketing-plan`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ budget: JSON.stringify(budgetData) }),
+      });
+
+      if (res.ok) {
+        setLastSaved(budgetData.lastUpdated);
+      } else {
+        console.error('Failed to save budget:', res.status);
+      }
+    } catch (error) {
+      console.error('Failed to save budget:', error);
+    } finally {
+      setSaving(false);
+    }
+  }, []);
+
+  // Debounced save trigger when data changes
+  useEffect(() => {
+    // Skip save during initial load
+    if (initialLoadRef.current || loading) return;
+
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced save
+    saveTimeoutRef.current = setTimeout(() => {
+      saveBudget(annualBudget, fiscalYear, lineItems);
+    }, 1000);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [annualBudget, fiscalYear, lineItems, saveBudget, loading]);
 
   // Calculate totals
   const totalPlanned = lineItems.reduce((sum, item) => sum + item.planned, 0);
@@ -142,6 +274,26 @@ Format your response clearly with category names and percentages.`
     color: '#F0F0F5',
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <CMOLayout>
+        <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '4px solid #2A2A38',
+            borderTopColor: '#F57C00',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <p style={{ color: '#8888A0', marginTop: '1rem' }}>Loading budget data...</p>
+        </div>
+      </CMOLayout>
+    );
+  }
+
   return (
     <CMOLayout>
       <div style={{ padding: '2rem' }}>
@@ -153,6 +305,12 @@ Format your response clearly with category names and percentages.`
             </h1>
             <p style={{ color: '#8888A0', marginTop: '0.5rem' }}>
               Plan and track your marketing spend across categories
+              {saving && <span style={{ marginLeft: '0.5rem', color: '#F57C00' }}>• Saving...</span>}
+              {!saving && lastSaved && (
+                <span style={{ marginLeft: '0.5rem', color: '#28a745' }}>
+                  • Saved {new Date(lastSaved).toLocaleTimeString()}
+                </span>
+              )}
             </p>
           </div>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -250,7 +408,7 @@ Format your response clearly with category names and percentages.`
           <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Allocated</div>
             <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#F57C00' }}>{formatCurrency(totalPlanned)}</div>
-            <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{((totalPlanned / annualBudget) * 100).toFixed(1)}% of budget</div>
+            <div style={{ fontSize: '0.8rem', color: '#8888A0' }}>{annualBudget > 0 ? ((totalPlanned / annualBudget) * 100).toFixed(1) : '0.0'}% of budget</div>
           </div>
           <div style={{ background: '#1C1C26', borderRadius: '12px', border: '1px solid #2A2A38', padding: '1.5rem' }}>
             <div style={{ fontSize: '0.875rem', color: '#8888A0', marginBottom: '0.5rem' }}>Remaining</div>
@@ -327,7 +485,7 @@ Format your response clearly with category names and percentages.`
                 <td style={{ padding: '1rem', fontWeight: '700', color: 'white' }}>TOTAL</td>
                 <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(totalPlanned)}</td>
                 <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{formatCurrency(totalActual)}</td>
-                <td style={{ padding: '1rem', textAlign: 'center', fontWeight: '700', color: 'white' }}>{((totalPlanned / annualBudget) * 100).toFixed(1)}%</td>
+                <td style={{ padding: '1rem', textAlign: 'center', fontWeight: '700', color: 'white' }}>{annualBudget > 0 ? ((totalPlanned / annualBudget) * 100).toFixed(1) : '0.0'}%</td>
                 <td style={{ padding: '1rem', fontWeight: '700', color: 'white' }}>{percentSpent.toFixed(1)}% spent</td>
               </tr>
             </tfoot>
