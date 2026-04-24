@@ -102,6 +102,7 @@ model Tenant {
   users                   User[]
   meetingRecords          MeetingRecord[]
   integrationConnections  IntegrationConnection[]
+  executiveConversations  ExecutiveConversation[]
 
   @@map("tenants")
 }
@@ -477,7 +478,7 @@ model ScheduledCommunication {
   createdBy      String?
   recipientEmail String?
   recipientName  String?
-  metadata       Json?     // D-6/D-7: Additional metadata for automation tracking
+  metadata       Json? // D-6/D-7: Additional metadata for automation tracking
   contact        Contact?  @relation(fields: [contactId], references: [id])
   tenant         Tenant    @relation(fields: [tenantId], references: [id])
 
@@ -1157,7 +1158,7 @@ model ContentAsset {
   tags         String[] @default([])
   metadata     Json     @default("{}")
   isArchived   Boolean  @default(false)
-  fileData     String?  // Base64-encoded file data for DB storage fallback
+  fileData     String? // Base64-encoded file data for DB storage fallback
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   tenant       Tenant   @relation(fields: [tenantId], references: [id])
@@ -1748,28 +1749,28 @@ model ConsultingTimeEntry {
 }
 
 model ConsultingDeliverable {
-  id           String               @id @default(cuid())
+  id           String            @id @default(cuid())
   tenantId     String
   engagementId String
   packageTier  String
   name         String
   description  String?
-  status       DeliverableStatus    @default(PENDING)
+  status       DeliverableStatus @default(PENDING)
   deliveredAt  DateTime?
   documentUrl  String?
 
   // D-4: Approval workflow fields
-  approvalStatus        String?              // 'draft', 'submitted', 'approved', 'revision_requested'
-  submittedAt           DateTime?
-  approvedAt            DateTime?
-  revisionNotes         String?
-  revisionRequestedAt   DateTime?
-  reviewToken           String?    @unique  // UUID token for client review URL
+  approvalStatus      String? // 'draft', 'submitted', 'approved', 'revision_requested'
+  submittedAt         DateTime?
+  approvedAt          DateTime?
+  revisionNotes       String?
+  revisionRequestedAt DateTime?
+  reviewToken         String?   @unique // UUID token for client review URL
 
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  engagement   ConsultingEngagement @relation(fields: [engagementId], references: [id])
-  tenant       Tenant               @relation(fields: [tenantId], references: [id])
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  engagement ConsultingEngagement @relation(fields: [engagementId], references: [id])
+  tenant     Tenant               @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId])
   @@index([engagementId])
@@ -1993,7 +1994,7 @@ enum ConsultingStatus {
 enum DeliverableStatus {
   PENDING
   IN_PROGRESS
-  REVIEW           // D-4: Awaiting client approval
+  REVIEW // D-4: Awaiting client approval
   REVISION_REQUESTED // D-4: Client requested changes
   COMPLETED
   DELIVERED
@@ -2145,7 +2146,7 @@ model ConsultingProposal {
 
   // Document
   documentUrl String? // PDF URL in S3
-  metadata    Json?   // D-2: Additional generation metadata
+  metadata    Json? // D-2: Additional generation metadata
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2219,58 +2220,58 @@ model ConsultingEvent {
 }
 
 model MeetingRecord {
-  id                  String    @id @default(cuid())
-  tenantId            String
-  tenant              Tenant    @relation(fields: [tenantId], references: [id])
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
 
   // Meeting metadata
-  title               String
-  scheduledAt         DateTime?
-  startedAt           DateTime?
-  endedAt             DateTime?
-  durationMinutes     Int?
-  meetingUrl          String?       // Google Meet, Zoom, etc.
-  source              String        // 'upload', 'twilio', 'calendly', 'google_meet', 'zoom'
-  platform            String?       // 'google_meet', 'zoom', 'phone', 'in_person'
+  title           String
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  endedAt         DateTime?
+  durationMinutes Int?
+  meetingUrl      String? // Google Meet, Zoom, etc.
+  source          String // 'upload', 'twilio', 'calendly', 'google_meet', 'zoom'
+  platform        String? // 'google_meet', 'zoom', 'phone', 'in_person'
 
   // Attendees stored as JSON array: [{name, email, role}]
-  attendees           Json?
+  attendees Json?
 
   // Recording
-  recordingUrl        String?       // S3 URL
-  recordingKey        String?       // S3 key for deletion
-  recordingFormat     String?       // 'mp4', 'webm', 'm4a', 'wav', 'mp3'
-  recordingSizeBytes  Int?
+  recordingUrl       String? // S3 URL
+  recordingKey       String? // S3 key for deletion
+  recordingFormat    String? // 'mp4', 'webm', 'm4a', 'wav', 'mp3'
+  recordingSizeBytes Int?
 
   // Transcription
-  transcriptText      String?       // Full transcript
-  transcriptSpeakers  Json?         // Speaker-diarized segments: [{speaker, start, end, text}]
-  transcriptStatus    String        @default("none") // 'none', 'processing', 'completed', 'failed'
-  transcriptProvider  String?       // 'whisper', 'assemblyai'
-  transcriptError     String?
+  transcriptText     String? // Full transcript
+  transcriptSpeakers Json? // Speaker-diarized segments: [{speaker, start, end, text}]
+  transcriptStatus   String  @default("none") // 'none', 'processing', 'completed', 'failed'
+  transcriptProvider String? // 'whisper', 'assemblyai'
+  transcriptError    String?
 
   // AI Analysis
-  summaryText         String?       // Human-readable summary
-  summaryJson         Json?         // Structured: {keyDecisions, actionItems, followUps, concerns, nextSteps}
-  summaryStatus       String        @default("none") // 'none', 'processing', 'completed', 'failed'
+  summaryText   String? // Human-readable summary
+  summaryJson   Json? // Structured: {keyDecisions, actionItems, followUps, concerns, nextSteps}
+  summaryStatus String  @default("none") // 'none', 'processing', 'completed', 'failed'
 
   // Distribution
-  summaryEmailedAt    DateTime?
+  summaryEmailedAt DateTime?
 
   // Optional relations (nullable — not every meeting is consulting-related)
-  engagementId        String?
-  engagement          ConsultingEngagement? @relation(fields: [engagementId], references: [id])
-  leadId              String?
-  lead                ConsultingLead? @relation(fields: [leadId], references: [id])
-  contactId           String?
-  calendarEventId     String?
+  engagementId    String?
+  engagement      ConsultingEngagement? @relation(fields: [engagementId], references: [id])
+  leadId          String?
+  lead            ConsultingLead?       @relation(fields: [leadId], references: [id])
+  contactId       String?
+  calendarEventId String?
 
   // Metadata
-  createdById         String?       // User who uploaded/initiated
-  processedAt         DateTime?
-  metadata            Json?         // C-2: Additional metadata from Calendly/etc
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  createdById String? // User who uploaded/initiated
+  processedAt DateTime?
+  metadata    Json? // C-2: Additional metadata from Calendly/etc
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([tenantId])
   @@index([engagementId])
@@ -2280,21 +2281,37 @@ model MeetingRecord {
 }
 
 model IntegrationConnection {
-  id            String    @id @default(cuid())
-  tenantId      String
-  provider      String    // 'google-analytics', 'meta', 'linkedin', 'twitter', 'canva'
-  accessToken   String?
-  refreshToken  String?
-  expiresAt     DateTime?
-  metadata      Json?     // { propertyId, measurementId, propertyName, accountId }
-  status        String    @default("active") // 'active', 'disconnected', 'expired', 'error'
-  connectedAt   DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  tenantId     String
+  provider     String // 'google-analytics', 'meta', 'linkedin', 'twitter', 'canva'
+  accessToken  String?
+  refreshToken String?
+  expiresAt    DateTime?
+  metadata     Json? // { propertyId, measurementId, propertyName, accountId }
+  status       String    @default("active") // 'active', 'disconnected', 'expired', 'error'
+  connectedAt  DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  tenant       Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, provider])
   @@index([tenantId])
   @@index([provider])
   @@index([status])
   @@map("integration_connections")
+}
+
+model ExecutiveConversation {
+  id            String   @id @default(cuid())
+  tenantId      String
+  executiveType String // DON, JORDAN, PAM, BEN, MIRANDA, TED, JARVIS
+  role          String // "user" or "assistant"
+  content       String   @db.Text
+  metadata      Json? // For tool calls, attachments, etc.
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, executiveType, createdAt])
+  @@index([tenantId])
+  @@map("executive_conversations")
 }

@@ -57,6 +57,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
 import { ConsultingModule } from './consulting/consulting.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { MeetingIntelligenceModule } from './meeting-intelligence/meeting-intelligence.module';
+import { ConversationsModule } from './conversations/conversations.module';
 
 @Module({
   imports: [
@@ -115,6 +116,7 @@ import { MeetingIntelligenceModule } from './meeting-intelligence/meeting-intell
     ConsultingModule,      // Phase 5: Consulting engagements, time entries, deliverables
     WebhooksModule,        // External webhooks: Calendly, Twilio recordings
     MeetingIntelligenceModule, // Phase C: Meeting recording, transcription, AI summaries
+    ConversationsModule,       // Executive chat conversation persistence
   ],
   controllers: [AppController, AuthController, TwoFactorController],
   providers: [

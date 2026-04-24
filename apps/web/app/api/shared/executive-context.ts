@@ -16,7 +16,7 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
   };
 
   // Use verified endpoint paths matching actual API controllers
-  const [campaignsRes, dealsRes, calendar, tasksRes, hqDashboard, marketingPlan, productsRes] = await Promise.all([
+  const [campaignsRes, dealsRes, calendar, tasksRes, hqDashboard, marketingPlan, productsRes, conversationTopics] = await Promise.all([
     fetchJSON(`${API_URL}/campaigns`),                // campaigns controller - returns array directly
     fetchJSON(`${API_URL}/deals`),                    // Jordan's domain - returns { data: [], pagination: {} }
     fetchJSON(`${API_URL}/calendar-events/upcoming`), // Pam's domain - returns array directly
@@ -24,6 +24,7 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
     fetchJSON(`${API_URL}/hq/dashboard`),             // Shared HQ
     fetchJSON(`${API_URL}/cmo/marketing-plan`),       // Don's domain
     fetchJSON(`${API_URL}/products`),                 // Shared - what the company sells
+    fetchJSON(`${API_URL}/conversations/topics`),    // Recent conversation topics for cross-exec awareness
   ]);
 
   // Normalize responses - some endpoints return { data: [] }, others return [] directly
@@ -108,6 +109,30 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
       `${p.name}${p.basePrice ? ` [$${p.basePrice.toLocaleString()}]` : ''}`
     ).join(', ');
     sections.push(`PRODUCTS & SERVICES (${activeProducts.length}): ${productsList || 'None listed'}`);
+  }
+
+  // Recent conversation topics (what users have been discussing with each executive)
+  if (conversationTopics?.topics) {
+    const topicEntries = Object.entries(conversationTopics.topics as Record<string, string[]>);
+    if (topicEntries.length > 0) {
+      sections.push('\n=== RECENT CONVERSATIONS (What users have been asking about) ===');
+      const execNames: Record<string, string> = {
+        DON: 'Don (CMO)',
+        JORDAN: 'Jordan (CRO)',
+        PAM: 'Pam (EA)',
+        BEN: 'Ben (CFO)',
+        MIRANDA: 'Miranda (COO)',
+        TED: 'Ted (CPO)',
+        JARVIS: 'Jarvis (CIO)',
+      };
+      for (const [execType, topics] of topicEntries) {
+        if (Array.isArray(topics) && topics.length > 0) {
+          const name = execNames[execType] || execType;
+          const topicsList = topics.slice(0, 3).map(t => `"${t}"`).join(', ');
+          sections.push(`${name}: ${topicsList}`);
+        }
+      }
+    }
   }
 
   sections.push('=== Use this team context to give coordinated advice. Reference what other executives are working on when relevant. ===');

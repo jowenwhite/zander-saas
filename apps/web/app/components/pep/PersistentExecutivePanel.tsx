@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Maximize2, Minimize2, Send, Bot, Lock, SquarePen } from 'lucide-react';
+import { X, Maximize2, Minimize2, Send, Bot, Lock, SquarePen, Loader2 } from 'lucide-react';
 import { usePEP, Executive, ExecutiveInfo, EXECUTIVES, ZANDER } from './PEPContext';
 import { getActiveTenant } from '../../utils/auth';
 
@@ -19,10 +19,19 @@ type Message = {
   toolsExecuted?: ToolExecution[];
 };
 
-const STORAGE_PREFIX = 'pep_chat_';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
-// Get storage key for an executive
-const getStorageKey = (executive: Executive) => `${STORAGE_PREFIX}${executive}`;
+// Map executive IDs to their API type names
+const EXECUTIVE_TYPE_MAP: Record<Executive, string> = {
+  don: 'DON',
+  jordan: 'JORDAN',
+  pam: 'PAM',
+  ben: 'BEN',
+  miranda: 'MIRANDA',
+  ted: 'TED',
+  jarvis: 'JARVIS',
+  zander: 'ZANDER',
+};
 
 export default function PersistentExecutivePanel() {
   const {
@@ -41,11 +50,13 @@ export default function PersistentExecutivePanel() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [userPlan, setUserPlan] = useState<string>('starter');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [tenantId, setTenantId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const historyLoadedRef = useRef<Set<Executive>>(new Set());
 
   // Load user plan, superadmin status, and tenantId
   useEffect(() => {
@@ -67,38 +78,94 @@ export default function PersistentExecutivePanel() {
     }
   }, []);
 
-  // Load messages for current executive from sessionStorage
+  // Load conversation history from API when panel opens or executive changes
   useEffect(() => {
-    const key = getStorageKey(activeExecutive);
-    try {
-      const saved = sessionStorage.getItem(key);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const restored = parsed.map((m: Message) => ({
-          ...m,
-          timestamp: new Date(m.timestamp),
-        }));
-        setMessages(restored);
-      } else {
-        setMessages([]);
+    const loadConversationHistory = async () => {
+      // Skip if already loaded for this executive in this session
+      if (historyLoadedRef.current.has(activeExecutive)) {
+        return;
       }
-    } catch (e) {
-      console.error('Failed to restore chat history:', e);
-      setMessages([]);
-    }
-  }, [activeExecutive]);
 
-  // Save messages to sessionStorage
-  useEffect(() => {
-    if (messages.length > 0) {
-      const key = getStorageKey(activeExecutive);
-      try {
-        sessionStorage.setItem(key, JSON.stringify(messages));
-      } catch (e) {
-        console.error('Failed to save chat history:', e);
+      const token = localStorage.getItem('zander_token');
+      const activeTenant = getActiveTenant();
+      const currentTenantId = activeTenant?.id || tenantId;
+
+      if (!token || !currentTenantId) {
+        return;
       }
+
+      setIsLoadingHistory(true);
+      try {
+        const executiveType = EXECUTIVE_TYPE_MAP[activeExecutive];
+        const response = await fetch(
+          `${API_URL}/conversations?executiveType=${executiveType}&limit=50`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'x-tenant-id': currentTenantId,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.messages && Array.isArray(data.messages)) {
+            const restored = data.messages.map((m: { id: string; role: 'user' | 'assistant'; content: string; createdAt: string; metadata?: { toolsExecuted?: ToolExecution[] } }) => ({
+              id: m.id,
+              role: m.role,
+              content: m.content,
+              timestamp: new Date(m.createdAt),
+              toolsExecuted: m.metadata?.toolsExecuted,
+            }));
+            setMessages(restored);
+          }
+        }
+        historyLoadedRef.current.add(activeExecutive);
+      } catch (e) {
+        console.error('Failed to load conversation history:', e);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
+    // Only load when panel is visible
+    if (panelState !== 'hidden') {
+      loadConversationHistory();
     }
-  }, [messages, activeExecutive]);
+  }, [activeExecutive, panelState, tenantId]);
+
+  // Helper function to save a message to the API
+  const saveMessageToAPI = async (
+    executiveType: string,
+    role: 'user' | 'assistant',
+    content: string,
+    metadata?: { toolsExecuted?: ToolExecution[] }
+  ) => {
+    try {
+      const token = localStorage.getItem('zander_token');
+      const activeTenant = getActiveTenant();
+      const currentTenantId = activeTenant?.id || tenantId;
+
+      if (!token || !currentTenantId) return;
+
+      await fetch(`${API_URL}/conversations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'x-tenant-id': currentTenantId,
+        },
+        body: JSON.stringify({
+          executiveType,
+          role,
+          content,
+          metadata,
+        }),
+      });
+    } catch (e) {
+      console.error('Failed to save message to API:', e);
+    }
+  };
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -130,6 +197,8 @@ export default function PersistentExecutivePanel() {
     setInput('');
     setIsLoading(true);
 
+    const executiveType = EXECUTIVE_TYPE_MAP[activeExecutive];
+
     try {
       const token = localStorage.getItem('zander_token');
       const conversationHistory = messages.map(m => ({
@@ -159,6 +228,9 @@ export default function PersistentExecutivePanel() {
         throw new Error('Tenant ID not available');
       }
 
+      // Save user message to conversation store BEFORE calling BFF
+      saveMessageToAPI(executiveType, 'user', userMessage.content);
+
       const response = await fetch(execInfo.apiRoute, {
         method: 'POST',
         headers: {
@@ -186,6 +258,11 @@ export default function PersistentExecutivePanel() {
         toolsExecuted: data.toolsExecuted,
       };
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Save assistant message to conversation store AFTER receiving response
+      saveMessageToAPI(executiveType, 'assistant', data.content, {
+        toolsExecuted: data.toolsExecuted,
+      });
 
       // Emit tool-executed event if tools were used
       if (data.toolsExecuted && data.toolsExecuted.length > 0) {
@@ -226,10 +303,33 @@ export default function PersistentExecutivePanel() {
     setActiveExecutive(exec.id);
   };
 
-  const handleNewChat = () => {
+  const handleNewChat = async () => {
+    const executiveType = EXECUTIVE_TYPE_MAP[activeExecutive];
+
+    // Clear UI immediately
     setMessages([]);
-    const key = getStorageKey(activeExecutive);
-    sessionStorage.removeItem(key);
+
+    // Clear from API
+    try {
+      const token = localStorage.getItem('zander_token');
+      const activeTenant = getActiveTenant();
+      const currentTenantId = activeTenant?.id || tenantId;
+
+      if (token && currentTenantId) {
+        await fetch(`${API_URL}/conversations?executiveType=${executiveType}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-tenant-id': currentTenantId,
+          },
+        });
+      }
+    } catch (e) {
+      console.error('Failed to clear conversation:', e);
+    }
+
+    // Mark as needing to reload history when switching back
+    historyLoadedRef.current.delete(activeExecutive);
   };
 
   // Robot icon - shown when panel is hidden
@@ -501,7 +601,27 @@ export default function PersistentExecutivePanel() {
             padding: '1rem',
           }}
         >
-          {messages.length === 0 ? (
+          {isLoadingHistory ? (
+            <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+              <Loader2
+                size={32}
+                style={{
+                  color: execInfo?.color || '#00CCEE',
+                  animation: 'spin 1s linear infinite',
+                  margin: '0 auto 1rem',
+                }}
+              />
+              <p style={{ color: '#8888A0', margin: 0, fontSize: '0.9rem' }}>
+                Loading conversation history...
+              </p>
+              <style jsx>{`
+                @keyframes spin {
+                  from { transform: rotate(0deg); }
+                  to { transform: rotate(360deg); }
+                }
+              `}</style>
+            </div>
+          ) : messages.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
               <div
                 style={{
