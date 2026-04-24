@@ -89,18 +89,20 @@ export default function TopContentCard({
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#8888A0' }}>{item.metric}</div>
               </div>
-              <span
-                style={{
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: '4px',
-                  fontSize: '0.7rem',
-                  fontWeight: '600',
-                  background: 'rgba(40, 167, 69, 0.1)',
-                  color: '#28a745',
-                }}
-              >
-                ↑ {item.trend}%
-              </span>
+              {item.trend !== null && item.trend !== undefined && (
+                <span
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.7rem',
+                    fontWeight: '600',
+                    background: item.trend >= 0 ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)',
+                    color: item.trend >= 0 ? '#28a745' : '#dc3545',
+                  }}
+                >
+                  {item.trend >= 0 ? '↑' : '↓'} {Math.abs(item.trend)}%
+                </span>
+              )}
             </div>
           ))}
         </div>

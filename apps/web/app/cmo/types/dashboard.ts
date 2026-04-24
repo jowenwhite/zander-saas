@@ -49,7 +49,8 @@ export type MonthlyTheme = {
 export type TopContentResponse = {
   topContent: TopContent[];
   period: string;
-  isPlaceholder: boolean;
+  hasData: boolean;
+  trendsAvailable?: boolean;
 };
 
 export type TopContent = {
@@ -58,16 +59,20 @@ export type TopContent = {
   type: 'email' | 'social' | 'landing_page' | 'campaign';
   metric: string;
   metricValue: number;
-  trend: number;
+  trend: number | null; // null when real trend data not available
 };
 
 // Funnel Overview
 export type FunnelOverview = {
-  visitors: FunnelStage;
+  visitors: FunnelStage & { source?: string | null; guidance?: string | null };
   leads: FunnelStage;
   mqls: FunnelStage;
   croHandoff: FunnelStage;
   period: string;
+  hasData?: boolean;
+  integrations?: {
+    ga4Connected?: boolean;
+  };
 };
 
 export type FunnelStage = {

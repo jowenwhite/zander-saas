@@ -29,8 +29,11 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
     );
   }
 
+  // Check for GA4 guidance
+  const visitorsGuidance = (funnel.visitors as { guidance?: string })?.guidance;
+
   const stages = [
-    { key: 'visitors', label: 'Visitors', data: funnel.visitors, color: '#00CCEE' },
+    { key: 'visitors', label: 'Visitors', data: funnel.visitors, color: '#00CCEE', guidance: visitorsGuidance },
     { key: 'leads', label: 'Leads', data: funnel.leads, color: '#3498DB' },
     { key: 'mqls', label: 'MQLs', data: funnel.mqls, color: '#9B59B6' },
     { key: 'croHandoff', label: 'CRO Handoff', data: funnel.croHandoff, color: '#27AE60' },
@@ -61,11 +64,19 @@ export default function MarketingFunnelCard({ funnel, loading = false }: Marketi
                 {stage.label}
               </span>
               <span style={{ color: '#8888A0', fontSize: '0.875rem' }}>
-                {formatNumber(stage.data.count)}
-                {index > 0 && (
-                  <span style={{ marginLeft: '0.5rem', color: stage.color, fontWeight: '600' }}>
-                    ({stage.data.percentage}%)
+                {stage.data.count === 0 && (stage as { guidance?: string }).guidance ? (
+                  <span style={{ fontSize: '0.75rem', fontStyle: 'italic' }}>
+                    {(stage as { guidance?: string }).guidance}
                   </span>
+                ) : (
+                  <>
+                    {formatNumber(stage.data.count)}
+                    {index > 0 && (
+                      <span style={{ marginLeft: '0.5rem', color: stage.color, fontWeight: '600' }}>
+                        ({stage.data.percentage}%)
+                      </span>
+                    )}
+                  </>
                 )}
               </span>
             </div>

@@ -188,7 +188,7 @@ export default function CMODashboardPage() {
           {/* Top Performing Content */}
           <TopContentCard
             items={topContent?.topContent || []}
-            isPlaceholder={topContent?.isPlaceholder}
+            isPlaceholder={!topContent?.hasData}
             loading={false}
           />
         </div>

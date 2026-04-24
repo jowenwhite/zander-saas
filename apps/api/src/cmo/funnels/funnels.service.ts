@@ -151,18 +151,6 @@ export class FunnelsService {
       where: { tenantId },
     });
 
-    // Get contacts by lifecycle stage if available
-    // For now, simulate a funnel with percentages based on contact data
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-
-    // Get new contacts (visitors who became leads)
-    const newContacts = await this.prisma.contact.count({
-      where: {
-        tenantId,
-        createdAt: { gte: thirtyDaysAgo },
-      },
-    });
-
     // Get contacts with deals (MQLs)
     const contactsWithDeals = await this.prisma.contact.count({
       where: {
@@ -183,31 +171,51 @@ export class FunnelsService {
       },
     });
 
-    // Calculate funnel metrics
-    // Visitors = estimated at 10x the leads (typical conversion rate)
-    const estimatedVisitors = Math.max(totalContacts * 10, 1000);
+    // Check if GA4 is connected to get real visitor data
+    const ga4Connection = await this.prisma.integrationConnection.findFirst({
+      where: {
+        tenantId,
+        provider: 'google_analytics',
+        status: 'active',
+      },
+    });
+
+    // Real data only - no fake visitors
+    // Visitors come from GA4 if connected, otherwise show 0 with guidance
+    const visitors = 0; // TODO: Pull from GA4 integration when connected
     const leads = totalContacts;
     const mqls = contactsWithDeals;
     const croHandoff = contactsWithClosedDeals;
 
+    // Calculate real conversion percentages (0 if no data)
+    const leadsPercentage = visitors > 0 ? Math.round((leads / visitors) * 100) : 0;
+    const mqlsPercentage = leads > 0 ? Math.round((mqls / leads) * 100) : 0;
+    const croPercentage = mqls > 0 ? Math.round((croHandoff / mqls) * 100) : 0;
+
     return {
       visitors: {
-        count: estimatedVisitors,
+        count: visitors,
         percentage: 100,
+        source: ga4Connection ? 'google_analytics' : null,
+        guidance: !ga4Connection ? 'Connect Google Analytics to track visitors' : null,
       },
       leads: {
         count: leads,
-        percentage: estimatedVisitors > 0 ? Math.round((leads / estimatedVisitors) * 100) : 0,
+        percentage: leadsPercentage,
       },
       mqls: {
         count: mqls,
-        percentage: leads > 0 ? Math.round((mqls / leads) * 100) : 0,
+        percentage: mqlsPercentage,
       },
       croHandoff: {
         count: croHandoff,
-        percentage: mqls > 0 ? Math.round((croHandoff / mqls) * 100) : 0,
+        percentage: croPercentage,
       },
       period: 'All time',
+      hasData: leads > 0 || mqls > 0 || croHandoff > 0,
+      integrations: {
+        ga4Connected: !!ga4Connection,
+      },
     };
   }
 

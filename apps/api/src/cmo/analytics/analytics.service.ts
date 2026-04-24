@@ -445,23 +445,26 @@ export class AnalyticsService {
       _count: { id: true },
     });
 
-    // Build top content list
+    // Build top content list - no placeholder trends, only show real data
     const topContent = campaigns
       .filter((c) => c._count.enrollments > 0)
       .slice(0, 5)
-      .map((campaign, index) => ({
+      .map((campaign) => ({
         id: campaign.id,
         name: campaign.name,
         type: 'campaign' as const,
         metric: `${campaign._count.enrollments} enrolled`,
         metricValue: campaign._count.enrollments,
-        trend: index === 0 ? 12 : index === 1 ? 8 : 5, // Placeholder trends
+        // Only show trend if we have real historical data (not implemented yet)
+        trend: null as number | null,
       }));
 
     return {
       topContent,
       period: 'Last 30 days',
       hasData: topContent.length > 0,
+      // Indicate that trends require historical tracking
+      trendsAvailable: false,
     };
   }
 }
