@@ -126,6 +126,64 @@ CATEGORY 2 — Ad-hoc compose/draft requests from chat:
 Remember: You're the organizational backbone. Everything flows through you, and you make it look effortless.`;
 }
 
+// Fetch all EA data to give Pam context about calendar, tasks, and communications
+async function buildExecutiveAssistantContext(authHeaders: Record<string, string>): Promise<string> {
+  const fetchJSON = async (url: string) => {
+    try {
+      const res = await fetch(url, { headers: authHeaders });
+      if (!res.ok) return null;
+      return res.json();
+    } catch { return null; }
+  };
+
+  const [calendarEvents, tasks, emails, hqDashboard] = await Promise.all([
+    fetchJSON(`${EA_API_URL}/calendar-events/upcoming`),
+    fetchJSON(`${EA_API_URL}/tasks`),
+    fetchJSON(`${EA_API_URL}/email-messages`),
+    fetchJSON(`${EA_API_URL}/hq/dashboard`),
+  ]);
+
+  const sections: string[] = [];
+
+  if (calendarEvents?.length) {
+    const upcoming = calendarEvents.slice(0, 10);
+    sections.push(`UPCOMING EVENTS (${calendarEvents.length} total, showing 10):\n${upcoming.map((e: { title?: string; subject?: string; startDate?: string; date?: string }) => `- ${e.title || e.subject || 'No title'} [${e.startDate || e.date || 'No date'}]`).join('\n')}`);
+  }
+
+  if (tasks?.length) {
+    const pending = tasks.filter((t: { status?: string }) => t.status !== 'completed');
+    const completed = tasks.filter((t: { status?: string }) => t.status === 'completed');
+    sections.push(`TASKS (${pending.length} pending, ${completed.length} completed):\n${pending.slice(0, 10).map((t: { title?: string; priority?: string; status?: string; dueDate?: string }) => `- ${t.title || 'No title'} [${t.priority || 'normal'}, ${t.status || 'pending'}]${t.dueDate ? ` due ${t.dueDate}` : ''}`).join('\n')}`);
+  }
+
+  if (emails?.length) {
+    const unread = emails.filter((e: { read?: boolean }) => !e.read);
+    sections.push(`EMAILS (${unread.length} unread of ${emails.length} recent):\n${emails.slice(0, 5).map((e: { subject?: string; from?: string; senderName?: string }) => `- ${e.subject || 'No subject'} [from: ${e.senderName || e.from || 'unknown'}]`).join('\n')}`);
+  }
+
+  if (hqDashboard) {
+    const hqSections: string[] = [];
+    if (hqDashboard.keystones?.length) {
+      hqSections.push(`Keystones: ${hqDashboard.keystones.slice(0, 5).map((k: { title?: string; status?: string }) => `${k.title} [${k.status}]`).join(', ')}`);
+    }
+    if (hqDashboard.headwinds?.length) {
+      hqSections.push(`Headwinds: ${hqDashboard.headwinds.slice(0, 5).map((h: { title?: string; severity?: string }) => `${h.title} [${h.severity || 'medium'}]`).join(', ')}`);
+    }
+    if (hqDashboard.goals?.length) {
+      hqSections.push(`Goals: ${hqDashboard.goals.slice(0, 3).map((g: { title?: string; progress?: number }) => `${g.title} [${g.progress || 0}%]`).join(', ')}`);
+    }
+    if (hqSections.length) {
+      sections.push(`HQ DASHBOARD:\n${hqSections.join('\n')}`);
+    }
+  }
+
+  if (sections.length === 0) {
+    return '\n\n**CURRENT ASSISTANT DATA:** No tasks, events, or communications found yet. This is a fresh workspace — help the user get started by offering to manage their calendar, organize tasks, or set up email.';
+  }
+
+  return `\n\n**CURRENT ASSISTANT DATA — Reference this when answering questions about schedule, tasks, or inbox:**\n\n${sections.join('\n\n')}`;
+}
+
 // Tool definitions
 const TOOLS = [
   // ========== L1 READ TOOLS ==========
@@ -1943,6 +2001,15 @@ export async function POST(request: NextRequest) {
     // Fetch tenant context for executive awareness
     const tenantContext = await fetchTenantContext(authToken);
 
+    // Fetch EA data context so Pam knows about calendar, tasks, and inbox
+    const eaDataContext = await buildExecutiveAssistantContext({
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    });
+
+    // Build complete system prompt with tenant and EA context
+    const systemPrompt = buildPamSystemPrompt(tenantContext) + eaDataContext;
+
     // Get API key from environment
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
@@ -1970,7 +2037,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: buildPamSystemPrompt(tenantContext),
+        system: systemPrompt,
         tools: TOOLS,
         messages,
       }),
@@ -2031,7 +2098,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: buildPamSystemPrompt(tenantContext),
+          system: systemPrompt,
           messages: [
             ...messages,
             {

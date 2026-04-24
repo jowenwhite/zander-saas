@@ -133,6 +133,56 @@ CATEGORY 2 — Ad-hoc compose/draft requests from chat:
 Remember: You're not just a sales advisor — you're a revenue-driving executive who gets things done.`;
 }
 
+// Fetch all sales data to give Jordan context about existing CRM assets
+async function buildSalesDataContext(authHeaders: Record<string, string>): Promise<string> {
+  const fetchJSON = async (url: string) => {
+    try {
+      const res = await fetch(url, { headers: authHeaders });
+      if (!res.ok) return null;
+      return res.json();
+    } catch { return null; }
+  };
+
+  const [contacts, deals, activities, pipelineStages] = await Promise.all([
+    fetchJSON(`${CRO_API_URL}/contacts`),
+    fetchJSON(`${CRO_API_URL}/deals`),
+    fetchJSON(`${CRO_API_URL}/activities`),
+    fetchJSON(`${CRO_API_URL}/pipeline-stages`),
+  ]);
+
+  const sections: string[] = [];
+
+  if (deals?.length) {
+    const totalValue = deals.reduce((sum: number, d: { value?: number }) => sum + (d.value || 0), 0);
+    const byStage = deals.reduce((acc: Record<string, number>, d: { stage?: string }) => {
+      const stage = d.stage || 'Unknown';
+      acc[stage] = (acc[stage] || 0) + 1;
+      return acc;
+    }, {});
+    sections.push(`DEALS (${deals.length}, total value $${totalValue.toLocaleString()}):\nBy stage: ${Object.entries(byStage).map(([stage, count]) => `${stage}: ${count}`).join(', ')}`);
+    const recentDeals = deals.slice(0, 8);
+    sections.push(`RECENT DEALS:\n${recentDeals.map((d: { name: string; value?: number; stage?: string }) => `- ${d.name} [$${(d.value || 0).toLocaleString()}, ${d.stage || 'Unknown'}]`).join('\n')}`);
+  }
+
+  if (contacts?.length) {
+    sections.push(`CONTACTS (${contacts.length}):\n${contacts.slice(0, 10).map((c: { firstName?: string; lastName?: string; company?: string; email?: string }) => `- ${c.firstName || ''} ${c.lastName || ''} [${c.company || 'No company'}] ${c.email || ''}`).join('\n')}`);
+  }
+
+  if (activities?.length) {
+    sections.push(`RECENT ACTIVITIES (${activities.length}):\n${activities.slice(0, 10).map((a: { type?: string; subject?: string; title?: string; createdAt?: string }) => `- ${a.type || 'Activity'}: ${a.subject || a.title || 'No subject'} [${a.createdAt ? new Date(a.createdAt).toLocaleDateString() : ''}]`).join('\n')}`);
+  }
+
+  if (pipelineStages?.length) {
+    sections.push(`PIPELINE STAGES: ${pipelineStages.map((s: { name: string }) => s.name).join(' → ')}`);
+  }
+
+  if (sections.length === 0) {
+    return '\n\n**CURRENT SALES DATA:** No CRM data has been created yet. This is a fresh workspace — help the user get started by suggesting they add contacts, create deals, or set up their pipeline.';
+  }
+
+  return `\n\n**CURRENT SALES DATA — Reference this when answering questions about pipeline, deals, or contacts:**\n\n${sections.join('\n\n')}`;
+}
+
 // Tool definitions following Anthropic's schema
 const TOOLS = [
   {
@@ -1609,6 +1659,15 @@ export async function POST(request: NextRequest) {
     // Fetch tenant context for executive awareness
     const tenantContext = await fetchTenantContext(authToken);
 
+    // Fetch sales data context so Jordan knows about existing CRM assets
+    const salesDataContext = await buildSalesDataContext({
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    });
+
+    // Build complete system prompt with tenant and sales context
+    const systemPrompt = buildJordanSystemPrompt(tenantContext) + salesDataContext;
+
     // Get API key from environment
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
@@ -1636,7 +1695,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: buildJordanSystemPrompt(tenantContext),
+        system: systemPrompt,
         tools: TOOLS,
         messages,
       }),
@@ -1698,7 +1757,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: buildJordanSystemPrompt(tenantContext),
+          system: systemPrompt,
           messages: [
             ...messages,
             {
