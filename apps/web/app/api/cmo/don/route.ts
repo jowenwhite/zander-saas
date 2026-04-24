@@ -208,14 +208,14 @@ async function buildMarketingDataContext(authHeaders: Record<string, string>): P
   };
 
   const [campaigns, personas, funnels, segments, brand, calendar, marketingPlan, templates, workflows] = await Promise.all([
-    fetchJSON(`${CMO_API_URL}/cmo/campaigns`),
+    fetchJSON(`${CMO_API_URL}/campaigns`),           // campaigns controller (not under /cmo)
     fetchJSON(`${CMO_API_URL}/cmo/personas`),
     fetchJSON(`${CMO_API_URL}/cmo/funnels`),
     fetchJSON(`${CMO_API_URL}/cmo/segments`),
-    fetchJSON(`${CMO_API_URL}/cmo/brand`),
+    fetchJSON(`${CMO_API_URL}/cmo/assets/brand`),    // brand is under /cmo/assets
     fetchJSON(`${CMO_API_URL}/cmo/calendar`),
     fetchJSON(`${CMO_API_URL}/cmo/marketing-plan`),
-    fetchJSON(`${CMO_API_URL}/cmo/email-templates`),
+    fetchJSON(`${CMO_API_URL}/cmo/templates`),       // templates controller (not email-templates)
     fetchJSON(`${CMO_API_URL}/cmo/workflows`),
   ]);
 
@@ -1718,6 +1718,9 @@ function sanitizeResponse(text: string): string {
     /<\/?tool_result[^>]*>/gi,
     /<tool_use>[\s\S]*?<\/tool_use>/gi,
     /<tool_result>[\s\S]*?<\/tool_result>/gi,
+    // Generic <tool> tags (Claude sometimes outputs these)
+    /<\/?tool[^>]*>/gi,
+    /<tool[^>]*>[\s\S]*?<\/tool>/gi,
     // Anthropic XML namespace tags
     /<\/?antml:[^>]*>/gi,
     /<[^>]+>[\s\S]*?<\/antml:[^>]+>/gi,

@@ -15,14 +15,14 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
     } catch { return null; }
   };
 
-  // Use verified endpoint paths from individual context builders
+  // Use verified endpoint paths matching actual API controllers
   const [campaigns, deals, calendar, tasks, hqDashboard, marketingPlan] = await Promise.all([
-    fetchJSON(`${API_URL}/cmo/campaigns`),      // Don's domain
-    fetchJSON(`${API_URL}/deals`),               // Jordan's domain
+    fetchJSON(`${API_URL}/campaigns`),                // campaigns controller (not under /cmo)
+    fetchJSON(`${API_URL}/deals`),                    // Jordan's domain
     fetchJSON(`${API_URL}/calendar-events/upcoming`), // Pam's domain
-    fetchJSON(`${API_URL}/tasks`),               // Pam's domain
-    fetchJSON(`${API_URL}/hq/dashboard`),        // Shared HQ
-    fetchJSON(`${API_URL}/cmo/marketing-plan`),  // Don's domain
+    fetchJSON(`${API_URL}/tasks`),                    // Pam's domain
+    fetchJSON(`${API_URL}/hq/dashboard`),             // Shared HQ
+    fetchJSON(`${API_URL}/cmo/marketing-plan`),       // Don's domain
   ]);
 
   const sections: string[] = [];
