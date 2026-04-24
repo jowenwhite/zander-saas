@@ -60,6 +60,37 @@ interface MetaEngagementData {
   }>;
 }
 
+interface EmailAnalyticsData {
+  summary: {
+    totalSent: number;
+    delivered: number;
+    opened: number;
+    bounced: number;
+    complained: number;
+    delayed: number;
+    deliveryRate: number;
+    openRate: number;
+    bounceRate: number;
+    complaintRate: number;
+  };
+  trend: Array<{
+    date: string;
+    sent: number;
+    delivered: number;
+    opened: number;
+    bounced: number;
+    openRate: number;
+  }>;
+  topEmails: Array<{
+    subject: string;
+    sent: number;
+    delivered: number;
+    opened: number;
+    openRate: number;
+  }>;
+  hasData: boolean;
+}
+
 interface CampaignMetrics {
   id: string;
   name: string;
@@ -139,6 +170,10 @@ function CMOAnalyticsContent() {
   const [showPageSelector, setShowPageSelector] = useState(false);
   const [metaMessage, setMetaMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Email analytics state
+  const [emailAnalytics, setEmailAnalytics] = useState<EmailAnalyticsData | null>(null);
+  const [emailLoading, setEmailLoading] = useState(false);
+
   // Check GA and Meta status on mount and handle OAuth callbacks
   useEffect(() => {
     checkGAStatus();
@@ -193,6 +228,7 @@ function CMOAnalyticsContent() {
 
   useEffect(() => {
     fetchAnalytics();
+    fetchEmailAnalytics();
   }, [dateRange]);
 
   const checkGAStatus = async () => {
@@ -342,6 +378,31 @@ function CMOAnalyticsContent() {
       setData(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchEmailAnalytics = async () => {
+    try {
+      setEmailLoading(true);
+      const token = localStorage.getItem('zander_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
+
+      const response = await fetch(`${apiUrl}/cmo/analytics/email?dateRange=${dateRange}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const emailData = await response.json();
+        setEmailAnalytics(emailData);
+      } else {
+        console.error('Failed to fetch email analytics:', response.status);
+        setEmailAnalytics(null);
+      }
+    } catch (error) {
+      console.error('Error fetching email analytics:', error);
+      setEmailAnalytics(null);
+    } finally {
+      setEmailLoading(false);
     }
   };
 
@@ -975,6 +1036,215 @@ function CMOAnalyticsContent() {
         </Card>
         </div>
       )}
+
+      {/* Email Performance Section */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <Card>
+          <div style={cardHeaderStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>📧</span>
+              <div>
+                <h3 style={{ ...cardTitleStyle, margin: 0 }}>Email Performance</h3>
+                <p style={{ color: '#8888A0', fontSize: '0.75rem', margin: '0.25rem 0 0' }}>
+                  Delivery, open rates, and engagement metrics
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {emailLoading ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#8888A0' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+              <p>Loading email performance data...</p>
+            </div>
+          ) : emailAnalytics?.hasData ? (
+            <div>
+              {/* Email KPIs */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: '1rem',
+                padding: '1.5rem',
+                borderBottom: '1px solid #2A2A38'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Total Sent</div>
+                  <div style={{ color: '#F0F0F5', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {formatNumber(emailAnalytics.summary.totalSent)}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Delivered</div>
+                  <div style={{ color: '#27AE60', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {emailAnalytics.summary.deliveryRate}%
+                  </div>
+                  <div style={{ color: '#8888A0', fontSize: '0.65rem' }}>
+                    {formatNumber(emailAnalytics.summary.delivered)} emails
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Opened</div>
+                  <div style={{ color: '#3498DB', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {emailAnalytics.summary.openRate}%
+                  </div>
+                  <div style={{ color: '#8888A0', fontSize: '0.65rem' }}>
+                    {formatNumber(emailAnalytics.summary.opened)} opens
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Bounced</div>
+                  <div style={{ color: emailAnalytics.summary.bounceRate > 5 ? '#E74C3C' : '#F57C00', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {emailAnalytics.summary.bounceRate}%
+                  </div>
+                  <div style={{ color: '#8888A0', fontSize: '0.65rem' }}>
+                    {formatNumber(emailAnalytics.summary.bounced)} bounced
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ color: '#8888A0', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Complaints</div>
+                  <div style={{ color: emailAnalytics.summary.complaintRate > 0.1 ? '#E74C3C' : '#8888A0', fontSize: '1.75rem', fontWeight: '700' }}>
+                    {emailAnalytics.summary.complaintRate}%
+                  </div>
+                  <div style={{ color: '#8888A0', fontSize: '0.65rem' }}>
+                    {formatNumber(emailAnalytics.summary.complained)} spam reports
+                  </div>
+                </div>
+              </div>
+
+              {/* Trend Chart and Top Emails */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', padding: '1.5rem' }}>
+                {/* Daily Trend */}
+                <div>
+                  <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
+                    Daily Trend
+                  </h4>
+                  {emailAnalytics.trend.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {emailAnalytics.trend.slice(-7).map((day) => {
+                        const maxSent = Math.max(...emailAnalytics.trend.map(t => t.sent), 1);
+                        const percentage = (day.sent / maxSent) * 100;
+                        return (
+                          <div key={day.date} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <span style={{ fontSize: '0.75rem', color: '#8888A0', width: '60px', flexShrink: 0 }}>
+                              {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                            <div style={{ flex: 1, height: '20px', background: '#1C1C26', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
+                              <div
+                                style={{
+                                  width: `${(day.delivered / day.sent) * percentage}%`,
+                                  height: '100%',
+                                  background: '#27AE60',
+                                }}
+                                title={`Delivered: ${day.delivered}`}
+                              />
+                              <div
+                                style={{
+                                  width: `${(day.opened / day.sent) * percentage}%`,
+                                  height: '100%',
+                                  background: '#3498DB',
+                                  marginLeft: '-1px',
+                                }}
+                                title={`Opened: ${day.opened}`}
+                              />
+                            </div>
+                            <span style={{ fontSize: '0.75rem', color: '#F0F0F5', width: '35px', textAlign: 'right' }}>
+                              {day.sent}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div style={{ color: '#8888A0', fontSize: '0.875rem', padding: '1rem', textAlign: 'center' }}>
+                      No trend data available
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', justifyContent: 'center' }}>
+                    <span style={{ fontSize: '0.65rem', color: '#27AE60', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ width: '8px', height: '8px', background: '#27AE60', borderRadius: '2px' }} /> Delivered
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: '#3498DB', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ width: '8px', height: '8px', background: '#3498DB', borderRadius: '2px' }} /> Opened
+                    </span>
+                  </div>
+                </div>
+
+                {/* Top Performing Emails */}
+                <div>
+                  <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.875rem', fontWeight: '600', color: '#F0F0F5' }}>
+                    Top Performing Emails
+                  </h4>
+                  {emailAnalytics.topEmails.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {emailAnalytics.topEmails.slice(0, 5).map((email, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '0.5rem 0.75rem',
+                            background: '#1C1C26',
+                            borderRadius: '6px',
+                          }}
+                        >
+                          <span style={{
+                            fontSize: '0.8rem',
+                            color: '#F0F0F5',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '60%'
+                          }}>
+                            {email.subject}
+                          </span>
+                          <div style={{ display: 'flex', gap: '1rem', flexShrink: 0 }}>
+                            <span style={{ fontSize: '0.75rem', color: '#8888A0' }}>
+                              {email.sent} sent
+                            </span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#3498DB' }}>
+                              {email.openRate}% open
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ color: '#8888A0', fontSize: '0.875rem', padding: '1rem', textAlign: 'center' }}>
+                      Send at least 3 emails with the same subject to see performance data
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: '3rem', textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📧</div>
+              <h3 style={{ color: '#F0F0F5', margin: '0 0 0.5rem', fontSize: '1.125rem' }}>
+                No Email Data Yet
+              </h3>
+              <p style={{ color: '#8888A0', margin: '0 0 1rem', fontSize: '0.875rem', maxWidth: '350px', marginLeft: 'auto', marginRight: 'auto' }}>
+                Send emails through campaigns or templates to see delivery and engagement metrics here.
+              </p>
+              <a
+                href="/cmo/templates"
+                style={{
+                  display: 'inline-block',
+                  padding: '0.5rem 1rem',
+                  background: 'rgba(52, 152, 219, 0.15)',
+                  color: '#3498DB',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                }}
+              >
+                Create Email Template
+              </a>
+            </div>
+          )}
+        </Card>
+      </div>
 
       {/* Social Engagement Section - Meta Suite */}
       {metaStatus.connected && (
