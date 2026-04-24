@@ -196,6 +196,85 @@ ESCALATE IMMEDIATELY:
 When in doubt, draft and escalate. Never guess on tone for negative interactions.`;
 }
 
+// Fetch all marketing data to give Don context about existing assets
+async function buildMarketingDataContext(authHeaders: Record<string, string>): Promise<string> {
+  const fetchJSON = async (url: string) => {
+    try {
+      const res = await fetch(url, { headers: authHeaders });
+      if (!res.ok) return null;
+      return res.json();
+    } catch { return null; }
+  };
+
+  const [campaigns, personas, funnels, segments, brand, calendar, marketingPlan, templates, workflows] = await Promise.all([
+    fetchJSON(`${CMO_API_URL}/cmo/campaigns`),
+    fetchJSON(`${CMO_API_URL}/cmo/personas`),
+    fetchJSON(`${CMO_API_URL}/cmo/funnels`),
+    fetchJSON(`${CMO_API_URL}/cmo/segments`),
+    fetchJSON(`${CMO_API_URL}/cmo/brand`),
+    fetchJSON(`${CMO_API_URL}/cmo/calendar`),
+    fetchJSON(`${CMO_API_URL}/cmo/marketing-plan`),
+    fetchJSON(`${CMO_API_URL}/cmo/email-templates`),
+    fetchJSON(`${CMO_API_URL}/cmo/workflows`),
+  ]);
+
+  const sections: string[] = [];
+
+  if (campaigns?.length) {
+    sections.push(`EXISTING CAMPAIGNS (${campaigns.length}):\n${campaigns.map((c: { name: string; status: string; goal?: string }) => `- ${c.name} (${c.status})${c.goal ? `: ${c.goal}` : ''}`).join('\n')}`);
+  }
+
+  if (personas?.length) {
+    sections.push(`PERSONAS (${personas.length}):\n${personas.map((p: { name: string; tagline?: string }) => `- ${p.name}${p.tagline ? `: ${p.tagline}` : ''}`).join('\n')}`);
+  }
+
+  if (funnels?.length) {
+    sections.push(`FUNNELS (${funnels.length}):\n${funnels.map((f: { name: string; status: string }) => `- ${f.name} (${f.status})`).join('\n')}`);
+  }
+
+  if (segments?.length) {
+    sections.push(`SEGMENTS (${segments.length}):\n${segments.map((s: { name: string; contactCount?: number }) => `- ${s.name}${s.contactCount ? ` (${s.contactCount} contacts)` : ''}`).join('\n')}`);
+  }
+
+  if (workflows?.length) {
+    sections.push(`WORKFLOWS (${workflows.length}):\n${workflows.map((w: { name: string; status: string }) => `- ${w.name} (${w.status})`).join('\n')}`);
+  }
+
+  if (templates?.length) {
+    sections.push(`EMAIL TEMPLATES (${templates.length}):\n${templates.map((t: { name: string; subject?: string }) => `- ${t.name}${t.subject ? `: "${t.subject}"` : ''}`).join('\n')}`);
+  }
+
+  if (brand) {
+    const brandInfo: string[] = [];
+    if (brand.voice) brandInfo.push(`Voice: ${brand.voice}`);
+    if (brand.primaryColor) brandInfo.push(`Primary Color: ${brand.primaryColor}`);
+    if (brand.guidelines) brandInfo.push(`Guidelines: ${brand.guidelines.substring(0, 200)}...`);
+    if (brandInfo.length) {
+      sections.push(`BRAND SETTINGS:\n${brandInfo.join('\n')}`);
+    }
+  }
+
+  if (marketingPlan) {
+    const planInfo: string[] = [];
+    if (marketingPlan.goals) planInfo.push(`Goals: ${marketingPlan.goals}`);
+    if (marketingPlan.budget) planInfo.push(`Budget: ${JSON.stringify(marketingPlan.budget)}`);
+    if (planInfo.length) {
+      sections.push(`MARKETING PLAN:\n${planInfo.join('\n')}`);
+    }
+  }
+
+  if (calendar?.events?.length) {
+    const upcomingEvents = calendar.events.slice(0, 10);
+    sections.push(`UPCOMING CALENDAR EVENTS (${calendar.events.length} total, showing 10):\n${upcomingEvents.map((e: { title: string; date: string }) => `- ${e.date}: ${e.title}`).join('\n')}`);
+  }
+
+  if (sections.length === 0) {
+    return '\n\n**EXISTING MARKETING DATA:** No marketing assets have been created yet. This is a fresh workspace.';
+  }
+
+  return `\n\n**EXISTING MARKETING DATA — Reference this when answering questions about current state:**\n\n${sections.join('\n\n')}`;
+}
+
 // Tool definitions following Anthropic's schema
 const TOOLS = [
   {
@@ -4067,6 +4146,15 @@ export async function POST(request: NextRequest) {
     // Fetch tenant context for executive awareness
     const tenantContext = await fetchTenantContext(authToken);
 
+    // Fetch marketing data context so Don knows about existing assets
+    const marketingDataContext = await buildMarketingDataContext({
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    });
+
+    // Build complete system prompt with tenant and marketing context
+    const systemPrompt = buildDonSystemPrompt(tenantContext) + marketingDataContext;
+
     // Get API key from environment
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
@@ -4094,7 +4182,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        system: buildDonSystemPrompt(tenantContext),
+        system: systemPrompt,
         tools: TOOLS,
         messages,
       }),
@@ -4164,7 +4252,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1024,
-          system: buildDonSystemPrompt(tenantContext),
+          system: systemPrompt,
           messages: [
             ...messages,
             {
