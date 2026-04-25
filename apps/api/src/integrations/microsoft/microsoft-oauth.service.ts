@@ -30,7 +30,7 @@ export class MicrosoftOAuthService {
   getAuthUrl(userId: string, tenantId: string): string {
     const clientId = this.config.get<string>('MICROSOFT_CLIENT_ID');
     const redirectUri = encodeURIComponent(
-      this.config.get<string>('MICROSOFT_INTEGRATION_CALLBACK_URL') ||
+      this.config.get<string>('MICROSOFT_CALLBACK_URL') ||
         'http://localhost:3001/integrations/microsoft/callback',
     );
     const scope = encodeURIComponent(MICROSOFT_SCOPES);
@@ -73,7 +73,7 @@ export class MicrosoftOAuthService {
       client_secret: this.config.get<string>('MICROSOFT_CLIENT_SECRET') || '',
       code,
       redirect_uri:
-        this.config.get<string>('MICROSOFT_INTEGRATION_CALLBACK_URL') ||
+        this.config.get<string>('MICROSOFT_CALLBACK_URL') ||
         'http://localhost:3001/integrations/microsoft/callback',
       grant_type: 'authorization_code',
     });
