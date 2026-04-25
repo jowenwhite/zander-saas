@@ -581,3 +581,10 @@ Before Microsoft OAuth will work in production, add these Redirect URIs to Azure
 - Two Microsoft OAuth flows coexist: `auth/microsoft/` (user-scoped, MicrosoftToken) and `integrations/microsoft/` (tenant-scoped, IntegrationConnection) — different purposes, different redirect URIs
 - `sync_gmail_inbox` Pam tool unchanged — provider routing is transparent at the controller level
 - Microsoft Calendar sync only fires if `isConnected(tenantId)=true` AND user has no GoogleToken — prevents double-sync
+
+### Session 2 Additions (same date, post-deploy)
+- **Credential fix:** Updated to correct Zander Azure AD app (`c7588ee7`, not MCFOS `b1ffa2d0`)
+- **Deploy:** v88 image built and pushed; task def :75 registered with corrected env vars (MICROSOFT_CLIENT_ID, MICROSOFT_CALLBACK_URL, RESEND_WEBHOOK_SECRET, CANVA_CLIENT_ID, CANVA_CLIENT_SECRET); ECS service updated; health check confirmed ✓
+- **Phase 2 verifications:** Conversation persistence (Pam + Don via sessionStorage) confirmed ✓; CMO dashboard all 3 endpoints 200 OK ✓
+- **Bug fixes:** Removed `<style jsx>` from `apps/web/app/cmo/ai/page.tsx` (don-pulse, don-spin) and `apps/web/app/ea/page.tsx` (pam-pulse) — commit c7c29ff
+- **Handoff doc:** `Microsoft_OAuth_Handoff_v88.docx` generated at repo root
