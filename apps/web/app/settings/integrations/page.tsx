@@ -81,6 +81,14 @@ const PlatformIcon = ({ icon, size = 32 }: { icon: string; size?: number }) => {
         <path d="M22 6l-10 7L2 6" stroke="white" strokeWidth="2" />
       </svg>
     ),
+    microsoft: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <rect x="1" y="1" width="10.5" height="10.5" fill="#F25022" />
+        <rect x="12.5" y="1" width="10.5" height="10.5" fill="#7FBA00" />
+        <rect x="1" y="12.5" width="10.5" height="10.5" fill="#00A4EF" />
+        <rect x="12.5" y="12.5" width="10.5" height="10.5" fill="#FFB900" />
+      </svg>
+    ),
   };
 
   return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icons[icon] || <Link2 size={size} />}</div>;
@@ -123,11 +131,27 @@ function IntegrationsContent() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [successBanner, setSuccessBanner] = useState<string | null>(null);
+  const [errorBanner, setErrorBanner] = useState<string | null>(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.zanderos.com';
 
   useEffect(() => {
     fetchIntegrations();
+
+    // Handle OAuth return params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('microsoft') === 'connected') {
+      setSuccessBanner('Microsoft Outlook connected successfully.');
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (params.get('canva') === 'connected') {
+      setSuccessBanner('Canva connected successfully.');
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (params.get('error')) {
+      const msg = params.get('error')!.replace(/_/g, ' ');
+      setErrorBanner(`Connection failed: ${msg}`);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, []);
 
   const fetchIntegrations = async () => {
@@ -153,10 +177,16 @@ function IntegrationsContent() {
   const handleConnect = async (integration: Integration) => {
     if (!integration.connectPath) return;
 
+    const token = localStorage.getItem('zander_token');
+    if (!token) return;
+
     setActionLoading(integration.provider);
     try {
-      const token = localStorage.getItem('zander_token');
-      if (!token) return;
+      // Microsoft uses a GET redirect with the JWT as a query param (OAuth requires browser navigation)
+      if (integration.provider === 'microsoft') {
+        window.location.href = `${apiUrl}${integration.connectPath}?token=${encodeURIComponent(token)}`;
+        return;
+      }
 
       const res = await fetch(`${apiUrl}${integration.connectPath}`, {
         method: 'POST',
@@ -169,7 +199,6 @@ function IntegrationsContent() {
       const data = await res.json();
 
       if (data.authUrl) {
-        // OAuth flow - redirect to auth URL
         window.location.href = data.authUrl;
       }
     } catch (error) {
@@ -237,6 +266,10 @@ function IntegrationsContent() {
   };
 
   const categoryOrder = ['analytics', 'social', 'email', 'design', 'other'];
+
+  const connectedEmailProviders = integrations.filter(
+    (i) => i.category === 'email' && i.connected && !i.isSystemManaged,
+  );
 
   return (
     <div style={{ minHeight: '100vh', background: '#09090F' }}>
@@ -314,6 +347,58 @@ function IntegrationsContent() {
               </button>
             </div>
           </div>
+
+          {/* Success / Error Banners */}
+          {successBanner && (
+            <div
+              style={{
+                padding: '0.85rem 1.25rem',
+                background: 'rgba(40, 167, 69, 0.15)',
+                border: '1px solid rgba(40, 167, 69, 0.4)',
+                borderRadius: '8px',
+                color: '#28A745',
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span>{successBanner}</span>
+              <button
+                onClick={() => setSuccessBanner(null)}
+                style={{ background: 'none', border: 'none', color: '#28A745', cursor: 'pointer', fontSize: '1.1rem' }}
+              >
+                ×
+              </button>
+            </div>
+          )}
+          {errorBanner && (
+            <div
+              style={{
+                padding: '0.85rem 1.25rem',
+                background: 'rgba(220, 53, 69, 0.15)',
+                border: '1px solid rgba(220, 53, 69, 0.4)',
+                borderRadius: '8px',
+                color: '#DC3545',
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span>{errorBanner}</span>
+              <button
+                onClick={() => setErrorBanner(null)}
+                style={{ background: 'none', border: 'none', color: '#DC3545', cursor: 'pointer', fontSize: '1.1rem' }}
+              >
+                ×
+              </button>
+            </div>
+          )}
 
           {/* Summary Cards */}
           <div
@@ -474,6 +559,11 @@ function IntegrationsContent() {
                                 }}
                               >
                                 Connected {formatDate(integration.connectedAt)}
+                                {integration.metadata?.email && (
+                                  <span style={{ display: 'block', marginTop: '0.25rem' }}>
+                                    Account: {integration.metadata.email}
+                                  </span>
+                                )}
                                 {integration.metadata?.propertyName && (
                                   <span style={{ display: 'block', marginTop: '0.25rem' }}>
                                     Property: {integration.metadata.propertyName}
@@ -484,6 +574,22 @@ function IntegrationsContent() {
                                     Page: {integration.metadata.pageName}
                                   </span>
                                 )}
+                              </div>
+                            )}
+
+                            {/* Mutual exclusion note for email OAuth providers */}
+                            {integration.category === 'email' && !integration.isSystemManaged && !integration.comingSoon && (
+                              <div
+                                style={{
+                                  fontSize: '0.78rem',
+                                  color: '#6B6B85',
+                                  marginBottom: '0.75rem',
+                                  fontStyle: 'italic',
+                                }}
+                              >
+                                {connectedEmailProviders.length > 0 && !integration.connected
+                                  ? `${connectedEmailProviders[0].name} is active — disconnect it first to switch providers.`
+                                  : 'Only one email provider (Google or Microsoft) can be active per tenant.'}
                               </div>
                             )}
 
@@ -572,24 +678,32 @@ function IntegrationsContent() {
                                     </button>
                                   )}
                                 </>
-                              ) : (
-                                <button
-                                  onClick={() => handleConnect(integration)}
-                                  disabled={actionLoading === integration.provider}
-                                  style={{
-                                    padding: '0.5rem 1rem',
-                                    background: '#00CCEE',
-                                    color: '#09090F',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    fontSize: '0.85rem',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                  }}
-                                >
-                                  {actionLoading === integration.provider ? 'Connecting...' : 'Connect'}
-                                </button>
-                              )}
+                              ) : (() => {
+                                const emailBlocked =
+                                  integration.category === 'email' &&
+                                  !integration.isSystemManaged &&
+                                  connectedEmailProviders.length > 0 &&
+                                  !integration.connected;
+                                return (
+                                  <button
+                                    onClick={() => !emailBlocked && handleConnect(integration)}
+                                    disabled={actionLoading === integration.provider || emailBlocked}
+                                    title={emailBlocked ? `Disconnect ${connectedEmailProviders[0].name} first` : undefined}
+                                    style={{
+                                      padding: '0.5rem 1rem',
+                                      background: emailBlocked ? '#2A2A38' : '#00CCEE',
+                                      color: emailBlocked ? '#6B6B85' : '#09090F',
+                                      border: 'none',
+                                      borderRadius: '6px',
+                                      fontSize: '0.85rem',
+                                      fontWeight: '600',
+                                      cursor: emailBlocked ? 'not-allowed' : 'pointer',
+                                    }}
+                                  >
+                                    {actionLoading === integration.provider ? 'Connecting...' : 'Connect'}
+                                  </button>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>

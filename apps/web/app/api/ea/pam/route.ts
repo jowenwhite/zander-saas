@@ -147,11 +147,12 @@ async function buildExecutiveAssistantContext(authHeaders: Record<string, string
     } catch { return null; }
   };
 
-  const [calendarEventsRes, tasksRes, emailsRes, hqDashboard] = await Promise.all([
+  const [calendarEventsRes, tasksRes, emailsRes, hqDashboard, emailProviderStatus] = await Promise.all([
     fetchJSON(`${EA_API_URL}/calendar-events/upcoming`),
     fetchJSON(`${EA_API_URL}/tasks`),
     fetchJSON(`${EA_API_URL}/email-messages`),
     fetchJSON(`${EA_API_URL}/hq/dashboard`),
+    fetchJSON(`${EA_API_URL}/gmail/status`),
   ]);
 
   // Normalize responses - some endpoints return { data: [] }, others return [] directly
@@ -170,6 +171,17 @@ async function buildExecutiveAssistantContext(authHeaders: Record<string, string
     const pending = tasks.filter((t: { status?: string }) => t.status !== 'completed' && t.status !== 'COMPLETED');
     const completed = tasks.filter((t: { status?: string }) => t.status === 'completed' || t.status === 'COMPLETED');
     sections.push(`TASKS (${pending.length} pending, ${completed.length} completed):\n${pending.slice(0, 10).map((t: { title?: string; priority?: string; status?: string; dueDate?: string }) => `- ${t.title || 'No title'} [${t.priority || 'normal'}, ${t.status || 'pending'}]${t.dueDate ? ` due ${new Date(t.dueDate).toLocaleDateString()}` : ''}`).join('\n')}`);
+  }
+
+  // Active email provider (Google Gmail or Microsoft Outlook)
+  if (emailProviderStatus) {
+    const providerName = emailProviderStatus.provider === 'microsoft' ? 'Microsoft Outlook' : emailProviderStatus.provider === 'google' ? 'Google Gmail' : null;
+    if (providerName && emailProviderStatus.connected) {
+      const accountNote = emailProviderStatus.email ? ` (${emailProviderStatus.email})` : '';
+      sections.push(`EMAIL PROVIDER: ${providerName}${accountNote} — use sync_gmail_inbox to refresh inbox; emails are routed transparently to the correct provider.`);
+    } else {
+      sections.push(`EMAIL PROVIDER: Not connected — no email integration active for this tenant.`);
+    }
   }
 
   if (emails?.length) {

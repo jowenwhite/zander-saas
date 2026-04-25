@@ -78,6 +78,15 @@ export class IntegrationsController {
         category: 'email',
         isSystemManaged: true, // Configured at system level, not per-tenant OAuth
       },
+      {
+        provider: 'microsoft',
+        name: 'Microsoft Outlook',
+        description: 'Connect Outlook for email and calendar — ideal for Microsoft 365 accounts',
+        icon: 'microsoft',
+        category: 'email',
+        connectPath: '/integrations/microsoft/auth',
+        disconnectPath: '/integrations/microsoft/disconnect',
+      },
     ];
 
     // Fetch existing connections for this tenant

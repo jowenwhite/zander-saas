@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Query, Body, Request, Logger, UseGuards } from '@nestjs/common';
 import { GmailService } from './gmail.service';
 import { GoogleAuthService } from './google-auth.service';
+import { MicrosoftGraphService } from '../../integrations/microsoft/microsoft-graph.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 
 @Controller('gmail')
@@ -11,27 +13,50 @@ export class GmailController {
   constructor(
     private readonly gmailService: GmailService,
     private readonly googleAuthService: GoogleAuthService,
+    private readonly microsoftGraphService: MicrosoftGraphService,
+    private readonly prisma: PrismaService,
   ) {}
 
+  /**
+   * POST /gmail/sync
+   * Provider-aware inbox sync. Checks tenant's IntegrationConnection first — if microsoft is
+   * active, syncs from Outlook. Otherwise falls back to Gmail. Pam's sync_gmail_inbox tool
+   * calls this endpoint and the provider switch is fully transparent.
+   */
   @Post('sync')
   async syncEmails(
     @Request() req,
     @Body('maxResults') maxResults?: number,
   ) {
     const userId = req.user.sub;
-    this.logger.log(`Syncing emails for user: ${userId}`);
-
-    // Verify user has connected Gmail
-    const token = await this.googleAuthService.getTokenByUserId(userId);
-    if (!token) {
-      return { success: false, error: 'Gmail not connected' };
-    }
+    const tenantId = req.user.tenantId;
+    this.logger.log(`Inbox sync for user: ${userId}, tenant: ${tenantId}`);
 
     try {
+      const msConnection = await this.prisma.integrationConnection.findUnique({
+        where: { tenantId_provider: { tenantId, provider: 'microsoft' } },
+      });
+
+      if (msConnection?.status === 'active') {
+        this.logger.log(`Routing inbox sync to Microsoft Graph for tenant: ${tenantId}`);
+        const result = await this.microsoftGraphService.syncInbox(tenantId, maxResults || 50);
+        return { success: true, ...result, provider: 'microsoft' };
+      }
+
+      const googleToken = await this.googleAuthService.getTokenByUserId(userId);
+      if (!googleToken) {
+        return {
+          success: false,
+          synced: 0,
+          error: 'No email provider connected. Connect Gmail or Outlook in Settings > Integrations.',
+        };
+      }
+
+      this.logger.log(`Routing inbox sync to Gmail for user: ${userId}`);
       const result = await this.gmailService.syncEmails(userId, maxResults || 50);
-      return { success: true, ...result };
+      return { success: true, ...result, provider: 'google' };
     } catch (error) {
-      this.logger.error(`Sync error: ${error.message}`);
+      this.logger.error(`Inbox sync error: ${error.message}`);
       return { success: false, error: error.message };
     }
   }
@@ -42,7 +67,6 @@ export class GmailController {
     @Query('maxResults') maxResults?: string,
   ) {
     const userId = req.user.sub;
-    this.logger.log(`Fetching recent emails for user: ${userId}`);
 
     const token = await this.googleAuthService.getTokenByUserId(userId);
     if (!token) {
@@ -70,7 +94,6 @@ export class GmailController {
     @Body('htmlBody') htmlBody?: string,
   ) {
     const userId = req.user.sub;
-    this.logger.log(`Sending email for user: ${userId} to: ${to}`);
 
     const token = await this.googleAuthService.getTokenByUserId(userId);
     if (!token) {
@@ -89,11 +112,22 @@ export class GmailController {
   @Get('status')
   async getConnectionStatus(@Request() req) {
     const userId = req.user.sub;
-    const token = await this.googleAuthService.getTokenByUserId(userId);
-    return {
-      connected: !!token,
-      email: token?.email || null,
-      connectedAt: token?.createdAt || null,
-    };
+    const tenantId = req.user.tenantId;
+
+    const msConnection = await this.prisma.integrationConnection.findUnique({
+      where: { tenantId_provider: { tenantId, provider: 'microsoft' } },
+    });
+
+    if (msConnection?.status === 'active') {
+      const meta = msConnection.metadata as { email?: string } | null;
+      return { connected: true, provider: 'microsoft', email: meta?.email || null };
+    }
+
+    const googleToken = await this.googleAuthService.getTokenByUserId(userId);
+    if (googleToken) {
+      return { connected: true, provider: 'google', email: googleToken.email };
+    }
+
+    return { connected: false, provider: null, email: null };
   }
 }

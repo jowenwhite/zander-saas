@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleAuthService } from '../auth/google/google-auth.service';
+import { MicrosoftGraphService } from '../integrations/microsoft/microsoft-graph.service';
 
 @Injectable()
 export class CalendarEventsService {
@@ -9,6 +10,7 @@ export class CalendarEventsService {
   constructor(
     private prisma: PrismaService,
     private googleAuthService: GoogleAuthService,
+    private microsoftGraphService: MicrosoftGraphService,
   ) {}
 
   async create(tenantId: string, createdById: string, data: {
@@ -145,10 +147,45 @@ export class CalendarEventsService {
       this.logger.error(`Failed to sync event ${event.id} to Google Calendar: ${error.message}`);
       await this.prisma.calendarEvent.update({
         where: { id: event.id },
-        data: {
-          syncStatus: 'failed',
-        },
+        data: { syncStatus: 'failed' },
       });
+    }
+
+    // Sync to Outlook Calendar if tenant has Microsoft connected (only if Google not already synced)
+    try {
+      const isMicrosoftConnected = await this.microsoftGraphService.isConnected(tenantId);
+      const googleToken = await this.googleAuthService.getTokenByUserId(createdById);
+
+      if (isMicrosoftConnected && !googleToken) {
+        const tz = eventData.timezone || 'America/New_York';
+        const attendeeEmails = attendees?.map((a) => a.email).filter(Boolean) || [];
+
+        const graphEvent = await this.microsoftGraphService.createEvent(tenantId, {
+          subject: eventData.title,
+          body: eventData.description,
+          start: { dateTime: eventData.startTime.toISOString(), timeZone: tz },
+          end: { dateTime: eventData.endTime.toISOString(), timeZone: tz },
+          location: eventData.location,
+          attendees: attendeeEmails,
+          isOnlineMeeting: true,
+        });
+
+        await this.prisma.calendarEvent.update({
+          where: { id: event.id },
+          data: {
+            externalEventId: graphEvent.id,
+            externalCalendar: 'microsoft',
+            syncStatus: 'synced',
+            lastSyncedAt: new Date(),
+            meetingUrl: graphEvent.onlineMeeting?.joinUrl || null,
+            meetingPlatform: graphEvent.onlineMeeting?.joinUrl ? 'Microsoft Teams' : null,
+          },
+        });
+
+        this.logger.log(`Event ${event.id} synced to Outlook Calendar: ${graphEvent.id}`);
+      }
+    } catch (error) {
+      this.logger.error(`Failed to sync event ${event.id} to Outlook Calendar: ${error.message}`);
     }
 
     return this.findOne(tenantId, event.id);
