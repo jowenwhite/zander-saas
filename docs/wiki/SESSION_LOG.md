@@ -532,3 +532,52 @@ Updated Stripe product descriptions to reflect correct hours.
 **Docker Image:** v57
 **Deployment:** ECS force deployed, health OK
 
+
+---
+
+## Session: 2026-04-25 — Microsoft Outlook OAuth Integration
+
+### What Shipped (git: 0e969b0)
+- **Microsoft Outlook OAuth** — tenant-scoped via `IntegrationConnection` (separate from user-scoped `auth/microsoft/`)
+  - `apps/api/src/integrations/microsoft/microsoft-oauth.service.ts` — JWT-signed state, full OAuth flow
+  - `apps/api/src/integrations/microsoft/microsoft-graph.service.ts` — Graph API wrapper (mail + calendar)
+  - `apps/api/src/integrations/microsoft/microsoft-oauth.controller.ts` — GET /integrations/microsoft/auth, callback, status, disconnect
+  - `apps/api/src/integrations/microsoft/microsoft.module.ts`
+- **Email/Calendar Provider Abstraction** — `integrations/email-calendar/`
+  - `EmailCalendarProviderService` routes sync/calendar operations to Microsoft or Google based on active connection
+- **Provider-aware Gmail Controller** — `POST /gmail/sync` transparently routes to Outlook or Gmail; `GET /gmail/status` returns active provider + account
+- **Calendar sync to Outlook** — CalendarEventsService syncs to Outlook Calendar on event creation when Microsoft is connected and Google is not
+- **Integrations UI** — Microsoft Outlook card with:
+  - GET redirect connect handler (JWT in query param, not POST)
+  - Connected account email display from `metadata.email`
+  - Mutual exclusion note for email providers
+  - Disabled Connect button when another email provider is active
+  - Success/error banners on OAuth return
+- **Pam Executive Context** — `buildExecutiveAssistantContext` now includes active email provider + account email
+
+### Local Test Results
+- `GET /integrations/microsoft/auth?token=invalid` → 302 to `/settings/integrations?error=invalid_token` ✓
+- `GET /integrations/microsoft/auth?token=<valid>` → 302 to `login.microsoftonline.com/...?client_id=b1ffa2d0...` ✓
+- `GET /integrations/all` → 7 integrations including Microsoft Outlook (disconnected) ✓
+- `GET /gmail/status` → `{connected: true, provider: 'google', email: 'jowenwhite4@gmail.com'}` ✓
+- `GET /integrations/microsoft/status` → `{connected: false, email: null}` ✓
+
+### Production DB
+- `integration_connections` table already existed in prod RDS (from prior work) ✓
+
+### Deploy Status
+- **Task def JSON prepared:** `/tmp/new-task-def-v88.json` (25 env vars, image: v88, adds `MICROSOFT_INTEGRATION_CALLBACK_URL`)
+- **Blocked on:** Docker Desktop not running — need manual start to build/push v88
+- **Web deploy:** Auto-deployed to Vercel on git push ✓
+
+### IMPORTANT: Azure AD Configuration Required
+Before Microsoft OAuth will work in production, add these Redirect URIs to Azure app `b1ffa2d0-77c2-439a-9fbd-8517fefd01b0`:
+- `https://api.zanderos.com/integrations/microsoft/callback` (production, tenant-scoped)
+- `http://localhost:3001/integrations/microsoft/callback` (local dev)
+
+(The existing `https://api.zanderos.com/auth/microsoft/callback` is for user-scoped auth and must remain.)
+
+### Key Architecture Notes
+- Two Microsoft OAuth flows coexist: `auth/microsoft/` (user-scoped, MicrosoftToken) and `integrations/microsoft/` (tenant-scoped, IntegrationConnection) — different purposes, different redirect URIs
+- `sync_gmail_inbox` Pam tool unchanged — provider routing is transparent at the controller level
+- Microsoft Calendar sync only fires if `isConnected(tenantId)=true` AND user has no GoogleToken — prevents double-sync
