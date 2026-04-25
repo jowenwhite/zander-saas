@@ -1,11 +1,12 @@
 # Deployment — Zander Platform
 
-## Current Production State (v35)
+## Current Production State (v88)
 
-- **ECS**: zander-cluster/zander-api-service running task definition zander-api:41
-- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v35
-- **Commit**: `01addac`
+- **ECS**: zander-cluster/zander-api-service running task definition zander-api:75
+- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v88
+- **Commit**: `f4c1474`
 - **Health**: https://api.zanderos.com/health returns `{"status":"ok"}`
+- **Deployed**: 2026-04-25 — Microsoft Outlook OAuth integration (tenant-scoped)
 
 ## Infrastructure
 
