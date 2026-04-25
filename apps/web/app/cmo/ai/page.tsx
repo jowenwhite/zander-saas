@@ -176,6 +176,10 @@ export default function AskDonPage() {
 
   return (
     <CMOLayout>
+      <style>{`
+        @keyframes don-pulse { 0%,100%{opacity:.4;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+        @keyframes don-spin { to{transform:rotate(360deg)} }
+      `}</style>
       {/* Page Header */}
       <div
         style={{
@@ -489,7 +493,7 @@ export default function AskDonPage() {
                             border: '2px solid rgba(0, 204, 238, 0.3)',
                             borderTopColor: '#00CCEE',
                             borderRadius: '50%',
-                            animation: 'spin 1s linear infinite',
+                            animation: 'don-spin 1s linear infinite',
                           }} />
                           Executing: {executingTools.map(t => toolLabels[t]?.label || t).join(', ')}
                         </div>
@@ -505,7 +509,7 @@ export default function AskDonPage() {
                             height: '8px',
                             borderRadius: '50%',
                             background: '#00CCEE',
-                            animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite`,
+                            animation: `don-pulse 1.4s ease-in-out ${i * 0.2}s infinite`,
                           }}
                         />
                       ))}
@@ -604,25 +608,6 @@ export default function AskDonPage() {
         </div>
       </div>
 
-      {/* CSS Animation */}
-      <style jsx>{`
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 0.4;
-            transform: scale(0.8);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </CMOLayout>
   );
 }

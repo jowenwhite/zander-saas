@@ -1011,8 +1011,8 @@ export default function EAPage() {
           </div>
         )}
 
-        <style jsx>{`
-          @keyframes pulse {
+        <style>{`
+          @keyframes pam-pulse {
             0%, 100% { opacity: 0.4; transform: scale(0.8); }
             50% { opacity: 1; transform: scale(1); }
           }
