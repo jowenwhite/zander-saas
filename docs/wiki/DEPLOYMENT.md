@@ -1,12 +1,12 @@
 # Deployment — Zander Platform
 
-## Current Production State (v88)
+## Current Production State (v89)
 
-- **ECS**: zander-cluster/zander-api-service running task definition zander-api:75
-- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v88
-- **Commit**: `f4c1474`
+- **ECS**: zander-cluster/zander-api-service running task definition zander-api:76
+- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v89
+- **Commit**: `03459a1`
 - **Health**: https://api.zanderos.com/health returns `{"status":"ok"}`
-- **Deployed**: 2026-04-25 — Microsoft Outlook OAuth integration (tenant-scoped)
+- **Deployed**: 2026-04-26 — Remove legacy /auth/microsoft routes; fix "jwt malformed" OAuth callback error
 
 ## Infrastructure
 

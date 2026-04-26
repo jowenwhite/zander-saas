@@ -588,3 +588,26 @@ Before Microsoft OAuth will work in production, add these Redirect URIs to Azure
 - **Phase 2 verifications:** Conversation persistence (Pam + Don via sessionStorage) confirmed ✓; CMO dashboard all 3 endpoints 200 OK ✓
 - **Bug fixes:** Removed `<style jsx>` from `apps/web/app/cmo/ai/page.tsx` (don-pulse, don-spin) and `apps/web/app/ea/page.tsx` (pam-pulse) — commit c7c29ff
 - **Handoff doc:** `Microsoft_OAuth_Handoff_v88.docx` generated at repo root
+
+---
+
+## Session: 2026-04-26 — Fix Microsoft OAuth "jwt malformed" (v89)
+
+**Commit**: `03459a1`
+**Deploy**: v89 / task def zander-api:76
+**Health**: `{"status":"ok"}`
+
+### Problem
+CloudWatch showed "jwt malformed" on every Microsoft OAuth callback. Two conflicting controllers were live simultaneously:
+- **OLD** `MicrosoftAuthController` (`/auth/microsoft/`) — set raw userId as OAuth state
+- **NEW** `MicrosoftOAuthController` (`/integrations/microsoft/`) — expected JWT-signed state
+
+After `MICROSOFT_CALLBACK_URL` was updated to point at the new callback (`/integrations/microsoft/callback`), any OAuth flow initiated through the old controller arrived at the new callback with a raw userId as state. `jwt.verify(rawUserId, secret)` threw "jwt malformed".
+
+### Fix
+Removed `MicrosoftAuthController` from the `controllers` array in `microsoft-auth.module.ts`. One import removed, one array entry removed. `OutlookController`, `MicrosoftAuthService`, and `OutlookService` retained.
+
+### Verified correct (no changes needed)
+- Frontend already called `/integrations/microsoft/auth` (new controller) via `connectPath` from `/integrations/all`
+- `MICROSOFT_CALLBACK_URL` already pointed to `/integrations/microsoft/callback`
+- Status reads from `integrationConnection` table via `/integrations/all`
