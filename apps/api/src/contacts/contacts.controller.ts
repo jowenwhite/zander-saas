@@ -1,14 +1,51 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ContactsService } from './contacts.service';
+import { ContactImportService } from './contact-import.service';
 import { CreateContactDto, UpdateContactDto, ImportContactsDto } from './dto';
+import { PersonRole } from './dto/create-contact.dto';
 
 @Controller('contacts')
 @UseGuards(JwtAuthGuard)
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) {}
+  constructor(
+    private readonly contactsService: ContactsService,
+    private readonly contactImportService: ContactImportService,
+  ) {}
+
+  // POST /contacts/import/parse — parse uploaded file, return preview + mapping
+  // Any authenticated user can import (contacts are user-scoped within tenant)
+  @Post('import/parse')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
+  async parseImport(@UploadedFile() file: Express.Multer.File, @Request() req) {
+    if (!file) {
+      return { error: 'No file uploaded' };
+    }
+    return this.contactImportService.parseFile(file);
+  }
+
+  // POST /contacts/import/check-duplicates — diff import batch against existing contacts
+  @Post('import/check-duplicates')
+  async checkDuplicates(@Body() body: { contacts: any[] }, @Request() req) {
+    return this.contactImportService.checkDuplicates(body.contacts, req.tenantId);
+  }
+
+  // POST /contacts/import/execute — create/update contacts from import batch
+  @Post('import/execute')
+  async executeImport(@Body() body: { contacts: any[]; duplicateStrategy: 'skip' | 'update' | 'import'; defaultRole: PersonRole; fileType: 'vcf' | 'csv' | 'xlsx' }, @Request() req) {
+    const { tenantId, user } = req;
+    return this.contactImportService.executeImport(
+      body.contacts,
+      body.duplicateStrategy || 'skip',
+      body.defaultRole || PersonRole.CLIENT,
+      body.fileType || 'csv',
+      tenantId,
+      user?.userId,
+    );
+  }
 
   // GET /contacts - List all contacts with filters
   // HIGH-3: Pass userId and role for ownership-based filtering

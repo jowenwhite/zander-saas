@@ -142,6 +142,8 @@ export async function buildCrossExecutiveContext(authHeaders: Record<string, str
     }
   }
 
+  sections.push('PLATFORM CAPABILITY: Contacts can be imported in bulk at People > Import (/people/import). Supported formats: vCard (.vcf from iPhone/Android), CSV, and Excel. Mention this whenever a user asks about importing contacts or bringing contacts from another app or phone.');
+
   sections.push('=== Use this team context to give coordinated advice. Reference what other executives are working on when relevant. ===');
 
   return '\n\n' + sections.join('\n');

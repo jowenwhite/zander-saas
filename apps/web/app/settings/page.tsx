@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ThemeToggle from '../components/ThemeToggle';
 import NavBar from '../components/NavBar';
 import AuthGuard from '../components/AuthGuard';
@@ -65,6 +65,7 @@ const getIntegrationIcon = (iconKey: string, size: number = 24): React.ReactNode
 
 function SettingsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeModule, setActiveModule] = useState('cro');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
@@ -415,7 +416,7 @@ function SettingsContent() {
     phone: [
       { id: 'twilio', name: 'Twilio', description: twilioPhone ? `Connected: ${twilioPhone}` : 'Send SMS messages via AI executives', status: 'available', connected: twilioConnected },
       { id: 'google_contacts', name: 'Google Contacts', description: 'Sync contacts from Google', status: 'available', connected: gmailConnected },
-      { id: 'apple_contacts', name: 'Apple Contacts', description: 'Sync contacts from iCloud', status: 'soon', connected: false },
+      { id: 'apple_contacts', name: 'Import Contacts', description: 'Import from Apple, Android, Outlook, or any CSV/Excel file', status: 'available', connected: true },
     ],
     accounting: [
       { id: 'quickbooks', name: 'QuickBooks', description: 'Sync invoices, payments, and financial data', status: 'available', connected: false },
@@ -1535,7 +1536,14 @@ function SettingsContent() {
                     )}
                   </div>
                   <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.8rem', color: '#8888A0', lineHeight: '1.4' }}>{integration.description}</p>
-                  {integration.connected ? (
+                  {integration.id === 'apple_contacts' ? (
+                    <button
+                      onClick={() => router.push('/people/import')}
+                      style={{ padding: '0.5rem 1rem', background: '#00CCEE', color: '#13131A', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}
+                    >
+                      Import Contacts ↗
+                    </button>
+                  ) : integration.connected ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28A745' }} />
                       <span style={{ fontSize: '0.8rem', color: '#28A745', fontWeight: '600' }}>Connected</span>
