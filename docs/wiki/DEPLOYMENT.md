@@ -1,12 +1,12 @@
 # Deployment — Zander Platform
 
-## Current Production State (v89)
+## Current Production State (v90)
 
-- **ECS**: zander-cluster/zander-api-service running task definition zander-api:76
-- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v89
-- **Commit**: `03459a1`
+- **ECS**: zander-cluster/zander-api-service running task definition zander-api:77
+- **ECR**: 288720721534.dkr.ecr.us-east-1.amazonaws.com/zander-api:v90
+- **Commit**: `ed2b2a2`
 - **Health**: https://api.zanderos.com/health returns `{"status":"ok"}`
-- **Deployed**: 2026-04-26 — Remove legacy /auth/microsoft routes; fix "jwt malformed" OAuth callback error
+- **Deployed**: 2026-04-26 — Contact Import: vCard/CSV/Excel parsing, 5-step wizard, field mapping, dedup, executive context updates
 
 ## Infrastructure
 
