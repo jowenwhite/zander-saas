@@ -16,6 +16,7 @@ const SEED_SCRIPTS = [
   'seed:demo-summit-phase2',
   'seed:demo-summit-phase3',
   'seed:demo-summit-phase4',
+  'seed:demo-summit-phase5',
 ] as const;
 
 // ANSI colors for console output
@@ -246,8 +247,37 @@ async function deleteAllTenantData(): Promise<void> {
   counts['PipelineStage'] = pipelineStages.count;
   log(`  Deleted ${pipelineStages.count} pipeline stages`, colors.cyan);
 
-  // 24. Users (keeping these so demo logins still work)
-  // We'll just reset their passwords instead
+  // 24. HQ Module data (Keystones, Headwinds, Horizon, Goals, Ledger, Founding, Legacy)
+  const keystones = await prisma.keystone.deleteMany({ where: { tenantId: TENANT_ID } });
+  counts['Keystone'] = keystones.count;
+  log(`  Deleted ${keystones.count} keystones`, colors.cyan);
+
+  const headwinds = await prisma.headwind.deleteMany({ where: { tenantId: TENANT_ID } });
+  counts['Headwind'] = headwinds.count;
+  log(`  Deleted ${headwinds.count} headwinds`, colors.cyan);
+
+  const horizonItems = await prisma.ideaParkingLot.deleteMany({ where: { tenantId: TENANT_ID } });
+  counts['IdeaParkingLot'] = horizonItems.count;
+  log(`  Deleted ${horizonItems.count} horizon items`, colors.cyan);
+
+  const hqGoals = await prisma.hQGoal.deleteMany({ where: { tenantId: TENANT_ID } });
+  counts['HQGoal'] = hqGoals.count;
+  log(`  Deleted ${hqGoals.count} HQ goals`, colors.cyan);
+
+  const ledgerEntries = await prisma.ledgerEntry.deleteMany({ where: { tenantId: TENANT_ID } });
+  counts['LedgerEntry'] = ledgerEntries.count;
+  log(`  Deleted ${ledgerEntries.count} ledger entries`, colors.cyan);
+
+  const legacyMilestones = await prisma.legacyMilestone.deleteMany({ where: { tenantId: TENANT_ID } });
+  counts['LegacyMilestone'] = legacyMilestones.count;
+  log(`  Deleted ${legacyMilestones.count} legacy milestones`, colors.cyan);
+
+  // FoundingDocument is a singleton (unique on tenantId) — delete then re-seed
+  const foundingDoc = await prisma.foundingDocument.deleteMany({ where: { tenantId: TENANT_ID } });
+  counts['FoundingDocument'] = foundingDoc.count;
+  log(`  Deleted ${foundingDoc.count} founding document`, colors.cyan);
+
+  // 25. Users (keeping these so demo logins still work)
   const users = await prisma.user.findMany({
     where: { tenantId: TENANT_ID },
   });
@@ -286,6 +316,7 @@ async function runSeeds(): Promise<void> {
     { name: 'Phase 2: Contacts & Deals', script: SEED_SCRIPTS[1] },
     { name: 'Phase 3: Communications & Tasks', script: SEED_SCRIPTS[2] },
     { name: 'Phase 4: CMO Marketing Data', script: SEED_SCRIPTS[3] },
+    { name: 'Phase 5: HQ Module + Pipeline Refresh', script: SEED_SCRIPTS[4] },
   ];
 
   for (const seed of seedInfo) {
@@ -327,6 +358,7 @@ async function main() {
   log('  • All activities and tasks', colors.yellow);
   log('  • All CMO data (campaigns, workflows, funnels, etc.)', colors.yellow);
   log('  • All products and pipeline stages', colors.yellow);
+  log('  • All HQ data (keystones, headwinds, goals, ledger, founding doc, legacy)', colors.yellow);
   log('', colors.reset);
   log('Users will be PRESERVED so demo logins continue to work.', colors.green);
   log('', colors.reset);
