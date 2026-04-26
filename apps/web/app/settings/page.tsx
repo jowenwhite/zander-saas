@@ -199,9 +199,12 @@ function SettingsContent() {
     
     // Check Outlook status
     const checkOutlookStatus = async () => {
-      if (!user?.id) return;
+      const token = localStorage.getItem('zander_token');
+      if (!token) return;
       try {
-        const res = await fetch(`https://api.zanderos.com/auth/microsoft/status?userId=${user.id}`);
+        const res = await fetch('https://api.zanderos.com/integrations/microsoft/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await res.json();
         setOutlookConnected(data.connected);
         setOutlookEmail(data.email);
@@ -296,13 +299,26 @@ function SettingsContent() {
 
   // Outlook/Microsoft handlers
   const handleConnectOutlook = () => {
-    if (!user?.id) return;
-    window.location.href = `https://api.zanderos.com/auth/microsoft?state=${user.id}`;
+    const token = localStorage.getItem('zander_token');
+    if (!token) return;
+    window.location.href = `https://api.zanderos.com/integrations/microsoft/auth?token=${encodeURIComponent(token)}`;
   };
 
   const handleDisconnectOutlook = async () => {
-    if (!user?.id) return;
-    window.location.href = `https://api.zanderos.com/auth/microsoft/disconnect?userId=${user.id}`;
+    const token = localStorage.getItem('zander_token');
+    if (!token) return;
+    try {
+      const res = await fetch('https://api.zanderos.com/integrations/microsoft/disconnect', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setOutlookConnected(false);
+        setOutlookEmail(null);
+      }
+    } catch (error) {
+      console.error('Failed to disconnect Outlook:', error);
+    }
   };
   const handleSyncOutlook = async () => {
     if (!user?.id) return;
